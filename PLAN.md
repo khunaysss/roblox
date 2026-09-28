@@ -17,7 +17,7 @@ Andere Spieler können einem Autos klauen.
 | # | Stadt | Wahrzeichen & Deko | Autos dort |
 |---|---|---|---|
 | 1 | **Paris** | Eiffelturm, Cafés, Laternen, Kopfsteinpflaster | billigste |
-| 2 | **New York** | Hochhäuser, gelbe Taxis, Freiheitsstatue | |
+| 2 | **London** | Big Ben, rote Doppeldeckerbusse, Telefonzellen | |
 | 3 | **Las Vegas** | Casinos, Neon-Schilder, Glitzer | |
 | 4 | **Tokyo** | Neon, Kirschblüten, Tokyo Tower | |
 | 5 | **Dubai** | Wüste, Burj Khalifa, Gold/Luxus | seltenste |
@@ -26,8 +26,31 @@ Andere Spieler können einem Autos klauen.
 - Zwischen den Städten gibt es sichtbare Übergänge (Torbogen mit Stadtnamen).
 
 ## 3. Autos
-- Stil: **echt aussehend** (Sportwagen, SUV, Supercar …), **ohne echte Markennamen**.
+- Stil: **echte Auto-Formen mit lustiger Deko** passend zur Stadt (z. B. Baguette auf dem Dach), **ohne echte Markennamen**.
 - **7 Seltenheiten:** Common, Uncommon, Rare, Epic, Legendary, Mythic, Secret.
+- **8 Autos pro Stadt, also 40 Autos insgesamt.** Die Vorlagen sind die „Collection“-Bilder des Nutzers.
+- **Wichtig:** Der Nutzer hat die Autos eventuell schon mit einer anderen KI in Studio gebaut.
+  **Vor dem Bauen in Studio nachschauen**, ob es die Modelle schon gibt, und vorhandene Modelle verwenden.
+
+### Auto-Liste
+
+| # | Seltenheit | Paris | London | Las Vegas | Tokyo | Dubai |
+|---|---|---|---|---|---|---|
+| 1 | Common | Baguette Buggy | Teacup Taxi | Dice Roller | Kei Box | Dune Hopper |
+| 2 | Common | Petit Coupe | Foggy Hatch | Slot Machine Sedan | Ramen Roller | Camel Cruiser |
+| 3 | Uncommon | Croissant Cruiser | Crumpet Mini | Chip Stack Coupe | Neko Mini | Oasis Wagon |
+| 4 | Rare | Beret Racer | Double Decker Dash | Neon Nightrider | Drift Kitsune | Mirage GT |
+| 5 | Epic | Riviera GT | Thames Tourer | High Roller | Shibuya Streetrunner | Falcon Fury |
+| 6 | Legendary | Eiffel Express | Royal Guard Rover | Rockstar Cruiser | Sushi Drifter | Golden Sandstorm |
+| 7 | Mythic | Le Mime Mobile | Clockwork Coupe | Jackpot Jet | Mecha Ronin | Sultan Supreme |
+| 8 | Secret | Lumiere Phantom | Crown Jewel GT | The Golden Ace | Sakura Dragon | Diamond Oasis |
+
+### Geld *(Vorschlag)*
+- **Einkommen $/s** = Grundwert der Seltenheit × Stadt-Faktor
+  - Grundwerte: Common 5 · Uncommon 15 · Rare 50 · Epic 150 · Legendary 500 · Mythic 2.000 · Secret 10.000
+  - Stadt-Faktor: Paris ×1 · London ×5 · Las Vegas ×25 · Tokyo ×125 · Dubai ×625
+- **Preis** = Einkommen × 60 (also nach 1 Minute wieder verdient)
+- Beispiele: Baguette Buggy 5 $/s für 300 $ · Diamond Oasis 6,25 Mio $/s für 375 Mio $
 - Weiter hinten (Stadt 1 → 5) gibt es seltenere Autos.
 - **Spawn:** Häufige Autos stehen **geparkt**. Seltene Autos **fahren herum**, und zwar nur innerhalb ihrer Stadt.
   Je seltener ein Auto ist, desto wahrscheinlicher fährt es.
@@ -70,7 +93,7 @@ Geld, Autos, Upgrades, Rebirths und Trails werden gespeichert (DataStore).
 Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste startet.
 
 1. **Map-Grundgerüst:** Safe Zone, 8 Autohäuser, Straße, 5 leere Stadtflächen
-2. **Städte bauen:** Paris → New York → Las Vegas → Tokyo → Dubai
+2. **Städte bauen:** Paris → London → Las Vegas → Tokyo → Dubai
 3. **Autos:** Modelle, Seltenheiten, Spawnen (geparkt + fahrend)
 4. **Starter-Auto & Kaufen**
 5. **Autohaus:** Stellplätze, Geld/s, Geld abholen
@@ -81,6 +104,5 @@ Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste 
 10. **Robux-Käufe**
 
 ## Offene Fragen (vor Phase 2 klären)
-- Genaue Autos pro Stadt, mit Namen, Preisen und Einkommen
 - Farben/Design des Autohauses
 - Größe der Map (wie lang ist jede Stadt?)
