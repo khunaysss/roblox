@@ -7,3 +7,7 @@
   und auf das OK warten, bevor die nächste Phase anfängt.
 - Alles selbst aus Parts bauen, **keine Toolbox-Modelle**.
 - Wird im Plan etwas geändert, PLAN.md aktualisieren.
+
+## Fertige Bau-Skripte
+- `src/build/Phase1_Map.lua`: baut Phase 1 (Map-Grundgerüst). Den Inhalt mit `run_code` in Studio ausführen,
+  danach prüfen und Fehler beheben. Das Skript löscht vorher `workspace.StealACar_Map` und baut sie neu.
