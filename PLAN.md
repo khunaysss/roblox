@@ -31,6 +31,10 @@ Andere Spieler können einem Autos klauen.
 - **8 Autos pro Stadt, also 40 Autos insgesamt.** Die Vorlagen sind die „Collection“-Bilder des Nutzers.
 - **Wichtig:** Der Nutzer hat die Autos eventuell schon mit einer anderen KI in Studio gebaut.
   **Vor dem Bauen in Studio nachschauen**, ob es die Modelle schon gibt, und vorhandene Modelle verwenden.
+- Weiter hinten (Stadt 1 → 5) gibt es seltenere Autos.
+- **Spawn:** Häufige Autos stehen **geparkt**. Seltene Autos **fahren herum**, und zwar nur innerhalb ihrer Stadt.
+  Je seltener ein Auto ist, desto wahrscheinlicher fährt es.
+- Jedes Auto hat einen Preis und ein **Einkommen $/s**.
 
 ### Auto-Liste
 
@@ -51,10 +55,6 @@ Andere Spieler können einem Autos klauen.
   - Stadt-Faktor: Paris ×1 · London ×5 · Las Vegas ×25 · Tokyo ×125 · Dubai ×625
 - **Preis** = Einkommen × 60 (also nach 1 Minute wieder verdient)
 - Beispiele: Baguette Buggy 5 $/s für 300 $ · Diamond Oasis 6,25 Mio $/s für 375 Mio $
-- Weiter hinten (Stadt 1 → 5) gibt es seltenere Autos.
-- **Spawn:** Häufige Autos stehen **geparkt**. Seltene Autos **fahren herum**, und zwar nur innerhalb ihrer Stadt.
-  Je seltener ein Auto ist, desto wahrscheinlicher fährt es.
-- Jedes Auto hat einen Preis und ein **Einkommen $/s**.
 
 ## 4. Auto holen
 1. Man fährt mit seinem **kostenlosen Starter-Auto** in eine Stadt.
@@ -75,9 +75,23 @@ Andere Spieler können einem Autos klauen.
 - **Klauen:** Andere Spieler können ein Auto aus deinem Autohaus nehmen und damit in ihr eigenes fahren.
 - **Schutz-Tor:** ein Laser-Tor, das man per Knopf schließt *(Vorschlag: 60 s zu, danach 60 s Abklingzeit)*.
 
+## 6b. Laufband (Speed farmen)
+- **Jedes Autohaus hat 1 Laufband**, und zwar in einem **Anbau hinten am Autohaus** *(Vorschlag)*. Man sieht es von der Straße aus durch das Glas.
+- Man stellt eines seiner Autos drauf *(Vorschlag: am Stellplatz „Aufs Laufband“ drücken)*. Ist kein Auto drauf, passiert nichts.
+- **Farmt automatisch**, auch AFK: **Speed + Geld**. Das Auto auf dem Laufband bringt mehr als ein geparktes *(Vorschlag: ×2 Geld)*.
+- **Seltenere Autos farmen mehr Speed** *(Vorschlag: Speed/s = Grundwert der Seltenheit ÷ 5, also Common 1/s … Secret 2.000/s, × Stadt-Faktor)*.
+- **Animation wie auf der Autobahn:** Die Räder drehen sich, das Band läuft, Fahrbahnstreifen, Leitplanken und Laternen rauschen vorbei,
+  dazu Wind-/Speed-Linien und ein Tacho über dem Laufband, der den Speed anzeigt.
+- **Offline:** Das Laufband farmt weiter, aber nur sehr wenig *(Vorschlag: 10 %, höchstens 8 Stunden lang)*.
+- **Upgrade-Shop:** Das Laufband lässt sich aufrüsten (Stufe 1–10, jede Stufe +25 % Speed) *(Vorschlag)*.
+- **Rebirth:** Speed geht auf 0, dafür farmt das Laufband danach schneller (Rebirth-Multiplikator).
+- **Wofür Speed gut ist** *(Vorschlag)*:
+  - **Alle deine Autos fahren schneller**, auch das Starter-Auto. So entkommt man der Polizei besser.
+  - **Städte freischalten:** Am Torbogen braucht man einen Mindest-Speed *(z. B. London 100, Las Vegas 1.000, Tokyo 10.000, Dubai 100.000)*.
+
 ## 7. Safe Zone
 - **Verkaufs-Stand:** Autos gegen Geld verkaufen.
-- **Upgrade-Shop:** schnelleres Starter-Auto, längeres Schutz-Tor, mehr Stellplätze.
+- **Upgrade-Shop:** schnelleres Starter-Auto, längeres Schutz-Tor, mehr Stellplätze, Laufband-Stufe.
 - **Trails-Shop:** Kosmetik (Spuren hinter dem Auto/Spieler).
 - **Rebirth:** alles zurücksetzen, dafür dauerhaft einen Geld-Multiplikator bekommen.
 
@@ -87,7 +101,7 @@ Andere Spieler können einem Autos klauen.
 - **Polizei-Immunität** (Einmal-Kauf): Polizei für eine Weile aus *(Vorschlag: 60 s)*
 
 ## 9. Speichern
-Geld, Autos, Upgrades, Rebirths und Trails werden gespeichert (DataStore).
+Geld, Speed, Autos, Upgrades, Rebirths und Trails werden gespeichert, dazu die Offline-Zeit fürs Laufband (DataStore).
 
 ## 10. Bau-Reihenfolge
 Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste startet.
@@ -96,7 +110,7 @@ Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste 
 2. **Städte bauen:** Paris → London → Las Vegas → Tokyo → Dubai
 3. **Autos:** Modelle, Seltenheiten, Spawnen (geparkt + fahrend)
 4. **Starter-Auto & Kaufen**
-5. **Autohaus:** Stellplätze, Geld/s, Geld abholen
+5. **Autohaus:** Stellplätze, Geld/s, Geld abholen, **Laufband mit Autobahn-Animation**
 6. **Polizei-Verfolgung**
 7. **Klauen & Schutz-Tor**
 8. **Safe-Zone-Shops:** Verkaufen, Upgrades, Trails, Rebirth
