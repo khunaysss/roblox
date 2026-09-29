@@ -114,6 +114,7 @@ Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste 
 4. **Starter-Auto & Kaufen**
 5. **Autohaus:** Stellplätze, Geld/s, Geld abholen, **Laufband mit Autobahn-Animation**
 6. **Polizei-Verfolgung**
+6b. **Gameplay-UI** (siehe Abschnitt 12), Vorlage: `docs/vorlagen/gameplay-ui.webp`
 7. **Klauen & Schutz-Tor**
 8. **Safe-Zone-Shops:** Verkaufen, Upgrades, Trails, Rebirth
 9. **Speichern**
@@ -132,6 +133,20 @@ Ziel: hell, bunt, sonnig und „poppig“ wie **Steal a Egg** und **Steal a Brai
 - **Materialien:** überwiegend `SmoothPlastic` mit satten Farben, Neon für Akzente (Schilder, Stellplätze, Laser-Tor).
 - **Städte** behalten ihre Stimmung, auch bei Tageslicht: Vegas und Tokyo mit vielen Neon-Schildern, Dubai mit Gold.
 - Vorher und nachher Screenshots zeigen, dann auf das OK warten.
+
+## 12. Gameplay-UI (Phase 6b)
+Vorlage: **`docs/vorlagen/gameplay-ui.webp`**. Stil: dicke, runde Cartoon-Schrift (FredokaOne) mit schwarzer Kontur,
+abgerundete Kästen mit dunklem, halbtransparentem Hintergrund und kräftigen Farben.
+- **Links:** Geld-Anzeige (grün, Geldschein-Icon, z. B. „$8.4M“), darunter die Speed-Anzeige (Blitz-Icon, „Speed: 12,800“).
+  Zahlen kurz schreiben (K, M, B, T).
+- **Oben Mitte (nur während einer Polizeijagd):** Banner „WANTED! Get back to your dealership!“ mit blinkenden
+  Blaulichtern und 1–5 Polizei-Sternen, je nach Seltenheit bzw. Anzahl der Polizeiautos.
+- **Pfeil zum Autohaus:** gelber Pfeil mit „Your Dealership: 240m“ (während der Jagd).
+- **Unten Mitte (wenn man im Auto sitzt):** Auto-Karte mit Bild/Icon, Name, Seltenheits-Tag in der Seltenheitsfarbe
+  und Einkommen („+$50K/s“).
+- **Unten rechts (im Auto):** runder Tacho mit km/h.
+- **Beim Fahren:** Speed-Linien am Bildschirmrand, je schneller, desto mehr.
+- Die Shop-Knöpfe (links) und der Knopf fürs Schutz-Tor (rechts) kommen in Phase 7/8 im selben Stil dazu.
 
 ## Offene Fragen (vor Phase 2 klären)
 - Farben/Design des Autohauses
