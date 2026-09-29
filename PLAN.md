@@ -1,6 +1,6 @@
 # Steal a Car – Spielplan
 
-Status: **Entwurf – wartet auf Freigabe.** Es wird nichts gebaut, bevor der Plan freigegeben ist.
+Status: **Freigegeben.** Gebaut wird Phase für Phase.
 
 Werte mit *(Vorschlag)* hat Claude festgelegt und kann man noch ändern.
 
@@ -78,7 +78,7 @@ Andere Spieler können einem Autos klauen.
 ## 6b. Laufband (Speed farmen)
 - **Jedes Autohaus hat 1 Laufband**, und zwar in einem **Anbau hinten am Autohaus** *(Vorschlag)*. Man sieht es von der Straße aus durch das Glas.
 - Man stellt eines seiner Autos drauf *(Vorschlag: am Stellplatz „Aufs Laufband“ drücken)*. Ist kein Auto drauf, passiert nichts.
-- **Farmt automatisch**, auch AFK: **Speed + Geld**. Das Auto auf dem Laufband bringt mehr als ein geparktes *(Vorschlag: ×2 Geld)*.
+- **Speed bekommt man nur auf dem Laufband.** Es farmt automatisch, auch AFK: **Speed + Geld**. Das Auto auf dem Laufband bringt mehr als ein geparktes *(Vorschlag: ×2 Geld)*.
 - **Seltenere Autos farmen mehr Speed** *(Vorschlag: Speed/s = Grundwert der Seltenheit ÷ 5, also Common 1/s … Secret 2.000/s, × Stadt-Faktor)*.
 - **Animation wie auf der Autobahn:** Die Räder drehen sich, das Band läuft, Fahrbahnstreifen, Leitplanken und Laternen rauschen vorbei,
   dazu Wind-/Speed-Linien und ein Tacho über dem Laufband, der den Speed anzeigt.
@@ -86,7 +86,8 @@ Andere Spieler können einem Autos klauen.
 - **Upgrade-Shop:** Das Laufband lässt sich aufrüsten (Stufe 1–10, jede Stufe +25 % Speed) *(Vorschlag)*.
 - **Rebirth:** Speed geht auf 0, dafür farmt das Laufband danach schneller (Rebirth-Multiplikator).
 - **Wofür Speed gut ist** *(Vorschlag)*:
-  - **Alle deine Autos fahren schneller**, auch das Starter-Auto. So entkommt man der Polizei besser.
+  - **Alle deine Autos fahren etwas schneller**, auch das Starter-Auto, aber **nur ein bisschen** (z. B. höchstens +50 %).
+    Alles bleibt **ausbalanciert**: Die Polizei wird mitgestärkt, damit sie nie zu leicht ist.
   - **Städte freischalten:** Am Torbogen braucht man einen Mindest-Speed *(z. B. London 100, Las Vegas 1.000, Tokyo 10.000, Dubai 100.000)*.
 
 ## 7. Safe Zone
