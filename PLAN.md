@@ -109,6 +109,7 @@ Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste 
 
 1. **Map-Grundgerüst:** Safe Zone, 8 Autohäuser, Straße, 5 leere Stadtflächen
 2. **Städte bauen:** Paris → London → Las Vegas → Tokyo → Dubai
+2b. **Look & Lighting** wie Steal a Egg / Steal a Brainrot (siehe Abschnitt 11)
 3. **Autos:** Modelle, Seltenheiten, Spawnen (geparkt + fahrend)
 4. **Starter-Auto & Kaufen**
 5. **Autohaus:** Stellplätze, Geld/s, Geld abholen, **Laufband mit Autobahn-Animation**
@@ -117,6 +118,17 @@ Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste 
 8. **Safe-Zone-Shops:** Verkaufen, Upgrades, Trails, Rebirth
 9. **Speichern**
 10. **Robux-Käufe**
+
+## 11. Look & Lighting (Phase 2b)
+Ziel: hell, bunt, sonnig und „poppig“ wie **Steal a Egg** und **Steal a Brainrot**.
+- **Lighting:** Technology `Future`, helle Mittagssonne (ClockTime ~14), weiche Schatten, kräftiges Ambient,
+  damit nichts dunkel wirkt.
+- **Farben:** `ColorCorrection` mit mehr Sättigung (~0.2) und etwas Kontrast, dazu leichtes `Bloom`, damit Neon und Gold leuchten.
+- **Himmel:** knallblauer Himmel mit Cartoon-Wolken (`Clouds`), leichte `Atmosphere` für Tiefe, `SunRays`.
+- **Umgebung:** Wasser/Meer rund um die Map wie auf dem Steal-a-Brainrot-Bild, grüner Karo-Rasen, Bäume und Büsche am Rand.
+- **Materialien:** überwiegend `SmoothPlastic` mit satten Farben, Neon für Akzente (Schilder, Stellplätze, Laser-Tor).
+- **Städte** behalten ihre Stimmung, auch bei Tageslicht: Vegas und Tokyo mit vielen Neon-Schildern, Dubai mit Gold.
+- Vorher und nachher Screenshots zeigen, dann auf das OK warten.
 
 ## Offene Fragen (vor Phase 2 klären)
 - Farben/Design des Autohauses
