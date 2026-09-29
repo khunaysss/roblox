@@ -115,10 +115,12 @@ Jede Phase wird erst gebaut, getestet und von dir abgenickt, bevor die nächste 
 5. **Autohaus:** Stellplätze, Geld/s, Geld abholen, **Laufband mit Autobahn-Animation**
 6. **Polizei-Verfolgung**
 6b. **Gameplay-UI** (siehe Abschnitt 12), Vorlage: `docs/vorlagen/gameplay-ui.webp`
+6c. **Map v2: große offene Welt** (siehe Abschnitt 13). Ersetzt die lange Straße aus Phase 1/2, der Gameplay-Code bleibt.
 7. **Klauen & Schutz-Tor**
 8. **Safe-Zone-Shops:** Verkaufen, Upgrades, Trails, Rebirth
 9. **Speichern**
 10. **Robux-Käufe**
+11. **Extra-Funktionen** (siehe Abschnitt 13): Tuning-Werkstatt → Rennen → Stunt-Park → Geheime Orte
 
 ## 11. Look & Lighting (Phase 2b)
 Ziel: hell, bunt, sonnig und „poppig“ wie **Steal a Egg** und **Steal a Brainrot**.
@@ -147,6 +149,36 @@ abgerundete Kästen mit dunklem, halbtransparentem Hintergrund und kräftigen Fa
 - **Unten rechts (im Auto):** runder Tacho mit km/h.
 - **Beim Fahren:** Speed-Linien am Bildschirmrand, je schneller, desto mehr.
 - Die Shop-Knöpfe (links) und der Knopf fürs Schutz-Tor (rechts) kommen in Phase 7/8 im selben Stil dazu.
+
+## 13. Map v2: große offene Welt
+Entscheidung des Nutzers: Die Map wird **viel größer** und eine **offene Welt** (ähnlich wie Driving Empire), **weniger blockig**.
+Der **Gameplay-Code aus Phase 1–6 bleibt** (Polizei, Geld, Laufband, UI) und wird nur an die neue Map angepasst.
+
+### Aufbau *(Vorschlag)*
+- **Große Insel im Meer.** In der **Mitte liegt der Hub:** Safe Zone, 8 Autohäuser mit Laufband-Anbau und die Shops.
+- **Die 5 Städte liegen rund um den Hub**, jede in eine andere Richtung, und sind über **Autobahnen** verbunden.
+  Je seltener die Autos einer Stadt, desto weiter weg liegt sie: Paris ist am nächsten, Dubai am weitesten.
+- **Die Städte sind richtig groß:** mehrere Straßen, Kreuzungen, Seitengassen, Häuserreihen, Gehwege, Ampeln
+  und das Wahrzeichen in der Mitte.
+- **Verkehr** fährt in den Städten herum (Busse, Taxis …). Die Verkehrsautos kann man nicht kaufen, sie sind Hindernisse.
+- **Die Autobahnen** sind mehrspurig, haben Leitplanken, Brücken, Tunnel und Schilder mit Entfernungen. Dort patrouilliert auch die Polizei.
+- **Städte freischalten per Speed:** Schranke/Tor an der Autobahn-Auffahrt (London 100, Las Vegas 1.000, Tokyo 10.000, Dubai 100.000).
+- Zwischen den Städten gibt es Natur: Wald, Hügel, Strand, Wüste vor Dubai.
+- **Performance:** `StreamingEnabled` einschalten, Verkehr und Polizei nur in der Nähe von Spielern laufen lassen.
+
+### Aussehen: weniger blockig
+- **Mix:** **Map und Gebäude** baut Claude aus **runden Parts** (Zylinder, Kugeln, Keile, abgerundete Kanten, Details wie Fenster und Markisen).
+  **Autos und große Wahrzeichen** (Eiffelturm, Big Ben, Burj Khalifa …) dürfen **Modelle aus dem Creator Store (Toolbox)** sein.
+- **Regel für Toolbox-Modelle:** Vor dem Einfügen **alle Skripte darin prüfen und löschen**, die nicht gebraucht werden
+  (Viren/Backdoors: `require(`, `getfenv`, `loadstring`, versteckte Skripte). Nur Modelle ohne Skripte oder mit geprüften Skripten nutzen.
+- Die lustige Deko der Autos (Baguette, Krone …) baut Claude selbst und setzt sie aufs Modell.
+- Lighting und Farben bleiben wie in Phase 2b: hell, sonnig, bunt.
+
+### Extra-Funktionen (Phase 11) *(Vorschlag, vom Nutzer an Claude übergeben)*
+1. **Tuning-Werkstatt** im Hub: lackieren, Felgen, Unterboden-Neon, Spoiler. Kostet Geld, später auch Robux-Farben.
+2. **Rennen:** Rennstrecke außerhalb der Städte, Rennen gegen die Zeit oder gegen andere Spieler. Belohnung: Geld und Speed.
+3. **Stunt-Park:** Rampen, Loopings und ein Drift-Platz. Belohnung für Stunts: Geld.
+4. **Geheime Orte:** In jeder Stadt ist ein Versteck mit einem Schatz oder einem sehr seltenen Bonus-Auto.
 
 ## Offene Fragen (vor Phase 2 klären)
 - Farben/Design des Autohauses

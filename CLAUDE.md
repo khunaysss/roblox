@@ -5,7 +5,8 @@
 - **Baue nichts, was nicht im Plan steht.** Wenn etwas unklar ist, frag zuerst nach.
 - Arbeite **Phase für Phase** (siehe PLAN.md, Abschnitt 10). Nach jeder Phase kurz zeigen, was gebaut wurde,
   und auf das OK warten, bevor die nächste Phase anfängt.
-- Alles selbst aus Parts bauen, **keine Toolbox-Modelle**.
+- Map und Gebäude selbst aus Parts bauen (rund, nicht zu blockig). **Autos und große Wahrzeichen dürfen aus der Toolbox kommen**,
+  aber vorher alle Skripte darin prüfen und unnötige löschen (siehe PLAN.md, Abschnitt 13).
 - Wird im Plan etwas geändert, PLAN.md aktualisieren.
 
 ## Fertige Bau-Skripte
