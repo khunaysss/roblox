@@ -126,6 +126,9 @@ Ziel: hell, bunt, sonnig und „poppig“ wie **Steal a Egg** und **Steal a Brai
 - **Farben:** `ColorCorrection` mit mehr Sättigung (~0.2) und etwas Kontrast, dazu leichtes `Bloom`, damit Neon und Gold leuchten.
 - **Himmel:** knallblauer Himmel mit Cartoon-Wolken (`Clouds`), leichte `Atmosphere` für Tiefe, `SunRays`.
 - **Umgebung:** Wasser/Meer rund um die Map wie auf dem Steal-a-Brainrot-Bild, grüner Karo-Rasen, Bäume und Büsche am Rand.
+- **Blockige Form wie Steal a Brainrot:** alles aus einfachen, klaren Blöcken (kein Detail-Kleinkram),
+  **Karo-Boden aus zwei Grüntönen** (große quadratische Kacheln abwechselnd hell/dunkel), Glaswände mit
+  **leuchtenden Neon-Kanten** (blau) an den Rändern, rote Neon-Laserstreifen am Tor, Gebäude und Bäume als klobige Voxel-Formen.
 - **Materialien:** überwiegend `SmoothPlastic` mit satten Farben, Neon für Akzente (Schilder, Stellplätze, Laser-Tor).
 - **Städte** behalten ihre Stimmung, auch bei Tageslicht: Vegas und Tokyo mit vielen Neon-Schildern, Dubai mit Gold.
 - Vorher und nachher Screenshots zeigen, dann auf das OK warten.
