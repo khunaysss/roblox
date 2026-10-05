@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rucksack Mockup</title>
+<style>
+@font-face{font-family:Fredoka;src:url(fonts/Fredoka.ttf);font-weight:300 700}
+:root{
+  --navy:#1c2342; --navy2:#252d52; --navy3:#2f3864; --edge:#0e1226; --text:#ffffff; --muted:#aab2d6;
+  --yellow:#f4b42c; --yellow-d:#c98a12; --green:#3fbf4f; --green-d:#2a8f37; --purple:#8a4fe0; --purple-d:#6233ad;
+  --red:#e2393f; --red-d:#a8202a; --blue:#2f8ef0; --blue-d:#1d64b8;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:Fredoka,system-ui,sans-serif;color:var(--text);
+  background:linear-gradient(160deg,#5fb0d8,#2f6f9a 55%,#2f8a4a)}
+.scene{position:relative;padding:40px 16px}
+.panel{position:relative;width:min(980px,100%);background:var(--navy);border:5px solid var(--edge);border-radius:18px;
+  box-shadow:0 10px 0 #0a0d1d,0 20px 40px #0008;padding:44px 18px 18px}
+/* Lego-Noppen oben wie im HUD */
+.studs{position:absolute;top:-14px;left:30px;right:30px;display:flex;justify-content:space-between;pointer-events:none}
+.studs i{width:40px;height:12px;background:var(--navy2);border:4px solid var(--edge);border-bottom:0;border-radius:8px 8px 0 0}
+.title{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:var(--yellow);border:5px solid var(--edge);
+  border-radius:14px;padding:6px 26px 8px;display:flex;align-items:center;gap:12px;font-size:28px;font-weight:700;
+  box-shadow:inset 0 -6px 0 var(--yellow-d);white-space:nowrap;text-shadow:0 3px 0 #0005}
+.title .ic{font-size:30px}
+.title .count{font-size:18px;background:#0005;border-radius:10px;padding:2px 10px}
+.close{position:absolute;top:-22px;right:-18px;width:56px;height:56px;border-radius:12px;background:var(--red);border:5px solid var(--edge);
+  display:grid;place-items:center;font-size:30px;font-weight:700;box-shadow:inset 0 -6px 0 var(--red-d)}
+.body{display:grid;grid-template-columns:120px 1fr;gap:14px}
+/* Tabs links */
+.tabs{display:flex;flex-direction:column;gap:10px}
+.tab{background:var(--navy2);border:4px solid var(--edge);border-radius:12px;padding:10px 6px;text-align:center;font-weight:600;font-size:16px;color:var(--muted)}
+.tab .ic{display:block;font-size:30px;margin-bottom:2px;filter:grayscale(.6)}
+.tab.on{background:var(--blue);color:#fff;box-shadow:inset 0 -5px 0 var(--blue-d)}
+.tab.on .ic{filter:none}
+/* Werkzeugleiste */
+.main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search{flex:1;min-width:160px;background:var(--navy3);border:4px solid var(--edge);border-radius:12px;padding:8px 12px;color:var(--muted);font-size:16px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:3px solid var(--edge);border-radius:10px;padding:5px 10px;font-size:14px;font-weight:600;background:var(--navy3);color:var(--muted)}
+.chip.on{background:#fff;color:var(--navy)}
+.chip i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;background:var(--c)}
+.sort{background:var(--navy3);border:4px solid var(--edge);border-radius:12px;padding:6px 12px;font-size:15px;font-weight:600}
+/* Raster */
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;background:var(--navy2);border:4px solid var(--edge);border-radius:14px;padding:12px;
+  max-height:420px;overflow:hidden}
+.card{position:relative;border-radius:14px;border:4px solid var(--edge);background:var(--c);padding:4px;box-shadow:inset 0 -5px 0 #0004}
+.card .img{height:118px;border-radius:9px;overflow:hidden;background:#11152b}
+.card img{width:100%;height:100%;object-fit:cover;object-position:50% 38%;transform:scale(1.25)}
+.card .nm{font-weight:700;font-size:15px;text-align:center;margin-top:4px;line-height:1.1;text-shadow:0 2px 0 #0006;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .inc{font-weight:700;font-size:14px;text-align:center;color:#fff;background:#0007;border-radius:8px;margin:2px 10px 0;text-shadow:none}
+.card .rar{position:absolute;left:8px;bottom:50px;font-size:10px;font-weight:700;background:#0008;border-radius:6px;padding:1px 6px;letter-spacing:.3px}
+.badge{position:absolute;top:8px;width:26px;height:26px;border-radius:8px;border:3px solid var(--edge);display:grid;place-items:center;font-size:14px}
+.badge.eq{left:8px;background:var(--green)}
+.badge.lock{left:8px;background:var(--yellow)}
+.badge.n{right:8px;width:auto;padding:0 6px;background:#0009;font-size:13px;font-weight:700}
+.card.sel{outline:4px solid #fff;outline-offset:2px}
+/* Leiste unten */
+.bottom{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+.info{color:var(--muted);font-size:14px;font-weight:600;margin-right:auto;line-height:1.3}
+.info b{color:#fff}
+.btn{border:4px solid var(--edge);border-radius:12px;padding:8px 12px;font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;
+  text-shadow:0 2px 0 #0006;white-space:nowrap}
+.btn .ic{font-size:20px}
+.btn.purple{background:var(--purple);box-shadow:inset 0 -5px 0 var(--purple-d)}
+.btn.green{background:var(--green);box-shadow:inset 0 -5px 0 var(--green-d)}
+.btn.yellow{background:var(--yellow);box-shadow:inset 0 -5px 0 var(--yellow-d)}
+.btn .dd{background:#0004;border-radius:8px;padding:1px 8px;font-size:14px}
+.note{position:absolute;left:16px;bottom:8px;font-size:12px;color:#ffffffb0}
+@media (max-width:760px){.grid{grid-template-columns:repeat(3,1fr)}.body{grid-template-columns:1fr}.tabs{flex-direction:row}.tab{flex:1}}
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="panel">
+    <div class="studs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="title"><span class="ic">🎒</span>Rucksack<span class="count">12/50</span></div>
+    <div class="close">X</div>
+    <div class="body">
+      <div class="tabs">
+        <div class="tab on"><span class="ic">🧍</span>Figuren</div>
+        <div class="tab"><span class="ic">🧪</span>Items</div>
+        <div class="tab"><span class="ic">🎲</span>Würfel</div>
+      </div>
+      <div class="main">
+        <div class="toolbar">
+          <div class="search">🔍 Suchen …</div>
+          <div class="chips">
+            <span class="chip on">Alle</span>
+            <span class="chip" style="--c:#b8bcc4"><i></i>Common</span>
+            <span class="chip" style="--c:#4fd16a"><i></i>Uncommon</span>
+            <span class="chip" style="--c:#3f8cff"><i></i>Rare</span>
+            <span class="chip" style="--c:#b05cff"><i></i>Epic+</span>
+          </div>
+          <div class="sort">Sortieren: $/s ▾</div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="bottom">
+          <div class="info">Aufgestellt <b>5/8</b><br>Einkommen <b>$1.2K/s</b></div>
+          <div class="btn green"><span class="ic">⭐</span>Beste aufstellen</div>
+          <div class="btn purple"><span class="ic">👑</span>Bestes ausrüsten</div>
+          <div class="btn yellow"><span class="ic">💰</span>Verkaufen <span class="dd">bis Uncommon ▾</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note">Mockup · Icons werden durch deine eigenen ersetzt</div>
+</div>
+<script>
+const P = "../../characters/preview/";
+const items = [
+  ["Infinity/01_SkullShades","Skull Shades","Infinity","#33e8ff","$2.5K/s","eq",1],
+  ["Secret/01_AliBurgeraye","Ali Burgeraye","Secret","#ff3fbf","$900/s","eq",1],
+  ["Celestial/01_333IQ","333 IQ","Celestial","#6a8cff","$640/s","eq",1],
+  ["Divine/01_Doge","Doge","Divine","#ffe680","$420/s","eq",1],
+  ["Mythic/01_TungTung","Tung Tung","Mythic","#ff4f6b","$120/s","eq",2],
+  ["Legendary/02_Maxwell","Maxwell","Legendary","#ffc83a","$60/s","lock",1],
+  ["Epic/05_Gigachad","Gigachad","Epic","#b05cff","$24/s","",3],
+  ["Rare/02_Floppa","Floppa","Rare","#3f8cff","$9/s","",1],
+  ["Uncommon/01_Trollface","Trollface","Uncommon","#4fd16a","$4/s","lock",2],
+  ["Common/01_W","W","Common","#b8bcc4","$2/s","",4],
+  ["Common/02_L","L","Common","#b8bcc4","$2/s","",1],
+  ["Common/05_Mid","Mid","Common","#b8bcc4","$1/s","",6],
+];
+document.getElementById("grid").innerHTML = items.map(([img,nm,r,c,inc,b,n],i) => `
+  <div class="card${i===0?" sel":""}" style="--c:${c}">
+    <div class="img"><img src="${P}${img}.png" alt=""></div>
+    ${b==="eq"?'<div class="badge eq">✔</div>':b==="lock"?'<div class="badge lock">🔒</div>':""}
+    ${n>1?`<div class="badge n">x${n}</div>`:""}
+    <div class="rar">${r.toUpperCase()}</div>
+    <div class="nm">${nm}</div><div class="inc">${inc}</div>
+  </div>`).join("");
+</script>
+</body>
+</html>
