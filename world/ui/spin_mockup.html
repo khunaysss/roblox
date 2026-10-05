@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spin Mockup</title>
+<style>
+@font-face{font-family:Fredoka;src:url(fonts/Fredoka.ttf);font-weight:300 700}
+:root{--navy:#1c2342;--navy2:#252d52;--edge:#0e1226;--muted:#aab2d6;--yellow:#f4b42c;--yellow-d:#c98a12;--red:#e2393f;--red-d:#a8202a}
+*{box-sizing:border-box}
+body{margin:0;font-family:Fredoka,system-ui,sans-serif;color:#fff;background:#000}
+.screen{position:relative;width:1200px;height:430px;overflow:hidden}
+.bg{position:absolute;inset:-20px;background:url(assets/game_bg.webp) center/cover;filter:blur(6px) brightness(.55)}
+.state{position:absolute;left:16px;top:12px;font-size:15px;background:#000a;border-radius:8px;padding:4px 10px;z-index:9}
+/* Rahmen */
+.frame{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:1000px;height:250px;background:var(--yellow);
+  border:5px solid var(--edge);border-radius:22px;box-shadow:inset 0 -8px 0 var(--yellow-d),0 8px 0 #0008;padding:16px 18px 40px}
+.frame:before{content:"";position:absolute;top:-13px;left:30px;right:30px;height:11px;
+  background:radial-gradient(circle at 14px 11px,#ffd35c 9px,var(--edge) 10px,transparent 11px) 0 0/44px 22px repeat-x}
+.badge{position:absolute;top:-24px;left:26px;background:var(--navy);border:4px solid var(--edge);border-radius:12px;padding:5px 14px;
+  font-size:20px;font-weight:700;display:flex;gap:8px;align-items:center;z-index:3}
+.window{position:relative;height:100%;background:var(--navy);border:5px solid var(--edge);border-radius:14px;overflow:hidden}
+.reel{position:absolute;top:50%;transform:translateY(-50%);display:flex;gap:12px}
+.fade{position:absolute;top:0;bottom:0;width:150px;z-index:2}
+.fade.l{left:0;background:linear-gradient(90deg,var(--navy),transparent)}.fade.r{right:0;background:linear-gradient(-90deg,var(--navy),transparent)}
+.mk{position:absolute;left:50%;width:0;height:0;border:14px solid transparent;margin-left:-14px;z-index:4;filter:drop-shadow(0 0 4px #fff8)}
+.mk.t{top:-2px;border-top:20px solid #fff}.mk.b{bottom:-2px;border-bottom:20px solid #fff}
+.line{position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#ffffff70;z-index:3}
+.dots{position:absolute;left:30px;right:30px;bottom:10px;display:flex;justify-content:space-between}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--yellow-d);border:3px solid var(--edge)}
+.dots i.on{background:#fff}
+/* Karten */
+.card{width:128px;height:154px;border-radius:14px;border:4px solid var(--edge);background:var(--c);padding:4px;box-shadow:inset 0 -5px 0 #0004;
+  flex:0 0 auto;position:relative;transition:all .2s}
+.card .img{height:96px;border-radius:9px;overflow:hidden;background:#11152b}
+.card img{width:100%;height:100%;object-fit:cover;object-position:50% 38%;transform:scale(1.25)}
+.card .nm{font-weight:700;font-size:14px;text-align:center;margin-top:3px;text-shadow:0 2px 0 #0007;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .od{font-size:12px;text-align:center;background:#0008;border-radius:7px;margin:2px 8px 0;font-weight:600}
+.card.blur{filter:blur(1.5px) brightness(.85)}
+.card.dim{filter:brightness(.45) saturate(.6)}
+.card.win{transform:scale(1.18);box-shadow:inset 0 -5px 0 #0004,0 0 0 4px #fff,0 0 30px 8px var(--c);z-index:5}
+.card.mystery{--c:#3a3f5c}
+.card.mystery .img{display:grid;place-items:center;font-size:54px;font-weight:700;color:#aab2d6;background:repeating-linear-gradient(45deg,#232845 0 10px,#1c2140 10px 20px)}
+/* Ergebnis-Text */
+.result{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);text-align:center;z-index:6}
+.result .t{font-size:34px;font-weight:700;text-shadow:0 4px 0 #0008}
+.result .s{font-size:18px;font-weight:700;color:#ffc83a;text-shadow:0 0 12px #ffc83a}
+.rays{position:absolute;left:50%;top:195px;width:560px;height:560px;margin:-280px 0 0 -280px;border-radius:50%;
+  background:repeating-conic-gradient(#ffc83a55 0 7deg,transparent 7deg 20deg);
+  -webkit-mask:radial-gradient(circle,#000 0 25%,transparent 65%);mask:radial-gradient(circle,#000 0 25%,transparent 65%)}
+.btns{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:12px}
+.b{border:4px solid var(--edge);border-radius:12px;padding:8px 18px;font-weight:700;font-size:16px;background:var(--navy2)}
+.b.skip{background:var(--navy2);color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="out"></div>
+<script>
+const P = "../../characters/preview/";
+const C = {Common:"#b8bcc4",Uncommon:"#4fd16a",Rare:"#3f8cff",Epic:"#b05cff",Legendary:"#ffc83a",Mythic:"#ff4f6b",Secret:"#ff3fbf"};
+const reel = [
+ ["Common/05_Mid","Mid","Common","1 in 2"],["Uncommon/08_Pookie","Pookie","Uncommon","1 in 5"],["Common/01_W","W","Common","1 in 2"],
+ ["Rare/02_Floppa","Floppa","Rare","1 in 20"],[null,"???","Mystery","???"],["Legendary/02_Maxwell","Maxwell","Legendary","1 in 300"],
+ ["Common/02_L","L","Common","1 in 2"],["Epic/05_Gigachad","Gigachad","Epic","1 in 75"],["Uncommon/01_Trollface","Trollface","Uncommon","1 in 5"],
+];
+function card([img,nm,r,od], cls){
+  if(!img) return `<div class="card mystery ${cls}"><div class="img">?</div><div class="nm">???</div><div class="od">Mystery</div></div>`;
+  return `<div class="card ${cls}" style="--c:${C[r]}"><div class="img"><img src="${P}${img}.png"></div><div class="nm">${nm}</div><div class="od">${od}</div></div>`;
+}
+function screen(state){
+  const spinning = state === "spin";
+  const cards = reel.map((x,i)=>card(x, spinning ? (i===4?"":"blur") : (i===5?"win":"dim"))).join("");
+  const offset = spinning ? -40 : -(5*140+64-482);
+  return `<div class="screen"><div class="bg"></div>
+   <div class="state">${spinning?"1 · Während des Spins (Karten verschwimmen, Tick-Sound pro Karte)":"2 · Treffer (Rest wird dunkel, Gewinner springt raus)"}</div>
+   ${spinning?"":'<div class="rays"></div>'}
+   <div class="frame"><div class="badge">🎲 SPIN</div><div class="window">
+     <div class="mk t"></div>${spinning?'<div class="line"></div>':""}
+     <div class="reel" style="left:${offset}px">${cards}</div><div class="fade l"></div><div class="fade r"></div></div>
+     <div class="dots">${Array.from({length:22},(_,i)=>`<i class="${i%3===(spinning?1:0)?"on":""}"></i>`).join("")}</div>
+   </div>
+   ${spinning?'<div class="btns"><div class="b skip">Überspringen</div></div>':'<div class="result"><div class="t">Maxwell</div><div class="s">LEGENDARY · 1 in 300</div></div>'}
+  </div>`;
+}
+document.getElementById("out").innerHTML = screen("spin") + screen("win");
+</script>
+</body>
+</html>
