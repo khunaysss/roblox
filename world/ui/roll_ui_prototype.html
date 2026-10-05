@@ -65,6 +65,31 @@ canvas#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   justify-content:space-between;padding:0 10px;font-size:12px;color:var(--muted);transition:all .12s}
 .rung.lit{background:var(--c);border-color:#fff;color:#111;font-weight:700;box-shadow:0 0 16px var(--c)}
 
+/* Variante 4: Gluecksrad */
+.wheelbox{position:relative;width:300px;height:300px}
+.wheel{width:300px;height:300px;border-radius:50%;border:6px solid #fff;box-shadow:0 0 30px #0008;position:relative;
+  transition:transform 4s cubic-bezier(.1,.75,.15,1)}
+.wheel span{position:absolute;left:50%;top:50%;transform-origin:0 0;font-size:20px}
+.pointer{position:absolute;left:50%;top:-14px;margin-left:-14px;border:14px solid transparent;border-top:26px solid #ffd23a;z-index:2;
+  filter:drop-shadow(0 0 6px #ffd23a)}
+.hub{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:#1f2129;border:5px solid #fff;
+  display:grid;place-items:center;font-size:24px}
+/* Variante 5: Karten-Pack */
+.pack{display:flex;gap:16px}
+.flip{width:120px;height:150px;perspective:600px}
+.flip .in{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .6s}
+.flip.open .in{transform:rotateY(180deg)}
+.flip .back,.flip .front{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px}
+.flip .back{background:repeating-linear-gradient(45deg,#e8383d 0 12px,#c42a30 12px 24px);border:4px solid #fff;display:grid;place-items:center;font-size:40px}
+.flip .front{transform:rotateY(180deg)}
+.flip .front .card{width:100%;height:100%}
+.flip.wobble .in{animation:wob .5s infinite}
+@keyframes wob{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+/* Variante 6: Slots */
+.slots{display:flex;gap:12px;padding:16px;background:#2a2d38;border:5px solid #ffd23a;border-radius:20px;box-shadow:0 0 30px #ffd23a55}
+.slot{width:90px;height:110px;overflow:hidden;background:#111218;border-radius:12px;border:3px solid #3a3e4c;position:relative}
+.strip{position:absolute;left:0;right:0;top:0}
+.strip div{height:110px;display:grid;place-items:center;font-size:52px}
 /* Reveal */
 .reveal{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
   z-index:5;pointer-events:none;opacity:0}
@@ -103,6 +128,9 @@ canvas#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
     <button class="tab on" data-v="reel">1 · Walze</button>
     <button class="tab" data-v="dice">2 · Würfel-Wurf</button>
     <button class="tab" data-v="ladder">3 · Seltenheits-Leiter</button>
+    <button class="tab" data-v="wheel">4 · Glücksrad</button>
+    <button class="tab" data-v="pack">5 · Karten-Pack</button>
+    <button class="tab" data-v="slots">6 · Slot-Maschine</button>
   </div>
   <div class="stage" id="stage">
     <div class="dark" id="dark"></div>
@@ -156,6 +184,15 @@ function buildView(){
     const pips = n => ({1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]}[n]).map(p=>`<div class="pip" style="grid-area:${Math.ceil(p/3)}/${(p-1)%3+1}"></div>`).join("");
     v.innerHTML = `<div class="scene"><div class="dice" id="dice">${[1,2,3,4,5,6].map(n=>`<div class="face f${n}">${pips(n)}</div>`).join("")}</div></div>`;
   }
+  if (variant === "wheel") {
+    const n = R.length, seg = 360 / n;
+    const grad = R.map((r, i) => `${r.c} ${i*seg}deg ${(i+1)*seg}deg`).join(",");
+    v.innerHTML = `<div class="wheelbox"><div class="pointer"></div><div class="wheel" id="wheel" style="background:conic-gradient(${grad})">` +
+      R.map((r, i) => `<span style="transform:rotate(${i*seg + seg/2 - 90}deg) translate(98px,-12px) rotate(90deg)">${r.ico}</span>`).join("") +
+      `</div><div class="hub">🎲</div></div>`;
+  }
+  if (variant === "pack") v.innerHTML = `<div class="pack">${[0,1,2].map(i => `<div class="flip" id="fl${i}"><div class="in"><div class="back">?</div><div class="front" id="ff${i}"></div></div></div>`).join("")}</div>`;
+  if (variant === "slots") v.innerHTML = `<div class="slots">${[0,1,2].map(i => `<div class="slot"><div class="strip" id="st${i}"></div></div>`).join("")}</div>`;
   if (variant === "ladder") v.innerHTML = `<div class="ladder">${R.map((r,i)=>`<div class="rung" id="rung${i}" style="--c:${r.c}"><span>${r.n}</span><span>1 in ${r.o.toLocaleString("de-DE")}</span></div>`).join("")}</div>`;
 }
 
@@ -194,6 +231,38 @@ async function spinLadder(res){
   // kleine Taeuschung: naechste Stufe kurz anblinken
   if (steps < R.length - 1) { const nx = $("#rung"+(steps+1)); nx.classList.add("lit"); await wait(160); nx.classList.remove("lit"); }
   await wait(350);
+}
+
+let wheelAngle = 0;
+async function spinWheel(res){
+  const seg = 360 / R.length;
+  const target = 360 - (res.ri * seg + seg / 2) + (Math.random() - .5) * seg * .6;
+  wheelAngle += 360 * 5 + ((target - wheelAngle % 360) + 360) % 360;
+  $("#wheel").style.transform = `rotate(${wheelAngle}deg)`;
+  await wait(4100);
+}
+async function spinPack(res){
+  const filler = [randomFill(), randomFill()].map(x => x.ri > res.ri ? {ri:0, r:R[0], name:R[0].f[0]} : x);
+  const order = [filler[0], filler[1], res];
+  for (let i = 0; i < 3; i++) $("#ff"+i).innerHTML = cardHTML(order[i]);
+  for (let i = 0; i < 2; i++) { await wait(450); $("#fl"+i).classList.add("open"); }
+  const last = $("#fl2"); last.classList.add("wobble"); await wait(400 + res.ri * 120);
+  last.classList.remove("wobble"); last.classList.add("open"); await wait(700);
+}
+async function spinSlots(res){
+  for (let i = 0; i < 3; i++) {
+    const icons = Array.from({length:24}, () => R[Math.floor(Math.random()*R.length)].ico);
+    icons.push(res.r.ico);
+    const st = $("#st"+i); st.innerHTML = icons.map(x => `<div>${x}</div>`).join("");
+    st.style.transition = "none"; st.style.transform = "translateY(0)";
+  }
+  await frame();
+  for (let i = 0; i < 3; i++) {
+    const st = $("#st"+i);
+    st.style.transition = `transform ${1.6 + i * .7}s cubic-bezier(.15,.75,.2,1)`;
+    st.style.transform = `translateY(-${24 * 110}px)`;
+  }
+  await wait(1600 + 2 * 700 + 200);
 }
 
 /* ---------- Reveal + Effekte ---------- */
@@ -252,8 +321,11 @@ async function doRoll(){
   if (variant === "reel") await spinReel(res);
   if (variant === "dice") await spinDice(res);
   if (variant === "ladder") await spinLadder(res);
+  if (variant === "wheel") await spinWheel(res);
+  if (variant === "pack") await spinPack(res);
+  if (variant === "slots") await spinSlots(res);
   await reveal(res);
-  if (variant === "dice") buildView();
+  if (variant === "dice" || variant === "pack") buildView();
   busy = false; $("#roll").disabled = false;
   if (auto) setTimeout(doRoll, 300);
 }
