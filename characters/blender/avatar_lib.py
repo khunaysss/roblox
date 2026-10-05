@@ -743,15 +743,16 @@ def render(path_png, tier="Common", res=520, samples=20):
     cam.rotation_euler = (ctr - cam_loc).to_track_quat("-Z", "Y").to_euler()
     cam.data.lens = 50
     sc.camera = cam
-    bpy.ops.object.light_add(type="AREA", location=(ctr.x + 5, ctr.y - 7, ctr.z + 6))
-    key = bpy.context.object; key.data.energy = 900; key.data.size = 6
+    k = max(ext / 5.0, 1.0)
+    bpy.ops.object.light_add(type="AREA", location=(ctr.x + 5 * k, ctr.y - 7 * k, ctr.z + 6 * k))
+    key = bpy.context.object; key.data.energy = 900 * k * k; key.data.size = 6 * k
     key.rotation_euler = (Vector((ctr.x, ctr.y, ctr.z)) - key.location).to_track_quat("-Z", "Y").to_euler()
-    bpy.ops.object.light_add(type="AREA", location=(ctr.x - 6, ctr.y + 5, ctr.z + 3))
-    rim = bpy.context.object; rim.data.energy = 1200; rim.data.size = 4
+    bpy.ops.object.light_add(type="AREA", location=(ctr.x - 6 * k, ctr.y + 5 * k, ctr.z + 3 * k))
+    rim = bpy.context.object; rim.data.energy = 1200 * k * k; rim.data.size = 4 * k
     rim.data.color = lin(TIER_RIM.get(tier, "#ffffff"))
     rim.rotation_euler = (Vector((ctr.x, ctr.y, ctr.z)) - rim.location).to_track_quat("-Z", "Y").to_euler()
-    bpy.ops.object.light_add(type="AREA", location=(ctr.x - 6, ctr.y - 6, ctr.z + 1))
-    fill = bpy.context.object; fill.data.energy = 250; fill.data.size = 6
+    bpy.ops.object.light_add(type="AREA", location=(ctr.x - 6 * k, ctr.y - 6 * k, ctr.z + 1 * k))
+    fill = bpy.context.object; fill.data.energy = 250 * k * k; fill.data.size = 6 * k
     fill.rotation_euler = (Vector((ctr.x, ctr.y, ctr.z)) - fill.location).to_track_quat("-Z", "Y").to_euler()
     w = bpy.data.worlds.new("W"); w.use_nodes = True
     w.node_tree.nodes["Background"].inputs[0].default_value = (0.03, 0.03, 0.035, 1)
