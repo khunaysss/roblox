@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HUD Mockup</title>
+<style>
+@font-face{font-family:Fredoka;src:url(fonts/Fredoka.ttf);font-weight:300 700}
+:root{
+  --navy:#1c2342; --navy2:#252d52; --edge:#0e1226; --muted:#aab2d6;
+  --yellow:#f4b42c; --yellow-d:#c98a12; --green:#3fbf4f; --green-d:#2a8f37; --purple:#8a4fe0; --purple-d:#6233ad;
+  --red:#e2393f; --red-d:#a8202a; --blue:#2f8ef0; --blue-d:#1d64b8;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Fredoka,system-ui,sans-serif;color:#fff;background:#000}
+.screen{position:relative;width:1500px;height:800px;overflow:hidden}
+.bg{position:absolute;inset:-20px;background:url(assets/game_bg.webp) center/cover;filter:blur(7px) brightness(.85) saturate(.9)}
+/* gemeinsamer Panel-Stil */
+.panel{background:var(--navy);border:4px solid var(--edge);border-radius:14px;box-shadow:0 5px 0 #0a0d1d;position:absolute}
+.panel.studs:before{content:"";position:absolute;top:-11px;left:16px;right:16px;height:9px;
+  background:radial-gradient(circle at 12px 9px,var(--navy2) 8px,var(--edge) 9px,transparent 10px) 0 0/34px 18px repeat-x}
+.btn{border:4px solid var(--edge);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;text-shadow:0 2px 0 #0007;position:relative}
+.btn .ic{font-size:30px;line-height:1}
+.badge{position:absolute;top:-10px;right:-10px;min-width:26px;height:26px;border-radius:13px;background:var(--red);border:3px solid var(--edge);
+  font-size:14px;display:grid;place-items:center;padding:0 5px}
+/* oben links: Menue + Ziel */
+.menu{left:20px;top:20px;width:74px;height:74px;background:var(--navy2)}
+.menu .ic{font-size:28px}
+.goal{left:106px;top:20px;width:330px;height:74px;padding:7px 14px}
+.goal .t{font-size:13px;color:var(--yellow);font-weight:600}
+.goal .q{font-size:17px;font-weight:700;margin-top:1px}
+.goal .bar{position:absolute;left:14px;right:80px;bottom:8px;height:8px;border-radius:4px;background:#0006}
+.goal .bar i{display:block;width:0%;height:100%;border-radius:4px;background:var(--green)}
+.goal .rw{position:absolute;right:12px;bottom:4px;font-size:14px;color:#c8ffb0;font-weight:700}
+/* oben Mitte: Hub/Home als ein Schalter */
+.seg{left:50%;top:20px;transform:translateX(-50%);display:flex;padding:5px;gap:5px}
+.seg .s{display:flex;align-items:center;gap:8px;padding:8px 20px;border-radius:10px;font-weight:700;font-size:20px;color:var(--muted)}
+.seg .s.on{background:var(--yellow);color:#fff;box-shadow:inset 0 -5px 0 var(--yellow-d);text-shadow:0 2px 0 #0006}
+/* oben rechts: kleine Knopf-Spalte */
+.side{position:absolute;right:20px;top:20px;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.sq{width:64px;height:64px;font-size:11px;background:var(--navy2)}
+.sq .ic{font-size:26px;margin-bottom:1px}
+.offer{width:64px;height:78px;background:var(--purple);box-shadow:inset 0 -5px 0 var(--purple-d);font-size:12px}
+.offer .ic{font-size:28px}
+.offer .pr{font-size:12px;background:#0005;border-radius:6px;padding:0 5px;margin-top:2px}
+/* Quest-Popover (aufgeklappt gezeigt) */
+.quests{right:96px;top:20px;width:270px;padding:12px}
+.quests h4{margin:0 0 8px;font-size:18px;display:flex;justify-content:space-between}
+.quests h4 span{font-size:13px;color:var(--muted);font-weight:600}
+.qrow{background:var(--navy2);border-radius:10px;padding:7px 10px;margin-bottom:7px;font-size:15px;font-weight:600}
+.qrow .b{height:7px;border-radius:4px;background:#0006;margin-top:5px}
+.qrow .b i{display:block;height:100%;border-radius:4px;background:var(--green)}
+.qrow.done{background:var(--green);box-shadow:inset 0 -4px 0 var(--green-d)}
+.hint{position:absolute;right:96px;top:262px;font-size:12px;color:#ffffffc0}
+/* unten links: Geld */
+.money{left:20px;bottom:20px;width:250px;height:92px;padding:10px 16px}
+.money .v{font-size:40px;font-weight:700;color:#7cf08a;text-shadow:0 3px 0 #0007;line-height:1.05}
+.money .r{font-size:17px;color:var(--muted);font-weight:600}
+.money .r b{color:#fff}
+/* unten Mitte: Aktionsleiste */
+.actions{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:14px;align-items:flex-end}
+.act{width:110px;height:96px;font-size:17px}
+.act.purple{background:var(--purple);box-shadow:inset 0 -6px 0 var(--purple-d)}
+.act.green{background:var(--green);box-shadow:inset 0 -6px 0 var(--green-d)}
+.roll{width:250px;height:112px;background:var(--red);box-shadow:inset 0 -8px 0 var(--red-d);flex-direction:row;gap:12px;font-size:46px;letter-spacing:1px}
+.roll .ic{font-size:46px}
+.auto{position:absolute;left:50%;bottom:-16px;transform:translateX(-50%);background:var(--navy);border:3px solid var(--edge);border-radius:10px;
+  display:flex;align-items:center;gap:8px;padding:3px 10px;font-size:14px;letter-spacing:0;text-shadow:none}
+.toggle{width:34px;height:18px;border-radius:9px;background:#0007;position:relative}
+.toggle:after{content:"";position:absolute;left:3px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--muted)}
+.tag{position:absolute;left:20px;bottom:126px;font-size:12px;color:#fff;background:#0008;border-radius:8px;padding:4px 8px}
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="bg"></div>
+
+  <div class="panel btn menu"><span class="ic">☰</span><span class="badge">!</span></div>
+  <div class="panel studs goal">
+    <div class="t">ZIEL 2/18</div>
+    <div class="q">Stell 2 Figuren auf Podeste</div>
+    <div class="bar"><i></i></div><div class="rw">+$300</div>
+  </div>
+
+  <div class="panel seg">
+    <div class="s on">🏝️ Hub</div>
+    <div class="s">🏠 Home</div>
+  </div>
+
+  <div class="side">
+    <div class="panel btn sq" style="position:relative"><span class="ic">📜</span>Quests<span class="badge">1</span></div>
+    <div class="panel btn offer" style="position:relative"><span class="ic">🧪</span>x10<span class="pr">R$149</span></div>
+  </div>
+  <div class="panel quests">
+    <h4>Quests <span>1 bereit</span></h4>
+    <div class="qrow done">✔ Abholen!</div>
+    <div class="qrow">Sammle $10K<div class="b"><i style="width:15%"></i></div></div>
+    <div class="qrow">Rolle 25 mal<div class="b"><i style="width:40%"></i></div></div>
+    <div class="qrow">Rolle 3 Rare+<div class="b"><i style="width:0%"></i></div></div>
+  </div>
+  <div class="hint">↑ klappt nur bei Klick auf "Quests" auf</div>
+
+  <div class="panel studs money">
+    <div class="v">$200</div>
+    <div class="r"><b>+$0</b>/s</div>
+  </div>
+
+  <div class="actions">
+    <div class="btn act purple"><span class="ic">🎒</span>Rucksack</div>
+    <div class="btn roll"><span class="ic">🎲</span>ROLL<div class="auto">AUTO <span class="toggle"></span></div></div>
+    <div class="btn act green"><span class="ic">⬆️</span>Upgrades</div>
+  </div>
+</div>
+</body>
+</html>
