@@ -731,7 +731,7 @@ def export(path_fbx):
     bpy.ops.export_scene.fbx(filepath=path_fbx, use_selection=True, add_leaf_bones=False,
                              bake_anim=False, object_types={"MESH", "EMPTY"})
 
-def render(path_png, tier="Common", res=520, samples=20):
+def render(path_png, tier="Common", res=520, samples=20, dist=2.0, view=(0.5, -1.0, 0.28)):
     sc = bpy.context.scene
     bpy.context.view_layer.update()
     meshes = [o for o in S.objs if o.type == "MESH"]
@@ -742,8 +742,8 @@ def render(path_png, tier="Common", res=520, samples=20):
     ext = max(mx.x - mn.x, mx.z - mn.z, (mx.y - mn.y) * 0.7, 4.5)
     bpy.ops.mesh.primitive_plane_add(size=80, location=(ctr.x, ctr.y, min(mn.z, 0) - 0.005))
     bpy.context.object.data.materials.append(M("#2a2b30", rough=0.8))
-    d = Vector((0.5, -1.0, 0.28)).normalized()
-    cam_loc = ctr + d * ext * 2.0
+    d = Vector(view).normalized()
+    cam_loc = ctr + d * ext * dist
     bpy.ops.object.camera_add(location=cam_loc)
     cam = bpy.context.object
     cam.rotation_euler = (ctr - cam_loc).to_track_quat("-Z", "Y").to_euler()
