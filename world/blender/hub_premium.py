@@ -19,6 +19,9 @@ PALETTES = {
     "pastel": dict(name="Pastel Candy", grass="#a6d8a8", plaza="#fbf6f0", plaza2="#efe4f3", curb="#d9cde6",
                    trim="#5f5490", accent="#f2868f", accent2="#ffcf9e", accent3="#86c3e3", wood="#c79a78",
                    metal="#5f5490", glow="#fff0b3", leaf="#79bf86", leaf2="#9fd6a2", sign_text="#ffffff", sky=(0.78, 0.86, 0.95)),
+    "game_lego": dict(name="Game Lego", grass="#4cc25a", plaza="#f4f5f7", plaza2="#dde2ea", curb="#2f6fe0",
+                      trim="#1f3fa8", accent="#e2393f", accent2="#f4b42c", accent3="#33c8f0", wood="#a8703f",
+                      metal="#1c2342", glow="#ffe68a", leaf="#2f9e44", leaf2="#4cc25a", sign_text="#ffffff", sky=(0.45, 0.72, 0.95)),
     "ocean_resort": dict(name="Ocean Resort", grass="#5f9f5f", plaza="#f3eee4", plaza2="#dbe5e6", curb="#b9c7c9",
                          trim="#1f4b5c", accent="#ef5b4f", accent2="#f5b062", accent3="#3fa7bf", wood="#86573a",
                          metal="#24343d", glow="#ffdf9a", leaf="#3f7d4a", leaf2="#5f9f55", sign_text="#fdfaf4", sky=(0.5, 0.75, 0.9)),
@@ -35,7 +38,7 @@ def plaza(R=26):
     for i in range(rings):
         r_out = R * (rings - i) / rings
         cyl(f"PlazaRing{i}", r_out, 0.5 + 0.01 * i, (0, 0, 0.25 + 0.005 * i), c("plaza" if i % 2 == 0 else "plaza2"), verts=48)
-    cyl("Curb", R + 0.8, 0.7, (0, 0, 0.3), c("curb"), verts=48)
+    cyl("Curb", R + 0.8, 0.4, (0, 0, 0.2), c("curb"), verts=48)
     for i in range(40):  # Bordstein-Kappen
         a = 2 * PI * i / 40
         box("CurbCap", (2.2, 0.9, 0.3), (math.cos(a) * (R + 0.45), math.sin(a) * (R + 0.45), 0.78), c("trim"), rot=(0, 0, a + PI / 2), bevel=0.06)

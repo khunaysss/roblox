@@ -344,21 +344,23 @@ end)
 ]==]
 spin.Parent = model'''
 
-def export_hub():
+def export_hub(palette="game_lego", fname="Hub_Game.lua"):
     import hub_premium
-    hub_premium.P.clear(); hub_premium.P.update(hub_premium.PALETTES["pastel"])
+    hub_premium.P.clear(); hub_premium.P.update(hub_premium.PALETTES[palette])
     L.reset("MemeHub"); hub_premium.hub()
     for o in list(bpy.data.objects):  # Wiese gehoert nicht zum Hub
         if o.type == "MESH" and o not in S.objs and o.name.startswith("Plane"):
             bpy.data.objects.remove(o, do_unlink=True)
     rows = collect(2.0)
-    write_building("Hub_Pastel.lua", "MemeHub", rows, 'folder(workspace, "MemeWorld")', "0, 0, 0", extra=SPINNER,
-                   comment="Neuer Hub (Pastel Candy). Wird in Workspace/MemeWorld/MemeHub gebaut. Staende heissen Booth<Name>_..., ROLL-Pavillon Roll_..., Tor Gate_...")
+    write_building(fname, "MemeHub", rows, 'folder(workspace, "MemeWorld")', "0, 0, 0", extra=SPINNER,
+                   comment=f"Neuer Hub (Palette {palette}). Wird in Workspace/MemeWorld/MemeHub gebaut. Staende heissen Booth<Name>_..., ROLL-Pavillon Roll_..., Tor Gate_...")
     print("hub", len(rows))
 
 if __name__ == "__main__":
     if sys.argv[1:] == ["hub"]:
-        export_hub()
+        export_hub("game_lego", "Hub_Game.lua")
+        export_hub("pastel", "Hub_Pastel.lua")
     else:
         main()
-        export_hub()
+        export_hub("game_lego", "Hub_Game.lua")
+        export_hub("pastel", "Hub_Pastel.lua")

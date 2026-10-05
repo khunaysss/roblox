@@ -1,4 +1,4 @@
--- Neuer Hub (Pastel Candy). Wird in Workspace/MemeWorld/MemeHub gebaut. Staende heissen Booth<Name>_..., ROLL-Pavillon Roll_..., Tor Gate_...
+-- Neuer Hub (Palette pastel). Wird in Workspace/MemeWorld/MemeHub gebaut. Staende heissen Booth<Name>_..., ROLL-Pavillon Roll_..., Tor Gate_...
 -- Automatisch erzeugt aus world/blender. Ausfuehren in Roblox Studio (Command Bar oder MCP).
 -- Position anpassen: ORIGIN unten aendern oder das Model danach verschieben.
 
@@ -83,7 +83,7 @@ local ROWS = {
 	{"PlazaRing4","C",1.08,44.571,44.571,0,0.54,0,0,-1,0,1,0,0,0,0,1,"#fbf6f0",0},
 	{"PlazaRing5","C",1.1,29.714,29.714,0,0.55,0,0,-1,0,1,0,0,0,0,1,"#efe4f3",0},
 	{"PlazaRing6","C",1.12,14.857,14.857,0,0.56,0,0,-1,0,1,0,0,0,0,1,"#fbf6f0",0},
-	{"Curb","C",1.4,107.2,107.2,0,0.6,0,0,-1,0,1,0,0,0,0,1,"#d9cde6",0},
+	{"Curb","C",0.8,107.2,107.2,0,0.4,0,0,-1,0,1,0,0,0,0,1,"#d9cde6",0},
 	{"CurbCap","B",4.4,1.8,0.6,-52.9,1.56,0,0,1,0,0,0,1,1,0,0,"#5f5490",0},
 	{"CurbCap","B",4.4,1.8,0.6,-52.249,1.56,8.275,0.156,0.988,0,0,0,1,0.988,-0.156,0,"#5f5490",0},
 	{"CurbCap","B",4.4,1.8,0.6,-50.311,1.56,16.347,0.309,0.951,0,0,0,1,0.951,-0.309,0,"#5f5490",0},
