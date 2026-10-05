@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roll UI Prototyp</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14151b; --panel:#1f2129; --panel2:#2a2d38; --text:#f4f5f8; --muted:#a3a7b5; --line:#3a3e4c;
+  --roll:#e8383d; --roll-dark:#a8202a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 50% 0%,#24304a 0%,var(--bg) 60%);color:var(--text);
+  font-family:Fredoka,system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0 2px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab{background:var(--panel);border:2px solid var(--line);color:var(--text);padding:8px 14px;border-radius:12px;
+  font:inherit;font-size:15px;cursor:pointer}
+.tab.on{border-color:#ffd23a;background:#2c2a1e}
+.stage{position:relative;background:linear-gradient(#1b1d25,#111218);border:3px solid var(--line);border-radius:18px;
+  height:360px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.stage.shake{animation:shake .5s}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-8px,4px)}40%{transform:translate(7px,-5px)}60%{transform:translate(-6px,-3px)}80%{transform:translate(5px,5px)}}
+.flash{position:absolute;inset:0;pointer-events:none;opacity:0}
+.flash.go{animation:flash .7s ease-out}
+@keyframes flash{0%{opacity:.95}100%{opacity:0}}
+.dark{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .35s}
+.dark.on{opacity:.75}
+#view{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+canvas#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* Karten */
+.card{width:120px;height:150px;border-radius:14px;background:var(--panel2);border:4px solid var(--c,#888);flex:0 0 auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative;
+  box-shadow:0 0 0 2px #0006 inset}
+.card .ico{width:56px;height:56px;border-radius:12px;background:var(--c);display:grid;place-items:center;font-size:30px;
+  box-shadow:inset 0 -6px 0 #0003}
+.card .nm{font-size:12px;text-align:center;padding:0 6px;line-height:1.1}
+.card .rr{font-size:11px;color:var(--c);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+
+/* Variante 1: Walze */
+.reel{position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;gap:10px;padding:0 10px;will-change:transform}
+.marker{position:absolute;left:50%;top:18px;bottom:18px;width:4px;margin-left:-2px;background:#ffd23a;border-radius:2px;
+  box-shadow:0 0 14px #ffd23a;z-index:3}
+.marker:before,.marker:after{content:"";position:absolute;left:50%;margin-left:-10px;border:10px solid transparent}
+.marker:before{top:-12px;border-top-color:#ffd23a}.marker:after{bottom:-12px;border-bottom-color:#ffd23a}
+.fade{position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
+.fade.l{left:0;background:linear-gradient(90deg,#111218,transparent)}.fade.r{right:0;background:linear-gradient(-90deg,#111218,transparent)}
+
+/* Variante 2: Wuerfel */
+.scene{perspective:700px;width:140px;height:140px}
+.dice{width:140px;height:140px;position:relative;transform-style:preserve-3d;transition:transform 2.2s cubic-bezier(.15,.7,.2,1)}
+.face{position:absolute;inset:0;border-radius:22px;background:#f4f4f4;border:4px solid #d8d8d8;display:grid;
+  grid-template:repeat(3,1fr)/repeat(3,1fr);padding:18px}
+.pip{width:22px;height:22px;border-radius:50%;background:#d81818;place-self:center}
+.f1{transform:translateZ(70px)}.f2{transform:rotateY(90deg) translateZ(70px)}.f3{transform:rotateY(180deg) translateZ(70px)}
+.f4{transform:rotateY(-90deg) translateZ(70px)}.f5{transform:rotateX(90deg) translateZ(70px)}.f6{transform:rotateX(-90deg) translateZ(70px)}
+
+/* Variante 3: Leiter */
+.ladder{display:flex;flex-direction:column-reverse;gap:5px;width:min(420px,90%)}
+.rung{height:22px;white-space:nowrap;border-radius:8px;background:var(--panel2);border:2px solid var(--line);display:flex;align-items:center;
+  justify-content:space-between;padding:0 10px;font-size:12px;color:var(--muted);transition:all .12s}
+.rung.lit{background:var(--c);border-color:#fff;color:#111;font-weight:700;box-shadow:0 0 16px var(--c)}
+
+/* Reveal */
+.reveal{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  z-index:5;pointer-events:none;opacity:0}
+.reveal.on{opacity:1}
+.reveal .big{transform:scale(.2);transition:transform .45s cubic-bezier(.2,1.6,.4,1)}
+.reveal.on .big{transform:scale(1.25)}
+.reveal .title{font-size:30px;font-weight:700;text-shadow:0 3px 0 #0008;opacity:0;transform:translateY(10px);transition:all .35s .25s}
+.reveal .meta{font-size:16px;color:var(--c);font-weight:700;opacity:0;transition:opacity .35s .4s;text-shadow:0 0 10px var(--c)}
+.reveal.on .title,.reveal.on .meta{opacity:1;transform:none}
+.rays{position:absolute;width:520px;height:520px;border-radius:50%;
+  background:repeating-conic-gradient(var(--c) 0 8deg,transparent 8deg 22deg);opacity:0;
+  mask:radial-gradient(circle,#000 0 30%,transparent 70%);-webkit-mask:radial-gradient(circle,#000 0 30%,transparent 70%)}
+.reveal.on.big-r .rays{opacity:.35;animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Unten: Steuerung */
+.bar{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.btn-roll{background:var(--roll);color:#fff;border:0;border-bottom:6px solid var(--roll-dark);border-radius:16px;
+  font:inherit;font-size:28px;font-weight:700;padding:12px 44px;cursor:pointer;letter-spacing:1px}
+.btn-roll:active{transform:translateY(3px);border-bottom-width:3px}
+.btn-roll:disabled{filter:grayscale(.6);cursor:default}
+.small{background:var(--panel);border:2px solid var(--line);color:var(--text);border-radius:12px;font:inherit;
+  padding:10px 14px;cursor:pointer}
+.small.on{border-color:#3fe07a;color:#3fe07a}
+.hist{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px;min-height:30px}
+.chip{font-size:12px;padding:4px 8px;border-radius:8px;background:var(--panel);border:2px solid var(--c)}
+.note{color:var(--muted);font-size:13px;margin-top:14px;line-height:1.4}
+@media (max-width:560px){.stage{height:300px}.btn-roll{font-size:22px;padding:10px 30px}.card{width:100px;height:128px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Roll-UI Prototyp</h1>
+  <p class="sub">Drei Varianten zum Ausprobieren. Je seltener die Figur, desto größer der Effekt (Abdunkeln, Strahlen, Blitz, Wackeln).</p>
+  <div class="tabs">
+    <button class="tab on" data-v="reel">1 · Walze</button>
+    <button class="tab" data-v="dice">2 · Würfel-Wurf</button>
+    <button class="tab" data-v="ladder">3 · Seltenheits-Leiter</button>
+  </div>
+  <div class="stage" id="stage">
+    <div class="dark" id="dark"></div>
+    <div id="view"></div>
+    <canvas id="fx"></canvas>
+    <div class="flash" id="flash"></div>
+    <div class="reveal" id="reveal"><div class="rays"></div><div class="big" id="revealCard"></div>
+      <div class="title" id="rt"></div><div class="meta" id="rm"></div></div>
+  </div>
+  <div class="bar">
+    <button class="small" id="auto">AUTO</button>
+    <button class="btn-roll" id="roll">🎲 ROLL</button>
+    <button class="small" id="luck">Glück ×1</button>
+  </div>
+  <div class="hist" id="hist"></div>
+  <p class="note">"Glück" ist nur zum Testen, damit du auch die hohen Seltenheiten siehst. Die Chancen sind Beispielwerte.</p>
+</div>
+<script>
+const R = [
+ {n:"Common",c:"#b8bcc4",o:2,ico:"🙂",f:["W","L","Oof","Sus","Mid","Bruh","Chat","Yapping","Skill Issue","Basic NPC"]},
+ {n:"Uncommon",c:"#4fd16a",o:5,ico:"😏",f:["Trollface","Amogus","This is Fine","Pookie","FBI Open Up"]},
+ {n:"Rare",c:"#3f8cff",o:20,ico:"😎",f:["Bacon Hair","Floppa","Walter","Rickroll","Bongo Cat"]},
+ {n:"Epic",c:"#b05cff",o:75,ico:"🐸",f:["Dat Boi","Gigachad","Cheems Bonk","Pedro","Brainrot"]},
+ {n:"Legendary",c:"#ffc83a",o:300,ico:"👑",f:["Only in Ohio","Maxwell","Skibidi Toilet","Grimace Shake"]},
+ {n:"Mythic",c:"#ff4f6b",o:1000,ico:"🔥",f:["Tung Tung","MontiBlack","Giga Noob","Crab Rave"]},
+ {n:"Secret",c:"#ff3fbf",o:5000,ico:"❓",f:["Ali Burgeraye","OIIA Cat","Illuminati Dorito"]},
+ {n:"Divine",c:"#fff2b0",o:20000,ico:"😇",f:["Doge","Harambe","Onion Ogre"]},
+ {n:"Celestial",c:"#6a8cff",o:75000,ico:"🌌",f:["333 IQ","Doomer","Smug Forehead"]},
+ {n:"Cosmic",c:"#8a5cff",o:250000,ico:"🌀",f:["Backrooms Smiler","Aliens Guy","Sigma Wolf"]},
+ {n:"Eternal",c:"#ff7a1a",o:1000000,ico:"⏳",f:["Waiting Skeleton","Gnome","Dancing Rat"]},
+ {n:"Infinity",c:"#33e8ff",o:5000000,ico:"♾️",f:["Skull Shades","Wojak","Doge x Cheems","Meme Man","Dad Laugh"]},
+];
+const $ = s => document.querySelector(s);
+let variant = "reel", busy = false, auto = false, luck = 1;
+const LUCKS = [1, 100, 10000];
+
+function pick(){
+  // Seltenste zuerst pruefen: Chance 1/o, mit Glueck multipliziert
+  for (let i = R.length - 1; i > 0; i--) if (Math.random() < Math.min(1, luck / R[i].o)) return roll(i);
+  return roll(0);
+  function roll(i){ const r = R[i]; return {ri:i, r, name:r.f[Math.floor(Math.random()*r.f.length)]}; }
+}
+function randomFill(){ const i = Math.random() < .55 ? 0 : Math.random() < .6 ? 1 : Math.floor(Math.random()*5)+1; const r=R[i]; return {ri:i,r,name:r.f[Math.floor(Math.random()*r.f.length)]}; }
+function cardHTML(x){ return `<div class="card" style="--c:${x.r.c}"><div class="ico">${x.r.ico}</div><div class="nm">${x.name}</div><div class="rr">${x.r.n}</div></div>`; }
+
+/* ---------- Varianten ---------- */
+function buildView(){
+  const v = $("#view");
+  if (variant === "reel") v.innerHTML = `<div class="fade l"></div><div class="fade r"></div><div class="marker"></div><div class="reel" id="reel"></div>`;
+  if (variant === "dice") {
+    const pips = n => ({1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]}[n]).map(p=>`<div class="pip" style="grid-area:${Math.ceil(p/3)}/${(p-1)%3+1}"></div>`).join("");
+    v.innerHTML = `<div class="scene"><div class="dice" id="dice">${[1,2,3,4,5,6].map(n=>`<div class="face f${n}">${pips(n)}</div>`).join("")}</div></div>`;
+  }
+  if (variant === "ladder") v.innerHTML = `<div class="ladder">${R.map((r,i)=>`<div class="rung" id="rung${i}" style="--c:${r.c}"><span>${r.n}</span><span>1 in ${r.o.toLocaleString("de-DE")}</span></div>`).join("")}</div>`;
+}
+
+async function spinReel(res){
+  const reel = $("#reel"), N = 46, win = 40;
+  const items = Array.from({length:N}, (_, i) => i === win ? res : randomFill());
+  reel.innerHTML = items.map(cardHTML).join("");
+  reel.style.transition = "none"; reel.style.transform = "translateY(-50%) translateX(0)";
+  await frame();
+  const cw = reel.children[0].getBoundingClientRect().width + 10;
+  const stageW = $("#stage").getBoundingClientRect().width;
+  const jitter = (Math.random() - .5) * (cw * .6);
+  const x = -(win * cw + cw / 2 + 10 - stageW / 2) + jitter;
+  reel.style.transition = "transform 4.2s cubic-bezier(.08,.8,.15,1)";
+  reel.style.transform = `translateY(-50%) translateX(${x}px)`;
+  await wait(4300);
+}
+async function spinDice(res){
+  const d = $("#dice");
+  const rx = 720 + Math.floor(Math.random()*4)*90, ry = 1080 + Math.floor(Math.random()*4)*90;
+  d.style.transition = "none"; d.style.transform = "rotateX(0) rotateY(0)"; await frame();
+  d.style.transition = "transform 2.2s cubic-bezier(.15,.7,.2,1)";
+  d.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(${1 + res.ri * .03})`;
+  await wait(1700);
+  d.style.transition = "transform .35s ease-in"; d.style.transform += " scale(0)";
+  await wait(380);
+}
+async function spinLadder(res){
+  R.forEach((_, i) => $("#rung"+i).classList.remove("lit"));
+  const steps = res.ri;
+  let delay = 70;
+  for (let i = 0; i <= steps; i++) {
+    $("#rung"+i).classList.add("lit");
+    await wait(delay); delay *= 1.28;
+  }
+  // kleine Taeuschung: naechste Stufe kurz anblinken
+  if (steps < R.length - 1) { const nx = $("#rung"+(steps+1)); nx.classList.add("lit"); await wait(160); nx.classList.remove("lit"); }
+  await wait(350);
+}
+
+/* ---------- Reveal + Effekte ---------- */
+async function reveal(res){
+  const big = res.ri >= 4, huge = res.ri >= 5, insane = res.ri >= 8;
+  const rv = $("#reveal");
+  rv.style.setProperty("--c", res.r.c);
+  $("#revealCard").innerHTML = cardHTML(res);
+  $("#rt").textContent = res.name;
+  $("#rm").textContent = `${res.r.n} · 1 in ${res.r.o.toLocaleString("de-DE")}`;
+  if (huge) { $("#dark").classList.add("on"); await wait(insane ? 900 : 450); }
+  if (big) { const f = $("#flash"); f.style.background = res.r.c; f.classList.remove("go"); void f.offsetWidth; f.classList.add("go"); }
+  if (huge) { const s = $("#stage"); s.classList.remove("shake"); void s.offsetWidth; s.classList.add("shake"); }
+  rv.classList.toggle("big-r", big);
+  rv.classList.add("on");
+  burst(res.r.c, 12 + res.ri * 14, res.ri >= 2);
+  addHist(res);
+  await wait(big ? 2200 : 1200);
+  rv.classList.remove("on"); $("#dark").classList.remove("on");
+  await wait(250);
+}
+
+const cv = $("#fx"), cx = cv.getContext("2d"); let parts = [];
+function burst(color, n, stars){
+  const r = cv.getBoundingClientRect(); cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio;
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 6;
+    parts.push({x:cv.width/2, y:cv.height/2, vx:Math.cos(a)*sp*devicePixelRatio, vy:Math.sin(a)*sp*devicePixelRatio - 2,
+      life:60 + Math.random()*40, c: Math.random() < .7 ? color : "#ffffff", s:(3 + Math.random()*5)*devicePixelRatio, star: stars && Math.random() < .4});
+  }
+  if (!tick.on) { tick.on = true; requestAnimationFrame(tick); }
+}
+function tick(){
+  cx.clearRect(0, 0, cv.width, cv.height);
+  parts = parts.filter(p => p.life-- > 0);
+  for (const p of parts) {
+    p.x += p.vx; p.y += p.vy; p.vy += .12 * devicePixelRatio; p.vx *= .985;
+    cx.globalAlpha = Math.min(1, p.life / 30); cx.fillStyle = p.c;
+    if (p.star) { cx.save(); cx.translate(p.x, p.y); cx.rotate(p.life * .1); cx.fillRect(-p.s/2, -p.s/6, p.s, p.s/3); cx.fillRect(-p.s/6, -p.s/2, p.s/3, p.s); cx.restore(); }
+    else cx.fillRect(p.x, p.y, p.s, p.s);
+  }
+  if (parts.length) requestAnimationFrame(tick); else { tick.on = false; cx.clearRect(0, 0, cv.width, cv.height); }
+}
+function addHist(res){
+  const h = $("#hist"); const el = document.createElement("span");
+  el.className = "chip"; el.style.setProperty("--c", res.r.c); el.textContent = res.name;
+  h.prepend(el); while (h.children.length > 10) h.lastChild.remove();
+}
+
+/* ---------- Steuerung ---------- */
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const frame = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+async function doRoll(){
+  if (busy) return; busy = true; $("#roll").disabled = true;
+  const res = pick();
+  if (variant === "reel") await spinReel(res);
+  if (variant === "dice") await spinDice(res);
+  if (variant === "ladder") await spinLadder(res);
+  await reveal(res);
+  if (variant === "dice") buildView();
+  busy = false; $("#roll").disabled = false;
+  if (auto) setTimeout(doRoll, 300);
+}
+$("#roll").onclick = doRoll;
+$("#auto").onclick = e => { auto = !auto; e.target.classList.toggle("on", auto); if (auto) doRoll(); };
+$("#luck").onclick = e => { luck = LUCKS[(LUCKS.indexOf(luck) + 1) % LUCKS.length]; e.target.textContent = "Glück ×" + luck.toLocaleString("de-DE"); };
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  if (busy) return;
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === t));
+  variant = t.dataset.v; buildView();
+});
+buildView();
+</script>
+</body>
+</html>
