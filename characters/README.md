@@ -1,13 +1,26 @@
 # Charaktere (Blender, headless)
 
-Erzeugen: `pip install bpy && python3 characters/blender/make_blocky.py <Name>`
-Ausgabe: `characters/export/<Name>.fbx|glb`, Vorschau in `characters/preview/<Name>.png`.
+Alle Figuren werden per Skript in Blender gebaut (keine Handarbeit), im Stil eines Roblox-Avatars:
+gemeinsamer Koerper, eigene Kleidung/Farben, Accessoires und Requisiten aus einfachen Formen.
 
-Import in Roblox Studio: Asset Manager -> Bulk Import / 3D Importer -> FBX waehlen.
-Rig: 6 Knochen (Torso, Head, LeftArm, RightArm, LeftLeg, RightLeg), starres Skinning.
-Groesse/Ausrichtung nach dem Import pruefen (Blender Z-up, Figur ca. 5 Einheiten hoch).
+## Bauen
+```
+pip install bpy pillow
+python3 characters/blender/build_all.py                 # alle Stufen
+python3 characters/blender/build_all.py Epic            # eine Stufe
+python3 characters/blender/build_all.py Epic --only 05_Gigachad
+python3 characters/blender/sheet.py                     # Uebersichtsbilder pro Stufe
+```
 
-## Common-Stufe (10 Figuren)
-`python3 characters/blender/common.py [01_W 02_L ...]` baut die Figuren aus `characters/reference/common_board.webp`
-nach und exportiert `characters/export/<NN_Name>.fbx|glb` (je Teil ein eigenes Objekt unter einem Root-Empty,
-fuer einfache Skript-Animation: Wippen/Drehen). Vergleich: `characters/preview/common_sheet.png`.
+- `blender/avatar_lib.py` – Koerper, Posen, Gesichter, Haare, Huete, Tierkoepfe, Requisiten, Stufen-Effekte
+- `blender/roster.py` – alle Figuren nach Stufe (Reihenfolge wie auf den Referenz-Boards)
+- `export/<Stufe>/<NN_Name>.fbx` – fuer Roblox Studio
+- `preview/<Stufe>/<NN_Name>.png` und `preview/<Stufe>_sheet.png` – Vorschau
+
+## In Roblox Studio
+Asset Manager -> Bulk Import (oder 3D Importer) -> FBX waehlen. Groesse/Ausrichtung pruefen
+(Blender Z-up, Figur ca. 5.3 Einheiten hoch, schaut nach -Y).
+
+Jedes Teil ist ein eigenes Objekt unter einem Root (Name der Figur). Teile mit `FX_` im Namen
+(Heiligenschein, Planeten, Aepfel, Burger, Pixel ...) sind Effekte zum Animieren per Skript
+(drehen, schweben) oder zum Entfernen. Fuer einfaches Wippen/Drehen braucht es kein Rig.
