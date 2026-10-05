@@ -70,6 +70,30 @@ body{margin:0;font-family:Fredoka,system-ui,sans-serif;color:#fff;background:#00
 .toggle{width:34px;height:18px;border-radius:9px;background:#0007;position:relative}
 .toggle:after{content:"";position:absolute;left:3px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--muted)}
 .tag{position:absolute;left:20px;bottom:126px;font-size:12px;color:#fff;background:#0008;border-radius:8px;padding:4px 8px}
+
+/* Wuerfel-Slot am ROLL-Knopf */
+.dice{width:86px;height:96px;background:var(--navy2);font-size:13px;color:#fff}
+.dice .ic{font-size:34px}
+.dice .nm{font-size:12px;color:var(--yellow)}
+.dice .sw{position:absolute;top:-10px;left:-10px;width:26px;height:26px;border-radius:8px;background:var(--blue);border:3px solid var(--edge);display:grid;place-items:center;font-size:13px}
+/* links: Schnellzugriff */
+.quick{position:absolute;left:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:12px}
+.qb{width:74px;height:74px;font-size:13px}
+.qb .ic{font-size:30px;margin-bottom:2px}
+.qb.shop{background:var(--green);box-shadow:inset 0 -5px 0 var(--green-d)}
+.qb.index{background:var(--blue);box-shadow:inset 0 -5px 0 var(--blue-d)}
+.qb.reb{background:var(--purple);box-shadow:inset 0 -5px 0 var(--purple-d)}
+/* rechts unten: Glueck */
+.luck{right:20px;bottom:20px;width:270px;padding:12px 14px}
+.luck .top{display:flex;justify-content:space-between;align-items:center}
+.luck .lv{font-size:26px;font-weight:700;color:#7cf08a}
+.luck .lt{font-size:14px;color:var(--muted);font-weight:600}
+.boost{display:flex;align-items:center;gap:8px;background:var(--navy2);border-radius:10px;padding:5px 8px;margin-top:8px;font-size:14px;font-weight:600}
+.boost .tm{margin-left:auto;color:var(--yellow)}
+.pity{margin-top:8px;font-size:13px;color:var(--muted);font-weight:600}
+.pity .b{height:9px;border-radius:5px;background:#0006;margin-top:4px}
+.pity .b i{display:block;height:100%;width:37%;border-radius:5px;background:linear-gradient(90deg,#b05cff,#ff4fb0)}
+.pity b{color:#fff}
 </style>
 </head>
 <body>
@@ -101,6 +125,18 @@ body{margin:0;font-family:Fredoka,system-ui,sans-serif;color:#fff;background:#00
   </div>
   <div class="hint">↑ klappt nur bei Klick auf "Quests" auf</div>
 
+  <div class="quick">
+    <div class="btn qb shop"><span class="ic">🛒</span>Shop</div>
+    <div class="btn qb index"><span class="ic">📖</span>Index</div>
+    <div class="btn qb reb"><span class="ic">🔄</span>Rebirth</div>
+  </div>
+
+  <div class="panel studs luck">
+    <div class="top"><span class="lt">Glück</span><span class="lv">🍀 x2</span></div>
+    <div class="boost">🧪 Glückstrank x2<span class="tm">4:59</span></div>
+    <div class="pity">Garantiert <b>Epic</b> in <b>63</b> Rolls<div class="b"><i></i></div></div>
+  </div>
+
   <div class="panel studs money">
     <div class="v">$200</div>
     <div class="r"><b>+$0</b>/s</div>
@@ -108,6 +144,7 @@ body{margin:0;font-family:Fredoka,system-ui,sans-serif;color:#fff;background:#00
 
   <div class="actions">
     <div class="btn act purple"><span class="ic">🎒</span>Rucksack</div>
+    <div class="btn dice"><span class="sw">⇄</span><span class="ic">🎲</span>Würfel<span class="nm">Basic</span></div>
     <div class="btn roll"><span class="ic">🎲</span>ROLL<div class="auto">AUTO <span class="toggle"></span></div></div>
     <div class="btn act green"><span class="ic">⬆️</span>Upgrades</div>
   </div>
