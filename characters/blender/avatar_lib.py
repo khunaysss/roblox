@@ -731,7 +731,7 @@ def export(path_fbx):
     bpy.ops.export_scene.fbx(filepath=path_fbx, use_selection=True, add_leaf_bones=False,
                              bake_anim=False, object_types={"MESH", "EMPTY"})
 
-def render(path_png, tier="Common", res=520, samples=20, dist=2.0, view=(0.5, -1.0, 0.28)):
+def render(path_png, tier="Common", res=520, samples=20, dist=2.0, view=(0.5, -1.0, 0.28), bg=(0.03, 0.03, 0.035), rim_tint=True, exposure=0.0):
     sc = bpy.context.scene
     bpy.context.view_layer.update()
     meshes = [o for o in S.objs if o.type == "MESH"]
@@ -761,11 +761,15 @@ def render(path_png, tier="Common", res=520, samples=20, dist=2.0, view=(0.5, -1
     fill = bpy.context.object; fill.data.energy = 250 * k * k; fill.data.size = 6 * k
     fill.rotation_euler = (Vector((ctr.x, ctr.y, ctr.z)) - fill.location).to_track_quat("-Z", "Y").to_euler()
     w = bpy.data.worlds.new("W"); w.use_nodes = True
-    w.node_tree.nodes["Background"].inputs[0].default_value = (0.03, 0.03, 0.035, 1)
+    w.node_tree.nodes["Background"].inputs[0].default_value = (*bg, 1)
+    if not rim_tint:
+        rim.data.color = (1, 1, 1)
+        rim.data.energy *= 0.5
     sc.world = w
     sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.samples = samples
     sc.cycles.use_denoising = True
     sc.view_settings.view_transform = "Standard"
+    sc.view_settings.exposure = exposure
     sc.render.resolution_x = sc.render.resolution_y = res
     sc.render.filepath = path_png
     bpy.ops.render.render(write_still=True)
