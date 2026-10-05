@@ -77,45 +77,46 @@ def flag(x, y, role):
 
 def booth(cx, cy, face, role, label):
     a = face
+    pre = f"Booth{label.title()}_"
     def Pp(x, y, z):
         dx, dy = rot2(x, y, a); return (cx + dx, cy + dy, z)
-    box("Counter", (4.6, 1.8, 1.5), Pp(0, 0, 1.25), c("wood"), rot=(0, 0, a), bevel=0.06)
+    box(pre + "Counter", (4.6, 1.8, 1.5), Pp(0, 0, 1.25), c("wood"), rot=(0, 0, a), bevel=0.06)
     for i in range(5):
-        box("Plank", (0.08, 1.82, 1.4), Pp(-1.8 + i * 0.9, 0, 1.25), c("trim"), rot=(0, 0, a), bevel=0)
-    box("CounterTop", (4.9, 2.1, 0.22), Pp(0, 0, 2.1), c("plaza"), rot=(0, 0, a), bevel=0.05)
+        box(pre + "Plank", (0.08, 1.82, 1.4), Pp(-1.8 + i * 0.9, 0, 1.25), c("trim"), rot=(0, 0, a), bevel=0)
+    box(pre + "CounterTop", (4.9, 2.1, 0.22), Pp(0, 0, 2.1), c("plaza"), rot=(0, 0, a), bevel=0.05)
     for x in (-2.15, 2.15):
-        box("Post", (0.28, 0.28, 3.2), Pp(x, 0.7, 3.8), c("wood"), rot=(0, 0, a), bevel=0.04)
+        box(pre + "Post", (0.28, 0.28, 3.2), Pp(x, 0.7, 3.8), c("wood"), rot=(0, 0, a), bevel=0.04)
     for i in range(7):
-        box("Awning", (0.7, 2.7, 0.14), Pp(-2.1 + i * 0.7, -0.15, 5.35), c(role if i % 2 == 0 else "plaza"), rot=(0.22, 0, a), bevel=0.02)
+        box(pre + "Awning", (0.7, 2.7, 0.14), Pp(-2.1 + i * 0.7, -0.15, 5.35), c(role if i % 2 == 0 else "plaza"), rot=(0.22, 0, a), bevel=0.02)
     for i in range(7):  # gewellte Kante
-        box("AwningEdge", (0.62, 0.12, 0.35), Pp(-2.1 + i * 0.7, -1.45, 4.95), c(role if i % 2 == 0 else "plaza"), rot=(0, 0, a), bevel=0.05)
-    box("SignFrame", (3.6, 0.22, 1.1), Pp(0, 0.65, 6.35), c("trim"), rot=(0, 0, a), bevel=0.08)
-    box("SignBoard", (3.3, 0.24, 0.85), Pp(0, 0.64, 6.35), c(role), rot=(0, 0, a), bevel=0.05)
-    txt(label, Pp(0, 0.5, 6.33), (PI / 2, 0, a), 0.5, P["sign_text"])
-    box("Crate", (0.9, 0.9, 0.9), Pp(2.9, -0.2, 0.95), c("wood"), rot=(0, 0, a + 0.3), bevel=0.06)
-    box("Crate2", (0.7, 0.7, 0.7), Pp(2.9, -0.2, 1.75), c("accent2"), rot=(0, 0, a - 0.2), bevel=0.06)
+        box(pre + "AwningEdge", (0.62, 0.12, 0.35), Pp(-2.1 + i * 0.7, -1.45, 4.95), c(role if i % 2 == 0 else "plaza"), rot=(0, 0, a), bevel=0.05)
+    box(pre + "SignFrame", (3.6, 0.22, 1.1), Pp(0, 0.65, 6.35), c("trim"), rot=(0, 0, a), bevel=0.08)
+    box(pre + "SignBoard", (3.3, 0.24, 0.85), Pp(0, 0.64, 6.35), c(role), rot=(0, 0, a), bevel=0.05)
+    txt(label, Pp(0, 0.5, 6.33), (PI / 2, 0, a), 0.5, P["sign_text"]).name = pre + "SignText"
+    box(pre + "Crate", (0.9, 0.9, 0.9), Pp(2.9, -0.2, 0.95), c("wood"), rot=(0, 0, a + 0.3), bevel=0.06)
+    box(pre + "Crate2", (0.7, 0.7, 0.7), Pp(2.9, -0.2, 1.75), c("accent2"), rot=(0, 0, a - 0.2), bevel=0.06)
 
 def pavilion():
     for i, (r, h) in enumerate(((8.5, 0.6), (7.2, 0.6), (6.0, 0.6))):
         cyl(f"Step{i}", r, h, (0, 0, 0.8 + i * 0.6), c("plaza2" if i % 2 else "curb"), verts=8)
-    cyl("Floor", 5.8, 0.1, (0, 0, 2.46), c("plaza"), verts=8)
+    cyl("Roll_Floor", 5.8, 0.1, (0, 0, 2.46), c("plaza"), verts=8)
     for i in range(8):
         a = 2 * PI * i / 8 + PI / 8
         x, y = math.cos(a) * 5.0, math.sin(a) * 5.0
-        cyl("Column", 0.35, 5.0, (x, y, 5.0), c("plaza"), verts=12)
-        box("ColBase", (0.95, 0.95, 0.35), (x, y, 2.65), c("trim"), bevel=0.05)
-        box("ColCap", (0.95, 0.95, 0.35), (x, y, 7.4), c("trim"), bevel=0.05)
-    cyl("RoofRing", 6.4, 0.6, (0, 0, 7.9), c("trim"), verts=8)
-    cyl("RoofBand", 6.5, 0.25, (0, 0, 7.55), c("accent2"), verts=8)
-    cone("Roof", 6.6, 1.2, 3.4, (0, 0, 9.9), c("accent"), verts=8)
-    cyl("RoofTop", 1.25, 0.5, (0, 0, 11.8), c("trim"), verts=8)
-    cyl("Finial", 0.18, 1.4, (0, 0, 12.7), c("accent2"), verts=8)
+        cyl("Roll_Column", 0.35, 5.0, (x, y, 5.0), c("plaza"), verts=12)
+        box("Roll_ColBase", (0.95, 0.95, 0.35), (x, y, 2.65), c("trim"), bevel=0.05)
+        box("Roll_ColCap", (0.95, 0.95, 0.35), (x, y, 7.4), c("trim"), bevel=0.05)
+    cyl("Roll_RoofRing", 6.4, 0.6, (0, 0, 7.9), c("trim"), verts=8)
+    cyl("Roll_RoofBand", 6.5, 0.25, (0, 0, 7.55), c("accent2"), verts=8)
+    cone("Roll_Roof", 6.6, 1.2, 3.4, (0, 0, 9.9), c("accent"), verts=8)
+    cyl("Roll_RoofTop", 1.25, 0.5, (0, 0, 11.8), c("trim"), verts=8)
+    cyl("Roll_Finial", 0.18, 1.4, (0, 0, 12.7), c("accent2"), verts=8)
     # Roll-Theke + Schild
-    box("RollCounter", (5.0, 1.6, 1.4), (0, -1.0, 3.2), c("trim"), bevel=0.08)
-    box("RollCounterTop", (5.3, 1.9, 0.2), (0, -1.0, 3.95), c("accent2"), bevel=0.05)
-    box("RollSignFrame", (6.2, 0.3, 1.5), (0, -6.6, 8.9), c("trim"), bevel=0.1)
-    box("RollSign", (5.8, 0.32, 1.15), (0, -6.62, 8.9), c("accent"), bevel=0.06)
-    txt("ROLL A MEME", (0, -6.82, 8.9), (PI / 2, 0, 0), 0.62, P["sign_text"])
+    box("Roll_RollCounter", (5.0, 1.6, 1.4), (0, -1.0, 3.2), c("trim"), bevel=0.08)
+    box("Roll_RollCounterTop", (5.3, 1.9, 0.2), (0, -1.0, 3.95), c("accent2"), bevel=0.05)
+    box("Roll_RollSignFrame", (6.2, 0.3, 1.5), (0, -6.6, 8.9), c("trim"), bevel=0.1)
+    box("Roll_RollSign", (5.8, 0.32, 1.15), (0, -6.62, 8.9), c("accent"), bevel=0.06)
+    txt("ROLL A MEME", (0, -6.82, 8.9), (PI / 2, 0, 0), 0.62, P["sign_text"]).name = "Roll_SignText"
     # schwebender Wuerfel
     box("FX_Dice", (2.0, 2.0, 2.0), (0, 0, 15.6), c("plaza"), rot=(0.6, 0.4, 0.5), bevel=0.32, seg=4)
     for p in ((0.52, -0.62, 16.2), (-0.38, -0.8, 15.2), (0.1, -0.7, 15.7)):
@@ -129,7 +130,7 @@ def gate():
         box("GatePillarBase", (2.0, 2.0, 0.6), (x, -27.5, 0.9), c("trim"), bevel=0.08)
     box("GateBeam", (13.5, 1.7, 1.6), (0, -27.5, 9.2), c("trim"), bevel=0.12)
     box("GateBoard", (8.5, 0.3, 1.2), (0, -28.4, 9.2), c("accent"), bevel=0.06)
-    txt("MEME HUB", (0, -28.6, 9.2), (PI / 2, 0, 0), 0.8, P["sign_text"])
+    txt("MEME HUB", (0, -28.6, 9.2), (PI / 2, 0, 0), 0.8, P["sign_text"]).name = "Gate_SignText"
 
 LABELS = [("SHOP", "accent3"), ("INDEX", "accent2"), ("REBIRTH", "accent"), ("QUESTS", "accent3"), ("CODES", "accent2")]
 

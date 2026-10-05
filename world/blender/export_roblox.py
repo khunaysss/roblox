@@ -65,7 +65,28 @@ class Emitter:
         self.rows.append("{" + ",".join([f'"{name}"', f'"{kind}"'] + [fmt(x) for x in size] + [fmt(x) for x in p] +
                                          [fmt(x) for x in r] + [f'"{hexc}"', str(mcode)]) + "}")
 
+    def text(self, o):
+        mw = o.matrix_world
+        loc, rot, sc = mw.decompose()
+        bb = [Vector(c) for c in o.bound_box]
+        mn = Vector((min(v.x for v in bb), min(v.y for v in bb), min(v.z for v in bb)))
+        mx = Vector((max(v.x for v in bb), max(v.y for v in bb), max(v.z for v in bb)))
+        ctr, dim = (mn + mx) / 2, mx - mn
+        A = C @ rot.to_matrix()
+        r, u, n = A.col[0], A.col[1], A.col[2]
+        X, Y, Z = -r, u, -n          # Front-Flaeche (-Z) zeigt zum Betrachter, Text liest richtig
+        p = (C @ (mw @ ctr)) * self.scale
+        w, h = dim.x * sc[0] * self.scale * 1.15, dim.y * sc[1] * self.scale * 1.35
+        R = [X[0], Y[0], Z[0], X[1], Y[1], Z[1], X[2], Y[2], Z[2]]
+        m = o.data.materials[0] if o.data.materials else None
+        hexc = m.get("hex", "#ffffff") if m else "#ffffff"
+        body = o.data.body.replace('"', "'")
+        self.rows.append("{" + ",".join([f'"{o.name.split(".")[0]}"', '"T"', fmt(w), fmt(h), "0.05"] + [fmt(x) for x in p] +
+                                         [fmt(x) for x in R] + [f'"{hexc}"', "0", f'"{body}"']) + "}")
+
     def obj(self, o):
+        if o.type == "FONT" and not o.hide_render:
+            return self.text(o)
         if o.type != "MESH" or o.hide_render:
             return
         bb = [Vector(c) for c in o.bound_box]
@@ -141,7 +162,23 @@ local function buildModel(name, rows, collide)
 	for _, r in ipairs(rows) do
 		local part = Instance.new("Part")
 		part.Name = r[1]
-		if r[2] == "C" then
+		if r[2] == "T" then
+			part.Transparency = 1
+			local gui = Instance.new("SurfaceGui")
+			gui.Face = Enum.NormalId.Front
+			gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+			gui.PixelsPerStud = 60
+			gui.LightInfluence = 0
+			local label = Instance.new("TextLabel")
+			label.Size = UDim2.fromScale(1, 1)
+			label.BackgroundTransparency = 1
+			label.Text = r[20]
+			label.TextScaled = true
+			label.Font = Enum.Font.FredokaOne
+			label.TextColor3 = Color3.fromHex(r[18])
+			label.Parent = gui
+			gui.Parent = part
+		elseif r[2] == "C" then
 			part.Shape = Enum.PartType.Cylinder
 		elseif r[2] == "S" then
 			local mesh = Instance.new("SpecialMesh")
@@ -157,8 +194,9 @@ local function buildModel(name, rows, collide)
 		part.TopSurface = Enum.SurfaceType.Smooth
 		part.BottomSurface = Enum.SurfaceType.Smooth
 		part.Anchored = true
-		part.CanCollide = collide and string.sub(r[1], 1, 3) ~= "FX_"
-		part.CastShadow = true
+		part.CanCollide = collide and string.sub(r[1], 1, 3) ~= "FX_" and r[2] ~= "T"
+		if r[2] == "T" then part.CanQuery = false; part.CanTouch = false; part.CastShadow = false end
+		if r[2] ~= "T" then part.CastShadow = true end
 		part.Parent = model
 	end
 	return model
@@ -281,5 +319,46 @@ arena.Parent = model -- unsichtbarer Marker fuer das Boss-Skript (Mitte der Dach
                    comment="Boss-Turm A: Festung. Dach = Boss-Arena, Leiter an der Rueckseite.")
     print("turm", len(rows))
 
+SPINNER = r'''-- Dreht den Wuerfel ueber dem Pavillon (Server-Skript im Hub, nur wenige Teile)
+local spin = Instance.new("Script")
+spin.Name = "DiceSpinner"
+spin.Source = [==[
+local RunService = game:GetService("RunService")
+local model = script.Parent
+local parts = {}
+for _, p in ipairs(model:GetChildren()) do
+	if p:IsA("BasePart") and (p.Name == "FX_Dice" or p.Name == "FX_Pip" or p.Name == "FX_Halo") then
+		table.insert(parts, p)
+	end
+end
+local dice = model:FindFirstChild("FX_Dice")
+if not dice then return end
+local center = dice.Position
+local rel = {}
+for _, p in ipairs(parts) do rel[p] = CFrame.new(center):ToObjectSpace(p.CFrame) end
+RunService.Heartbeat:Connect(function()
+	local t = os.clock()
+	local cf = CFrame.new(center + Vector3.new(0, math.sin(t * 1.5) * 0.6, 0)) * CFrame.Angles(0, t * 0.9, 0)
+	for p, r in pairs(rel) do p.CFrame = cf * r end
+end)
+]==]
+spin.Parent = model'''
+
+def export_hub():
+    import hub_premium
+    hub_premium.P.clear(); hub_premium.P.update(hub_premium.PALETTES["pastel"])
+    L.reset("MemeHub"); hub_premium.hub()
+    for o in list(bpy.data.objects):  # Wiese gehoert nicht zum Hub
+        if o.type == "MESH" and o not in S.objs and o.name.startswith("Plane"):
+            bpy.data.objects.remove(o, do_unlink=True)
+    rows = collect(2.0)
+    write_building("Hub_Pastel.lua", "MemeHub", rows, 'folder(workspace, "MemeWorld")', "0, 0, 0", extra=SPINNER,
+                   comment="Neuer Hub (Pastel Candy). Wird in Workspace/MemeWorld/MemeHub gebaut. Staende heissen Booth<Name>_..., ROLL-Pavillon Roll_..., Tor Gate_...")
+    print("hub", len(rows))
+
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["hub"]:
+        export_hub()
+    else:
+        main()
+        export_hub()
