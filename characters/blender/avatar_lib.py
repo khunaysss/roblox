@@ -37,6 +37,7 @@ def M(c, metal=0.0, rough=0.5, emit=0.0):
         b.inputs["Emission Color"].default_value = (*rgb, 1)
         b.inputs["Emission Strength"].default_value = emit
     m.diffuse_color = (*rgb, 1)
+    m["hex"] = c; m["metal"] = metal; m["emit"] = emit; m["rough"] = rough
     _mats[key] = m
     return m
 
@@ -79,6 +80,7 @@ def box(name, size, loc, m, rot=(0, 0, 0), bevel=0.06, seg=2):
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     _bevel(o, min(bevel, min(size) * 0.45) if bevel else 0, seg)
     o.rotation_euler = Euler(rot)
+    o["prim"] = "box"
     return _fin(o, name, m)
 
 def cyl(name, r, h, loc, m, rot=(0, 0, 0), verts=24, bevel=0.0):
@@ -86,12 +88,14 @@ def cyl(name, r, h, loc, m, rot=(0, 0, 0), verts=24, bevel=0.0):
     o = bpy.context.object
     _bevel(o, bevel)
     o.rotation_euler = Euler(rot)
+    o["prim"] = "cyl"; o["verts"] = verts; o["r"] = r; o["h"] = h
     return _fin(o, name, m)
 
 def cone(name, r1, r2, h, loc, m, rot=(0, 0, 0), verts=24):
     bpy.ops.mesh.primitive_cone_add(radius1=r1, radius2=r2, depth=h, location=loc, vertices=verts)
     o = bpy.context.object
     o.rotation_euler = Euler(rot)
+    o["prim"] = "cone"; o["verts"] = verts; o["r1"] = r1; o["r2"] = r2; o["h"] = h
     return _fin(o, name, m)
 
 def ball(name, r, loc, m, scale=(1, 1, 1)):
@@ -100,6 +104,7 @@ def ball(name, r, loc, m, scale=(1, 1, 1)):
     o.scale = scale
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     bpy.ops.object.shade_smooth()
+    o["prim"] = "ball"
     return _fin(o, name, m)
 
 def torus(name, R, r, loc, m, rot=(0, 0, 0)):
@@ -108,6 +113,7 @@ def torus(name, R, r, loc, m, rot=(0, 0, 0)):
     o = bpy.context.object
     o.rotation_euler = Euler(rot)
     bpy.ops.object.shade_smooth()
+    o["prim"] = "torus"; o["R"] = R; o["r"] = r
     return _fin(o, name, m)
 
 def limb(name, size, pivot, m, rot=(0, 0, 0), offset=0.0, bevel=0.07, loc_off=(0, 0, 0)):
