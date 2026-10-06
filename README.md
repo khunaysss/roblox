@@ -15,6 +15,7 @@ Großer Autobahn-Rundkurs, gebaut mit Blender, für Roblox.
 - Weite Kurven (engster Radius 202 Studs), S-Kurven, sanfte Hügel
 - Tunnel, 3 Brücken über die Autobahn, 4 Schilderbrücken, Laternen, Leitplanken
 - Start/Ziel-Linie mit Zielflagge-Muster und rotem Banner
+- 6 Verkehrsautos und ein Verkehrs-Skript (siehe unten)
 - `TrackLanes.lua`: Wegpunkte für alle 6 Spuren, damit KI-Autos in ihrer Spur fahren können
 
 ## Dateien
@@ -25,6 +26,9 @@ Großer Autobahn-Rundkurs, gebaut mit Blender, für Roblox.
 | `export/Autobahn.blend` | In Blender weiter bearbeiten |
 | `export/TrackLanes.lua` | ModuleScript mit Spur-Wegpunkten und Spawnpunkt |
 | `blender/autobahn_strecke.py` | Generator: Strecke anpassen und neu erzeugen |
+| `export/autos/*.fbx`, `export/Autos.blend` | Verkehrsautos |
+| `roblox/Traffic.client.lua` | LocalScript für den Verkehr |
+| `blender/autos.py` | Generator für die Autos |
 
 ## In Roblox importieren
 
@@ -58,6 +62,39 @@ end
 `Forward` = rechte Fahrbahn (gleiche Richtung wie der Start), `Backward` = Gegenfahrbahn.
 Jede Liste ist in Fahrtrichtung sortiert und wiederholt sich als Schleife. Für den Ghost-Driver-Effekt
 fährt der Spieler auf der Gegenfahrbahn, die Verkehrsautos folgen `Backward` bzw. `Forward`.
+
+## Verkehr (Autos zum Durchcutten)
+
+![Ghost Driver](docs/verkehr_ghostdriver.png)
+
+| Autos | Verkehr von oben |
+|---|---|
+| ![](docs/autos_vorne.png) | ![](docs/verkehr_oben.png) |
+
+Sechs Autos in `export/autos/`: **Limousine, SUV, Kompakt, Sportwagen, Transporter, LKW** (mit Auflieger).
+Jedes Auto besteht aus Teilen wie `Limousine_Body`, `_Glass`, `_Tire`, `_Rim`, `_Headlight`, `_Taillight`, `_Trim`.
+Das Skript färbt `Body` und `Trailer` zufällig ein und setzt die Materialien (Glas, Neon-Lichter, Gummi …) selbst.
+
+### Einrichten
+
+1. Alle sechs FBX aus `export/autos/` mit **Import 3D** importieren (Scale Unit: **Studs**).
+2. In `ReplicatedStorage` einen Ordner **`TrafficCars`** anlegen und die sechs Models hineinziehen.
+   Die Models müssen genau so heißen wie die Dateien (`Limousine`, `SUV`, …).
+3. `export/TrackLanes.lua` als **ModuleScript** `TrackLanes` in `ReplicatedStorage` legen.
+4. `roblox/Traffic.client.lua` als **LocalScript** in `StarterPlayer > StarterPlayerScripts` legen.
+5. Optional: Bei den `*_Body`-Teilen in Studio `CollisionFidelity = Box` einstellen (schneller).
+
+### So funktioniert's
+
+- Pro Spur fahren alle Autos gleich schnell, also bleiben die Abstände immer gleich: **170–420 Studs**
+  zwischen zwei Autos auf derselben Spur (mit der Standard-Einstellung ca. 167 Autos auf der ganzen Strecke).
+- Innen schnell (105 Studs/s), Mitte 80, außen langsam (55) mit LKWs und Transportern.
+- Die Positionen werden aus der Serverzeit berechnet: Jeder Spieler sieht denselben Verkehr, ohne Netzwerk-Last.
+- Nur Autos im Umkreis von 1500 Studs um die Kamera werden angezeigt.
+- Karosserie und Auflieger haben Kollision. Wer reinfährt, crasht.
+
+Alles lässt sich oben im Skript im `CONFIG`-Block einstellen (`GapMin`, `GapMax`, `LaneSpeed`, `LaneCars`, Farben).
+Mehr Platz zum Cutten bekommst du mit größerem `GapMin`/`GapMax`, mehr Chaos mit kleineren Werten.
 
 ## Strecke ändern
 
