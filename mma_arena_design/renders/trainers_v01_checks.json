@@ -1,0 +1,393 @@
+{
+ "rig": "new shared skeleton (Fighter_Design_v03 has no armature)",
+ "poles": {
+  "Mike_Tyson": {
+   "LeftLowerArm": [
+    130,
+    0.0
+   ],
+   "RightLowerArm": [
+    50,
+    0.0
+   ],
+   "LeftLowerLeg": [
+    -88.75,
+    0.0083
+   ],
+   "RightLowerLeg": [
+    -91.25,
+    0.0083
+   ]
+  },
+  "Muhammad_Ali": {
+   "LeftLowerArm": [
+    130,
+    0.0
+   ],
+   "RightLowerArm": [
+    50,
+    0.0
+   ],
+   "LeftLowerLeg": [
+    -88.75,
+    0.0083
+   ],
+   "RightLowerLeg": [
+    -91.25,
+    0.0083
+   ]
+  },
+  "Alex_Pereira": {
+   "LeftLowerArm": [
+    130,
+    0.0
+   ],
+   "RightLowerArm": [
+    50,
+    0.0
+   ],
+   "LeftLowerLeg": [
+    -88.75,
+    0.0083
+   ],
+   "RightLowerLeg": [
+    -91.25,
+    0.0083
+   ]
+  },
+  "Khabib_Nurmagomedov": {
+   "LeftLowerArm": [
+    130,
+    0.0
+   ],
+   "RightLowerArm": [
+    50,
+    0.0
+   ],
+   "LeftLowerLeg": [
+    -88.75,
+    0.0083
+   ],
+   "RightLowerLeg": [
+    -91.25,
+    0.0083
+   ]
+  },
+  "Charles_Oliveira": {
+   "LeftLowerArm": [
+    130,
+    0.0
+   ],
+   "RightLowerArm": [
+    50,
+    0.0
+   ],
+   "LeftLowerLeg": [
+    -88.75,
+    0.0083
+   ],
+   "RightLowerLeg": [
+    -91.25,
+    0.0083
+   ]
+  },
+  "Saenchai": {
+   "LeftLowerArm": [
+    130,
+    0.0
+   ],
+   "RightLowerArm": [
+    50,
+    0.0
+   ],
+   "LeftLowerLeg": [
+    -88.75,
+    0.0083
+   ],
+   "RightLowerLeg": [
+    -91.25,
+    0.0083
+   ]
+  }
+ },
+ "pose_tests": {
+  "Mike_Tyson": {
+   "rest": {
+    "Hair": 34,
+    "Shorts": 128,
+    "Gloves": 88
+   },
+   "guard": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "straight_punch": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "arms_overhead": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "torso_twist": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "squat": {
+    "Hair": 0,
+    "Shorts": 116,
+    "Gloves": 0
+   },
+   "squat_feet_z": [
+    0.088,
+    0.088
+   ],
+   "knee_kick": {
+    "Hair": 0,
+    "Shorts": 104,
+    "Gloves": 0
+   }
+  },
+  "Muhammad_Ali": {
+   "rest": {
+    "Hair": 32,
+    "Shorts": 144,
+    "Gloves": 88
+   },
+   "guard": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "straight_punch": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "arms_overhead": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "torso_twist": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0
+   },
+   "squat": {
+    "Hair": 0,
+    "Shorts": 108,
+    "Gloves": 0
+   },
+   "squat_feet_z": [
+    0.09,
+    0.09
+   ],
+   "knee_kick": {
+    "Hair": 0,
+    "Shorts": 104,
+    "Gloves": 0
+   }
+  },
+  "Alex_Pereira": {
+   "rest": {
+    "Hair": 34,
+    "Shorts": 138,
+    "MMA_Gloves": 140
+   },
+   "guard": {
+    "Hair": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 20
+   },
+   "straight_punch": {
+    "Hair": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "arms_overhead": {
+    "Hair": 10,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "torso_twist": {
+    "Hair": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "squat": {
+    "Hair": 0,
+    "Shorts": 140,
+    "MMA_Gloves": 52
+   },
+   "squat_feet_z": [
+    0.09,
+    0.09
+   ],
+   "knee_kick": {
+    "Hair": 0,
+    "Shorts": 95,
+    "MMA_Gloves": 20
+   }
+  },
+  "Khabib_Nurmagomedov": {
+   "rest": {
+    "Hair_Beard": 142,
+    "Shorts": 134,
+    "MMA_Gloves": 140
+   },
+   "guard": {
+    "Hair_Beard": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 24
+   },
+   "straight_punch": {
+    "Hair_Beard": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "arms_overhead": {
+    "Hair_Beard": 32,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "torso_twist": {
+    "Hair_Beard": 3,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "squat": {
+    "Hair_Beard": 15,
+    "Shorts": 140,
+    "MMA_Gloves": 44
+   },
+   "squat_feet_z": [
+    0.088,
+    0.088
+   ],
+   "knee_kick": {
+    "Hair_Beard": 0,
+    "Shorts": 107,
+    "MMA_Gloves": 24
+   }
+  },
+  "Charles_Oliveira": {
+   "rest": {
+    "Hair": 56,
+    "Shorts": 150,
+    "MMA_Gloves": 140
+   },
+   "guard": {
+    "Hair": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 20
+   },
+   "straight_punch": {
+    "Hair": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "arms_overhead": {
+    "Hair": 18,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "torso_twist": {
+    "Hair": 0,
+    "Shorts": 0,
+    "MMA_Gloves": 0
+   },
+   "squat": {
+    "Hair": 0,
+    "Shorts": 120,
+    "MMA_Gloves": 52
+   },
+   "squat_feet_z": [
+    0.09,
+    0.09
+   ],
+   "knee_kick": {
+    "Hair": 0,
+    "Shorts": 89,
+    "MMA_Gloves": 20
+   }
+  },
+  "Saenchai": {
+   "rest": {
+    "Hair": 34,
+    "Shorts": 210,
+    "Gloves": 88,
+    "Armbands": 480
+   },
+   "guard": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0,
+    "Armbands": -32
+   },
+   "straight_punch": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0,
+    "Armbands": -20
+   },
+   "arms_overhead": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0,
+    "Armbands": -28
+   },
+   "torso_twist": {
+    "Hair": 0,
+    "Shorts": 0,
+    "Gloves": 0,
+    "Armbands": 0
+   },
+   "squat": {
+    "Hair": 0,
+    "Shorts": 150,
+    "Gloves": 0,
+    "Armbands": -8
+   },
+   "squat_feet_z": [
+    0.085,
+    0.085
+   ],
+   "knee_kick": {
+    "Hair": 0,
+    "Shorts": 65,
+    "Gloves": 0,
+    "Armbands": -32
+   }
+  }
+ },
+ "lowest_point": {
+  "Mike_Tyson": -0.0,
+  "Muhammad_Ali": -0.0,
+  "Alex_Pereira": -0.0,
+  "Khabib_Nurmagomedov": -0.0,
+  "Charles_Oliveira": -0.0,
+  "Saenchai": -0.0
+ },
+ "transforms_ok": true,
+ "height_m": {
+  "Mike_Tyson": 1.881,
+  "Muhammad_Ali": 1.974,
+  "Alex_Pereira": 1.903,
+  "Khabib_Nurmagomedov": 1.881,
+  "Charles_Oliveira": 1.928,
+  "Saenchai": 1.821
+ },
+ "tris": {
+  "Mike_Tyson": 2862,
+  "Muhammad_Ali": 2948,
+  "Alex_Pereira": 3228,
+  "Khabib_Nurmagomedov": 3550,
+  "Charles_Oliveira": 3314,
+  "Saenchai": 3744
+ }
+}
