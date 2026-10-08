@@ -1,0 +1,21 @@
+{
+ "arena_tris": 76772,
+ "crowd_tris": 135900,
+ "crowd_near_spectator_instances": 1800,
+ "of_which_ringside": 393,
+ "crowd_far_silhouette_groups": 198,
+ "crowd_far_people_approx": 2852,
+ "spectator_mesh_variants": 10,
+ "aisle_violations": 0,
+ "fighter_instances": 3,
+ "coach_instances": 2,
+ "instanced_character_tris": {
+  "fighter": 13692,
+  "coach": 5056
+ },
+ "near_white_pixels_percent": {
+  "overview": 0.01,
+  "fight_view": 0.0,
+  "walkout": 0.02
+ }
+}
