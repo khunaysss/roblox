@@ -1,0 +1,79 @@
+{
+ "geometry": {
+  "hair_x_beard": {
+   "Hair_QuiffV03+Beard_None": 0,
+   "Hair_QuiffV03+Beard_Short": 0,
+   "Hair_QuiffV03+Beard_Full": 0,
+   "Hair_Buzzcut+Beard_None": 0,
+   "Hair_Buzzcut+Beard_Short": 0,
+   "Hair_Buzzcut+Beard_Full": 0,
+   "Hair_SidePart+Beard_None": 0,
+   "Hair_SidePart+Beard_Short": 0,
+   "Hair_SidePart+Beard_Full": 0,
+   "Hair_ShortCurls+Beard_None": 0,
+   "Hair_ShortCurls+Beard_Short": 0,
+   "Hair_ShortCurls+Beard_Full": 0
+  },
+  "vs_reference": {
+   "Hair_QuiffV03": {
+    "Face_Ear_L": 0,
+    "Face_Ear_R": 0,
+    "Fighter_UpperTorso": 0,
+    "Face_Nose": 0,
+    "tris": 292
+   },
+   "Hair_Buzzcut": {
+    "Face_Ear_L": 0,
+    "Face_Ear_R": 0,
+    "Fighter_UpperTorso": 0,
+    "Face_Nose": 0,
+    "tris": 160
+   },
+   "Hair_SidePart": {
+    "Face_Ear_L": 0,
+    "Face_Ear_R": 0,
+    "Fighter_UpperTorso": 0,
+    "Face_Nose": 0,
+    "tris": 300
+   },
+   "Hair_ShortCurls": {
+    "Face_Ear_L": 0,
+    "Face_Ear_R": 0,
+    "Fighter_UpperTorso": 0,
+    "Face_Nose": 0,
+    "tris": 4000
+   },
+   "Beard_Short": {
+    "Face_Ear_L": 0,
+    "Face_Ear_R": 0,
+    "Fighter_UpperTorso": 0,
+    "Face_Nose": 10,
+    "tris": 352
+   },
+   "Beard_Full": {
+    "Face_Ear_L": 0,
+    "Face_Ear_R": 0,
+    "Fighter_UpperTorso": 0,
+    "Face_Nose": 10,
+    "tris": 336
+   }
+  }
+ },
+ "tattoo_contrast": {
+  "light": {
+   "v04_mean_dL": 0.267,
+   "v05_mean_dL": 0.337,
+   "ink_pixels": 4509
+  },
+  "medium": {
+   "v04_mean_dL": 0.237,
+   "v05_mean_dL": 0.283,
+   "ink_pixels": 4529
+  },
+  "dark": {
+   "v04_mean_dL": 0.072,
+   "v05_mean_dL": 0.21,
+   "ink_pixels": 4013
+  }
+ }
+}
