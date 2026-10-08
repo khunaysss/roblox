@@ -1,0 +1,276 @@
+{
+ "routes": {
+  "entrance_to_corridor": {
+   "blocked_by": [],
+   "min_width_m": 6.6
+  },
+  "corridor_east_west": {
+   "blocked_by": [],
+   "min_width_m": 5.92
+  },
+  "corridor_to_locker_door": {
+   "blocked_by": [],
+   "min_width_m": 10.34
+  },
+  "through_locker_door": {
+   "blocked_by": [],
+   "min_width_m": 1.18
+  },
+  "locker_door_to_style_spot": {
+   "blocked_by": [],
+   "min_width_m": 4.9
+  },
+  "corridor_to_cage_door": {
+   "blocked_by": [],
+   "min_width_m": 17.97
+  },
+  "corridor_to_mat": {
+   "blocked_by": [],
+   "min_width_m": 7.17
+  },
+  "corridor_to_bags": {
+   "blocked_by": [],
+   "min_width_m": 6.32
+  },
+  "corridor_to_coach_area": {
+   "blocked_by": [],
+   "min_width_m": "open"
+  },
+  "corridor_to_strength": {
+   "blocked_by": [],
+   "min_width_m": 18.0
+  },
+  "corridor_to_warmup": {
+   "blocked_by": [],
+   "min_width_m": "open"
+  }
+ },
+ "doors": {
+  "entrance_clear_w_h": [
+   1.08,
+   2.24
+  ],
+  "locker_clear_w_h": [
+   1.25,
+   2.3
+  ],
+  "fighter_height": 1.857,
+  "fighter_apose_width": 1.2
+ },
+ "bag_spacing_m": 2.6,
+ "floating_objects": [],
+ "overlaps": [
+  [
+   "Bag_Support_Beam",
+   "Bag_Beam_Hangers_To_Ceiling",
+   12
+  ],
+  [
+   "Dumbbell_S_Upper_A",
+   "Dumbbell_Rack",
+   10
+  ],
+  [
+   "Dumbbell_S_Upper_B",
+   "Dumbbell_Rack",
+   10
+  ],
+  [
+   "Dumbbell_M_Upper_A",
+   "Dumbbell_Rack",
+   10
+  ],
+  [
+   "Dumbbell_M_Upper_B",
+   "Dumbbell_Rack",
+   10
+  ],
+  [
+   "Dumbbell_L_Upper_A",
+   "Dumbbell_Rack",
+   10
+  ],
+  [
+   "Dumbbell_L_Upper_B",
+   "Dumbbell_Rack",
+   10
+  ],
+  [
+   "Plate_Storage_Tree",
+   "Plate_On_Tree_R_35",
+   80
+  ],
+  [
+   "Plate_Storage_Tree",
+   "Plate_On_Tree_L_35",
+   80
+  ],
+  [
+   "Plate_Storage_Tree",
+   "Plate_On_Tree_R_85",
+   80
+  ],
+  [
+   "Plate_Storage_Tree",
+   "Plate_On_Tree_L_85",
+   80
+  ],
+  [
+   "Power_Rack",
+   "Barbell",
+   36
+  ],
+  [
+   "Barbell",
+   "Barbell_Plate_L_1",
+   48
+  ],
+  [
+   "Barbell",
+   "Barbell_Plate_L_2",
+   48
+  ],
+  [
+   "Barbell",
+   "Barbell_Plate_R_1",
+   48
+  ],
+  [
+   "Barbell",
+   "Barbell_Plate_R_2",
+   48
+  ],
+  [
+   "Dumbbell_Rack",
+   "Dumbbell_S_A",
+   10
+  ],
+  [
+   "Dumbbell_Rack",
+   "Dumbbell_S_B",
+   10
+  ],
+  [
+   "Dumbbell_Rack",
+   "Dumbbell_M_A",
+   10
+  ],
+  [
+   "Dumbbell_Rack",
+   "Dumbbell_M_B",
+   10
+  ],
+  [
+   "Dumbbell_Rack",
+   "Dumbbell_L_A",
+   10
+  ],
+  [
+   "Dumbbell_Rack",
+   "Dumbbell_L_B",
+   19
+  ],
+  [
+   "Bench_EastWall",
+   "Towel_EastWall",
+   8
+  ],
+  [
+   "Bench_EastWall",
+   "Bottle_EastWall",
+   10
+  ],
+  [
+   "Bench_MatSide",
+   "Towel_MatSide",
+   8
+  ],
+  [
+   "Bench_MatSide",
+   "Bottle_MatSide",
+   10
+  ],
+  [
+   "Seat_Bench",
+   "Water_Bottle",
+   10
+  ],
+  [
+   "Seat_Bench",
+   "Towel_On_Bench",
+   8
+  ],
+  [
+   "LockerRoom_Bench",
+   "LockerRoom_Towel",
+   6
+  ],
+  [
+   "Cage_Door_Frame_Static",
+   "Cage_Door_Leaf",
+   64
+  ]
+ ],
+ "materials": {
+  "unique_used": 50,
+  "objects_without_material": []
+ },
+ "tris_without_fighters": 23534,
+ "tris_by_collection": {
+  "Architecture": 4382,
+  "Cage": 4666,
+  "BagArea": 3080,
+  "StrengthArea": 4416,
+  "LockerRoom": 3354,
+  "Props": 2932,
+  "Lights": 704
+ },
+ "collision_meshes": 37,
+ "interaction_tagged": [
+  "Adjustable_Bench_Dumbbells",
+  "Bench_EastWall",
+  "Bench_MatSide",
+  "Cage_Door_Leaf",
+  "Coach_Desk",
+  "Customization_Spot",
+  "Door_Entrance_Leaf",
+  "Door_LockerRoom_Leaf",
+  "Exercise_Mat_1",
+  "Exercise_Mat_2",
+  "Exercise_Mat_3",
+  "Flat_Bench_InRack",
+  "Focus_Mitt_1L",
+  "Focus_Mitt_1R",
+  "Focus_Mitt_2L",
+  "Focus_Mitt_2R",
+  "Heavy_Bag_1",
+  "Heavy_Bag_2",
+  "LockerRoom_Bench",
+  "LockerRoom_Bench_2",
+  "Locker_01",
+  "Locker_02",
+  "Locker_03",
+  "Locker_04",
+  "Locker_05",
+  "Locker_06",
+  "Locker_07",
+  "Locker_08",
+  "Mitt_Wall_Holder",
+  "Pinboard_Plans_Poster",
+  "Power_Rack",
+  "Round_Timer",
+  "Standing_Bag"
+ ],
+ "near_white_pixels_percent": {
+  "overview": 0.0,
+  "cage_player_height": 0.03,
+  "training_area": 0.0,
+  "locker_room": 0.0
+ },
+ "dark_pixels_percent": {
+  "overview": 4.03,
+  "cage_player_height": 0.33,
+  "training_area": 0.02,
+  "locker_room": 2.32
+ }
+}
