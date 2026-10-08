@@ -1,0 +1,102 @@
+{
+ "routes": {
+  "entrance_to_corridor": {
+   "blocked_by": [],
+   "min_width_m": 7.58
+  },
+  "corridor_east_west": {
+   "blocked_by": [],
+   "min_width_m": 7.6
+  },
+  "corridor_to_locker_door": {
+   "blocked_by": [],
+   "min_width_m": 9.95
+  },
+  "corridor_to_cage_door": {
+   "blocked_by": [],
+   "min_width_m": 17.99
+  },
+  "corridor_to_mat": {
+   "blocked_by": [],
+   "min_width_m": 7.31
+  },
+  "corridor_to_bags": {
+   "blocked_by": [],
+   "min_width_m": 6.46
+  },
+  "corridor_to_coach_area": {
+   "blocked_by": [],
+   "min_width_m": "open"
+  },
+  "corridor_to_strength": {
+   "blocked_by": [],
+   "min_width_m": 17.85
+  }
+ },
+ "bag_free_radius_m": {
+  "Heavy_Bag_1": 1.8,
+  "Heavy_Bag_2": 1.8
+ },
+ "mat_clear": "no equipment on the mat",
+ "door_heights_m": {
+  "entrance": 2.25,
+  "locker": 2.2,
+  "fighter_height": 1.857
+ },
+ "tris_without_fighters": 12416,
+ "tris_by_collection": {
+  "Building": 1818,
+  "Bag_Training": 2488,
+  "Grappling": 1980,
+  "Training_Cage": 2568,
+  "Strength_Equipment": 1928,
+  "Coach_Area": 1462,
+  "Props": 172
+ },
+ "reusable_assets": [
+  "AS_Bag_Chain_1m",
+  "AS_Bag_Support_Beam",
+  "AS_Barbell_Bar",
+  "AS_Bumper_Plate_20",
+  "AS_Bumper_Plate_25_Red",
+  "AS_Cage_BottomRail",
+  "AS_Cage_Door",
+  "AS_Cage_Door_Fence",
+  "AS_Cage_Fence_DoorSide",
+  "AS_Cage_Fence_Panel",
+  "AS_Cage_TopRail",
+  "AS_Ceiling_Light",
+  "AS_Coach_Chair",
+  "AS_Coach_Desk",
+  "AS_Door_Steel",
+  "AS_Dumbbell_L",
+  "AS_Dumbbell_M",
+  "AS_Dumbbell_Rack",
+  "AS_Dumbbell_S",
+  "AS_Flat_Bench",
+  "AS_Focus_Mitt",
+  "AS_Heavy_Bag",
+  "AS_Mat_Tile_1m_Charcoal",
+  "AS_Mat_Tile_1m_Red",
+  "AS_Mitt_Wall_Holder",
+  "AS_Pinboard",
+  "AS_Power_Rack",
+  "AS_Roof_IBeam",
+  "AS_Seat_Bench",
+  "AS_Sports_Bag",
+  "AS_Standing_Bag",
+  "AS_Towel_Folded",
+  "AS_Trophy_Shelf",
+  "AS_Trophy_big",
+  "AS_Trophy_small",
+  "AS_Wall_Pad_1m",
+  "AS_Water_Bottle",
+  "AS_Window_Frame"
+ ],
+ "instanced_objects": 120,
+ "near_white_pixels_percent": {
+  "overview": 0.0,
+  "bag_area": 0.0,
+  "cage_grappling": 0.02
+ }
+}
