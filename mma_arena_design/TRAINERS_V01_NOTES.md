@@ -23,3 +23,20 @@ Vorschauen: `renders/trainers_v01_overview.png`, `trainers_v01_front/side/back.p
 
 ## Hinweis
 Die Figuren stellen reale Personen dar. Für eine Veröffentlichung im Spiel sind in der Regel Rechte an Namen und Aussehen nötig.
+
+---
+
+# v02 – Kampfstile (`Cage_Champions_Trainers_v02.blend`, Skript `build_trainer_styles_v02.py`)
+Pro Trainer 3 Actions (30 fps, Fake User, auf dem gemeinsamen Rig): `<Name>_Stance_Idle` (Schleife), `<Name>_Signature_1_…`, `<Name>_Signature_2_…`.
+
+| Trainer | Haltung | Signature 1 | Signature 2 |
+|---|---|---|---|
+| Mike Tyson | Peek-a-boo, tief, Bob & Weave | Linker Körperhaken + rechter Uppercut | Slip + Konter-Cross |
+| Muhammad Ali | aufrecht, Hände tief, tänzelnd | Jab-Jab-Cross | Ali Shuffle |
+| Alex Pereira | groß, Deckung hoch | Linker Haken | Rechter Low Kick |
+| Khabib Nurmagomedov | breite Ringer-Haltung | Double-Leg-Takedown | Clinch-Kontrolle |
+| Charles Oliveira | Rechtsauslage, Muay Thai/BJJ | Clinch-Knie | Front-Kick |
+| Saenchai | aufrechte Muay-Thai-Haltung | Teep | Rechter High Kick |
+
+Animiert werden nur LowerTorso, UpperTorso, Head und die IK-Steuer-Bones. Für Roblox müssen die Actions auf die Deform-Bones gebacken
+und als Animationen exportiert/hochgeladen werden; Trefferzeitpunkte und Spiellogik kommen in Roblox dazu. Prüfwerte: `renders/trainer_styles_v02_checks.json`.

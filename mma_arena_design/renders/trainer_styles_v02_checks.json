@@ -1,0 +1,92 @@
+{
+ "Mike_Tyson": {
+  "style": "Peek-a-boo: tief geduckt, Handschuhe an den Wangen, Bob & Weave",
+  "actions": [
+   "Mike_Tyson_Stance_Idle",
+   "Mike_Tyson_Signature_1_Left_Body_Hook_Right_Uppercut",
+   "Mike_Tyson_Signature_2_Slip_And_Counter_Cross"
+  ],
+  "frames": [
+   41,
+   33,
+   25
+  ],
+  "ankle_below_rest_m": -0.0,
+  "max_hand_target_miss_m": 0.306
+ },
+ "Muhammad_Ali": {
+  "style": "Aufrecht, H\u00e4nde tief, st\u00e4ndig in Bewegung auf den Fu\u00dfballen (Ali Shuffle)",
+  "actions": [
+   "Muhammad_Ali_Stance_Idle",
+   "Muhammad_Ali_Signature_1_Jab_Jab_Cross",
+   "Muhammad_Ali_Signature_2_Ali_Shuffle"
+  ],
+  "frames": [
+   33,
+   29,
+   19
+  ],
+  "ankle_below_rest_m": 0.0,
+  "max_hand_target_miss_m": 0.331
+ },
+ "Alex_Pereira": {
+  "style": "Gro\u00dfe, aufrechte Kickbox-Haltung, Deckung hoch, gef\u00e4hrlicher linker Haken",
+  "actions": [
+   "Alex_Pereira_Stance_Idle",
+   "Alex_Pereira_Signature_1_Left_Hook",
+   "Alex_Pereira_Signature_2_Right_Low_Kick"
+  ],
+  "frames": [
+   41,
+   21,
+   27
+  ],
+  "ankle_below_rest_m": -0.0,
+  "max_hand_target_miss_m": 0.041
+ },
+ "Khabib_Nurmagomedov": {
+  "style": "Breite, tiefe Ringer-Haltung, H\u00e4nde vorn zum Greifen, Druck nach vorn",
+  "actions": [
+   "Khabib_Nurmagomedov_Stance_Idle",
+   "Khabib_Nurmagomedov_Signature_1_Double_Leg_Takedown",
+   "Khabib_Nurmagomedov_Signature_2_Clinch_Control"
+  ],
+  "frames": [
+   41,
+   37,
+   33
+  ],
+  "ankle_below_rest_m": -0.0,
+  "max_hand_target_miss_m": 0.183
+ },
+ "Charles_Oliveira": {
+  "style": "Muay-Thai-/BJJ-Stil, Rechtsauslage, sucht Clinch und Knie",
+  "actions": [
+   "Charles_Oliveira_Stance_Idle",
+   "Charles_Oliveira_Signature_1_Clinch_Knee",
+   "Charles_Oliveira_Signature_2_Front_Kick"
+  ],
+  "frames": [
+   41,
+   31,
+   27
+  ],
+  "ankle_below_rest_m": -0.0,
+  "max_hand_target_miss_m": 0.049
+ },
+ "Saenchai": {
+  "style": "Aufrechte Muay-Thai-Haltung, vorderes Bein leicht, verspielt, Teeps und hohe Kicks",
+  "actions": [
+   "Saenchai_Stance_Idle",
+   "Saenchai_Signature_1_Teep_Push_Kick",
+   "Saenchai_Signature_2_Right_Head_Kick"
+  ],
+  "frames": [
+   41,
+   25,
+   29
+  ],
+  "ankle_below_rest_m": 0.0,
+  "max_hand_target_miss_m": 0.0
+ }
+}
