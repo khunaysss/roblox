@@ -1,0 +1,35 @@
+{
+ "overlaps": {
+  "Main_Coach_Focus_Mitt_L": {
+   "Body": 60,
+   "Training_Shirt": 0,
+   "Training_Pants": 0,
+   "Sport_Shoes": 0
+  },
+  "Main_Coach_Focus_Mitt_R": {
+   "Body": 60,
+   "Training_Shirt": 0,
+   "Training_Pants": 0,
+   "Sport_Shoes": 0
+  },
+  "Main_Coach_Belly_Pad": {
+   "Body": 0,
+   "Training_Shirt": 0,
+   "Training_Pants": 0,
+   "Sport_Shoes": 0
+  },
+  "Main_Coach_Belly_Pad_Strap": {
+   "Body": 0,
+   "Training_Shirt": 0,
+   "Training_Pants": 0,
+   "Sport_Shoes": 0
+  }
+ },
+ "belly_pad_vs_strap": 136,
+ "min_gap_m": {
+  "Main_Coach_Focus_Mitt_L": 0.0001,
+  "Main_Coach_Focus_Mitt_R": 0.0001,
+  "Main_Coach_Belly_Pad": 0.0114,
+  "Main_Coach_Belly_Pad_Strap": 0.0002
+ }
+}
