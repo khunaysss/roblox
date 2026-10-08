@@ -1,6 +1,6 @@
 # Aktueller Designstand
 
 - **Arena:** `MMA_Arena_Design_v03.blend` (aktueller Stand; v01/v02 bleiben als Historie)
-- **Fighter:** `Fighter_Prototype_v01.blend` (blockiger Prototyp, ohne Rig/Animation)
+- **Fighter:** `Fighter_Prototype_v02.blend` (aktueller Stand, ohne Rig/Animation; v01 bleibt als Historie)
 - **Größenreferenz:** `MMA_Arena_v03_FighterScale.blend` = Kopie von v03 mit verlinktem Fighter im Käfig
-  (verlinkt aus `Fighter_Prototype_v01.blend` – Änderungen am Fighter erscheinen dort automatisch)
+  (verlinkt noch aus `Fighter_Prototype_v01.blend` – Änderungen am Fighter erscheinen dort automatisch)
