@@ -1,0 +1,24 @@
+{
+ "objects": [
+  "Main_Coach_Beard_GreyTemples",
+  "Main_Coach_Body",
+  "Main_Coach_Face_Age_Lines",
+  "Main_Coach_Hair",
+  "Main_Coach_Sport_Shoes",
+  "Main_Coach_Training_Pants",
+  "Main_Coach_Training_Shirt"
+ ],
+ "armature": "Main_Coach_Armature",
+ "bones": 24,
+ "overlap_with_body": {
+  "Main_Coach_Hair": 34,
+  "Main_Coach_Beard_GreyTemples": 132,
+  "Main_Coach_Face_Age_Lines": 0,
+  "Main_Coach_Training_Shirt": 254,
+  "Main_Coach_Training_Pants": 128,
+  "Main_Coach_Sport_Shoes": 62
+ },
+ "lowest_z": -0.0,
+ "height_m": 1.922,
+ "tris": 3728
+}
