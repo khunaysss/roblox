@@ -174,3 +174,4 @@ v02 wurde nur geöffnet (Prüfsumme unverändert). Modell, Gewichtung und Anpass
 - Datei `mma_arena_design/Wrestling_Prototype_v01.blend`: zwei Kopien von Fighter_Rigged_v03 (A rot, B blau).
 - Rig: ja, je 24 Bones mit IK. Animationen: 12 Actions, je A/B: `TD_DoubleLeg_Success`, `TD_DoubleLeg_Defended`, `Ground_Guard_Idle` (Loop), `Ground_Guard_Punch`, `Ground_Guard_Escape`, `Ground_GetUp`.
 - Offene Probleme: Handschuh-Überlappungen bei Griffen (bis ca. 15 cm), schnelle Arm- und Fallbewegungen, Beine in der Guard bis ca. 9 cm in A's Hüfte, nicht gebacken, kein Export, kein Roblox-Test. Details in `WRESTLING_ANIMATIONS.md`.
+- **v02** `mma_arena_design/Wrestling_Prototype_v02.blend`: Guard-Kontakte korrigiert (Idle 6,8 → 3,6 cm, Schlag 6,7 → 4,8 cm, robuste Messung). Rest: Landung 6,9 cm (Frame 34), Escape-Beginn 8,5 cm (Frame 5). Details in `WRESTLING_GUARD_V02.md`.

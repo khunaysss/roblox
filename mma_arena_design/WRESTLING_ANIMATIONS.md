@@ -99,3 +99,5 @@ Die Messmethode für Durchdringung prüft, wie tief Vertices einer Figur im näc
 - **Root:** Die Root-Bewegung folgt dem Becken. Beim Liegen und Knien liegt der Root daher nicht unter dem Schwerpunkt der ganzen Figur. Ob Roblox Root-Motion so verwenden kann, ist ungeklärt.
 - **Shorts und Gelenke** (`check_wrestling_v01_shorts.py`, jeder 2. Frame, beide Figuren, alle Abschnitte): Die Shorts-Naht öffnet sich höchstens 1.1 cm. Der Bund weicht 0.0 cm vom Becken ab. An Schulter, Ellbogen, Handgelenk, Hüfte, Knie, Knöchel, Taille und Hals reißt in keinem geprüften Frame etwas ab (größter Spalt 0.0 cm).
 - **Kein Export:** kein FBX für die Wrestling-Actions, kein Backen, kein Roblox-Test.
+
+> **Hinweis (nach v02):** Die Guard-Durchdringung wurde hier zu niedrig angegeben; mit robuster Messung waren es 6,2–8,6 cm. Korrektur und Neumessung: `WRESTLING_GUARD_V02.md`.

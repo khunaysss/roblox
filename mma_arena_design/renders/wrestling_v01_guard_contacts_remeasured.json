@@ -1,0 +1,30 @@
+{
+ "TD_DoubleLeg_Success (Ende, 34-56)": {
+  "max_depth_m": 0.0623,
+  "where": "B Body:RightLowerLeg#1026 <-> A Body:LowerTorso#40",
+  "frame": 38,
+  "frames_checked": 12,
+  "frames_over_3cm": 12
+ },
+ "Ground_Guard_Idle (1-48)": {
+  "max_depth_m": 0.0679,
+  "where": "B Body:LeftLowerLeg#682 <-> A Body:LowerTorso#970",
+  "frame": 41,
+  "frames_checked": 24,
+  "frames_over_3cm": 24
+ },
+ "Ground_Guard_Punch (1-36)": {
+  "max_depth_m": 0.0665,
+  "where": "B Body:LeftLowerLeg#682 <-> A Body:LowerTorso#40",
+  "frame": 11,
+  "frames_checked": 18,
+  "frames_over_3cm": 18
+ },
+ "Ground_Guard_Escape (Beginn, 1-14)": {
+  "max_depth_m": 0.0858,
+  "where": "B Body:LeftLowerLeg#682 <-> A Shorts:LowerTorso#536",
+  "frame": 5,
+  "frames_checked": 14,
+  "frames_over_3cm": 10
+ }
+}
