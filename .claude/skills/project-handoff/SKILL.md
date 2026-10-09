@@ -22,9 +22,9 @@ Dateien in `mma_arena_design/`. Fehlt eine Datei, als fehlend melden und nicht u
 - Keinen Fortschritt erfinden.
 
 ## 3. Zuständigkeiten (laut TASKS.md)
-- Claude: Blender-Modelle, Animationen, Skripte und Doku dazu; Roblox-Importe und -Tests nur auf ausdrücklichen Auftrag.
-- Projektleitung (Nutzer): Planung, Gameplay, UI, Prüfung; gibt Aufgaben zwischen ChatGPT und Claude weiter.
-- ChatGPT: Planung und UI-Ideen, ohne direkten Repo-Zugriff.
+- Claude: Umsetzung: Blender-Modelle, Rigging, Animationen sowie Roblox-Code, Import und Tests, soweit die Verbindungen es ermöglichen; Roblox-Schritte nur auf ausdrücklichen Auftrag.
+- Projektleitung (Nutzer): entscheidet, prüft und gibt Aufgaben zwischen ChatGPT und Claude weiter.
+- ChatGPT: unterstützt bei Planung, Gameplay, UI, Prompts und Bewertung, ohne Repo-Zugriff.
 - Nicht davon ausgehen, dass mehrere Sitzungen gleichzeitig dieselbe Datei bearbeiten. Ist eine Datei in `TASKS.md` als „in Arbeit (du)“ markiert, diese Aufgabe pausieren.
 
 ## 4. Commit

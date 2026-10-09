@@ -1,9 +1,9 @@
 # Cage Champions – Aufgabenliste
 
 **Rollen**
-- **Claude:** Blender-Modelle und Animationen. Skripte und Dokumentation dazu.
-- **Du (Projektleitung, Mittelmann):** Planung, UI-Designs, Gameplay, Prüfung der Ergebnisse. Du gibst Aufgaben zwischen ChatGPT und Claude weiter.
-- **ChatGPT:** Planung und UI-Ideen, über dich. Hat keinen direkten Zugriff aufs Repo.
+- **Claude:** Umsetzung: Blender-Modelle, Rigging, Animationen sowie Roblox-Code, Import und Tests, soweit die verfügbaren Verbindungen (Blender, Roblox Studio MCP) das ermöglichen. Skripte und Dokumentation dazu.
+- **Du (Projektleitung, Mittelmann):** Entscheidungen, Planung, Prüfung der Ergebnisse. Du gibst Aufgaben zwischen ChatGPT und Claude weiter.
+- **ChatGPT:** unterstützt dich bei Planung, Gameplay, UI, Prompts und Bewertung. Hat keinen direkten Zugriff aufs Repo.
 
 **Regeln**
 - Das Git-Repo ist der gemeinsame Stand. Branch: `claude/mcp-server-setup-mzv403`.

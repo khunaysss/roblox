@@ -2,6 +2,11 @@
 
 Roblox-MMA-Spiel. Projektdateien liegen in `mma_arena_design/`. Stand, Aufgaben und Rollen stehen in `mma_arena_design/CURRENT.md`, `TASKS.md` und `ASSET_OVERVIEW.md`.
 
+## Rollen
+- **Claude:** Umsetzung: Blender-Modelle, Rigging, Animationen sowie Roblox-Code, Import und Tests, soweit die verfügbaren Verbindungen das ermöglichen.
+- **ChatGPT:** unterstützt den Nutzer bei Planung, Gameplay, UI, Prompts und Bewertung. Keinen Repo-Zugriff von ChatGPT voraussetzen.
+- **Nutzer:** Projektleitung; entscheidet und gibt Aufgaben weiter.
+
 ## Umfang
 - Das andere Spiel im Repo (Meme-Roll-Spiel: `characters/`, `world/` auf anderen Branches) nicht verändern.
 - Bestehende Assets wiederverwenden und nur den beauftragten Umfang bearbeiten. Nur relevante Dateien und Abschnitte lesen.
