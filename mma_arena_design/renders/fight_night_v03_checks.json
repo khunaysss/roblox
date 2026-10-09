@@ -1,0 +1,55 @@
+{
+ "path": {
+  "from": [
+   0,
+   -56.6
+  ],
+  "to": [
+   0,
+   -6.5
+  ],
+  "length_m": 50.1,
+  "blocked": {},
+  "floor_gaps_y": [],
+  "floor_height_range_m": [
+   0.0,
+   0.009
+  ],
+  "zones": {
+   "locker_room": {
+    "min_width_m": 1.96,
+    "min_clear_height_m": 3.2
+   },
+   "locker_door": {
+    "min_width_m": 2.0,
+    "min_clear_height_m": 2.6
+   },
+   "corridor": {
+    "min_width_m": 2.34,
+    "min_clear_height_m": 3.54
+   },
+   "walkout_doors": {
+    "min_width_m": 2.44,
+    "min_clear_height_m": 2.98
+   },
+   "covered_tunnel": {
+    "min_width_m": 2.44,
+    "min_clear_height_m": 4.6
+   },
+   "open_walkout": {
+    "min_width_m": 3.92,
+    "min_clear_height_m": 4.8
+   }
+  },
+  "needed": {
+   "fighter_height": 1.857,
+   "pair_side_by_side_apose_m": 3.27,
+   "single_apose_m": 1.52
+  }
+ },
+ "door_overlaps": {
+  "Walkout_Backstage_Door": [],
+  "Walkout_Connection_Door": []
+ },
+ "sources_unchanged": "opened/appended only, saved under a new name"
+}

@@ -1,0 +1,53 @@
+{
+ "objects": [
+  "Referee_Body",
+  "Referee_Face_Features",
+  "Referee_Gloves_Cuffs",
+  "Referee_Hair",
+  "Referee_Pants_Black",
+  "Referee_Polo_Black",
+  "Referee_Sport_Shoes"
+ ],
+ "armature": "Referee_Armature",
+ "bones": 24,
+ "overlap_with_body": {
+  "Referee_Hair": 34,
+  "Referee_Gloves_Cuffs": 72,
+  "Referee_Face_Features": 88,
+  "Referee_Polo_Black": 328,
+  "Referee_Pants_Black": 152,
+  "Referee_Sport_Shoes": 52
+ },
+ "lowest_z": -0.0,
+ "height_m": 1.848,
+ "apose_width_m": 1.632,
+ "fighter_v03_height_m": 1.857,
+ "fighter_v03_apose_width_m": 1.518,
+ "tris": 4088,
+ "bone_names_same_as_trainers": [
+  "CTRL_IK_Foot_L",
+  "CTRL_IK_Foot_R",
+  "CTRL_IK_Hand_L",
+  "CTRL_IK_Hand_R",
+  "CTRL_Pole_Elbow_L",
+  "CTRL_Pole_Elbow_R",
+  "CTRL_Pole_Knee_L",
+  "CTRL_Pole_Knee_R",
+  "Head",
+  "LeftFoot",
+  "LeftHand",
+  "LeftLowerArm",
+  "LeftLowerLeg",
+  "LeftUpperArm",
+  "LeftUpperLeg",
+  "LowerTorso",
+  "RightFoot",
+  "RightHand",
+  "RightLowerArm",
+  "RightLowerLeg",
+  "RightUpperArm",
+  "RightUpperLeg",
+  "Root",
+  "UpperTorso"
+ ]
+}
