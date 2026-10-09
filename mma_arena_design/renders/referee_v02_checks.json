@@ -1,0 +1,26 @@
+{
+ "objects": [
+  "Referee_Body",
+  "Referee_Face_Features",
+  "Referee_Gloves_Thin",
+  "Referee_Hair",
+  "Referee_Pants_Black",
+  "Referee_Polo_Black",
+  "Referee_Sport_Shoes"
+ ],
+ "glove_overlap_with_body_tris": 44,
+ "glove_material_faces_left_on_body": 0,
+ "Left_glove_size_m": [
+  0.252,
+  0.156,
+  0.28
+ ],
+ "Left_glove_reaches_wrist_m": 0.05,
+ "Right_glove_size_m": [
+  0.252,
+  0.156,
+  0.28
+ ],
+ "Right_glove_reaches_wrist_m": 0.05,
+ "other_objects_unchanged": "polo, pants, shoes, face, hair, armature taken over from referee_v01.blend"
+}
