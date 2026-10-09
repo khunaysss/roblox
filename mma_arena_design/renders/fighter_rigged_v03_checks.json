@@ -1,0 +1,65 @@
+{
+ "source": "Fighter_Rigged_v02.blend (unchanged)",
+ "model_and_weights": "unchanged from v02",
+ "elbow_pole_search": {
+  "best_offset_rel_chest": [
+   0.45,
+   -0.1,
+   0.15
+  ],
+  "max_penetration_m": 0.0,
+  "worst_candidate_m": 0.1169,
+  "candidates": 27
+ },
+ "idle_action": {
+  "name": "Fighter_Idle_Bounce",
+  "frames": 32,
+  "fps": 24,
+  "seconds": 1.33,
+  "keys_every": 4,
+  "animated": [
+   "LowerTorso",
+   "UpperTorso",
+   "Head",
+   "CTRL_IK_Hand_L",
+   "CTRL_IK_Hand_R",
+   "CTRL_IK_Foot_L",
+   "CTRL_IK_Foot_R",
+   "CTRL_Pole_Knee_L",
+   "CTRL_Pole_Knee_R",
+   "CTRL_Pole_Elbow_L",
+   "CTRL_Pole_Elbow_R"
+  ],
+  "loop": "Cycles modifier on all F-curves, key at frame 33 = key at frame 1"
+ },
+ "idle_loop_worst": {
+  "glove_into_head_m": 0.0015,
+  "forearm_into_chest_m": 0.0,
+  "shorts_seam_opening_m": 0.0013,
+  "waistband_off_pelvis_m": 0.0,
+  "foot_slide_m": 0.0,
+  "lowest_z": -0.0005,
+  "highest_sole_z": -0.0004,
+  "glove_to_head_gap_max_m": 0.0863,
+  "pelvis_height_range_m": [
+   0.853,
+   0.865
+  ]
+ },
+ "loop_seam": {
+  "frame1_vs_frame33_max_bone_offset_m": 0.0,
+  "step_across_seam_m(32->33)": 0.00454,
+  "step_after_seam_m(1->2)": 0.00454,
+  "max_step_inside_loop_m": 0.00681,
+  "mean_step_m": 0.00451
+ },
+ "video": {
+  "file": "renders/fighter_rigged_v03_idle_preview.mp4",
+  "ok": true,
+  "loop_frames_rendered": 32,
+  "plays": 3,
+  "fps": 24,
+  "duration_s": "4.000000",
+  "ffmpeg_error": ""
+ }
+}

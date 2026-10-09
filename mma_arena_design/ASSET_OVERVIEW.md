@@ -1,13 +1,14 @@
 # Asset-Übersicht – Cage Champions (Blender)
 
-Stand: 2026-10-09 (aktualisiert nach Fighter_Rigged_v02). Geprüft wurden die tatsächlichen `.blend`-Dateien (headless geöffnet, nur gelesen): Armatures, Bones, IK-Constraints, Armature-Modifier, Actions, NLA-Spuren, Shape Keys, verknüpfte Bibliotheken, nicht angewendete Modifier. Vorschau-Bilder wurden **nicht** ausgewertet.
-Alle 25 `.blend`-Dateien liegen in `mma_arena_design/`, sind committet und gepusht (Branch `claude/mcp-server-setup-mzv403`). Ältere Versionen wurden nicht überschrieben. `.blend1`-Backups sind per `.gitignore` ausgeschlossen.
+Stand: 2026-10-09 (aktualisiert nach Fighter_Rigged_v03). Geprüft wurden die tatsächlichen `.blend`-Dateien (headless geöffnet, nur gelesen): Armatures, Bones, IK-Constraints, Armature-Modifier, Actions, NLA-Spuren, Shape Keys, verknüpfte Bibliotheken, nicht angewendete Modifier. Vorschau-Bilder wurden **nicht** ausgewertet.
+Alle 26 `.blend`-Dateien liegen in `mma_arena_design/`, sind committet und gepusht (Branch `claude/mcp-server-setup-mzv403`). Ältere Versionen wurden nicht überschrieben. `.blend1`-Backups sind per `.gitignore` ausgeschlossen.
 
 ## Aktueller Stand
 
 | Modell oder Map | Tatsächlicher Dateipfad | Neueste Version | Rig vorhanden | Animationen vorhanden | Offene technische Probleme |
 |---|---|---|---|---|---|
-| **Basiskämpfer, gerigged (aktuell)** | `mma_arena_design/Fighter_Rigged_v02.blend` | v02 | **ja**: gleiches Skelett wie v01 (24 Bones, 4 IK); 37 Meshes mit Armature-Modifier; Shorts und Hüfte neu gewichtet | 2 Actions: `Fighter_Test_Poses` (Ruhe + 5 Testposen, Jab bei Frame 21 ersetzt durch echte Schlag-Endposition) und `Fighter_Preview_Sequence` (168 Frames: Kampfhaltung → Jab → Knieheben → Kniebeuge) | siehe „Fighter_Rigged_v02 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
+| **Basiskämpfer, gerigged (aktuell)** | `mma_arena_design/Fighter_Rigged_v03.blend` | v03 | **ja**: wie v02 (24 Bones, 4 IK, gleiche Gewichtung) | 3 Actions: `Fighter_Idle_Bounce` (aktiv, 32-Frame-Loop „leichtes Federn“), `Fighter_Test_Poses`, `Fighter_Preview_Sequence` | siehe „Fighter_Rigged_v03 – Ergebnisse“. Roblox-Import nicht getestet. |
+| Basiskämpfer, gerigged v02 | `mma_arena_design/Fighter_Rigged_v02.blend` | v02 | **ja**: gleiches Skelett wie v01 (24 Bones, 4 IK); 37 Meshes mit Armature-Modifier; Shorts und Hüfte neu gewichtet | 2 Actions: `Fighter_Test_Poses` (Ruhe + 5 Testposen, Jab bei Frame 21 ersetzt durch echte Schlag-Endposition) und `Fighter_Preview_Sequence` (168 Frames: Kampfhaltung → Jab → Knieheben → Kniebeuge) | siehe „Fighter_Rigged_v02 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
 | Basiskämpfer, gerigged (Vorversion) | `mma_arena_design/Fighter_Rigged_v01.blend` | v01 | **ja**: `Fighter_Armature` = Kopie des Trainer-Skeletts (24 Bones, gleiche Namen, 4 IK), an die Gelenke des Fighters angepasst; 37 Meshes mit Armature-Modifier | 1 Action `Fighter_Test_Poses` (Ruhe-A-Pose + 5 Testposen, Marker bei Frame 1/11/21/31/41/51). Keine Trainer-Actions in der Datei. | siehe Abschnitt „Fighter_Rigged_v01 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
 | Basiskämpfer (Design-Quelle) | `mma_arena_design/Fighter_Design_v03.blend` | v03 (unverändert) | nein | keine | Quelle; die Rig-fähige Arbeitskopie ist `Fighter_Rigged_v01.blend`. Hier weiterhin 50 Einzelobjekte, Boolean-Cutter, negative Skalierungen. |
 | Fighter-Anpassung | `mma_arena_design/Fighter_Customization_v05.blend` | v05 | nein | keine | Baut auf der Fighter-v03-Geometrie auf, also mit denselben Problemen wie oben. Zusätzlich nicht angewendete Booleans an den Bärten. |
@@ -129,3 +130,35 @@ v01 wurde nur geöffnet; die Prüfsumme ist unverändert. Geändert wurden aussc
 - **Beugefalte vorn:** Bei starker Hüftbeugung schiebt sich das Hüftteil der Shorts bis 3 cm über die Bundkante (Falte vorn). Der Bund selbst bleibt fest am Becken.
 - **Knieheben:** Mehr Haut-Vertices liegen knapp außerhalb der Shorts (10 statt 3), der Maximalwert bleibt bei 1,7 cm.
 - **Roblox:** kein Export, kein Import. Die Kompatibilität ist nicht bestätigt.
+
+## Fighter_Rigged_v03 – Ergebnisse (gemessen, Skript `build_fighter_rigged_v03.py`, Werte `renders/fighter_rigged_v03_checks.json`)
+
+v02 wurde nur geöffnet (Prüfsumme unverändert). Modell, Gewichtung und Anpassungsoptionen sind unverändert übernommen. Neu ist nur die Action `Fighter_Idle_Bounce`.
+
+**Bewegung**
+- MMA-Grundhaltung in Normalauslage: breiter Stand, Becken 8,5 cm abgesenkt, leichte Vorlage.
+- Führhand vor dem Kinn, Schlaghand an der Wange; die Handschuh-Ziele folgen dem Kopf.
+- Federn: zwei kleine Knie-Wipper pro Loop (Becken 0,853–0,865 m, also 1,2 cm Hub), eine seitliche Gewichtsverlagerung von ±1,8 cm, Schulter- und Hüftdrehung ±1,5–2,5°, leichte Kopfbewegung. Kein Abheben.
+
+**Loop**
+- 32 Frames bei 24 fps = 1,33 s; Schlüssel alle 4 Frames; Cycles-Modifier auf allen Kurven.
+- Frame 33 ist identisch mit Frame 1 (Abweichung 0,0 mm).
+- Bewegung über die Naht (32→33): 4,5 mm. Das entspricht dem Mittelwert innerhalb des Loops (4,5 mm); der größte Schritt im Loop sind 6,8 mm. Damit gibt es keinen sichtbaren Sprung.
+
+**Füße**
+- Die IK-Fußziele sind konstant. Die Füße verschieben sich über den ganzen Loop um 0,0 mm.
+- Die Sohle liegt höchstens 0,5 mm im Boden und hebt nie ab.
+
+**Arme**
+- Ellbogen-Pole relativ zur Brust, aus 27 Varianten gewählt: Abstand zur Seite 0,45, nach vorn 0,10, nach oben 0,15 (m). Die schlechteste Variante hätte den Unterarm 11,7 cm in die Brust gedrückt.
+- Unterarm in der Brust: 0 cm. Handschuh im Kopf: höchstens 0,15 cm, er liegt also nur an.
+- Die Führhand ist höchstens 8,6 cm vor dem Gesicht.
+
+**Shorts**
+- Die Naht öffnet sich höchstens 0,13 cm. Der Bund weicht 0 mm vom Becken ab.
+
+**Video:** `renders/fighter_rigged_v03_idle_preview.mp4` – H.264, 960 × 630, 24 fps, 4 s. Der Loop läuft dreimal, links von vorne, rechts von der Seite.
+
+**Offen**
+- Das Federn ist mit Trainer-Posen gebaut, nicht mit echten Bewegungsreferenzen. Timing und Stärke sind Geschmackssache und lassen sich über die Werte in `pose_at()` anpassen.
+- Roblox: kein Export, kein Import. Die Kompatibilität ist nicht bestätigt.
