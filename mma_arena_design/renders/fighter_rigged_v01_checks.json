@@ -1,0 +1,966 @@
+{
+ "boolean_check": {
+  "Beard_Full_Volume": {
+   "cutters": [
+    "CUT_Beard_Full_Volume_1",
+    "CUT_Beard_Full_Volume_2",
+    "CUT_Beard_Full_Volume_3"
+   ],
+   "volume_removed_by_booleans_m3": 0.009586,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Beard_Short_Shell": {
+   "cutters": [
+    "CUT_Beard_Short_Shell_1",
+    "CUT_Beard_Short_Shell_2",
+    "CUT_Beard_Short_Shell_3"
+   ],
+   "volume_removed_by_booleans_m3": 0.000364,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Fighter_Hand_L": {
+   "cutters": [
+    "CUT_Fighter_Hand_L_1",
+    "CUT_Fighter_Hand_L_2",
+    "CUT_Fighter_Hand_L_3"
+   ],
+   "volume_removed_by_booleans_m3": 2.9e-05,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Fighter_Hand_R": {
+   "cutters": [
+    "CUT_Fighter_Hand_R_1",
+    "CUT_Fighter_Hand_R_2",
+    "CUT_Fighter_Hand_R_3"
+   ],
+   "volume_removed_by_booleans_m3": 2.9e-05,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Glove_L_PaddedShell": {
+   "cutters": [
+    "CUT_Glove_L_PaddedShell_1",
+    "CUT_Glove_L_PaddedShell_2"
+   ],
+   "volume_removed_by_booleans_m3": 9e-06,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Glove_R_PaddedShell": {
+   "cutters": [
+    "CUT_Glove_R_PaddedShell_1",
+    "CUT_Glove_R_PaddedShell_2"
+   ],
+   "volume_removed_by_booleans_m3": 9e-06,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Hair_Buzzcut": {
+   "cutters": [
+    "CUT_Hair_Buzzcut_1"
+   ],
+   "volume_removed_by_booleans_m3": 1e-05,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Hair_Cap": {
+   "cutters": [
+    "CUT_Hair_Cap_1",
+    "CUT_Hair_Cap_2",
+    "CUT_Hair_Cap_3"
+   ],
+   "volume_removed_by_booleans_m3": 0.000156,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Hair_ShortCurls_Base": {
+   "cutters": [
+    "CUT_Hair_ShortCurls_Base_1"
+   ],
+   "volume_removed_by_booleans_m3": 1.5e-05,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Shorts_Hips": {
+   "cutters": [
+    "CUT_Shorts_Hips_1"
+   ],
+   "volume_removed_by_booleans_m3": 7.1e-05,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Shorts_Leg_L": {
+   "cutters": [
+    "CUT_Shorts_Leg_L_1"
+   ],
+   "volume_removed_by_booleans_m3": 8e-06,
+   "nonmanifold_final": 0,
+   "ok": true
+  },
+  "Shorts_Leg_R": {
+   "cutters": [
+    "CUT_Shorts_Leg_R_1"
+   ],
+   "volume_removed_by_booleans_m3": 8e-06,
+   "nonmanifold_final": 0,
+   "ok": true
+  }
+ },
+ "transforms": {
+  "negative_scale_fixed": [
+   "Face_Ear_R",
+   "Face_Focused_Brow_R",
+   "Face_Focused_Eye_Glint_R",
+   "Face_Focused_Eye_R",
+   "Face_Friendly_Brow_R",
+   "Face_Friendly_Eye_Glint_R",
+   "Face_Friendly_Eye_R",
+   "Face_Neutral_Brow_R",
+   "Face_Neutral_Eye_Glint_R",
+   "Face_Neutral_Eye_R",
+   "Fighter_Foot_R",
+   "Fighter_Hand_R",
+   "Fighter_LowerArm_R",
+   "Fighter_LowerLeg_R",
+   "Fighter_UpperArm_R",
+   "Fighter_UpperLeg_R",
+   "Glove_R_ClosureTab",
+   "Glove_R_KnuckleAccent",
+   "Glove_R_PaddedShell",
+   "Glove_R_Piping",
+   "Glove_R_Thumb",
+   "Glove_R_WristBand",
+   "Hair_SidePart_Sideburn_R",
+   "Hair_Sideburn_R",
+   "Shorts_HipStripe_R",
+   "Shorts_LegStripe_R",
+   "Shorts_Leg_R"
+  ],
+  "meshes_baked": 74,
+  "non_identity_after": []
+ },
+ "face_cleanup": {
+  "ngons_triangulated": 81,
+  "degenerate_removed": 24,
+  "normals_flipped": 0,
+  "open_meshes": []
+ },
+ "tattoo_uv_corner_alpha": 0.0,
+ "skeleton": {
+  "bones": 24,
+  "names_identical_to_trainer": true,
+  "moved_m": {
+   "Root": 0.0,
+   "LowerTorso": 0.0,
+   "UpperTorso": 0.0,
+   "Head": 0.0,
+   "LeftUpperArm": 0.01,
+   "LeftLowerArm": 0.049,
+   "LeftHand": 0.096,
+   "LeftUpperLeg": 0.0,
+   "LeftLowerLeg": 0.019,
+   "LeftFoot": 0.003,
+   "RightUpperArm": 0.01,
+   "RightLowerArm": 0.049,
+   "RightHand": 0.096,
+   "RightUpperLeg": 0.0,
+   "RightLowerLeg": 0.019,
+   "RightFoot": 0.003
+  },
+  "ik_pole_calibration": {
+   "LeftLowerArm": [
+    123.0,
+    0.0019
+   ],
+   "RightLowerArm": [
+    57.0,
+    0.0019
+   ],
+   "LeftLowerLeg": [
+    -85.75,
+    0.0012
+   ],
+   "RightLowerLeg": [
+    -94.25,
+    0.0012
+   ]
+  }
+ },
+ "rest_check": {
+  "tears": {},
+  "joint_gap_m": {
+   "waist": 0.0,
+   "neck": 0.0,
+   "shoulder_L": 0.0,
+   "elbow_L": 0.0,
+   "wrist_L": 0.0,
+   "hip_L": 0.0,
+   "knee_L": 0.0,
+   "ankle_L": 0.0,
+   "shoulder_R": 0.0,
+   "elbow_R": 0.0,
+   "wrist_R": 0.0,
+   "hip_R": 0.0,
+   "knee_R": 0.0,
+   "ankle_R": 0.0
+  },
+  "strong_penetrations": {},
+  "skin_through_shorts": {
+   "verts": 8,
+   "max_extra_m": 0.0158,
+   "rest_touching_verts": 8
+  },
+  "shorts_parts_connected": {
+   "L": true,
+   "R": true
+  },
+  "lowest_z": -0.0004,
+  "elbow_bend_deg": {
+   "L": 3.5,
+   "R": 3.5
+  },
+  "knee_bend_deg": {
+   "L": 6.3,
+   "R": 6.3
+  },
+  "shoulder_line_yaw_deg": 0.0,
+  "hip_line_yaw_deg": 0.0,
+  "left_knee_height_m": 0.501,
+  "pelvis_height_m": 0.95,
+  "left_hand_reach_m": 0.53
+ },
+ "trainer_actions_on_fighter_raw": {
+  "Saenchai_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "RightHand->Head": 0.044,
+    "LeftUpperArm->Head": 0.04,
+    "LeftLowerArm->Head": 0.027
+   },
+   "skin_through_shorts_max_m": 0.0057,
+   "lowest_z": 0.0175,
+   "shorts_disconnected": 0
+  },
+  "Saenchai_Signature_2_Right_Head_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "RightHand->Head": 0.054,
+    "LeftUpperArm->Head": 0.044,
+    "LeftLowerArm->Head": 0.035,
+    "RightLowerArm->UpperTorso": 0.084,
+    "LeftUpperLeg->RightUpperLeg": 0.085
+   },
+   "skin_through_shorts_max_m": 0.0179,
+   "lowest_z": 0.0103,
+   "shorts_disconnected": 0
+  },
+  "Saenchai_Signature_1_Teep_Push_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "RightHand->Head": 0.101,
+    "LeftUpperArm->Head": 0.068,
+    "LeftLowerArm->Head": 0.091,
+    "LeftLowerArm->UpperTorso": 0.094,
+    "LeftUpperLeg->RightUpperLeg": 0.029
+   },
+   "skin_through_shorts_max_m": 0.0169,
+   "lowest_z": 0.0139,
+   "shorts_disconnected": 0
+  },
+  "Muhammad_Ali_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.12,
+    "RightLowerArm->UpperTorso": 0.059
+   },
+   "skin_through_shorts_max_m": 0.0,
+   "lowest_z": 0.0169,
+   "shorts_disconnected": 0
+  },
+  "Muhammad_Ali_Signature_2_Ali_Shuffle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.127,
+    "RightLowerArm->UpperTorso": 0.056
+   },
+   "skin_through_shorts_max_m": 0.0057,
+   "lowest_z": 0.0141,
+   "shorts_disconnected": 0
+  },
+  "Muhammad_Ali_Signature_1_Jab_Jab_Cross": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.119,
+    "RightLowerArm->UpperTorso": 0.129,
+    "RightHand->Head": 0.084,
+    "LeftHand->Head": 0.049
+   },
+   "skin_through_shorts_max_m": 0.0124,
+   "lowest_z": 0.0151,
+   "shorts_disconnected": 0
+  },
+  "Mike_Tyson_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.128,
+    "RightLowerArm->UpperTorso": 0.131,
+    "RightUpperArm->Head": 0.025,
+    "RightLowerArm->Head": 0.024,
+    "RightHand->Head": 0.048,
+    "LeftLowerArm->Head": 0.024
+   },
+   "skin_through_shorts_max_m": 0.0138,
+   "lowest_z": -0.0005,
+   "shorts_disconnected": 0
+  },
+  "Mike_Tyson_Signature_2_Slip_And_Counter_Cross": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.129,
+    "RightLowerArm->UpperTorso": 0.121,
+    "RightLowerArm->Head": 0.065,
+    "RightUpperArm->Head": 0.074,
+    "LeftHand->Head": 0.048
+   },
+   "skin_through_shorts_max_m": 0.012,
+   "lowest_z": -0.0005,
+   "shorts_disconnected": 0
+  },
+  "Mike_Tyson_Signature_1_Left_Body_Hook_Right_Uppercut": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.122,
+    "RightLowerArm->UpperTorso": 0.128,
+    "RightHand->Head": 0.057,
+    "RightLowerArm->Head": 0.022,
+    "LeftUpperArm->Head": 0.027,
+    "LeftLowerArm->Head": 0.049
+   },
+   "skin_through_shorts_max_m": 0.0098,
+   "lowest_z": -0.0005,
+   "shorts_disconnected": 0
+  },
+  "Khabib_Nurmagomedov_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "RightLowerArm->UpperTorso": 0.061
+   },
+   "skin_through_shorts_max_m": 0.0109,
+   "lowest_z": -0.0005,
+   "shorts_disconnected": 0
+  },
+  "Khabib_Nurmagomedov_Signature_2_Clinch_Control": {
+   "tears": {},
+   "strong_pen": {
+    "RightLowerArm->UpperTorso": 0.058
+   },
+   "skin_through_shorts_max_m": 0.0117,
+   "lowest_z": -0.0005,
+   "shorts_disconnected": 0
+  },
+  "Khabib_Nurmagomedov_Signature_1_Double_Leg_Takedown": {
+   "tears": {},
+   "strong_pen": {
+    "RightLowerArm->UpperTorso": 0.078
+   },
+   "skin_through_shorts_max_m": 0.0209,
+   "lowest_z": -0.0005,
+   "shorts_disconnected": 0
+  },
+  "Charles_Oliveira_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {},
+   "skin_through_shorts_max_m": 0.0057,
+   "lowest_z": -0.0004,
+   "shorts_disconnected": 0
+  },
+  "Charles_Oliveira_Signature_2_Front_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "LeftHand->Head": 0.08,
+    "RightUpperArm->Head": 0.061,
+    "RightLowerArm->UpperTorso": 0.084,
+    "RightLowerArm->Head": 0.034
+   },
+   "skin_through_shorts_max_m": 0.0149,
+   "lowest_z": -0.0004,
+   "shorts_disconnected": 0
+  },
+  "Charles_Oliveira_Signature_1_Clinch_Knee": {
+   "tears": {},
+   "strong_pen": {},
+   "skin_through_shorts_max_m": 0.0157,
+   "lowest_z": -0.0004,
+   "shorts_disconnected": 0
+  },
+  "Alex_Pereira_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "RightHand->Head": 0.07,
+    "LeftUpperArm->Head": 0.03
+   },
+   "skin_through_shorts_max_m": 0.0135,
+   "lowest_z": -0.0004,
+   "shorts_disconnected": 0
+  },
+  "Alex_Pereira_Signature_2_Right_Low_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "RightHand->Head": 0.094,
+    "LeftUpperArm->Head": 0.03,
+    "RightLowerArm->UpperTorso": 0.098,
+    "LeftUpperLeg->RightUpperLeg": 0.062,
+    "LeftLowerLeg->RightLowerLeg": 0.041,
+    "LeftLowerArm->Head": 0.021
+   },
+   "skin_through_shorts_max_m": 0.0133,
+   "lowest_z": -0.0004,
+   "shorts_disconnected": 0
+  },
+  "Alex_Pereira_Signature_1_Left_Hook": {
+   "tears": {},
+   "strong_pen": {
+    "RightHand->Head": 0.078,
+    "LeftUpperArm->Head": 0.027,
+    "LeftLowerArm->UpperTorso": 0.04,
+    "RightLowerArm->UpperTorso": 0.128,
+    "RightUpperArm->Head": 0.03,
+    "RightLowerArm->Head": 0.035
+   },
+   "skin_through_shorts_max_m": 0.0114,
+   "lowest_z": -0.0004,
+   "shorts_disconnected": 0
+  }
+ },
+ "trainer_actions_on_fighter_retargeted": {
+  "RT_Saenchai_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.029
+   },
+   "skin_through_shorts_max_m": 0.0057,
+   "lowest_z": 0.0168,
+   "shorts_disconnected": 0
+  },
+  "RT_Saenchai_Signature_2_Right_Head_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.022,
+    "RightHand->Head": 0.051,
+    "RightLowerArm->UpperTorso": 0.08,
+    "LeftUpperArm->Head": 0.043,
+    "LeftUpperLeg->RightUpperLeg": 0.089,
+    "LeftLowerArm->Head": 0.031
+   },
+   "skin_through_shorts_max_m": 0.0197,
+   "lowest_z": 0.0095,
+   "shorts_disconnected": 0
+  },
+  "RT_Saenchai_Signature_1_Teep_Push_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.097,
+    "LeftUpperLeg->RightUpperLeg": 0.031,
+    "LeftUpperArm->Head": 0.049,
+    "RightHand->Head": 0.027
+   },
+   "skin_through_shorts_max_m": 0.0173,
+   "lowest_z": 0.0133,
+   "shorts_disconnected": 0
+  },
+  "RT_Muhammad_Ali_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.089
+   },
+   "skin_through_shorts_max_m": 0.0,
+   "lowest_z": 0.0167,
+   "shorts_disconnected": 0
+  },
+  "RT_Muhammad_Ali_Signature_2_Ali_Shuffle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.086
+   },
+   "skin_through_shorts_max_m": 0.0,
+   "lowest_z": 0.0139,
+   "shorts_disconnected": 0
+  },
+  "RT_Muhammad_Ali_Signature_1_Jab_Jab_Cross": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.088,
+    "RightLowerArm->UpperTorso": 0.076
+   },
+   "skin_through_shorts_max_m": 0.0127,
+   "lowest_z": 0.0149,
+   "shorts_disconnected": 0
+  },
+  "RT_Mike_Tyson_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.115,
+    "LeftUpperArm->Head": 0.022,
+    "LeftLowerArm->Head": 0.028,
+    "RightHand->Head": 0.026,
+    "RightLowerArm->UpperTorso": 0.108,
+    "RightLowerArm->Head": 0.024
+   },
+   "skin_through_shorts_max_m": 0.0131,
+   "lowest_z": -0.0033,
+   "shorts_disconnected": 0
+  },
+  "RT_Mike_Tyson_Signature_2_Slip_And_Counter_Cross": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.12,
+    "LeftUpperArm->Head": 0.036,
+    "LeftLowerArm->Head": 0.032,
+    "RightHand->Head": 0.029,
+    "LeftHand->Head": 0.051,
+    "RightLowerArm->UpperTorso": 0.083
+   },
+   "skin_through_shorts_max_m": 0.0088,
+   "lowest_z": -0.0033,
+   "shorts_disconnected": 0
+  },
+  "RT_Mike_Tyson_Signature_1_Left_Body_Hook_Right_Uppercut": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.12,
+    "LeftUpperArm->Head": 0.062,
+    "LeftLowerArm->Head": 0.084,
+    "RightHand->Head": 0.026,
+    "RightLowerArm->UpperTorso": 0.122,
+    "RightLowerArm->Head": 0.026
+   },
+   "skin_through_shorts_max_m": 0.0129,
+   "lowest_z": -0.0033,
+   "shorts_disconnected": 0
+  },
+  "RT_Khabib_Nurmagomedov_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {},
+   "skin_through_shorts_max_m": 0.0117,
+   "lowest_z": -0.0033,
+   "shorts_disconnected": 0
+  },
+  "RT_Khabib_Nurmagomedov_Signature_2_Clinch_Control": {
+   "tears": {},
+   "strong_pen": {},
+   "skin_through_shorts_max_m": 0.0115,
+   "lowest_z": -0.0033,
+   "shorts_disconnected": 0
+  },
+  "RT_Khabib_Nurmagomedov_Signature_1_Double_Leg_Takedown": {
+   "tears": {},
+   "strong_pen": {},
+   "skin_through_shorts_max_m": 0.0213,
+   "lowest_z": -0.0033,
+   "shorts_disconnected": 0
+  },
+  "RT_Charles_Oliveira_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "RightUpperArm->Head": 0.021
+   },
+   "skin_through_shorts_max_m": 0.0137,
+   "lowest_z": -0.0014,
+   "shorts_disconnected": 0
+  },
+  "RT_Charles_Oliveira_Signature_2_Front_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "RightUpperArm->Head": 0.028,
+    "RightLowerArm->Head": 0.093,
+    "RightLowerArm->UpperTorso": 0.063
+   },
+   "skin_through_shorts_max_m": 0.0148,
+   "lowest_z": -0.0014,
+   "shorts_disconnected": 0
+  },
+  "RT_Charles_Oliveira_Signature_1_Clinch_Knee": {
+   "tears": {},
+   "strong_pen": {
+    "RightUpperArm->Head": 0.021
+   },
+   "skin_through_shorts_max_m": 0.0121,
+   "lowest_z": -0.0014,
+   "shorts_disconnected": 0
+  },
+  "RT_Alex_Pereira_Stance_Idle": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.024,
+    "LeftLowerArm->Head": 0.036
+   },
+   "skin_through_shorts_max_m": 0.0131,
+   "lowest_z": -0.0014,
+   "shorts_disconnected": 0
+  },
+  "RT_Alex_Pereira_Signature_2_Right_Low_Kick": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.031,
+    "RightHand->Head": 0.086,
+    "LeftUpperLeg->RightUpperLeg": 0.062,
+    "LeftLowerLeg->RightLowerLeg": 0.041,
+    "RightLowerArm->UpperTorso": 0.047,
+    "LeftUpperArm->Head": 0.024
+   },
+   "skin_through_shorts_max_m": 0.0133,
+   "lowest_z": -0.0014,
+   "shorts_disconnected": 0
+  },
+  "RT_Alex_Pereira_Signature_1_Left_Hook": {
+   "tears": {},
+   "strong_pen": {
+    "LeftLowerArm->UpperTorso": 0.027,
+    "RightLowerArm->UpperTorso": 0.083,
+    "RightUpperArm->Head": 0.043,
+    "LeftLowerArm->Head": 0.026
+   },
+   "skin_through_shorts_max_m": 0.0128,
+   "lowest_z": -0.0015,
+   "shorts_disconnected": 0
+  }
+ },
+ "test_poses": {
+  "Kampfhaltung": {
+   "tears": {},
+   "joint_gap_m": {
+    "waist": 0.0,
+    "neck": 0.0,
+    "shoulder_L": 0.0,
+    "elbow_L": 0.0,
+    "wrist_L": 0.0,
+    "hip_L": 0.0,
+    "knee_L": 0.0,
+    "ankle_L": 0.0,
+    "shoulder_R": 0.0,
+    "elbow_R": 0.0,
+    "wrist_R": 0.0,
+    "hip_R": 0.0,
+    "knee_R": 0.0,
+    "ankle_R": 0.0
+   },
+   "strong_penetrations": {
+    "LeftLowerArm->UpperTorso": 0.024
+   },
+   "skin_through_shorts": {
+    "verts": 1,
+    "max_extra_m": 0.0057
+   },
+   "shorts_parts_connected": {
+    "L": true,
+    "R": true
+   },
+   "lowest_z": -0.0014,
+   "elbow_bend_deg": {
+    "L": 89.9,
+    "R": 89.9
+   },
+   "knee_bend_deg": {
+    "L": 26.3,
+    "R": 16.1
+   },
+   "shoulder_line_yaw_deg": -30.0,
+   "hip_line_yaw_deg": -30.0,
+   "left_knee_height_m": 0.498,
+   "pelvis_height_m": 0.91,
+   "left_hand_reach_m": 0.376,
+   "source": "RT_Alex_Pereira_Stance_Idle frame 1",
+   "options_follow_head_max_dev_m": 0.0,
+   "options_shown": {
+    "hair": "quiff",
+    "beard": "none",
+    "skin": "medium",
+    "shorts_c": "red"
+   }
+  },
+  "Jab_gestreckt": {
+   "tears": {},
+   "joint_gap_m": {
+    "waist": 0.0,
+    "neck": 0.0,
+    "shoulder_L": 0.0,
+    "elbow_L": 0.0,
+    "wrist_L": 0.0,
+    "hip_L": 0.0,
+    "knee_L": 0.0,
+    "ankle_L": 0.0,
+    "shoulder_R": 0.0,
+    "elbow_R": 0.0,
+    "wrist_R": 0.0,
+    "hip_R": 0.0,
+    "knee_R": 0.0,
+    "ankle_R": 0.0
+   },
+   "strong_penetrations": {},
+   "skin_through_shorts": {
+    "verts": 0,
+    "max_extra_m": 0.0
+   },
+   "shorts_parts_connected": {
+    "L": true,
+    "R": true
+   },
+   "lowest_z": 0.0149,
+   "elbow_bend_deg": {
+    "L": 0.4,
+    "R": 99.2
+   },
+   "knee_bend_deg": {
+    "L": 0.4,
+    "R": 0.4
+   },
+   "shoulder_line_yaw_deg": -32.0,
+   "hip_line_yaw_deg": -32.0,
+   "left_knee_height_m": 0.509,
+   "pelvis_height_m": 0.95,
+   "left_hand_reach_m": 0.53,
+   "source": "RT_Muhammad_Ali_Signature_1_Jab_Jab_Cross frame 5",
+   "options_follow_head_max_dev_m": 0.0,
+   "options_shown": {
+    "hair": "buzz",
+    "beard": "none",
+    "skin": "light",
+    "shorts_c": "blue"
+   }
+  },
+  "Oberkoerperdrehung": {
+   "tears": {},
+   "joint_gap_m": {
+    "waist": 0.0,
+    "neck": 0.0,
+    "shoulder_L": 0.0,
+    "elbow_L": 0.0,
+    "wrist_L": 0.0,
+    "hip_L": 0.0,
+    "knee_L": 0.0,
+    "ankle_L": 0.0,
+    "shoulder_R": 0.0,
+    "elbow_R": 0.0,
+    "wrist_R": 0.0,
+    "hip_R": 0.0,
+    "knee_R": 0.0,
+    "ankle_R": 0.0
+   },
+   "strong_penetrations": {
+    "RightLowerArm->UpperTorso": 0.025
+   },
+   "skin_through_shorts": {
+    "verts": 0,
+    "max_extra_m": 0.0
+   },
+   "shorts_parts_connected": {
+    "L": true,
+    "R": true
+   },
+   "lowest_z": -0.0014,
+   "elbow_bend_deg": {
+    "L": 0.4,
+    "R": 89.9
+   },
+   "knee_bend_deg": {
+    "L": 37.8,
+    "R": 30.9
+   },
+   "shoulder_line_yaw_deg": 20.0,
+   "hip_line_yaw_deg": 0.0,
+   "left_knee_height_m": 0.499,
+   "pelvis_height_m": 0.87,
+   "left_hand_reach_m": 0.53,
+   "source": "RT_Alex_Pereira_Signature_1_Left_Hook frame 11",
+   "options_follow_head_max_dev_m": 0.0,
+   "options_shown": {
+    "hair": "quiff",
+    "beard": "short",
+    "skin": "dark",
+    "shorts_c": "red"
+   }
+  },
+  "Knieheben": {
+   "tears": {},
+   "joint_gap_m": {
+    "waist": 0.0,
+    "neck": 0.0,
+    "shoulder_L": 0.0,
+    "elbow_L": 0.0,
+    "wrist_L": 0.0,
+    "hip_L": 0.0,
+    "knee_L": 0.0,
+    "ankle_L": 0.0,
+    "shoulder_R": 0.0,
+    "elbow_R": 0.0,
+    "wrist_R": 0.0,
+    "hip_R": 0.0,
+    "knee_R": 0.0,
+    "ankle_R": 0.0
+   },
+   "strong_penetrations": {},
+   "skin_through_shorts": {
+    "verts": 3,
+    "max_extra_m": 0.0165
+   },
+   "shorts_parts_connected": {
+    "L": true,
+    "R": true
+   },
+   "lowest_z": 0.0079,
+   "elbow_bend_deg": {
+    "L": 0.4,
+    "R": 0.4
+   },
+   "knee_bend_deg": {
+    "L": 121.4,
+    "R": 0.4
+   },
+   "shoulder_line_yaw_deg": 10.0,
+   "hip_line_yaw_deg": 10.0,
+   "left_knee_height_m": 0.858,
+   "pelvis_height_m": 0.95,
+   "left_hand_reach_m": 0.53,
+   "source": "RT_Charles_Oliveira_Signature_1_Clinch_Knee frame 14",
+   "options_follow_head_max_dev_m": 0.0,
+   "options_shown": {
+    "hair": "buzz",
+    "beard": "short",
+    "skin": "dark",
+    "shorts_c": "blue"
+   }
+  },
+  "Tiefe_Kniebeuge": {
+   "tears": {},
+   "joint_gap_m": {
+    "waist": 0.0,
+    "neck": 0.0,
+    "shoulder_L": 0.0,
+    "elbow_L": 0.0,
+    "wrist_L": 0.0,
+    "hip_L": 0.0,
+    "knee_L": 0.0,
+    "ankle_L": 0.0,
+    "shoulder_R": 0.0,
+    "elbow_R": 0.0,
+    "wrist_R": 0.0,
+    "hip_R": 0.0,
+    "knee_R": 0.0,
+    "ankle_R": 0.0
+   },
+   "strong_penetrations": {},
+   "skin_through_shorts": {
+    "verts": 7,
+    "max_extra_m": 0.009
+   },
+   "shorts_parts_connected": {
+    "L": true,
+    "R": true
+   },
+   "lowest_z": -0.0014,
+   "elbow_bend_deg": {
+    "L": 66.5,
+    "R": 66.5
+   },
+   "knee_bend_deg": {
+    "L": 128.1,
+    "R": 128.1
+   },
+   "shoulder_line_yaw_deg": 0.0,
+   "hip_line_yaw_deg": 0.0,
+   "left_knee_height_m": 0.382,
+   "pelvis_height_m": 0.45,
+   "left_hand_reach_m": 0.444,
+   "source": "apply_pose (trainer key-pose helper), custom values",
+   "options_follow_head_max_dev_m": 0.0,
+   "options_shown": {
+    "hair": "quiff",
+    "beard": "short",
+    "skin": "light",
+    "shorts_c": "red"
+   }
+  }
+ },
+ "option_swaps": {
+  "quiff/none/medium/red": {
+   "visible_option_collections": [
+    "Face_Focused",
+    "Hair_QuiffV03"
+   ],
+   "skin_tone": [
+    0.48,
+    0.3,
+    0.2
+   ],
+   "shorts_color": [
+    0.28,
+    0.008,
+    0.013
+   ]
+  },
+  "buzz/none/light/blue": {
+   "visible_option_collections": [
+    "Face_Focused",
+    "Hair_Buzzcut"
+   ],
+   "skin_tone": [
+    0.7,
+    0.49,
+    0.37
+   ],
+   "shorts_color": [
+    0.02,
+    0.06,
+    0.3
+   ]
+  },
+  "quiff/short/dark/red": {
+   "visible_option_collections": [
+    "Beard_Short",
+    "Face_Focused",
+    "Hair_QuiffV03"
+   ],
+   "skin_tone": [
+    0.085,
+    0.042,
+    0.026
+   ],
+   "shorts_color": [
+    0.28,
+    0.008,
+    0.013
+   ]
+  },
+  "buzz/short/dark/blue": {
+   "visible_option_collections": [
+    "Beard_Short",
+    "Face_Focused",
+    "Hair_Buzzcut"
+   ],
+   "skin_tone": [
+    0.085,
+    0.042,
+    0.026
+   ],
+   "shorts_color": [
+    0.02,
+    0.06,
+    0.3
+   ]
+  }
+ },
+ "materials": {
+  "body_faces_skin_shared": 1256,
+  "body_faces_total": 1256,
+  "shorts_cloth_faces_FR_Shorts_Color": 504
+ },
+ "tris": {
+  "before_bake_visible_and_options": 9888,
+  "body": 2084,
+  "shorts": 1096,
+  "gloves": 1336
+ }
+}

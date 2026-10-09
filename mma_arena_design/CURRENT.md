@@ -7,6 +7,7 @@
 - **Event-Map:** `Fight_Night_Arena_v03.blend` (aktuell: v02 + Backstage verbunden, Tür/Hallenwand geöffnet, Weg geprüft; Skript `build_fight_night_arena_v03.py`, Prüfwerte `renders/fight_night_v03_checks.json`) – v02 ( Publikum, Walkout-Begleiter, 2 Fighter im Käfig; Skript `build_fight_night_arena_v02.py`, Prüfwerte `renders/fight_night_v02_checks.json`; v01 als Historie)
 - **Backstage:** `backstage_v01.blend` (in der Event-Map v03 angehängt und verbunden; Umkleide + Gang bis zum Walkout-Tunnel der Event-Map, gleiche Koordinaten; Skript `build_backstage_v01.py`, Notizen `BACKSTAGE_V01_NOTES.md`, Prüfwerte `renders/backstage_v01_checks.json`)
 - **Anpassung:** `Fighter_Customization_v05.blend` (aktuell; v04 als Historie – siehe CUSTOMIZATION.md)
+- **Fighter gerigged:** `Fighter_Rigged_v01.blend` (Arbeitskopie aus Customization v05 + Trainer-Skelett, Testposen; Skript `build_fighter_rigged_v01.py`, Ergebnisse in `ASSET_OVERVIEW.md`)
 - **Fighter:** `Fighter_Design_v03.blend` (aktueller Stand: v02-Körper + slab/boolean-Überarbeitung von Haaren, Gesicht, Shorts, Handschuhen; ohne Rig/Animation). Historie: `Fighter_Design_v02.blend` (enthält auch den Original-Prototyp)
 - **Größenreferenz:** `MMA_Arena_v03_FighterScale.blend` = Kopie von v03 mit verlinktem Fighter im Käfig
   (verlinkt noch aus `Fighter_Prototype_v01.blend` – Änderungen am Fighter erscheinen dort automatisch)
