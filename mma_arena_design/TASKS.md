@@ -23,7 +23,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 |---|---|---|---|
 | 1 | Jab-Fehler beheben: Faust dreht nicht ein, hinterer Handschuh bis 1,2 cm im Kopf | Claude | `FIGHTER_JAB_V04.md` |
 | 2 | Weitere Grundaktionen auf demselben Rig: Cross, Hook, Uppercut, Low Kick, Block, Treffer-Reaktion, Schritte, K.o.-Fall | Claude | jeweils Start und Ende in der Kampfhaltung |
-| 2b | Prototyp ausbauen: Block, weitere Schläge, Runden + Zeit, Laufanimation seitlich/rückwärts, Sprung (Treffer-Reaktion + K.o. erledigt, v03) | Claude | `ROBLOX_PROTOTYPE_V02.md` |
+| 2b | Ringen: Takedown (E) + Sprawl, Guard-Schlag, Befreiung, Aufstehen aus Wrestling_Prototype_v02; danach Runden + Zeit (Stand-Moveset erledigt, `ROBLOX_MOVESET_V01.md`) | Claude | `ROBLOX_PROTOTYPE_V02.md` |
 | 3 | Weitere Animationen nach Roblox bringen: wie Idle als KeyframeSequence (Blender-Daten + Achsenumrechnung), nicht per FBX | Claude | `ROBLOX_IMPORT_TEST_V01.md` |
 | 3a | Handschuh-/Shorts-Details in Roblox (Textur oder getrennte Meshes) | Claude | eine Farbe pro MeshPart |
 | 3b | Upload der Animationen in die Roblox-Gruppe | Du / Claude | Gruppe ANIMEXGANG (ID 7160158), erst nach Freigabe |

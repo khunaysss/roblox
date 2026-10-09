@@ -51,13 +51,13 @@ ko.Parent = gui
 local hint = Instance.new("TextLabel")
 hint.AnchorPoint = Vector2.new(0.5, 1)
 hint.Position = UDim2.new(0.5, 0, 1, -20)
-hint.Size = UDim2.fromOffset(400, 24)
+hint.Size = UDim2.fromOffset(760, 24)
 hint.BackgroundTransparency = 1
 hint.Font = Enum.Font.Gotham
 hint.TextSize = 16
 hint.TextColor3 = Color3.new(1, 1, 1)
 hint.TextStrokeTransparency = 0.5
-hint.Text = "WASD laufen  ·  Linksklick Jab"
+hint.Text = "WASD laufen · LMB Jab · RMB Cross · Q Haken · R Uppercut · C Low Kick · F Block"
 hint.Parent = gui
 
 game:GetService("RunService").RenderStepped:Connect(function()
