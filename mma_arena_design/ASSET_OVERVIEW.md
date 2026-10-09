@@ -1,13 +1,14 @@
 # Asset-Übersicht – Cage Champions (Blender)
 
-Stand: 2026-10-09 (aktualisiert nach Fighter_Rigged_v03). Geprüft wurden die tatsächlichen `.blend`-Dateien (headless geöffnet, nur gelesen): Armatures, Bones, IK-Constraints, Armature-Modifier, Actions, NLA-Spuren, Shape Keys, verknüpfte Bibliotheken, nicht angewendete Modifier. Vorschau-Bilder wurden **nicht** ausgewertet.
-Alle 26 `.blend`-Dateien liegen in `mma_arena_design/`, sind committet und gepusht (Branch `claude/mcp-server-setup-mzv403`). Ältere Versionen wurden nicht überschrieben. `.blend1`-Backups sind per `.gitignore` ausgeschlossen.
+Stand: 2026-10-09 (aktualisiert nach der Export-Vorbereitung v03). Geprüft wurden die tatsächlichen `.blend`-Dateien (headless geöffnet, nur gelesen): Armatures, Bones, IK-Constraints, Armature-Modifier, Actions, NLA-Spuren, Shape Keys, verknüpfte Bibliotheken, nicht angewendete Modifier. Vorschau-Bilder wurden **nicht** ausgewertet.
+Alle 27 `.blend`-Dateien liegen in `mma_arena_design/`, sind committet und gepusht (Branch `claude/mcp-server-setup-mzv403`). Ältere Versionen wurden nicht überschrieben. `.blend1`-Backups sind per `.gitignore` ausgeschlossen.
 
 ## Aktueller Stand
 
 | Modell oder Map | Tatsächlicher Dateipfad | Neueste Version | Rig vorhanden | Animationen vorhanden | Offene technische Probleme |
 |---|---|---|---|---|---|
 | **Basiskämpfer, gerigged (aktuell)** | `mma_arena_design/Fighter_Rigged_v03.blend` | v03 | **ja**: wie v02 (24 Bones, 4 IK, gleiche Gewichtung) | 3 Actions: `Fighter_Idle_Bounce` (aktiv, 32-Frame-Loop „leichtes Federn“), `Fighter_Test_Poses`, `Fighter_Preview_Sequence` | siehe „Fighter_Rigged_v03 – Ergebnisse“. Roblox-Import nicht getestet. |
+| Basiskämpfer – Exportkopie | `mma_arena_design/Fighter_Rigged_v03_Export.blend`, `mma_arena_design/export/Fighter_Base_v03_Model.fbx`, `mma_arena_design/export/Fighter_Base_v03_Idle.fbx` | v03-Export | **ja**, gebacken: 16 Bones, keine IK/Constraints/Controls | `Fighter_Idle_Bounce_Baked` (Frame 1–33, jeder Frame geschlüsselt) | Blender-Reimport bestanden; Roblox nicht getestet. Siehe `EXPORT_V03_NOTES.md` |
 | Basiskämpfer, gerigged v02 | `mma_arena_design/Fighter_Rigged_v02.blend` | v02 | **ja**: gleiches Skelett wie v01 (24 Bones, 4 IK); 37 Meshes mit Armature-Modifier; Shorts und Hüfte neu gewichtet | 2 Actions: `Fighter_Test_Poses` (Ruhe + 5 Testposen, Jab bei Frame 21 ersetzt durch echte Schlag-Endposition) und `Fighter_Preview_Sequence` (168 Frames: Kampfhaltung → Jab → Knieheben → Kniebeuge) | siehe „Fighter_Rigged_v02 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
 | Basiskämpfer, gerigged (Vorversion) | `mma_arena_design/Fighter_Rigged_v01.blend` | v01 | **ja**: `Fighter_Armature` = Kopie des Trainer-Skeletts (24 Bones, gleiche Namen, 4 IK), an die Gelenke des Fighters angepasst; 37 Meshes mit Armature-Modifier | 1 Action `Fighter_Test_Poses` (Ruhe-A-Pose + 5 Testposen, Marker bei Frame 1/11/21/31/41/51). Keine Trainer-Actions in der Datei. | siehe Abschnitt „Fighter_Rigged_v01 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
 | Basiskämpfer (Design-Quelle) | `mma_arena_design/Fighter_Design_v03.blend` | v03 (unverändert) | nein | keine | Quelle; die Rig-fähige Arbeitskopie ist `Fighter_Rigged_v01.blend`. Hier weiterhin 50 Einzelobjekte, Boolean-Cutter, negative Skalierungen. |
@@ -162,3 +163,9 @@ v02 wurde nur geöffnet (Prüfsumme unverändert). Modell, Gewichtung und Anpass
 **Offen**
 - Das Federn ist mit Trainer-Posen gebaut, nicht mit echten Bewegungsreferenzen. Timing und Stärke sind Geschmackssache und lassen sich über die Werte in `pose_at()` anpassen.
 - Roblox: kein Export, kein Import. Die Kompatibilität ist nicht bestätigt.
+
+## Export-Vorbereitung v03 (Kurzfassung, Details in `EXPORT_V03_NOTES.md`)
+- IK und Constraints sind gebacken (Bone-Fehler 0,013 mm). Die 8 Kontroll-Bones sind entfernt; exportiert werden nur Armature und 13 Meshes.
+- Zwei FBX-Dateien mit demselben Skelett: Modell (Ruhepose) und Idle (mit Animation).
+- Reimport in eine leere Szene: Maßstab 1,857 m, Skelett-Namen, Eltern und Gelenke identisch, Gewichte identisch, Materialfarben identisch. Die Idle-Animation auf dem Modell-Skelett weicht höchstens 0,002 mm ab.
+- Einschränkungen: Tattoo-Textur nicht exportiert, nur der Standard-Look, Frame-Versatz +1 beim Blender-Reimport, Roblox-Import (Maßstab, Achsen, Rig, Materialien) **nicht getestet**.

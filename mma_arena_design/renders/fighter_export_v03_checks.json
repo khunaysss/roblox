@@ -1,0 +1,745 @@
+{
+ "source": "Fighter_Rigged_v03.blend (unchanged)",
+ "skeleton": {
+  "bones_exported": 16,
+  "removed_control_bones": [
+   "CTRL_IK_Hand_L",
+   "CTRL_Pole_Elbow_L",
+   "CTRL_IK_Foot_L",
+   "CTRL_Pole_Knee_L",
+   "CTRL_IK_Hand_R",
+   "CTRL_Pole_Elbow_R",
+   "CTRL_IK_Foot_R",
+   "CTRL_Pole_Knee_R"
+  ],
+  "hierarchy": {
+   "Root": null,
+   "LowerTorso": "Root",
+   "UpperTorso": "LowerTorso",
+   "Head": "UpperTorso",
+   "LeftUpperArm": "UpperTorso",
+   "LeftLowerArm": "LeftUpperArm",
+   "LeftHand": "LeftLowerArm",
+   "RightUpperArm": "UpperTorso",
+   "RightLowerArm": "RightUpperArm",
+   "RightHand": "RightLowerArm",
+   "LeftUpperLeg": "LowerTorso",
+   "LeftLowerLeg": "LeftUpperLeg",
+   "LeftFoot": "LeftLowerLeg",
+   "RightUpperLeg": "LowerTorso",
+   "RightLowerLeg": "RightUpperLeg",
+   "RightFoot": "RightLowerLeg"
+  }
+ },
+ "objects_exported": [
+  "Face_Focused_Brow_L",
+  "Face_Focused_Brow_R",
+  "Face_Focused_Eye_Glint_L",
+  "Face_Focused_Eye_Glint_R",
+  "Face_Focused_Eye_L",
+  "Face_Focused_Eye_R",
+  "Face_Focused_Mouth",
+  "Fighter_Armature",
+  "Fighter_Body",
+  "Fighter_Gloves",
+  "Fighter_Shorts",
+  "Hair_Cap",
+  "Hair_Sideburn_L",
+  "Hair_Sideburn_R"
+ ],
+ "objects_dropped_from_export_copy": [
+  "Attach_Beard",
+  "Attach_Face",
+  "Attach_Hair",
+  "Beard_Full_Moustache",
+  "Beard_Full_Volume",
+  "Beard_Short_Shell",
+  "Cam_FC4_Head",
+  "Cam_FC4_Tattoo_Arm",
+  "Cam_FC5_Head_Front",
+  "Cam_FD3_Detail_Face",
+  "Cam_FD3_Detail_Glove",
+  "Cam_FD3_Front",
+  "Cam_FD3_ThreeQuarter",
+  "Face_Friendly_Brow_L",
+  "Face_Friendly_Brow_R",
+  "Face_Friendly_Eye_Glint_L",
+  "Face_Friendly_Eye_Glint_R",
+  "Face_Friendly_Eye_L",
+  "Face_Friendly_Eye_R",
+  "Face_Friendly_Mouth",
+  "Face_Neutral_Brow_L",
+  "Face_Neutral_Brow_R",
+  "Face_Neutral_Eye_Glint_L",
+  "Face_Neutral_Eye_Glint_R",
+  "Face_Neutral_Eye_L",
+  "Face_Neutral_Eye_R",
+  "Face_Neutral_Mouth",
+  "Fighter_Customization",
+  "Hair_Buzzcut",
+  "Hair_ShortCurls_Base",
+  "Hair_ShortCurls_Tufts",
+  "Hair_SidePart_Short",
+  "Hair_SidePart_Sideburn_L",
+  "Hair_SidePart_Sideburn_R",
+  "Hair_SidePart_Swept",
+  "Preview_Ground",
+  "Soft_Fill",
+  "Soft_Key",
+  "Soft_Rim"
+ ],
+ "materials": {
+  "FC4_Hair_Color": {
+   "base_color": [
+    0.02,
+    0.015,
+    0.012
+   ],
+   "roughness": 0.6,
+   "note": "plain value"
+  },
+  "FD3_Glove_Black": {
+   "base_color": [
+    0.014,
+    0.014,
+    0.016
+   ],
+   "roughness": 0.38,
+   "note": "plain value"
+  },
+  "FD3_Shorts_Red": {
+   "base_color": [
+    0.28,
+    0.008,
+    0.013
+   ],
+   "roughness": 0.55,
+   "note": "plain value"
+  },
+  "FR_Shorts_Color": {
+   "base_color": [
+    0.28,
+    0.008,
+    0.013
+   ],
+   "roughness": 0.55,
+   "note": "linked (RGB) -> value from Shorts_Color"
+  },
+  "FD3_Face_Features": {
+   "base_color": [
+    0.012,
+    0.01,
+    0.01
+   ],
+   "roughness": 0.4,
+   "note": "plain value"
+  },
+  "FD3_White_Detail": {
+   "base_color": [
+    0.8,
+    0.8,
+    0.8
+   ],
+   "roughness": 0.55,
+   "note": "plain value"
+  },
+  "FC4_Skin_Shared": {
+   "base_color": [
+    0.48,
+    0.3,
+    0.2
+   ],
+   "roughness": 0.62,
+   "note": "linked (MIX) -> value from Skin_Tone"
+  }
+ },
+ "bake": {
+  "action": "Fighter_Idle_Bounce_Baked",
+  "frames": [
+   1,
+   33
+  ],
+  "fps": 24,
+  "keyed_bones": 16,
+  "channels": "location + rotation_quaternion + scale on every frame",
+  "max_world_matrix_error": 1.31e-05,
+  "deformed_mesh_vs_original_max_m": 4e-06
+ },
+ "export_settings": {
+  "use_selection": true,
+  "object_types": [
+   "ARMATURE",
+   "MESH"
+  ],
+  "apply_unit_scale": true,
+  "apply_scale_options": "FBX_SCALE_NONE",
+  "global_scale": 1.0,
+  "axis_forward": "-Z",
+  "axis_up": "Y",
+  "use_mesh_modifiers": true,
+  "mesh_smooth_type": "FACE",
+  "use_tspace": false,
+  "add_leaf_bones": false,
+  "primary_bone_axis": "Y",
+  "secondary_bone_axis": "X",
+  "use_armature_deform_only": false,
+  "armature_nodetype": "NULL",
+  "path_mode": "AUTO",
+  "model_file": "bake_anim=False (rest pose)",
+  "idle_file": "meshes + armature (bind pose), bake_anim=True, step 1, simplify 0, force start/end keys, only the active action",
+  "scene_units": "METRIC, scale_length 1.0"
+ },
+ "files": {
+  "Fighter_Rigged_v03_Export.blend": 271909,
+  "export/Fighter_Base_v03_Model.fbx": 385116,
+  "export/Fighter_Base_v03_Idle.fbx": 511932
+ },
+ "reimport_check": {
+  "model_file_objects": [
+   "Face_Focused_Brow_L:MESH",
+   "Face_Focused_Brow_R:MESH",
+   "Face_Focused_Eye_Glint_L:MESH",
+   "Face_Focused_Eye_Glint_R:MESH",
+   "Face_Focused_Eye_L:MESH",
+   "Face_Focused_Eye_R:MESH",
+   "Face_Focused_Mouth:MESH",
+   "Fighter_Body:MESH",
+   "Fighter_Gloves:MESH",
+   "Fighter_Shorts:MESH",
+   "Hair_Cap:MESH",
+   "Hair_Sideburn_L:MESH",
+   "Hair_Sideburn_R:MESH",
+   "Import_Model_Armature:ARMATURE"
+  ],
+  "idle_file_objects": [
+   "Face_Focused_Brow_L.001:MESH",
+   "Face_Focused_Brow_R.001:MESH",
+   "Face_Focused_Eye_Glint_L.001:MESH",
+   "Face_Focused_Eye_Glint_R.001:MESH",
+   "Face_Focused_Eye_L.001:MESH",
+   "Face_Focused_Eye_R.001:MESH",
+   "Face_Focused_Mouth.001:MESH",
+   "Fighter_Body.001:MESH",
+   "Fighter_Gloves.001:MESH",
+   "Fighter_Shorts.001:MESH",
+   "Hair_Cap.001:MESH",
+   "Hair_Sideburn_L.001:MESH",
+   "Hair_Sideburn_R.001:MESH",
+   "Import_Idle_Armature:ARMATURE"
+  ],
+  "height_m": 1.8574,
+  "lowest_z": -0.0004,
+  "object_transforms": {
+   "Import_Model_Armature": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     -0.0,
+     0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Import_Idle_Armature": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     -0.0,
+     0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Face_Focused_Brow_L": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Face_Focused_Eye_Glint_L": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Face_Focused_Brow_R": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Face_Focused_Eye_L": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Fighter_Shorts": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Hair_Sideburn_L": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Face_Focused_Eye_Glint_R": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Face_Focused_Eye_R": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Face_Focused_Mouth": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Fighter_Body": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Fighter_Gloves": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Hair_Cap": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   },
+   "Hair_Sideburn_R": {
+    "loc": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rot_deg": [
+     0.0,
+     -0.0,
+     0.0
+    ],
+    "scale": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  "skeleton": {
+   "model_bones": 16,
+   "idle_bones": 16,
+   "names_equal_model_idle": true,
+   "names_equal_source": true,
+   "parents_equal_source": true,
+   "parents_equal_model_idle": true,
+   "max_head_offset_vs_source_m": 0.0,
+   "max_tail_offset_vs_source_m": 0.7,
+   "max_head_offset_model_vs_idle_m": 0.0
+  },
+  "meshes": {
+   "Face_Focused_Brow_L": {
+    "verts_src": 24,
+    "verts_import": 24,
+    "materials": [
+     "FC4_Hair_Color"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Face_Focused_Brow_R": {
+    "verts_src": 24,
+    "verts_import": 24,
+    "materials": [
+     "FC4_Hair_Color"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Face_Focused_Eye_Glint_L": {
+    "verts_src": 8,
+    "verts_import": 8,
+    "materials": [
+     "FD3_White_Detail"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Face_Focused_Eye_Glint_R": {
+    "verts_src": 8,
+    "verts_import": 8,
+    "materials": [
+     "FD3_White_Detail"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Face_Focused_Eye_L": {
+    "verts_src": 8,
+    "verts_import": 8,
+    "materials": [
+     "FD3_Face_Features"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Face_Focused_Eye_R": {
+    "verts_src": 8,
+    "verts_import": 8,
+    "materials": [
+     "FD3_Face_Features"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Face_Focused_Mouth": {
+    "verts_src": 12,
+    "verts_import": 12,
+    "materials": [
+     "FD3_Face_Features"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Fighter_Body": {
+    "verts_src": 1204,
+    "verts_import": 1204,
+    "materials": [
+     "FC4_Skin_Shared"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Fighter_Gloves": {
+    "verts_src": 684,
+    "verts_import": 684,
+    "materials": [
+     "FD3_Shorts_Red",
+     "FD3_White_Detail",
+     "FD3_Glove_Black"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Fighter_Shorts": {
+    "verts_src": 972,
+    "verts_import": 972,
+    "materials": [
+     "FR_Shorts_Color",
+     "FD3_White_Detail"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Hair_Cap": {
+    "verts_src": 104,
+    "verts_import": 104,
+    "materials": [
+     "FC4_Hair_Color"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Hair_Sideburn_L": {
+    "verts_src": 24,
+    "verts_import": 24,
+    "materials": [
+     "FC4_Hair_Color"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   },
+   "Hair_Sideburn_R": {
+    "verts_src": 24,
+    "verts_import": 24,
+    "materials": [
+     "FC4_Hair_Color"
+    ],
+    "armature_modifier": true,
+    "parent": "Import_Model_Armature"
+   }
+  },
+  "weights_max_abs_diff": 0.0,
+  "vertex_groups_missing": [],
+  "materials": {
+   "FC4_Hair_Color": {
+    "source": [
+     0.02,
+     0.015,
+     0.012
+    ],
+    "import": [
+     0.02,
+     0.015,
+     0.012
+    ],
+    "max_diff": 0.0
+   },
+   "FC4_Skin_Shared": {
+    "source": [
+     0.48,
+     0.3,
+     0.2
+    ],
+    "import": [
+     0.48,
+     0.3,
+     0.2
+    ],
+    "max_diff": 0.0
+   },
+   "FD3_Face_Features": {
+    "source": [
+     0.012,
+     0.01,
+     0.01
+    ],
+    "import": [
+     0.012,
+     0.01,
+     0.01
+    ],
+    "max_diff": 0.0
+   },
+   "FD3_Glove_Black": {
+    "source": [
+     0.014,
+     0.014,
+     0.016
+    ],
+    "import": [
+     0.014,
+     0.014,
+     0.016
+    ],
+    "max_diff": 0.0
+   },
+   "FD3_Shorts_Red": {
+    "source": [
+     0.28,
+     0.008,
+     0.013
+    ],
+    "import": [
+     0.28,
+     0.008,
+     0.013
+    ],
+    "max_diff": 0.0
+   },
+   "FD3_White_Detail": {
+    "source": [
+     0.8,
+     0.8,
+     0.8
+    ],
+    "import": [
+     0.8,
+     0.8,
+     0.8
+    ],
+    "max_diff": 0.0
+   },
+   "FR_Shorts_Color": {
+    "source": [
+     0.28,
+     0.008,
+     0.013
+    ],
+    "import": [
+     0.28,
+     0.008,
+     0.013
+    ],
+    "max_diff": 0.0
+   }
+  },
+  "idle_action": {
+   "name": "Fighter_Armature|Scene",
+   "frame_range": [
+    2.0,
+    34.0
+   ]
+  },
+  "animation_on_model_armature": {
+   "frame_offset": 1,
+   "max_bone_position_error_m": 2e-06,
+   "max_deformed_vertex_error_m": {
+    "Face_Focused_Brow_L": 0.0,
+    "Face_Focused_Eye_Glint_L": 0.0,
+    "Face_Focused_Brow_R": 0.0,
+    "Face_Focused_Eye_L": 0.0,
+    "Fighter_Shorts": 1e-06,
+    "Hair_Sideburn_L": 0.0,
+    "Face_Focused_Eye_Glint_R": 0.0,
+    "Face_Focused_Eye_R": 0.0,
+    "Face_Focused_Mouth": 0.0,
+    "Fighter_Body": 2e-06,
+    "Fighter_Gloves": 1e-06,
+    "Hair_Cap": 0.0,
+    "Hair_Sideburn_R": 0.0
+   },
+   "loop_frame1_vs_frame33_m": 0.0
+  }
+ }
+}

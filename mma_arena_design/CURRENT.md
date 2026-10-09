@@ -8,6 +8,7 @@
 - **Backstage:** `backstage_v01.blend` (in der Event-Map v03 angehängt und verbunden; Umkleide + Gang bis zum Walkout-Tunnel der Event-Map, gleiche Koordinaten; Skript `build_backstage_v01.py`, Notizen `BACKSTAGE_V01_NOTES.md`, Prüfwerte `renders/backstage_v01_checks.json`)
 - **Anpassung:** `Fighter_Customization_v05.blend` (aktuell; v04 als Historie – siehe CUSTOMIZATION.md)
 - **Fighter gerigged:** `Fighter_Rigged_v03.blend` (aktuell: Idle-Loop „leichtes Federn“, Video `renders/fighter_rigged_v03_idle_preview.mp4`, Skript `build_fighter_rigged_v03.py`) – v02 ( echte Jab-Endposition, neue Shorts/Hüft-Gewichtung, Video `renders/fighter_rigged_v02_preview.mp4`, Skript `build_fighter_rigged_v02.py`) – v01 (Arbeitskopie aus Customization v05 + Trainer-Skelett, Testposen; Skript `build_fighter_rigged_v01.py`, Ergebnisse in `ASSET_OVERVIEW.md`)
+- **Fighter Export (für Roblox-Importtest vorbereitet, nicht getestet):** `Fighter_Rigged_v03_Export.blend` + `export/Fighter_Base_v03_Model.fbx` + `export/Fighter_Base_v03_Idle.fbx` (Skript `export_fighter_rigged_v03.py`, Notizen `EXPORT_V03_NOTES.md`)
 - **Fighter:** `Fighter_Design_v03.blend` (aktueller Stand: v02-Körper + slab/boolean-Überarbeitung von Haaren, Gesicht, Shorts, Handschuhen; ohne Rig/Animation). Historie: `Fighter_Design_v02.blend` (enthält auch den Original-Prototyp)
 - **Größenreferenz:** `MMA_Arena_v03_FighterScale.blend` = Kopie von v03 mit verlinktem Fighter im Käfig
   (verlinkt noch aus `Fighter_Prototype_v01.blend` – Änderungen am Fighter erscheinen dort automatisch)
