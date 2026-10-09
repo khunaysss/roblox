@@ -1,0 +1,225 @@
+{
+ "source": "Fighter_Rigged_v03.blend (unchanged)",
+ "existing_jab_action_found": false,
+ "existing_jab_material": "only a jab end pose (Fighter_Test_Poses frame 21, Fighter_Preview_Sequence) - no own action",
+ "model_rig_weights": "unchanged from v03",
+ "jab_action": {
+  "name": "Fighter_Jab",
+  "frames": 18,
+  "fps": 24,
+  "seconds": 0.75,
+  "keys": "every frame",
+  "phases": {
+   "stance": "1",
+   "preparation_dip": "1-3",
+   "extension": "3-6",
+   "hold": "6-8",
+   "return": "8-15",
+   "settle": "15-18"
+  },
+  "animated": [
+   "LowerTorso",
+   "UpperTorso",
+   "Head",
+   "CTRL_IK_Hand_L",
+   "CTRL_IK_Hand_R",
+   "CTRL_IK_Foot_L",
+   "CTRL_IK_Foot_R",
+   "CTRL_Pole_Knee_L",
+   "CTRL_Pole_Knee_R",
+   "CTRL_Pole_Elbow_L",
+   "CTRL_Pole_Elbow_R"
+  ]
+ },
+ "jab_worst": {
+  "lead_elbow_bend_min_deg": 11.9979,
+  "rear_glove_into_head_m": 0.0116,
+  "lead_glove_into_head_m": 0.0,
+  "forearm_into_chest_m": 0.0,
+  "rear_glove_to_chin_max_m": 0.1772,
+  "foot_slide_m": 0.0,
+  "lowest_z": -0.0005,
+  "elbow_flip_frames": [],
+  "lead_glove_reach_forward_m": 0.495,
+  "lead_shoulder_forward_max_m": 0.096,
+  "pelvis_yaw_range_deg": [
+   -34.0,
+   -26.5
+  ]
+ },
+ "per_frame": [
+  {
+   "f": 1,
+   "lead_glove_y": -0.376,
+   "lead_elbow_bend_deg": 104.3,
+   "lead_shoulder_fwd_m": 0.0,
+   "pelvis_yaw_deg": -28.0,
+   "pelvis_z": 0.865,
+   "rear_glove_chin_m": 0.177
+  },
+  {
+   "f": 2,
+   "lead_glove_y": -0.377,
+   "lead_elbow_bend_deg": 104.3,
+   "lead_shoulder_fwd_m": -0.003,
+   "pelvis_yaw_deg": -27.2,
+   "pelvis_z": 0.86,
+   "rear_glove_chin_m": 0.177
+  },
+  {
+   "f": 3,
+   "lead_glove_y": -0.378,
+   "lead_elbow_bend_deg": 104.3,
+   "lead_shoulder_fwd_m": -0.006,
+   "pelvis_yaw_deg": -26.5,
+   "pelvis_z": 0.855,
+   "rear_glove_chin_m": 0.177
+  },
+  {
+   "f": 4,
+   "lead_glove_y": -0.481,
+   "lead_elbow_bend_deg": 99.6,
+   "lead_shoulder_fwd_m": 0.023,
+   "pelvis_yaw_deg": -28.3,
+   "pelvis_z": 0.855,
+   "rear_glove_chin_m": 0.158
+  },
+  {
+   "f": 5,
+   "lead_glove_y": -0.712,
+   "lead_elbow_bend_deg": 70.4,
+   "lead_shoulder_fwd_m": 0.072,
+   "pelvis_yaw_deg": -31.7,
+   "pelvis_z": 0.855,
+   "rear_glove_chin_m": 0.131
+  },
+  {
+   "f": 6,
+   "lead_glove_y": -0.87,
+   "lead_elbow_bend_deg": 12.0,
+   "lead_shoulder_fwd_m": 0.095,
+   "pelvis_yaw_deg": -33.5,
+   "pelvis_z": 0.855,
+   "rear_glove_chin_m": 0.131
+  },
+  {
+   "f": 7,
+   "lead_glove_y": -0.87,
+   "lead_elbow_bend_deg": 12.0,
+   "lead_shoulder_fwd_m": 0.095,
+   "pelvis_yaw_deg": -33.7,
+   "pelvis_z": 0.856,
+   "rear_glove_chin_m": 0.131
+  },
+  {
+   "f": 8,
+   "lead_glove_y": -0.871,
+   "lead_elbow_bend_deg": 12.0,
+   "lead_shoulder_fwd_m": 0.096,
+   "pelvis_yaw_deg": -33.9,
+   "pelvis_z": 0.857,
+   "rear_glove_chin_m": 0.131
+  },
+  {
+   "f": 9,
+   "lead_glove_y": -0.837,
+   "lead_elbow_bend_deg": 36.0,
+   "lead_shoulder_fwd_m": 0.096,
+   "pelvis_yaw_deg": -34.0,
+   "pelvis_z": 0.858,
+   "rear_glove_chin_m": 0.131
+  },
+  {
+   "f": 10,
+   "lead_glove_y": -0.755,
+   "lead_elbow_bend_deg": 64.2,
+   "lead_shoulder_fwd_m": 0.092,
+   "pelvis_yaw_deg": -33.7,
+   "pelvis_z": 0.858,
+   "rear_glove_chin_m": 0.131
+  },
+  {
+   "f": 11,
+   "lead_glove_y": -0.65,
+   "lead_elbow_bend_deg": 85.5,
+   "lead_shoulder_fwd_m": 0.08,
+   "pelvis_yaw_deg": -32.8,
+   "pelvis_z": 0.859,
+   "rear_glove_chin_m": 0.131
+  },
+  {
+   "f": 12,
+   "lead_glove_y": -0.546,
+   "lead_elbow_bend_deg": 97.9,
+   "lead_shoulder_fwd_m": 0.062,
+   "pelvis_yaw_deg": -31.6,
+   "pelvis_z": 0.861,
+   "rear_glove_chin_m": 0.134
+  },
+  {
+   "f": 13,
+   "lead_glove_y": -0.458,
+   "lead_elbow_bend_deg": 102.7,
+   "lead_shoulder_fwd_m": 0.042,
+   "pelvis_yaw_deg": -30.4,
+   "pelvis_z": 0.862,
+   "rear_glove_chin_m": 0.148
+  },
+  {
+   "f": 14,
+   "lead_glove_y": -0.399,
+   "lead_elbow_bend_deg": 104.1,
+   "lead_shoulder_fwd_m": 0.022,
+   "pelvis_yaw_deg": -29.2,
+   "pelvis_z": 0.864,
+   "rear_glove_chin_m": 0.162
+  },
+  {
+   "f": 15,
+   "lead_glove_y": -0.377,
+   "lead_elbow_bend_deg": 104.4,
+   "lead_shoulder_fwd_m": 0.006,
+   "pelvis_yaw_deg": -28.3,
+   "pelvis_z": 0.865,
+   "rear_glove_chin_m": 0.173
+  },
+  {
+   "f": 16,
+   "lead_glove_y": -0.376,
+   "lead_elbow_bend_deg": 104.3,
+   "lead_shoulder_fwd_m": 0.0,
+   "pelvis_yaw_deg": -28.0,
+   "pelvis_z": 0.865,
+   "rear_glove_chin_m": 0.177
+  },
+  {
+   "f": 17,
+   "lead_glove_y": -0.376,
+   "lead_elbow_bend_deg": 104.3,
+   "lead_shoulder_fwd_m": 0.0,
+   "pelvis_yaw_deg": -28.0,
+   "pelvis_z": 0.865,
+   "rear_glove_chin_m": 0.177
+  },
+  {
+   "f": 18,
+   "lead_glove_y": -0.376,
+   "lead_elbow_bend_deg": 104.3,
+   "lead_shoulder_fwd_m": 0.0,
+   "pelvis_yaw_deg": -28.0,
+   "pelvis_z": 0.865,
+   "rear_glove_chin_m": 0.177
+  }
+ ],
+ "start_end": {
+  "frame1_vs_idle_frame1_max_bone_offset_m": 0.0,
+  "last_frame_vs_idle_frame1_max_bone_offset_m": 0.0
+ },
+ "video": {
+  "file": "renders/fighter_rigged_v04_jab_preview.mp4",
+  "ok": true,
+  "content": "2x normal speed, 1x half speed",
+  "duration_s": "3.000000",
+  "ffmpeg_error": ""
+ }
+}
