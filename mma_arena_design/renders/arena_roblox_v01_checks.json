@@ -1,0 +1,110 @@
+{
+ "source": "MMA_Arena_Design_v03.blend (nur gelesen)",
+ "meshes": 206,
+ "triangles": 15892,
+ "fbx_bytes": 466188,
+ "multi_material_meshes": {
+  "Platform_Base_Skirt": {
+   "M_Anthracite": 12,
+   "M_Black_Vinyl_Pad": 16
+  },
+  "Tribune_North_Row1_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_North_Row2_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_North_Row3_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_North_Row4_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_East_Row1_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_East_Row2_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_East_Row3_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_East_Row4_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_West_Row1_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_West_Row2_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_West_Row3_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_West_Row4_Seats": {
+   "M_Seat_Cushion": 504,
+   "M_Seat_Back_Red": 252
+  },
+  "Tribune_South_L_Row1_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Tribune_South_L_Row2_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Tribune_South_L_Row3_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Tribune_South_L_Row4_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Tribune_South_R_Row1_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Tribune_South_R_Row2_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Tribune_South_R_Row3_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Tribune_South_R_Row4_Seats": {
+   "M_Seat_Cushion": 168,
+   "M_Seat_Back_Red": 84
+  },
+  "Scoreboard_East": {
+   "M_Black_Vinyl_Pad": 12,
+   "M_Screen_Placeholder": 12,
+   "M_Red_LED": 12,
+   "M_Gold_Accent": 12
+  },
+  "Scoreboard_West": {
+   "M_Black_Vinyl_Pad": 12,
+   "M_Screen_Placeholder": 12,
+   "M_Red_LED": 12,
+   "M_Gold_Accent": 12
+  }
+ },
+ "textured_materials": [],
+ "glow_materials": [
+  "M_Red_LED",
+  "M_Screen_Placeholder",
+  "M_White_Lens"
+ ]
+}
