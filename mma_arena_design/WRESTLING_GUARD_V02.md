@@ -54,3 +54,10 @@ Weitere Werte in v02:
 - **Griffe:** Die Handschuhe überlappen weiterhin bei den Griffen (Guard bis ca. 7–8 cm, Takedown bis ca. 13 cm).
 - **Gleich wie v01, hier nicht bearbeitet:** schnelle Arm- und Fallbewegungen beim Schuss (bis 33 cm pro Frame), Root folgt dem Becken, kein Backen, kein Export, kein Roblox-Test.
 - **Gesamtablauf:** Kein vollständiges Neu-Rendering des Ablaufs; die v01-Videos zeigen die alte Guard.
+
+## Nächste Aufgaben (offen, noch nicht begonnen)
+1. **Handschuh-Überlappungen korrigieren:** Griffe hinter den Knien (Takedown, bis ca. 13 cm), B's Griffe an A's Unterarmen und Handschuh an Handschuh in der Guard (bis ca. 7–8 cm).
+2. **Arm- und Fallbewegungen weicher gestalten:** Schuss (Frame 13–15, bis 33 cm pro Frame), Hände zur Hüfte nach dem Anheben (Frame 26–29) und B's Fall- und Abstützbewegungen; Zwischenschlüssel bzw. Timing strecken.
+3. **Guard-Landung und Escape ohne starke Durchdringung:** Landung Takedown Frame 34–36 (bis 6,9 cm) und Escape-Beginn Frame 5 (8,5 cm); zusätzlich der verbleibende Guard-Kontakt von 3–5 cm.
+4. **Aufstehbewegung und Abschnittsübergänge prüfen:** `Ground_GetUp` aus Seiten- und Dreiviertelansicht bei normaler Geschwindigkeit. Übergänge Takedown → Idle (1,4 cm) und Schlag → Idle (1,9 cm) an den Gelenken angleichen.
+5. **Animationen für den späteren Export vorbereiten:** Exportkopie mit gebackenen Actions (IK, Kontakte), ohne Kontroll-Bones; Root-Bewegung festlegen; Reimport in eine leere Blender-Szene prüfen. Wie beim Basiskämpfer: `export_fighter_rigged_v03.py`. Noch keine Roblox-Arbeit.
