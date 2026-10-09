@@ -1,13 +1,14 @@
 # Asset-Übersicht – Cage Champions (Blender)
 
-Stand: 2026-10-09 (aktualisiert nach Fighter_Rigged_v01). Geprüft wurden die tatsächlichen `.blend`-Dateien (headless geöffnet, nur gelesen): Armatures, Bones, IK-Constraints, Armature-Modifier, Actions, NLA-Spuren, Shape Keys, verknüpfte Bibliotheken, nicht angewendete Modifier. Vorschau-Bilder wurden **nicht** ausgewertet.
-Alle 24 `.blend`-Dateien liegen in `mma_arena_design/`, sind committet und gepusht (Branch `claude/mcp-server-setup-mzv403`). Ältere Versionen wurden nicht überschrieben. `.blend1`-Backups sind per `.gitignore` ausgeschlossen.
+Stand: 2026-10-09 (aktualisiert nach Fighter_Rigged_v02). Geprüft wurden die tatsächlichen `.blend`-Dateien (headless geöffnet, nur gelesen): Armatures, Bones, IK-Constraints, Armature-Modifier, Actions, NLA-Spuren, Shape Keys, verknüpfte Bibliotheken, nicht angewendete Modifier. Vorschau-Bilder wurden **nicht** ausgewertet.
+Alle 25 `.blend`-Dateien liegen in `mma_arena_design/`, sind committet und gepusht (Branch `claude/mcp-server-setup-mzv403`). Ältere Versionen wurden nicht überschrieben. `.blend1`-Backups sind per `.gitignore` ausgeschlossen.
 
 ## Aktueller Stand
 
 | Modell oder Map | Tatsächlicher Dateipfad | Neueste Version | Rig vorhanden | Animationen vorhanden | Offene technische Probleme |
 |---|---|---|---|---|---|
-| **Basiskämpfer, gerigged** | `mma_arena_design/Fighter_Rigged_v01.blend` | v01 | **ja**: `Fighter_Armature` = Kopie des Trainer-Skeletts (24 Bones, gleiche Namen, 4 IK), an die Gelenke des Fighters angepasst; 37 Meshes mit Armature-Modifier | 1 Action `Fighter_Test_Poses` (Ruhe-A-Pose + 5 Testposen, Marker bei Frame 1/11/21/31/41/51). Keine Trainer-Actions in der Datei. | siehe Abschnitt „Fighter_Rigged_v01 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
+| **Basiskämpfer, gerigged (aktuell)** | `mma_arena_design/Fighter_Rigged_v02.blend` | v02 | **ja**: gleiches Skelett wie v01 (24 Bones, 4 IK); 37 Meshes mit Armature-Modifier; Shorts und Hüfte neu gewichtet | 2 Actions: `Fighter_Test_Poses` (Ruhe + 5 Testposen, Jab bei Frame 21 ersetzt durch echte Schlag-Endposition) und `Fighter_Preview_Sequence` (168 Frames: Kampfhaltung → Jab → Knieheben → Kniebeuge) | siehe „Fighter_Rigged_v02 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
+| Basiskämpfer, gerigged (Vorversion) | `mma_arena_design/Fighter_Rigged_v01.blend` | v01 | **ja**: `Fighter_Armature` = Kopie des Trainer-Skeletts (24 Bones, gleiche Namen, 4 IK), an die Gelenke des Fighters angepasst; 37 Meshes mit Armature-Modifier | 1 Action `Fighter_Test_Poses` (Ruhe-A-Pose + 5 Testposen, Marker bei Frame 1/11/21/31/41/51). Keine Trainer-Actions in der Datei. | siehe Abschnitt „Fighter_Rigged_v01 – Ergebnisse“ unten. Roblox-Import nicht getestet. |
 | Basiskämpfer (Design-Quelle) | `mma_arena_design/Fighter_Design_v03.blend` | v03 (unverändert) | nein | keine | Quelle; die Rig-fähige Arbeitskopie ist `Fighter_Rigged_v01.blend`. Hier weiterhin 50 Einzelobjekte, Boolean-Cutter, negative Skalierungen. |
 | Fighter-Anpassung | `mma_arena_design/Fighter_Customization_v05.blend` | v05 | nein | keine | Baut auf der Fighter-v03-Geometrie auf, also mit denselben Problemen wie oben. Zusätzlich nicht angewendete Booleans an den Bärten. |
 | 6 Trainer | `mma_arena_design/Cage_Champions_Trainers_v02.blend` | v02 | **ja**: 6 Armatures × 24 Bones; 24 IK-Constraints (Hände und Füße); 25 Meshes mit Armature-Modifier | 18 Actions: je Trainer `Stance_Idle` (Frame 1–33/41) und 2 Signature-Moves (Frame 1–19 bis 1–37). Keine NLA-Spuren; die Idle-Actions sind aktiv. | Shorts verformen sich in tiefen Posen. IK und CTRL-Bones müssen vor einem Export gebacken werden. Export nicht getestet. |
@@ -86,3 +87,45 @@ Gespeichert in der Action `Fighter_Test_Poses`. Übersicht: `renders/fighter_rig
 - Bei Kicks schneiden sich die Oberschenkel, weil Bein-Rotation und -Kreuzung nicht begrenzt sind.
 - Das Test-Tattoo am linken Oberarm aus v05 ist weiterhin aktiv.
 - Roblox: kein Export, kein Import, kein R15-Abgleich. Die Kompatibilität ist nicht bestätigt.
+
+## Fighter_Rigged_v02 – Ergebnisse (gemessen, Skript `build_fighter_rigged_v02.py`, Werte `renders/fighter_rigged_v02_checks.json`)
+
+v01 wurde nur geöffnet; die Prüfsumme ist unverändert. Geändert wurden ausschließlich die Jab-Pose und die Gewichtung von Shorts und Hüfte. Geometrie und Design sind gleich geblieben; nur an der Hüfte kamen zusätzliche Kantenringe für die Biegung hinzu (Shorts 1 096 → 1 928 Dreiecke, Körper 2 084 → 2 292).
+
+**1. Jab-Endposition** (Bild `renders/fighter_rigged_v02_jab_front_side.png`, vorne und seitlich gerendert und angesehen)
+
+| Messwert | v01 (Trainer-Frame) | v02 |
+|---|---|---|
+| Ellbogen der Schlaghand | 0,4° (ganz durchgestreckt) | 10° gebeugt = fast gestreckt |
+| Vordere Schulter vor der hinteren | 0,32 m | 0,42 m, also 5,9 cm weiter vorn als in der Kampfhaltung |
+| Reichweite Handschuh ab Brustbasis | 0,70 m | 0,89 m |
+| Hintere Hand: Abstand zum Kinn | 2,0 cm | 2,3 cm |
+| Hintere Hand: Eindringen in den Kopf | 0 | 0,9 cm (Handschuh liegt am Kinn an) |
+
+**2. Shorts und Hüfte**
+- Gemeinsames Gewichtsfeld für Shorts-Hüftteil, Shorts-Beine, Streifen, Oberschenkel-Haut und untere Becken-Haut. Der Anteil des Oberschenkels hängt von Höhe und Seite ab.
+- Hinten blendet es von 0,97 m auf 0,80 m, vorn von 0,935 m auf 0,78 m. Die äußere Hüftseite folgt dem Bein auf Hüfthöhe weniger stark.
+- Der Schritt ist zwischen beiden Beinen geteilt. Der Bund hängt zu 100 % am Becken.
+- Werte jeweils v01 → v02:
+
+| Pose | Shorts-Naht geöffnet | Hüftteil steht ab | Stoff über dem Bund | Haut außerhalb der Shorts | Bund weicht vom Becken ab |
+|---|---|---|---|---|---|
+| Kampfhaltung | 1,8 → 0,2 cm | 0 → 0,2 cm | 0 → 0 | 1 Vertex 0,6 cm → 2 Vertices 0,6 cm | 0 → 0 |
+| Knieheben | **10,9 → 0,6 cm** | 0,4 → 1,9 cm | 2,5 → 1,3 cm | 3 Vertices 1,7 cm → 10 Vertices 1,7 cm | 0 → 0 |
+| Tiefe Kniebeuge | **5,5 → 0,6 cm** | 0 → 1,3 cm | 3,6 → 3,0 cm | 7 Vertices 0,9 cm → 4 Vertices 0,5 cm | 0 → 0 |
+| Jab (neu) | 2,1 → 0,3 cm | 0 → 0,4 cm | 0 → 0 | 0 → 0 | 0 → 0 |
+
+Über die ganze Video-Sequenz (jeder 3. Frame) liegen die schlechtesten Werte bei:
+- Shorts-Naht: 0,7 cm offen
+- Hüftteil: steht 1,9 cm ab
+- Stoff über dem Bund: 3,1 cm (Beugefalte vorn)
+- Haut außerhalb der Shorts: 1,9 cm
+- Füße: höchstens 1,5 mm im Boden
+
+**3. Videovorschau:** `renders/fighter_rigged_v02_preview.mp4`. H.264, 640 × 720, 24 fps, 7 s (168 Frames, Cycles mit 8 Samples). Ablauf: Kampfhaltung → Jab → Kampfhaltung → Knieheben → Kampfhaltung → Kniebeuge → Kampfhaltung. Die Ausgabe hat funktioniert.
+
+**Verbleibende Probleme (gemessen)**
+- **Kniekehle in der tiefen Beuge (128°):** Die Wade dringt 8,5 cm in den Oberschenkel ein, ebenso in v01. In v02 wird das Eindringen auch am Shorts-Bein gemessen: 9,0 cm; in v01 war dieser Wert 0. Ursache ist die starre Blockform am Knie, die Gewichtung der Hüfte behebt das nicht.
+- **Beugefalte vorn:** Bei starker Hüftbeugung schiebt sich das Hüftteil der Shorts bis 3 cm über die Bundkante (Falte vorn). Der Bund selbst bleibt fest am Becken.
+- **Knieheben:** Mehr Haut-Vertices liegen knapp außerhalb der Shorts (10 statt 3), der Maximalwert bleibt bei 1,7 cm.
+- **Roblox:** kein Export, kein Import. Die Kompatibilität ist nicht bestätigt.

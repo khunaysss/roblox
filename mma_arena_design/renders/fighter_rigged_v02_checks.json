@@ -1,0 +1,175 @@
+{
+ "jab_v02": {
+  "lead_elbow_bend_deg": 10.0,
+  "rear_elbow_bend_deg": 100.6,
+  "lead_shoulder_ahead_of_rear_m": 0.417,
+  "lead_shoulder_forward_vs_stance_m": 0.059,
+  "lead_glove_reach_from_chest_m": 0.894,
+  "rear_glove_to_chin_m": 0.023,
+  "rear_glove_gap_to_head_m": 0.002,
+  "rear_glove_inside_head_m": 0.009,
+  "lead_glove_inside_head_m": 0.0,
+  "stance_lead_shoulder_ahead_of_rear_m": 0.3
+ },
+ "jab_v01_for_comparison": {
+  "lead_elbow_bend_deg": 0.4,
+  "rear_elbow_bend_deg": 99.2,
+  "lead_shoulder_ahead_of_rear_m": 0.318,
+  "lead_shoulder_forward_vs_stance_m": null,
+  "lead_glove_reach_from_chest_m": 0.696,
+  "rear_glove_to_chin_m": 0.02,
+  "rear_glove_gap_to_head_m": 0.015,
+  "rear_glove_inside_head_m": 0.0,
+  "lead_glove_inside_head_m": 0.0
+ },
+ "shorts_hip_v01_weights": {
+  "Kampfhaltung": {
+   "shorts_seam_opening_m": 0.0182,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0,
+   "cloth_above_waistband_m": 0.0,
+   "skin_outside_shorts": {
+    "verts": 1,
+    "max_m": 0.0057
+   },
+   "calf_into_thigh_m": 0.0264,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": -0.0014
+  },
+  "Knieheben": {
+   "shorts_seam_opening_m": 0.1087,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0042,
+   "cloth_above_waistband_m": 0.0247,
+   "skin_outside_shorts": {
+    "verts": 3,
+    "max_m": 0.0165
+   },
+   "calf_into_thigh_m": 0.0721,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": 0.0079
+  },
+  "Tiefe_Kniebeuge": {
+   "shorts_seam_opening_m": 0.0552,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0,
+   "cloth_above_waistband_m": 0.0364,
+   "skin_outside_shorts": {
+    "verts": 7,
+    "max_m": 0.009
+   },
+   "calf_into_thigh_m": 0.0829,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": -0.0014
+  },
+  "Jab_v02": {
+   "shorts_seam_opening_m": 0.0206,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0,
+   "cloth_above_waistband_m": 0.0,
+   "skin_outside_shorts": {
+    "verts": 0,
+    "max_m": 0.0
+   },
+   "calf_into_thigh_m": 0.0136,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": 0.0191
+  }
+ },
+ "reweighted": {
+  "body_verts": 228,
+  "shorts_verts": 972,
+  "leg_share": "smoothstep back 0.97->0.8 m, front 0.935->0.78 m, outer hip side x0.55",
+  "waistband": "100 % LowerTorso",
+  "crotch_line": "shared 50/50 between both thighs"
+ },
+ "shorts_hip_v02_weights": {
+  "Kampfhaltung": {
+   "shorts_seam_opening_m": 0.002,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0015,
+   "cloth_above_waistband_m": 0.0,
+   "skin_outside_shorts": {
+    "verts": 2,
+    "max_m": 0.0056
+   },
+   "calf_into_thigh_m": 0.0264,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": -0.0014
+  },
+  "Knieheben": {
+   "shorts_seam_opening_m": 0.0064,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0193,
+   "cloth_above_waistband_m": 0.0129,
+   "skin_outside_shorts": {
+    "verts": 10,
+    "max_m": 0.0171
+   },
+   "calf_into_thigh_m": 0.0709,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": 0.0079
+  },
+  "Tiefe_Kniebeuge": {
+   "shorts_seam_opening_m": 0.0058,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0128,
+   "cloth_above_waistband_m": 0.0304,
+   "skin_outside_shorts": {
+    "verts": 4,
+    "max_m": 0.0053
+   },
+   "calf_into_thigh_m": 0.0855,
+   "calf_into_shorts_leg_m": 0.0896,
+   "lowest_z": -0.0014
+  },
+  "Jab_v02": {
+   "shorts_seam_opening_m": 0.0032,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0044,
+   "cloth_above_waistband_m": 0.0,
+   "skin_outside_shorts": {
+    "verts": 0,
+    "max_m": 0.0
+   },
+   "calf_into_thigh_m": 0.0136,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": 0.0191
+  },
+  "Rest": {
+   "shorts_seam_opening_m": 0.0,
+   "waistband_off_pelvis_m": 0.0,
+   "hip_piece_sticking_out_m": 0.0,
+   "cloth_above_waistband_m": 0.0,
+   "skin_outside_shorts": {
+    "verts": 0,
+    "max_m": 0.0
+   },
+   "calf_into_thigh_m": 0.0129,
+   "calf_into_shorts_leg_m": 0.0,
+   "lowest_z": -0.0004
+  }
+ },
+ "tris": {
+  "body": 2292,
+  "shorts": 1928
+ },
+ "preview_sequence_worst_every_3rd_frame": {
+  "shorts_seam_opening_m": 0.0074,
+  "waistband_off_pelvis_m": 0.0,
+  "hip_piece_sticking_out_m": 0.0193,
+  "cloth_above_waistband_m": 0.0308,
+  "calf_into_thigh_m": 0.0855,
+  "calf_into_shorts_leg_m": 0.0896,
+  "skin_outside_shorts_max_m": 0.0191,
+  "lowest_z": -0.0015
+ },
+ "video": {
+  "file": "renders/fighter_rigged_v02_preview.mp4",
+  "ok": true,
+  "frames": 168,
+  "fps": 24,
+  "seconds": 7.0,
+  "ffmpeg_error": ""
+ }
+}
