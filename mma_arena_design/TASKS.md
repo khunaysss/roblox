@@ -25,7 +25,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | 2 | Weitere Grundaktionen auf demselben Rig: Cross, Hook, Uppercut, Low Kick, Block, Treffer-Reaktion, Schritte, K.o.-Fall | Claude | jeweils Start und Ende in der Kampfhaltung |
 | 3 | Weitere Animationen nach Roblox bringen: wie Idle als KeyframeSequence (Blender-Daten + Achsenumrechnung), nicht per FBX | Claude | `ROBLOX_IMPORT_TEST_V01.md` |
 | 3a | Handschuh-/Shorts-Details in Roblox (Textur oder getrennte Meshes) | Claude | eine Farbe pro MeshPart |
-| 3b | Upload der Animationen in die Roblox-Gruppe | Du / Claude | Gruppen-ID fehlt, erst nach Freigabe |
+| 3b | Upload der Animationen in die Roblox-Gruppe | Du / Claude | Gruppe ANIMEXGANG (ID 7160158), erst nach Freigabe |
 | 4 | Kampfsystem planen: Steuerung, Schläge, Leben/Ausdauer, Runden | Du / ChatGPT | Grundlage für spätere Animationen |
 | 5 | UI-Designs: HUD (Leben, Ausdauer, Runde, Zeit), Menüs, Charakter-Anpassung | Du / ChatGPT | |
 

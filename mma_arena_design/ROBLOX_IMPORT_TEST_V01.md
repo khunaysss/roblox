@@ -43,8 +43,7 @@ Nicht abschließend geklärt: welcher Schritt im Roblox-Animationsimport die Umr
 ## Grenzen und offen
 - Visuell nur Standbilder in zwei Ansichten; keine Videoaufnahme der Bewegung.
 - Im Bearbeitungsmodus überschreibt der geöffnete Animation Editor die Bone-Transforms (alte FBX-Animation). Für Prüfungen Animation Editor schließen oder im Playtest prüfen.
-- Experimentelle Sequenzen `Fighter_Idle_Test_v04`–`v06` in `ServerStorage.CC_Animations` sind fehlerhaft (falsche Achsen) und nicht verwenden.
-- ChatGPT-Dateien `export_fighter_idle_roblox_v04.py`, `export/Fighter_Base_v03_Idle_Roblox_v04.fbx`, `export_idle_pose_data_v04.py`, `renders/fighter_idle_pose_data_v04.json`: geprüft, lösen das Achsenproblem nicht; nicht committet.
-- Kein Upload: für das veröffentlichte Spiel muss `Fighter_Idle_v07` in die Roblox-Gruppe hochgeladen werden (Gruppen-ID fehlt).
+- Frühere Diagnose-Dateien (v04, nicht von Claude) und die Studio-Testsequenzen `Fighter_Idle_Test_v04`–`v06` lösten das Achsenproblem nicht und wurden gelöscht.
+- Kein Upload: für das veröffentlichte Spiel muss `Fighter_Idle_v07` in die Roblox-Gruppe hochgeladen werden (Gruppe ANIMEXGANG, ID 7160158; erst nach Freigabe).
 - Handschuh- und Shorts-Details fehlen (Textur oder getrennte Meshes nötig).
 - Place-Datei: `mma_arena_design/CageChampions_ImportTest_v01.rbxl` (lokal gespeichert, enthält Kämpfer, `Fighter_Idle_v07` und `CC_IdleTest`).
