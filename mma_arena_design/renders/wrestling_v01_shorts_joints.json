@@ -1,0 +1,182 @@
+{
+ "TD_DoubleLeg_Success_A": {
+  "shorts_seam_opening_m": [
+   0.0066,
+   17
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   55
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "TD_DoubleLeg_Defended_A": {
+  "shorts_seam_opening_m": [
+   0.0083,
+   39
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   61
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_Guard_Idle_A": {
+  "shorts_seam_opening_m": [
+   0.0057,
+   11
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   47
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_Guard_Punch_A": {
+  "shorts_seam_opening_m": [
+   0.0054,
+   5
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   35
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_Guard_Escape_A": {
+  "shorts_seam_opening_m": [
+   0.0068,
+   31
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   51
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_GetUp_A": {
+  "shorts_seam_opening_m": [
+   0.0068,
+   1
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   59
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "TD_DoubleLeg_Success_B": {
+  "shorts_seam_opening_m": [
+   0.0102,
+   39
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   55
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "TD_DoubleLeg_Defended_B": {
+  "shorts_seam_opening_m": [
+   0.0072,
+   21
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   61
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_Guard_Idle_B": {
+  "shorts_seam_opening_m": [
+   0.0101,
+   45
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   47
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_Guard_Punch_B": {
+  "shorts_seam_opening_m": [
+   0.0098,
+   7
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   35
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_Guard_Escape_B": {
+  "shorts_seam_opening_m": [
+   0.0111,
+   13
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   51
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ },
+ "Ground_GetUp_B": {
+  "shorts_seam_opening_m": [
+   0.0083,
+   15
+  ],
+  "waistband_off_pelvis_m": [
+   0.0,
+   59
+  ],
+  "joint_gap_m": [
+   0.0,
+   "",
+   0
+  ]
+ }
+}

@@ -169,3 +169,8 @@ v02 wurde nur geöffnet (Prüfsumme unverändert). Modell, Gewichtung und Anpass
 - Zwei FBX-Dateien mit demselben Skelett: Modell (Ruhepose) und Idle (mit Animation).
 - Reimport in eine leere Szene: Maßstab 1,857 m, Skelett-Namen, Eltern und Gelenke identisch, Gewichte identisch, Materialfarben identisch. Die Idle-Animation auf dem Modell-Skelett weicht höchstens 0,002 mm ab.
 - Einschränkungen: Tattoo-Textur nicht exportiert, nur der Standard-Look, Frame-Versatz +1 beim Blender-Reimport, Roblox-Import (Maßstab, Achsen, Rig, Materialien) **nicht getestet**.
+
+## Wrestling-Prototyp v01
+- Datei `mma_arena_design/Wrestling_Prototype_v01.blend`: zwei Kopien von Fighter_Rigged_v03 (A rot, B blau).
+- Rig: ja, je 24 Bones mit IK. Animationen: 12 Actions, je A/B: `TD_DoubleLeg_Success`, `TD_DoubleLeg_Defended`, `Ground_Guard_Idle` (Loop), `Ground_Guard_Punch`, `Ground_Guard_Escape`, `Ground_GetUp`.
+- Offene Probleme: Handschuh-Überlappungen bei Griffen (bis ca. 15 cm), schnelle Arm- und Fallbewegungen, Beine in der Guard bis ca. 9 cm in A's Hüfte, nicht gebacken, kein Export, kein Roblox-Test. Details in `WRESTLING_ANIMATIONS.md`.
