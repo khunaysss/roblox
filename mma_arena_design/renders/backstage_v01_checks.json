@@ -1,0 +1,126 @@
+{
+ "scale": {
+  "fighter_height": 1.857,
+  "fighter_apose_width": 1.518,
+  "coach_height": 1.922,
+  "coach_apose_width_with_mitts": 1.75,
+  "corridor_clear_w_h": [
+   3.8,
+   3.6
+  ],
+  "locker_door_clear_w_h": [
+   2.0,
+   2.6
+  ],
+  "walkout_door_frame_w_h": [
+   2.8,
+   3.2
+  ],
+  "locker_room_w_d_h": [
+   9.0,
+   7.0,
+   3.2
+  ],
+  "pair_side_by_side_width_apose": 3.268
+ },
+ "routes": {
+  "prep_area_to_locker_door": {
+   "blocked_by": [],
+   "min_width_m_at_1m": 2.02
+  },
+  "through_locker_door": {
+   "blocked_by": [],
+   "min_width_m_at_1m": 1.97
+  },
+  "corridor_to_walkout_door": {
+   "blocked_by": [],
+   "min_width_m_at_1m": 3.78
+  },
+  "prep_area_to_locker_01_past_bench": {
+   "blocked_by": [],
+   "min_width_m_at_1m": 6.98
+  },
+  "prep_area_to_table": {
+   "blocked_by": [],
+   "min_width_m_at_1m": 6.09
+  },
+  "prep_area_to_bench_02": {
+   "blocked_by": [],
+   "min_width_m_at_1m": 4.45
+  }
+ },
+ "clear_heights": {
+  "locker_room": 3.2,
+  "locker_door": 2.6,
+  "corridor": 3.6,
+  "walkout_door_zone": 3.6
+ },
+ "camera_space_behind_player_m": 3.4,
+ "camera_space_behind_corridor_pair_m": 10.3,
+ "camera_space_behind_corridor_pair_hit": "LockerRoom_Wall_South",
+ "overlaps_backstage_internal": [],
+ "overlaps_with_linked_arena_tunnel": [],
+ "merge_conflicts_with_arena (expected: hall wall opening + placeholder floor)": {
+  "Backstage_Floor": [
+   "Corridor_Floor",
+   "LockerRoom_Floor",
+   "Corridor_Wall_West",
+   "Corridor_Wall_East",
+   "LockerRoom_Wall_North_Door",
+   "LockerRoom_Wall_West",
+   "LockerRoom_Wall_East",
+   "Corridor_Runner",
+   "LockerRoom_Door_Frame",
+   "Locker_01",
+   "Locker_02",
+   "Locker_03",
+   "Locker_04",
+   "Bench_01",
+   "Prep_Table",
+   "Prep_Area_Mat",
+   "Walkout_Connection_Door"
+  ],
+  "Hall_Wall_07": [
+   "Corridor_Ceiling",
+   "Corridor_Wall_West",
+   "Corridor_Wall_East",
+   "Corridor_Runner",
+   "LockerRoom_Door_Frame",
+   "Corridor_Light_Panel_1"
+  ]
+ },
+ "figure_overlaps": [],
+ "floating_objects": [],
+ "unmounted_wall_ceiling_parts": [],
+ "linked_duplicates": {
+  "BS_Bench": 2,
+  "BS_Ceiling_Light_Panel": 6,
+  "BS_Hand_Wrap_Roll": 2,
+  "BS_Locker": 4,
+  "BS_LockerRoom_Door_Leaf": 2
+ },
+ "objects": {
+  "BS_Architecture": 11,
+  "BS_Doors": 3,
+  "BS_Furniture": 7,
+  "BS_Props": 5,
+  "BS_Signage": 3,
+  "BS_Lights": 14,
+  "BS_Walkout_Connection": 5,
+  "Scale_References": 2,
+  "Scale_Check_Corridor": 2,
+  "Arena_Link_Reference": 5,
+  "Arena_Link_Conflict_Check": 3
+ },
+ "tris_backstage": 3870,
+ "dark_pixels_percent": {
+  "locker_overview": 44.88,
+  "player_view_to_corridor": 22.22,
+  "corridor_to_walkout": 3.19
+ },
+ "near_white_pixels_percent": {
+  "locker_overview": 0.0,
+  "player_view_to_corridor": 0.0,
+  "corridor_to_walkout": 0.0
+ }
+}
