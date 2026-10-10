@@ -67,17 +67,14 @@ CAS:BindAction("CC_Lock", function(_, state)
 end, true, Enum.KeyCode.T, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3)
 CAS:SetTitle("CC_Lock", "Ziel")
 
+-- Gegner = vom Kampf-System gesetztes Attribut CC_Opponent; in der Lobby (kein Kampf) wird nicht anvisiert
 local function findOpponent(root)
-	local best, bestDist = nil, LOCK_RANGE
-	for _, m in ipairs(workspace:GetChildren()) do
-		local h = m:IsA("Model") and m ~= player.Character and m:FindFirstChildOfClass("Humanoid")
-		local r = h and m:FindFirstChild("HumanoidRootPart")
-		if r and not m:GetAttribute("CC_KO") then
-			local d = (r.Position - root.Position).Magnitude
-			if d < bestDist then best, bestDist = m, d end
-		end
-	end
-	return best
+	local c = player.Character
+	local name = c and c:GetAttribute("CC_Opponent")
+	if not name then return nil end
+	local m = workspace:FindFirstChild(name)
+	if m and m:FindFirstChild("HumanoidRootPart") and not m:GetAttribute("CC_KO") then return m end
+	return nil
 end
 
 -- Bewegung bei Anvisierung: W/S = zum Gegner hin/weg, A/D = auf einem Kreis um den Gegner (Abstand bleibt).
@@ -121,7 +118,7 @@ RunService.RenderStepped:Connect(function(dt)
 	end
 	-- Ziel pruefen / loesen / neu aufnehmen
 	if current and (not current.Parent or current:GetAttribute("CC_KO") or not current:FindFirstChild("HumanoidRootPart")
-		or (current.HumanoidRootPart.Position - root.Position).Magnitude > LOCK_RANGE + 5) then
+		or (current.HumanoidRootPart.Position - root.Position).Magnitude > LOCK_RANGE + 5 or current.Name ~= char:GetAttribute("CC_Opponent")) then
 		current = nil
 	end
 	if lockWanted and not current then current = findOpponent(root) end

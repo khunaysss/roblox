@@ -11,7 +11,14 @@ local KSP = game:GetService("KeyframeSequenceProvider")
 local RunService = game:GetService("RunService")
 local RS = game.ReplicatedStorage
 local A = game.ServerStorage.CC_Animations
-local function anim(name) local a = Instance.new("Animation"); a.AnimationId = KSP:RegisterKeyframeSequence(A[name]); return a end
+-- Hochgeladene Animationen (Gruppe ANIMEXGANG): ServerStorage.CC_Animations.CC_AnimIds = ModuleScript { [Name] = Asset-ID }.
+-- Fehlt eine ID, wird die temporaere Studio-ID benutzt (funktioniert nur in Studio).
+local ANIM_IDS = A:FindFirstChild("CC_AnimIds") and require(A.CC_AnimIds) or {}
+local function anim(name)
+	local a = Instance.new("Animation")
+	a.AnimationId = ANIM_IDS[name] and ("rbxassetid://" .. tostring(ANIM_IDS[name])) or KSP:RegisterKeyframeSequence(A[name])
+	return a
+end
 local ANIMS = {
 	idle = "Fighter_Idle_v08", walk = "Fighter_Walk_v01", back = "Fighter_WalkBack_v01",
 	left = "Fighter_StrafeL_v01", right = "Fighter_StrafeR_v01",
@@ -598,7 +605,7 @@ RunService.Heartbeat:Connect(function()
 	local w = D_.wr
 	if os.clock() < (D_.groundThink or 0) then return end
 	D_.groundThink = os.clock() + 1.4 + math.random() * 1.2
-	if d:GetAttribute("CC_Passive") then return end
+	if d:GetAttribute("CC_Passive") or d:GetAttribute("CC_InMatch") == false then return end
 	if w.role == "top" and w.state == "guard" then
 		local r = math.random()
 		if SUBS[w.pos] and r < 0.3 then task.spawn(groundSubmit, D_)
@@ -681,6 +688,7 @@ end
 RS.CC_Action.OnServerEvent:Connect(function(player, move)
 	local f = player.Character and fighters[player.Character]
 	if not (f and type(move) == "string") then return end
+	if not f.char:GetAttribute("CC_Opponent") then return end   -- in der Lobby wird nicht gekaempft
 	if move == "escape" then groundEscape(f)
 	elseif f.wr then
 		if f.wr.role == "top" and f.wr.state == "sub" then if move == "hook" then f.mash = (f.mash or 0) + 1 end
@@ -692,6 +700,7 @@ RS.CC_Action.OnServerEvent:Connect(function(player, move)
 end)
 RS.CC_Block.OnServerEvent:Connect(function(player, on)
 	local f = player.Character and fighters[player.Character]
+	if f and on and not f.char:GetAttribute("CC_Opponent") then return end
 	if f and not f.wr then setBlock(f, on == true) end
 	if f and on then f.sprawlAt = os.clock() end -- F gedrueckt = Sprawl-Versuch gegen Takedowns
 end)
@@ -732,9 +741,12 @@ RunService.Heartbeat:Connect(function(dt)
 		if not root.Anchored then pcall(function() root:SetNetworkOwner(nil) end) end
 	end
 	if D.ko or D.wr then return end
+	-- nur im Trainingskampf aktiv (CC_Match setzt CC_InMatch und CC_Opponent); Gegner = CC_Opponent, sonst der naechste
+	if dummy:GetAttribute("CC_InMatch") == false then setBlock(D, false); D.hum:Move(Vector3.zero) return end
 	local best, bestDist
+	local oppChar = dummy:GetAttribute("CC_Opponent") and workspace:FindFirstChild(dummy:GetAttribute("CC_Opponent"))
 	for char, f in pairs(fighters) do
-		if f ~= D and not f.ko then
+		if f ~= D and not f.ko and (not oppChar or char == oppChar) then
 			local dist = (char.HumanoidRootPart.Position - root.Position).Magnitude
 			if not bestDist or dist < bestDist then best, bestDist = f, dist end
 		end

@@ -124,7 +124,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local char = player.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	if hum then myFill.Size = UDim2.fromScale(math.clamp(hum.Health / hum.MaxHealth, 0, 1), 1) end
-	local dummy = workspace:FindFirstChild("CC_TrainingDummy")
+	-- Gegner = CC_Opponent (Kampf-System); ohne Kampf: Lobby (nur Uhr/Banner fuer Zuschauer)
+	local oppName = char and char:GetAttribute("CC_Opponent")
+	local dummy = oppName and workspace:FindFirstChild(oppName)
+	local inMatch = dummy ~= nil
+	for _, b in ipairs({ myFill.Parent, foeFill.Parent, myStam.Parent, foeStam.Parent }) do b.Visible = inMatch end
+	foeFill.Parent:FindFirstChildOfClass("TextLabel").Text = dummy and (dummy == workspace:FindFirstChild("CC_TrainingDummy") and "GEGNER" or string.upper(dummy.Name)) or "GEGNER"
 	local dh = dummy and dummy:FindFirstChildOfClass("Humanoid")
 	if dh then foeFill.Size = UDim2.fromScale(math.clamp(dh.Health / dh.MaxHealth, 0, 1), 1) end
 	ko.Visible = (char and char:GetAttribute("CC_KO")) or (dummy and dummy:GetAttribute("CC_KO")) or false
@@ -137,7 +142,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	end
 	if char then
 		local gh = groundHint(char)
-		hint.Text = gh or HINT_STAND
+		hint.Text = gh or (inMatch and HINT_STAND or "Lobby: Modus im Menü links wählen")
 		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or "") or ""
 		local p = char:GetAttribute("CC_SubProgress")
 		duel.Visible = p ~= nil
@@ -154,8 +159,18 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		timeL.Text = st == "fight" and string.format("%d:%02d", t // 60, t % 60) or (st == "break" and "PAUSE" or "--:--")
 		scoreL.Text = string.format("Punkte  %d : %d", match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0)
 		banner.Text = match:GetAttribute("Banner") or ""
+		-- Kaempfer sehen ihr eigenes Ergebnis; Zuschauer den Servertext ("<Name> GEWINNT")
+		local me = player.Name
+		local fighter = me == match:GetAttribute("RedName") or me == match:GetAttribute("BlueName")
+		if st == "over" and fighter and match:GetAttribute("Winner") ~= "draw" then banner.Text = match:GetAttribute("WinnerName") == me and "SIEG" or "NIEDERLAGE" end
 		local w = match:GetAttribute("Winner")
 		banner.TextColor3 = (st == "over" and w == "red") and Color3.fromRGB(255, 215, 70) or (st == "over" and w == "blue") and Color3.fromRGB(120, 160, 255) or Color3.new(1, 1, 1)
+		clock.Visible = st ~= "idle"
+		if fighter then
+			local mine, theirs = match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0
+			if me == match:GetAttribute("BlueName") then mine, theirs = theirs, mine end
+			scoreL.Text = string.format("Punkte  %d : %d", mine, theirs)
+		end
 		bannerSub.Text = match:GetAttribute("BannerSub") or ""
 		if banner.Text ~= "" then ko.Visible = false end
 	end
