@@ -33,7 +33,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 ## Offen (Wrestling-Prototyp, siehe `WRESTLING_GUARD_V02.md`)
 | # | Aufgabe | Wer |
 |---|---|---|
-| W1 | Handschuh-Überlappungen korrigieren: Griffe am Knie bis ca. 13 cm, in der Guard bis ca. 7–8 cm | Claude |
+| W1 | Handschuh-Überlappungen korrigieren: Griffe am Knie bis ca. 13 cm, in der Guard bis ca. 7–8 cm. Versuch 2026-10-10 (Handschuh-Ziel automatisch aus dem Gegner schieben, auch zeitlich geglättet) verworfen: Hände sprangen bis 13–26 cm pro Frame (vorher 0,6 cm), Überlappung teils größer. Lösung: Griffziele im Bauskript `build_wrestling_v02.py` neu setzen | Claude |
 | W2 | Arm- und Fallbewegungen weicher gestalten (Schuss Frame 13–15, Fallbewegungen) | Claude |
 | W3 | Guard-Landung und Escape ohne starke Durchdringung (bis 6,9 bzw. 8,5 cm) | Claude |
 | W4 | Aufstehbewegung und Übergänge zwischen den Abschnitten prüfen | Claude |
