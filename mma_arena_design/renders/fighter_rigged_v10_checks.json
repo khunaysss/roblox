@@ -1,0 +1,35 @@
+{
+ "source": "Fighter_Rigged_v09.blend (unveraendert)",
+ "speed_mps": 1.68,
+ "stride_m": 0.35,
+ "actions": {
+  "Fighter_MoveF": {
+   "frames": 11,
+   "stance_foot_slip_per_frame_m": 0.0029,
+   "min_foot_separation_m": 0.444,
+   "lowest_foot_bone_z": 0.091,
+   "loop_error_m": 0.0
+  },
+  "Fighter_MoveB": {
+   "frames": 11,
+   "stance_foot_slip_per_frame_m": 0.0008,
+   "min_foot_separation_m": 0.444,
+   "lowest_foot_bone_z": 0.091,
+   "loop_error_m": 0.0
+  },
+  "Fighter_MoveL": {
+   "frames": 11,
+   "stance_foot_slip_per_frame_m": 0.0003,
+   "min_foot_separation_m": 0.604,
+   "lowest_foot_bone_z": 0.091,
+   "loop_error_m": 0.0
+  },
+  "Fighter_MoveR": {
+   "frames": 11,
+   "stance_foot_slip_per_frame_m": 0.0,
+   "min_foot_separation_m": 0.604,
+   "lowest_foot_bone_z": 0.091,
+   "loop_error_m": 0.0
+  }
+ }
+}

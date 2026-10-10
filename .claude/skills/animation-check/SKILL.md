@@ -31,3 +31,11 @@ Prüft Actions in `mma_arena_design/*.blend`. Die Prüfung verändert die geprü
 - Gefundene Fehler mit Frame, Körperteil und Messwert festhalten.
 - **Roblox-Kompatibilität** nur nach einem tatsächlichen Roblox-Test bestätigen. Bis dahin: „in Roblox nicht getestet“. Ein Blender-Reimport ersetzt keinen Roblox-Test.
 - Fehlen Blender, Datei oder Action: als fehlend melden.
+
+## Gameplay-Prüfung in Roblox (zusätzlich, nach dem Import)
+- Bei normaler Geschwindigkeit im Playtest prüfen, nicht nur in Blender.
+- **Fußgleiten auf dem Client messen** (nicht auf dem Server – dort kommt die Spielerposition verzögert an): pro Frame den langsameren Fuß nehmen; Median deutlich unter der Körpergeschwindigkeit.
+- **Lauf-Loops:** gleiche Länge und Phase, damit sie gemischt werden können; Abspieltempo = tatsächliche Geschwindigkeit / gebaute Geschwindigkeit.
+- **Kamera:** Anteil der Frames mit beiden Kämpfern im Bild, größter Kamerasprung pro Frame, Kamera im Käfig / ohne Wanddurchblick; Standbild aus der echten Spielkamera.
+- **Paarweise Animationen:** beide Kämpfer gleichzeitig starten, Aufstellung wie in Blender, Endpositionen (Root-Versatz) übernehmen, Kontakte im Bild prüfen.
+- Nur tatsächlich getestete Eingabegeräte (PC/Controller/Touch) als geprüft melden.

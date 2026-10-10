@@ -30,6 +30,17 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | 4 | Kampfsystem planen: Steuerung, Schläge, Leben/Ausdauer, Runden | Du / ChatGPT | Grundlage für spätere Animationen |
 | 5 | UI-Designs: HUD (Leben, Ausdauer, Runde, Zeit), Menüs, Charakter-Anpassung | Du / ChatGPT | |
 
+## Kampfsystem-Überarbeitung (Auftrag 2026-10-10, Reihenfolge)
+| Abschnitt | Stand | Nächste Schritte |
+|---|---|---|
+| A Fußarbeit, Anvisierung, Kamera | erledigt (PC getestet) | Controller/Touch testen |
+| B Schlagreichweite, Trefferprüfung, Kombos | offen | Reichweite mit kleinem Schritt + Hüfte; Trefferbereiche an Handschuh-Position zum Trefferzeitpunkt koppeln (gerade = Linie, Haken = Bogen); Kopf/Körper; Kombo-Fenster + Ausdauer |
+| C Kicks, Basis-Moveset | offen | Body Kick, High Kick, Front Kick; Standbein/Balance |
+| D Takedowns + Kamera | offen | Griff-Kontakte im Bauskript neu (siehe W1), Kamera in Bodenhöhe (vorbereitet) |
+| E Bodenpositionen, Submissions | offen | Half Guard, Side Control, Mount, Back; RNC, Armbar; paarweise Animationen |
+| Ausdauer | fehlt noch | wird mit B eingeführt (Angriffe/Block kosten, Erholung) |
+| Online-Test 2 Spieler | offen | Team-Test in Studio (2 Clients) |
+
 ## Offen (Wrestling-Prototyp, siehe `WRESTLING_GUARD_V02.md`)
 | # | Aufgabe | Wer |
 |---|---|---|

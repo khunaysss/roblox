@@ -15,6 +15,7 @@ local function anim(name) local a = Instance.new("Animation"); a.AnimationId = K
 local ANIMS = {
 	idle = "Fighter_Idle_v08", walk = "Fighter_Walk_v01", back = "Fighter_WalkBack_v01",
 	left = "Fighter_StrafeL_v01", right = "Fighter_StrafeR_v01",
+	mF = "Fighter_MoveF_v01", mB = "Fighter_MoveB_v01", mL = "Fighter_MoveL_v01", mR = "Fighter_MoveR_v01", -- Fussarbeit v10 (gemischt)
 	jab = "Fighter_Jab_v02", cross = "Fighter_Cross_v02", hook = "Fighter_Hook_v02",
 	uppercut = "Fighter_Uppercut_v01", lowkick = "Fighter_LowKick_v02",
 	block = "Fighter_Block_v01", blockhit = "Fighter_BlockHit_v01",
@@ -50,33 +51,42 @@ local function setup(char)
 	hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
 	local t = {}
 	for k, a in pairs(ANIMS) do t[k] = animator:LoadAnimation(a) end
-	for _, k in ipairs({ "idle", "walk", "back", "left", "right" }) do t[k].Looped = true end
+	for _, k in ipairs({ "idle", "walk", "back", "left", "right", "mF", "mB", "mL", "mR" }) do t[k].Looped = true end
 	t.idle:Play(0.2)
+	-- die vier Fussarbeit-Loops laufen immer synchron mit; nur ihre Gewichte aendern sich (Diagonalen, weiche Wechsel)
+	for _, k in ipairs({ "mF", "mB", "mL", "mR" }) do t[k]:Play(0, 0.001, 1) end
 	local f = { char = char, hum = hum, tracks = t, busyUntil = 0, ko = false, blocking = false, speed = hum.WalkSpeed, loco = nil }
 	fighters[char] = f
 	char.AncestryChanged:Connect(function() if not char.Parent then fighters[char] = nil end end)
 	return f
 end
 
--- Laufanimation nach Bewegungsrichtung relativ zur Blickrichtung
+-- Fussarbeit: vier synchrone Loops (vor/zurueck/links/rechts) nach Bewegungsrichtung relativ zur Blickrichtung gewichtet.
+-- Abspieltempo = tatsaechliche Geschwindigkeit / 6 (Loops sind fuer WalkSpeed 6 gebaut) -> Standfuss bleibt stehen.
+local MOVE_KEYS = { "mF", "mB", "mL", "mR" }
 RunService.Heartbeat:Connect(function()
 	for _, f in pairs(fighters) do
 		local root = f.char:FindFirstChild("HumanoidRootPart")
+		local t = f.tracks
 		if root and not f.ko and not f.wr then
 			if f.wantBlock and not f.blocking and os.clock() >= f.busyUntil then setBlock(f, true) end
+			if not t.mF.IsPlaying then for _, k in ipairs(MOVE_KEYS) do t[k]:Play(0, 0.001, 1) end end -- nach K.o./Reset wieder anwerfen (synchron)
 			local v = root.AssemblyLinearVelocity; v = Vector3.new(v.X, 0, v.Z)
-			local want = nil
-			if v.Magnitude > 0.8 then
-				local fwd = root.CFrame.LookVector:Dot(v.Unit); local side = root.CFrame.RightVector:Dot(v.Unit)
-				if math.abs(fwd) >= math.abs(side) then want = fwd > 0 and "walk" or "back" else want = side > 0 and "right" or "left" end
+			local speed = v.Magnitude
+			local fwd, side = 0, 0
+			if speed > 0.05 then fwd = root.CFrame.LookVector:Dot(v) / speed; side = root.CFrame.RightVector:Dot(v) / speed end
+			local amount = math.clamp((speed - 0.4) / 2.0, 0, 1)            -- weicher Einstieg aus dem Stand
+			local w = { mF = math.max(fwd, 0), mB = math.max(-fwd, 0), mR = math.max(side, 0), mL = math.max(-side, 0) }
+			local sum = w.mF + w.mB + w.mL + w.mR
+			for _, k in ipairs(MOVE_KEYS) do
+				local wk = sum > 0 and (w[k] / sum) * amount or 0
+				t[k]:AdjustWeight(math.max(wk, 0.001), 0.12)
+				t[k]:AdjustSpeed(math.max(speed, 0.5) / WALK_REF)
 			end
-			if want ~= f.loco then
-				if f.loco then f.tracks[f.loco]:Stop(0.15) end
-				if want then f.tracks[want]:Play(0.15) end
-				f.loco = want
-				f.char:SetAttribute("CC_Loco", want or "idle")
-			end
-			if want then f.tracks[want]:AdjustSpeed(v.Magnitude / WALK_REF) end
+			local dom = amount < 0.05 and "idle" or (math.abs(fwd) >= math.abs(side) and (fwd > 0 and "walk" or "back") or (side > 0 and "right" or "left"))
+			if dom ~= f.loco then f.loco = dom; f.char:SetAttribute("CC_Loco", dom) end
+		elseif t then
+			for _, k in ipairs(MOVE_KEYS) do if t[k] then t[k]:AdjustWeight(0.001, 0.1) end end
 		end
 	end
 end)
