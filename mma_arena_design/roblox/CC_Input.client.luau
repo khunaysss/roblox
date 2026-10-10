@@ -1,5 +1,6 @@
 -- StarterPlayer.StarterPlayerScripts.CC_Input
 -- Steuerung: WASD laufen · Linksklick Jab · Rechtsklick Cross · Q Haken · R Aufwaertshaken · C Low Kick · F halten = Block
+-- Ringen: E Takedown · F (rechtzeitig) Sprawl gegen Takedown · am Boden oben Linksklick Schlag · Leertaste Befreien/Aufstehen
 -- Der Kaempfer schaut automatisch zum naechsten Gegner (bis 40 Studs); sonst dreht er sich in Laufrichtung.
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -14,12 +15,14 @@ local KEYS = {
 	[Enum.KeyCode.Q] = "hook",
 	[Enum.KeyCode.R] = "uppercut",
 	[Enum.KeyCode.C] = "lowkick",
+	[Enum.KeyCode.E] = "takedown",
 }
 UIS.InputBegan:Connect(function(input, gp)
 	if gp then return end
 	local move = KEYS[input.UserInputType] or KEYS[input.KeyCode]
 	if move then action:FireServer(move) end
 	if input.KeyCode == Enum.KeyCode.F then block:FireServer(true) end
+	if input.KeyCode == Enum.KeyCode.Space and player.Character and player.Character:GetAttribute("CC_Wrestle") then action:FireServer("escape") end
 end)
 UIS.InputEnded:Connect(function(input)
 	if input.KeyCode == Enum.KeyCode.F then block:FireServer(false) end
@@ -43,6 +46,7 @@ RunService.RenderStepped:Connect(function()
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	local root = char and char:FindFirstChild("HumanoidRootPart")
 	if not (hum and root) then return end
+	if char:GetAttribute("CC_Wrestle") then hum.AutoRotate = false return end -- im Ringkampf steuert der Server die Position
 	local target = (not char:GetAttribute("CC_KO")) and opponent(root)
 	hum.AutoRotate = target == nil
 	if target then
