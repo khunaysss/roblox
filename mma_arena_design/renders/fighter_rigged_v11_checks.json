@@ -1,0 +1,93 @@
+{
+ "source": "Fighter_Rigged_v10.blend (unveraendert)",
+ "actions": {
+  "Fighter_Jab_v3": {
+   "glove_reach_y_min": -0.9372,
+   "glove_at_f6": [
+    0.023,
+    -0.937,
+    1.446
+   ],
+   "lowest_z": -0.0004,
+   "foot_L_y_min": -0.49,
+   "elbow_min_deg": 9.9943
+  },
+  "Fighter_Cross_v3": {
+   "glove_reach_y_min": -0.9064,
+   "glove_at_f6": [
+    -0.078,
+    -0.906,
+    1.436
+   ],
+   "lowest_z": -0.0004,
+   "foot_L_y_min": -0.47,
+   "elbow_min_deg": 9.9936
+  },
+  "Fighter_JabBody": {
+   "glove_reach_y_min": -1.0252,
+   "glove_at_f6": [
+    -0.016,
+    -1.025,
+    1.046
+   ],
+   "lowest_z": -0.0005,
+   "foot_L_y_min": -0.51,
+   "elbow_min_deg": 9.9932
+  },
+  "Fighter_CrossBody": {
+   "glove_reach_y_min": -0.9991,
+   "glove_at_f6": [
+    -0.023,
+    -0.999,
+    1.042
+   ],
+   "lowest_z": -0.0005,
+   "foot_L_y_min": -0.41,
+   "elbow_min_deg": 9.9932
+  },
+  "Fighter_Hook_v3": {
+   "glove_reach_y_min": -0.6985,
+   "glove_at_f6": [
+    0.299,
+    -0.569,
+    1.279
+   ],
+   "lowest_z": -0.0004,
+   "foot_L_y_min": -0.52,
+   "elbow_min_deg": 43.4695
+  },
+  "Fighter_Uppercut_v2": {
+   "glove_reach_y_min": -0.598,
+   "glove_at_f6": [
+    -0.166,
+    -0.339,
+    0.905
+   ],
+   "lowest_z": -0.0005,
+   "foot_L_y_min": -0.41,
+   "elbow_min_deg": 0.3561
+  },
+  "Fighter_LowKick_v3": {
+   "glove_reach_y_min": -0.3793,
+   "glove_at_f6": [
+    0.035,
+    -0.374,
+    1.393
+   ],
+   "lowest_z": -0.0004,
+   "foot_L_y_min": -0.3497,
+   "elbow_min_deg": 89.0298
+  },
+  "Fighter_HitBody": {
+   "glove_reach_y_min": -0.3762,
+   "glove_at_f6": [
+    0.018,
+    -0.153,
+    0.782
+   ],
+   "lowest_z": -0.0005,
+   "foot_L_y_min": -0.27,
+   "elbow_min_deg": 0.3566
+  }
+ }
+}

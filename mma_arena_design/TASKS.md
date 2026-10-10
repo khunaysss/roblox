@@ -34,11 +34,11 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | Abschnitt | Stand | Nächste Schritte |
 |---|---|---|
 | A Fußarbeit, Anvisierung, Kamera | erledigt (PC getestet) | Controller/Touch testen |
-| B Schlagreichweite, Trefferprüfung, Kombos | offen | Reichweite mit kleinem Schritt + Hüfte; Trefferbereiche an Handschuh-Position zum Trefferzeitpunkt koppeln (gerade = Linie, Haken = Bogen); Kopf/Körper; Kombo-Fenster + Ausdauer |
+| B Schlagreichweite, Trefferprüfung, Kombos | erledigt (PC getestet) | Haken/Uppercut nur Nahdistanz; Gegner-KI muss sich bewegen |
 | C Kicks, Basis-Moveset | offen | Body Kick, High Kick, Front Kick; Standbein/Balance |
 | D Takedowns + Kamera | offen | Griff-Kontakte im Bauskript neu (siehe W1), Kamera in Bodenhöhe (vorbereitet) |
 | E Bodenpositionen, Submissions | offen | Half Guard, Side Control, Mount, Back; RNC, Armbar; paarweise Animationen |
-| Ausdauer | fehlt noch | wird mit B eingeführt (Angriffe/Block kosten, Erholung) |
+| Ausdauer | erledigt (B) | Feinabstimmung mit C/D/E |
 | Online-Test 2 Spieler | offen | Team-Test in Studio (2 Clients) |
 
 ## Offen (Wrestling-Prototyp, siehe `WRESTLING_GUARD_V02.md`)

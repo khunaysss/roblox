@@ -10,6 +10,7 @@ local RS = game.ReplicatedStorage
 local reset = game.ServerStorage:WaitForChild("CC_ResetFighter")
 
 local ROUNDS, ROUND_TIME, BREAK_TIME, INTRO_TIME, OVER_TIME = 3, 120, 10, 4, 7
+-- Test: workspace-Attribut CC_RoundTime (Sekunden) ueberschreibt die Rundenzeit
 local BREAK_HEAL = 20                       -- Erholung in der Pause (max. volle Leben)
 
 local state = RS:FindFirstChild("CC_MatchState") or Instance.new("Folder")
@@ -93,6 +94,7 @@ while true do
 		end
 		-- Kampf
 		set("Banner", "FIGHT!"); set("BannerSub", "")
+		ROUND_TIME = workspace:GetAttribute("CC_RoundTime") or 120
 		set("State", "fight"); set("TimeLeft", ROUND_TIME)
 		bell(1)
 		freeze(false)

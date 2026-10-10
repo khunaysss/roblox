@@ -1,6 +1,6 @@
 -- StarterPlayer.StarterPlayerScripts.CC_Input
 -- Eingaben fuer PC, Controller und Touch (ContextActionService) + Gegner-Anvisierung.
---   PC:         Linksklick Jab · Rechtsklick Cross · Q Haken · R Aufwaertshaken · C Low Kick · F halten Block/Sprawl
+--   PC:         Linksklick Jab · Rechtsklick Cross (mit Umschalttaste: zum Koerper) · Q Haken · R Aufwaertshaken · C Low Kick · F halten Block/Sprawl
 --               E Takedown · Leertaste Befreien/Aufstehen (am Boden) · T oder mittlere Maustaste = Anvisieren an/aus
 --   Controller: X Jab · Y Cross · B Haken · R1 Aufwaertshaken · R2 Low Kick · L2 halten Block/Sprawl · L1 Takedown
 --               A Befreien (am Boden, sonst Springen) · R3 Anvisieren an/aus
@@ -20,9 +20,15 @@ local LOCK_RANGE = 40
 local TURN_RATE = 14             -- wie schnell der Kaempfer zum Gegner dreht (1/s)
 
 local function inWrestle() local c = player.Character; return c and c:GetAttribute("CC_Wrestle") end
+local UIS = game:GetService("UserInputService")
+local BODY = { jab = "jabBody", cross = "crossBody" }   -- mit gehaltener Umschalttaste zum Koerper
 local function bindMove(name, move, touch, ...)
 	CAS:BindAction(name, function(_, state)
-		if state == Enum.UserInputState.Begin then action:FireServer(move) end
+		if state == Enum.UserInputState.Begin then
+			local m = move
+			if BODY[m] and (UIS:IsKeyDown(Enum.KeyCode.LeftShift) or UIS:IsKeyDown(Enum.KeyCode.RightShift)) then m = BODY[m] end
+			action:FireServer(m)
+		end
 		return Enum.ContextActionResult.Pass
 	end, touch, ...)
 	if touch then CAS:SetTitle(name, ({ jab = "Jab", cross = "Cross", hook = "Haken", takedown = "TD" })[move] or move) end

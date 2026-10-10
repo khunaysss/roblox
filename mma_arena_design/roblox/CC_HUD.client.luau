@@ -34,6 +34,17 @@ end
 
 local myFill = bar("Player", 0, Color3.fromRGB(200, 40, 50), "DU")
 local foeFill = bar("Opponent", 1, Color3.fromRGB(40, 90, 200), "GEGNER")
+-- Ausdauer: schmaler gelber Balken unter den Lebensbalken
+local function sbar(anchorX)
+	local frame = Instance.new("Frame")
+	frame.AnchorPoint = Vector2.new(anchorX, 0)
+	frame.Position = UDim2.new(anchorX, anchorX == 0 and 20 or -20, 0, 50)
+	frame.Size = UDim2.fromOffset(320, 8); frame.BackgroundColor3 = Color3.fromRGB(25, 25, 28); frame.BorderSizePixel = 0; frame.Parent = gui
+	local fill = Instance.new("Frame"); fill.AnchorPoint = Vector2.new(anchorX, 0); fill.Position = UDim2.fromScale(anchorX, 0)
+	fill.Size = UDim2.fromScale(1, 1); fill.BackgroundColor3 = Color3.fromRGB(240, 200, 40); fill.BorderSizePixel = 0; fill.Parent = frame
+	return fill
+end
+local myStam, foeStam = sbar(0), sbar(1)
 
 local ko = Instance.new("TextLabel")
 ko.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -51,13 +62,13 @@ ko.Parent = gui
 local hint = Instance.new("TextLabel")
 hint.AnchorPoint = Vector2.new(0.5, 1)
 hint.Position = UDim2.new(0.5, 0, 1, -20)
-hint.Size = UDim2.fromOffset(1000, 24)
+hint.Size = UDim2.fromOffset(1200, 24)
 hint.BackgroundTransparency = 1
 hint.Font = Enum.Font.Gotham
 hint.TextSize = 16
 hint.TextColor3 = Color3.new(1, 1, 1)
 hint.TextStrokeTransparency = 0.5
-hint.Text = "WASD laufen · LMB Jab · RMB Cross · Q Haken · R Uppercut · C Low Kick · F Block/Sprawl · E Takedown · Leertaste Aufstehen"
+hint.Text = "WASD laufen · LMB Jab · RMB Cross (+Umschalt: Koerper) · Q Haken · R Uppercut · C Low Kick · F Block/Sprawl · E Takedown · T Ziel · Leertaste Aufstehen"
 hint.Parent = gui
 
 -- Rundenanzeige oben mittig: Runde, Zeit, Punkte; grosses Banner in der Mitte
@@ -89,6 +100,12 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local dh = dummy and dummy:FindFirstChildOfClass("Humanoid")
 	if dh then foeFill.Size = UDim2.fromScale(math.clamp(dh.Health / dh.MaxHealth, 0, 1), 1) end
 	ko.Visible = (char and char:GetAttribute("CC_KO")) or (dummy and dummy:GetAttribute("CC_KO")) or false
+	if char then
+		myStam.Size = UDim2.fromScale(math.clamp((char:GetAttribute("CC_Stamina") or 100) / 100, 0, 1), 1)
+		local tired = char:GetAttribute("CC_Tired")
+		myStam.BackgroundColor3 = (tired and workspace:GetServerTimeNow() - tired < 0.4) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
+	end
+	if dummy then foeStam.Size = UDim2.fromScale(math.clamp((dummy:GetAttribute("CC_Stamina") or 100) / 100, 0, 1), 1) end
 	if match then
 		local st, t = match:GetAttribute("State"), match:GetAttribute("TimeLeft") or 0
 		roundL.Text = st == "over" and "ENDE" or ("RUNDE " .. tostring(match:GetAttribute("Round") or 1) .. " / 3")

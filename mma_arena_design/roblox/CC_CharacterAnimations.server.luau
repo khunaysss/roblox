@@ -16,8 +16,9 @@ local ANIMS = {
 	idle = "Fighter_Idle_v08", walk = "Fighter_Walk_v01", back = "Fighter_WalkBack_v01",
 	left = "Fighter_StrafeL_v01", right = "Fighter_StrafeR_v01",
 	mF = "Fighter_MoveF_v01", mB = "Fighter_MoveB_v01", mL = "Fighter_MoveL_v01", mR = "Fighter_MoveR_v01", -- Fussarbeit v10 (gemischt)
-	jab = "Fighter_Jab_v02", cross = "Fighter_Cross_v02", hook = "Fighter_Hook_v02",
-	uppercut = "Fighter_Uppercut_v01", lowkick = "Fighter_LowKick_v02",
+	jab = "Fighter_Jab_v03", cross = "Fighter_Cross_v03", hook = "Fighter_Hook_v03",
+	jabBody = "Fighter_JabBody_v01", crossBody = "Fighter_CrossBody_v01", hitBody = "Fighter_HitBody_v01",
+	uppercut = "Fighter_Uppercut_v02", lowkick = "Fighter_LowKick_v03",
 	block = "Fighter_Block_v01", blockhit = "Fighter_BlockHit_v01",
 	hit = "Fighter_HitReact_v01", ko = "Fighter_KO_v01",
 	hitStraight = "Fighter_HitStraight_v01", hitHook = "Fighter_HitHook_v01", hitUpper = "Fighter_HitUpper_v01",
@@ -25,21 +26,33 @@ local ANIMS = {
 }
 for k, n in pairs(ANIMS) do ANIMS[k] = anim(n) end
 
--- Angriffswerte: Trefferzeitpunkt (s), Reichweite (Studs), Schaden, Sperrzeit bis zur naechsten Aktion (s)
+-- Angriffswerte (B): Treffer wird ueber die SICHTBARE Faust bzw. den Fuss geprueft (Bone-Position im Trefferfenster),
+-- nicht ueber eine Reichweitenzahl. win = Trefferfenster (s ab Start), limb = Bone der Faust/des Fusses,
+-- zone = Ziel (head/body/leg), damage, cost = Ausdauer, lock = Sperre bis zur naechsten Aktion (Kombos: Eingabe wird gepuffert).
 local MOVES = {
-	jab      = { hit = 0.21, range = 4.5, damage = 6,  lock = 0.55, react = "hitStraight", ko = "ko",    heavy = false },
-	cross    = { hit = 0.25, range = 4.7, damage = 10, lock = 0.75, react = "hitStraight", ko = "ko",    heavy = true },
-	hook     = { hit = 0.33, range = 4.3, damage = 12, lock = 0.85, react = "hitHook",     ko = "koFwd", heavy = true },
-	uppercut = { hit = 0.38, range = 4.1, damage = 14, lock = 0.85, react = "hitUpper",    ko = "ko",    heavy = true },
-	lowkick  = { hit = 0.42, range = 4.6, damage = 9,  lock = 1.00, react = "hitLeg",      ko = "ko",    heavy = false },
+	jab       = { win = { 0.10, 0.30 }, limb = "LeftHand",  zone = "head", damage = 6,  cost = 5,  lock = 0.42, react = "hitStraight", ko = "ko",    heavy = false },
+	cross     = { win = { 0.10, 0.31 }, limb = "RightHand", zone = "head", damage = 10, cost = 8,  lock = 0.58, react = "hitStraight", ko = "ko",    heavy = true },
+	hook      = { win = { 0.27, 0.40 }, limb = "LeftHand",  zone = "head", damage = 12, cost = 10, lock = 0.70, react = "hitHook",     ko = "koFwd", heavy = true },
+	uppercut  = { win = { 0.32, 0.46 }, limb = "RightHand", zone = "head", damage = 14, cost = 11, lock = 0.72, react = "hitUpper",    ko = "ko",    heavy = true },
+	jabBody   = { win = { 0.10, 0.30 }, limb = "LeftHand",  zone = "body", damage = 5,  cost = 5,  lock = 0.45, react = "hitBody",     ko = "koFwd", heavy = false, bodyShot = true },
+	crossBody = { win = { 0.10, 0.31 }, limb = "RightHand", zone = "body", damage = 9,  cost = 8,  lock = 0.60, react = "hitBody",     ko = "koFwd", heavy = true,  bodyShot = true },
+	lowkick   = { win = { 0.36, 0.50 }, limb = "RightFoot", zone = "leg",  damage = 9,  cost = 12, lock = 0.85, react = "hitLeg",      ko = "ko",    heavy = false },
 }
+-- Trefferkugeln: Mittelpunkt entlang der Bone-Achse (Studs) und Radius (Studs). Faust = Handschuh-Mitte.
+local LIMB_OFFSET = { LeftHand = 0.45, RightHand = 0.45, RightFoot = 0.25 }
+-- Kopfmitte am Oberkoerper verankert: Trefferreaktionen weichen Folgeschlaegen nicht aus
+local ZONES = { head = { bone = "UpperTorso", along = 1.6, radius = 0.95 }, body = { bone = "UpperTorso", along = 0.55, radius = 1.25 },
+	leg = { bone = "LeftUpperLeg", along = 0.9, radius = 1.1 } }   -- Radius = halbe Koerperteil-Dicke + Handschuh bzw. Schienbein
+local STAMINA_MAX, STAMINA_REGEN, STAMINA_DELAY = 100, 16, 0.6
+local LOW_STAMINA = 25          -- darunter: weniger Schaden, langsamere Schlaege
+local BUFFER = 0.30             -- Eingabe so viele Sekunden vor Ende der Sperre wird gepuffert (Kombination)
 local WALK_REF = 6        -- Laufzyklen sind fuer WalkSpeed 6 gebaut
 local BLOCK_FACTOR = 0.2  -- Schaden im Block
 local BLOCK_SPEED = 3     -- Laufgeschwindigkeit im Block
 local KO_TIME = 3
 local STAGGER_HEALTH = 35  -- unter diesem Leben koennen schwere Treffer taumeln lassen
 local HITSTOP = 0.07       -- kurzes Einfrieren des Angriffs beim Treffer
-local REACTIONS = { "hit", "hitStraight", "hitHook", "hitUpper", "hitLeg", "stagger" }
+local REACTIONS = { "hit", "hitStraight", "hitHook", "hitUpper", "hitLeg", "stagger", "hitBody" }
 
 local fighters = {}
 local setBlock -- vorab deklariert (wird im Heartbeat benutzt, Definition weiter unten)
@@ -55,7 +68,9 @@ local function setup(char)
 	t.idle:Play(0.2)
 	-- die vier Fussarbeit-Loops laufen immer synchron mit; nur ihre Gewichte aendern sich (Diagonalen, weiche Wechsel)
 	for _, k in ipairs({ "mF", "mB", "mL", "mR" }) do t[k]:Play(0, 0.001, 1) end
-	local f = { char = char, hum = hum, tracks = t, busyUntil = 0, ko = false, blocking = false, speed = hum.WalkSpeed, loco = nil }
+	local f = { char = char, hum = hum, tracks = t, busyUntil = 0, ko = false, blocking = false, speed = hum.WalkSpeed, loco = nil,
+		stamina = STAMINA_MAX, lastSpend = 0 }
+	char:SetAttribute("CC_Stamina", STAMINA_MAX)
 	fighters[char] = f
 	char.AncestryChanged:Connect(function() if not char.Parent then fighters[char] = nil end end)
 	return f
@@ -174,46 +189,108 @@ local function react(target, kind, lock)
 	target.busyUntil = math.max(target.busyUntil, os.clock() + lock)
 end
 
+local function bonePos(char, name, along)
+	local hrp = char:FindFirstChild("HumanoidRootPart")
+	local b = hrp and hrp:FindFirstChild(name, true)
+	if not b then return nil end
+	local cf = b.TransformedWorldCFrame
+	return cf.Position + cf.UpVector * (along or 0)
+end
+local function spend(f, amount)
+	f.stamina = math.max(0, f.stamina - amount); f.lastSpend = os.clock()
+	f.char:SetAttribute("CC_Stamina", math.floor(f.stamina + 0.5))
+end
+-- Ausdauer-Erholung (nicht waehrend Block und kurz nach einer Aktion)
+RunService.Heartbeat:Connect(function(dt)
+	for _, f in pairs(fighters) do
+		if f.stamina < STAMINA_MAX and os.clock() - f.lastSpend > STAMINA_DELAY and not f.blocking then
+			f.stamina = math.min(STAMINA_MAX, f.stamina + STAMINA_REGEN * dt)
+			f.char:SetAttribute("CC_Stamina", math.floor(f.stamina + 0.5))
+		end
+	end
+end)
+
+local function land(attacker, target, move, m, track)
+	local blocked = target.blocking
+	local blockFactor = blocked and (m.bodyShot and 0.5 or BLOCK_FACTOR) or 1   -- hohe Deckung schuetzt den Koerper nur halb
+	local tired = attacker.stamina < LOW_STAMINA and 0.7 or 1
+	local dmg = m.damage * blockFactor * tired
+	target.hum.Health = math.max(0, target.hum.Health - dmg)
+	addDamage(attacker.char, dmg)
+	if blocked then spend(target, 4) end
+	print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
+	track:AdjustSpeed(0.05)
+	task.delay(blocked and HITSTOP * 0.5 or HITSTOP, function() if track.IsPlaying then track:AdjustSpeed(attacker.animSpeed or 1) end end)
+	if target.hum.Health <= 0 then
+		print("[CC] K.o.!", target.char.Name, m.ko)
+		interrupt(target); knockout(target, m.ko)
+		hitFX(target.char, 1.0, "ko"); hitFX(attacker.char, 0.6, "land")
+	elseif blocked and blockFactor < 0.4 then
+		target.tracks.blockhit:Play(0.03)
+		hitFX(target.char, 0.15, "block"); hitFX(attacker.char, 0.1, "block")
+	else
+		interrupt(target)
+		if m.heavy and target.hum.Health < STAGGER_HEALTH and math.random() < 0.6 then
+			react(target, "stagger", 1.1)
+			target.hum.WalkSpeed = 2
+			task.delay(1.1, function() if not target.ko and not target.blocking then target.hum.WalkSpeed = target.speed end end)
+			hitFX(target.char, 0.8, "stagger")
+		else
+			react(target, m.react, m.heavy and 0.4 or 0.3)
+			hitFX(target.char, m.heavy and 0.5 or 0.3, "hit")
+		end
+		spend(target, m.heavy and 4 or 2)
+		hitFX(attacker.char, m.heavy and 0.3 or 0.15, "land")
+	end
+end
+
 local function attack(attacker, move)
 	local m = MOVES[move]
-	if not m or attacker.ko or attacker.blocking or frozen(attacker) or os.clock() < attacker.busyUntil then return end
-	attacker.busyUntil = os.clock() + m.lock
+	if not m or attacker.ko or attacker.blocking or attacker.wr or frozen(attacker) then return end
+	local now = os.clock()
+	if now < attacker.busyUntil then
+		-- Kombination: kurz vor Ende der Sperre gedrueckt -> genau EINE Eingabe merken (kein Dauerfeuer)
+		if attacker.busyUntil - now <= BUFFER and not attacker.queued then
+			attacker.queued = move
+			task.delay(attacker.busyUntil - now + 0.01, function() local q = attacker.queued; attacker.queued = nil; if q then attack(attacker, q) end end)
+		end
+		return
+	end
+	if attacker.stamina < m.cost then attacker.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	spend(attacker, m.cost)
+	local speed = attacker.stamina < LOW_STAMINA and 0.85 or 1
+	attacker.animSpeed = speed
+	attacker.busyUntil = now + m.lock / speed
 	attacker.attackToken = (attacker.attackToken or 0) + 1
 	local token = attacker.attackToken
 	local track = attacker.tracks[move]
-	track:Play(0.05)
-	task.delay(m.hit, function()
-		if attacker.ko or not attacker.char.Parent or attacker.attackToken ~= token then return end
+	-- vorherigen Schlag ausblenden: sonst mischen sich zwei Schlaege gleicher Prioritaet und der Arm streckt sich nicht ganz
+	for k in pairs(MOVES) do local tr = attacker.tracks[k]; if k ~= move and tr.IsPlaying then tr:Stop(0.06) end end
+	track:Play(0.05, 1, speed)
+	-- Trefferfenster: Faust-/Fuss-Position gegen die Trefferkugel des Gegners (sichtbare Bewegung = Treffer)
+	local t0 = os.clock()
+	local done = false
+	local dmin = math.huge
+	local conn
+	conn = RunService.Heartbeat:Connect(function()
+		local t = (os.clock() - t0) * speed
+		if done or attacker.ko or not attacker.char.Parent or attacker.attackToken ~= token or t > m.win[2] then
+			conn:Disconnect()
+			if not done and workspace:GetAttribute("CC_DebugHits") then print(("[CC] %s %s verfehlt, kleinster Abstand zur Zone %.2f"):format(attacker.char.Name, move, dmin)) end
+			return
+		end
+		if t < m.win[1] then return end
+		local fist = bonePos(attacker.char, m.limb, LIMB_OFFSET[m.limb])
+		if not fist then return end
 		for _, target in pairs(fighters) do
-			if target ~= attacker and not target.ko and inFront(attacker, target, m.range) then
-				local blocked = target.blocking
-				local dmg = blocked and m.damage * BLOCK_FACTOR or m.damage
-				target.hum.Health = math.max(0, target.hum.Health - dmg)
-				addDamage(attacker.char, dmg)
-				print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
-				-- Hitstop: der Schlag haelt im Treffermoment kurz an
-				track:AdjustSpeed(0.05)
-				task.delay(blocked and HITSTOP * 0.5 or HITSTOP, function() if track.IsPlaying then track:AdjustSpeed(1) end end)
-				if target.hum.Health <= 0 then
-					print("[CC] K.o.!", target.char.Name, m.ko)
-					interrupt(target)
-					knockout(target, m.ko)
-					hitFX(target.char, 1.0, "ko"); hitFX(attacker.char, 0.6, "land")
-				elseif blocked then
-					target.tracks.blockhit:Play(0.03)
-					hitFX(target.char, 0.15, "block"); hitFX(attacker.char, 0.1, "block")
-				else
-					interrupt(target)
-					if m.heavy and target.hum.Health < STAGGER_HEALTH and math.random() < 0.6 then
-						react(target, "stagger", 1.1)
-						target.hum.WalkSpeed = 2
-						task.delay(1.1, function() if not target.ko and not target.blocking then target.hum.WalkSpeed = target.speed end end)
-						hitFX(target.char, 0.8, "stagger")
-					else
-						react(target, m.react, m.heavy and 0.4 or 0.3)
-						hitFX(target.char, m.heavy and 0.5 or 0.3, "hit")
-					end
-					hitFX(attacker.char, m.heavy and 0.3 or 0.15, "land")
+			if target ~= attacker and not target.ko and not target.wr then
+				local z = ZONES[m.zone]
+				local zp = bonePos(target.char, z.bone, z.along)
+				if zp then dmin = math.min(dmin, (fist - zp).Magnitude - z.radius) end
+				if zp and (fist - zp).Magnitude <= z.radius then
+					done = true; conn:Disconnect()
+					land(attacker, target, move, m, track)
+					return
 				end
 			end
 		end
