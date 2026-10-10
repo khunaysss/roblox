@@ -60,6 +60,27 @@ hint.TextStrokeTransparency = 0.5
 hint.Text = "WASD laufen · LMB Jab · RMB Cross · Q Haken · R Uppercut · C Low Kick · F Block/Sprawl · E Takedown · Leertaste Aufstehen"
 hint.Parent = gui
 
+-- Rundenanzeige oben mittig: Runde, Zeit, Punkte; grosses Banner in der Mitte
+local match = game.ReplicatedStorage:WaitForChild("CC_MatchState", 10)
+local clock = Instance.new("Frame")
+clock.AnchorPoint = Vector2.new(0.5, 0); clock.Position = UDim2.new(0.5, 0, 0, 14); clock.Size = UDim2.fromOffset(190, 58)
+clock.BackgroundColor3 = Color3.fromRGB(20, 20, 24); clock.BackgroundTransparency = 0.15; clock.BorderSizePixel = 0; clock.Parent = gui
+local function label(parent, y, h, size, font)
+	local l = Instance.new("TextLabel"); l.BackgroundTransparency = 1; l.Position = UDim2.new(0, 0, 0, y); l.Size = UDim2.new(1, 0, 0, h)
+	l.Font = font; l.TextSize = size; l.TextColor3 = Color3.new(1, 1, 1); l.Parent = parent; return l
+end
+local roundL = label(clock, 2, 18, 14, Enum.Font.GothamBold)
+local timeL = label(clock, 18, 26, 26, Enum.Font.GothamBlack)
+local scoreL = label(clock, 42, 14, 12, Enum.Font.Gotham); scoreL.TextColor3 = Color3.fromRGB(200, 200, 205)
+local banner = Instance.new("TextLabel")
+banner.AnchorPoint = Vector2.new(0.5, 0.5); banner.Position = UDim2.fromScale(0.5, 0.3); banner.Size = UDim2.fromOffset(700, 90)
+banner.BackgroundTransparency = 1; banner.Font = Enum.Font.GothamBlack; banner.TextSize = 72
+banner.TextColor3 = Color3.fromRGB(255, 255, 255); banner.TextStrokeTransparency = 0; banner.Parent = gui
+local bannerSub = Instance.new("TextLabel")
+bannerSub.AnchorPoint = Vector2.new(0.5, 0); bannerSub.Position = UDim2.new(0.5, 0, 0.3, 46); bannerSub.Size = UDim2.fromOffset(700, 36)
+bannerSub.BackgroundTransparency = 1; bannerSub.Font = Enum.Font.GothamBold; bannerSub.TextSize = 26
+bannerSub.TextColor3 = Color3.fromRGB(255, 220, 60); bannerSub.TextStrokeTransparency = 0.3; bannerSub.Parent = gui
+
 game:GetService("RunService").RenderStepped:Connect(function()
 	local char = player.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
@@ -68,4 +89,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local dh = dummy and dummy:FindFirstChildOfClass("Humanoid")
 	if dh then foeFill.Size = UDim2.fromScale(math.clamp(dh.Health / dh.MaxHealth, 0, 1), 1) end
 	ko.Visible = (char and char:GetAttribute("CC_KO")) or (dummy and dummy:GetAttribute("CC_KO")) or false
+	if match then
+		local st, t = match:GetAttribute("State"), match:GetAttribute("TimeLeft") or 0
+		roundL.Text = st == "over" and "ENDE" or ("RUNDE " .. tostring(match:GetAttribute("Round") or 1) .. " / 3")
+		timeL.Text = st == "fight" and string.format("%d:%02d", t // 60, t % 60) or (st == "break" and "PAUSE" or "--:--")
+		scoreL.Text = string.format("Punkte  %d : %d", match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0)
+		banner.Text = match:GetAttribute("Banner") or ""
+		local w = match:GetAttribute("Winner")
+		banner.TextColor3 = (st == "over" and w == "red") and Color3.fromRGB(255, 215, 70) or (st == "over" and w == "blue") and Color3.fromRGB(120, 160, 255) or Color3.new(1, 1, 1)
+		bannerSub.Text = match:GetAttribute("BannerSub") or ""
+		if banner.Text ~= "" then ko.Visible = false end
+	end
 end)

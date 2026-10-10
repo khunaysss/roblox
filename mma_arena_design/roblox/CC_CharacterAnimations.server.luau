@@ -110,6 +110,8 @@ local function knockout(f, kind)
 	f.char:SetAttribute("CC_KO", true)
 	task.delay(KO_TIME, function()
 		if not f.char.Parent then return end
+		local ms = RS:FindFirstChild("CC_MatchState")
+		if ms and ms:GetAttribute("State") == "over" then return end -- liegen bleiben; das Runden-System setzt beim Neustart zurueck
 		ko:Stop(0.4)
 		f.hum.Health = f.hum.MaxHealth
 		f.hum.WalkSpeed = f.speed
@@ -125,7 +127,24 @@ local function inFront(attacker, target, range)
 end
 
 -- Treffer-Effekt an die beteiligten Spieler (Kamera-Ruck, Aufblitzen); Staerke 0..1
+local function addDamage(char, amount)  -- fuer die Punktwertung (CC_Match)
+	char:SetAttribute("CC_DamageDealt", (char:GetAttribute("CC_DamageDealt") or 0) + amount)
+end
+local function frozen(f) return f.char:GetAttribute("CC_Frozen") == true end
+
+-- Sounds (SoundService.CC_Sounds): am HumanoidRootPart des Getroffenen abspielen (3D)
+local SFX = game:GetService("SoundService"):WaitForChild("CC_Sounds")
+local function sfx(char, name, pitch)
+	local src = SFX:FindFirstChild(name); local root = char and char:FindFirstChild("HumanoidRootPart")
+	if not (src and root) then return end
+	local snd = src:Clone(); snd.PlaybackSpeed = (pitch or 1) * (0.94 + math.random() * 0.12); snd.RollOffMaxDistance = 120; snd.Parent = root
+	snd:Play(); game:GetService("Debris"):AddItem(snd, snd.TimeLength + 0.5)
+end
 local function hitFX(char, strength, kind)
+	if kind == "hit" then sfx(char, strength > 0.4 and "HitHeavy" or "HitLight")
+	elseif kind == "stagger" then sfx(char, "HitHeavy", 0.9)
+	elseif kind == "block" and strength > 0.12 then sfx(char, "Block", 1.25)
+	elseif kind == "ko" then sfx(char, "HitHeavy", 0.85); task.delay(0.7, function() sfx(char, "BodyFall") end); game.ReplicatedStorage.CC_MatchState:SetAttribute("CrowdBoost", os.clock()) end
 	local p = game.Players:GetPlayerFromCharacter(char)
 	if p then RS.CC_HitFX:FireClient(p, strength, kind) end
 end
@@ -147,7 +166,7 @@ end
 
 local function attack(attacker, move)
 	local m = MOVES[move]
-	if not m or attacker.ko or attacker.blocking or os.clock() < attacker.busyUntil then return end
+	if not m or attacker.ko or attacker.blocking or frozen(attacker) or os.clock() < attacker.busyUntil then return end
 	attacker.busyUntil = os.clock() + m.lock
 	attacker.attackToken = (attacker.attackToken or 0) + 1
 	local token = attacker.attackToken
@@ -160,6 +179,7 @@ local function attack(attacker, move)
 				local blocked = target.blocking
 				local dmg = blocked and m.damage * BLOCK_FACTOR or m.damage
 				target.hum.Health = math.max(0, target.hum.Health - dmg)
+				addDamage(attacker.char, dmg)
 				print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
 				-- Hitstop: der Schlag haelt im Treffermoment kurz an
 				track:AdjustSpeed(0.05)
@@ -261,7 +281,7 @@ local function groundLoop(top, bottom)
 end
 
 function tryTakedown(a)
-	if a.ko or a.wr or os.clock() < a.busyUntil then return end
+	if a.ko or a.wr or frozen(a) or os.clock() < a.busyUntil then return end
 	-- Ziel: naechster Gegner vor A in Reichweite
 	local b, bd
 	for _, f in pairs(fighters) do
@@ -299,6 +319,7 @@ function tryTakedown(a)
 		return
 	end
 	b.hum.Health = math.max(1, b.hum.Health - TD_DAMAGE)
+	addDamage(a.char, TD_DAMAGE + 5) -- Takedown zaehlt zusaetzlich
 	a.wr.role, b.wr.role = "top", "bottom"
 	a.char:SetAttribute("CC_Wrestle", "top"); b.char:SetAttribute("CC_Wrestle", "bottom")
 	a.busyUntil, b.busyUntil = 0, 0
@@ -314,6 +335,7 @@ function groundPunch(top)
 	task.delay(11 / 24, function()          -- Schlagkontakt Frame 11
 		if not (top.wr and bottom.wr) then return end
 		bottom.hum.Health = math.max(0, bottom.hum.Health - GROUND_PUNCH_DAMAGE)
+		addDamage(top.char, GROUND_PUNCH_DAMAGE)
 		print(("[CC] %s Bodenschlag -> %s %.0f"):format(top.char.Name, bottom.char.Name, bottom.hum.Health))
 		hitFX(bottom.char, 0.5, "hit"); hitFX(top.char, 0.25, "land")
 		ta:AdjustSpeed(0.05); task.delay(HITSTOP, function() if ta.IsPlaying then ta:AdjustSpeed(1) end end)
@@ -377,6 +399,25 @@ end)
 
 local function hook(p) p.CharacterAdded:Connect(setup); if p.Character then task.spawn(setup, p.Character) end end
 game.Players.PlayerAdded:Connect(hook); for _, p in ipairs(game.Players:GetPlayers()) do hook(p) end
+
+-- Reset (vom Runden-System ueber ServerStorage.CC_ResetFighter): Ringkampf, Block, K.o., Animationen beenden,
+-- volle oder angegebene Leben, an Position setzen
+local resetEvent = game.ServerStorage:FindFirstChild("CC_ResetFighter") or Instance.new("BindableFunction")
+resetEvent.Name = "CC_ResetFighter"; resetEvent.Parent = game.ServerStorage
+resetEvent.OnInvoke = function(char, cf, health)
+	local f = fighters[char]
+	if not f then return false end
+	f.attackToken = (f.attackToken or 0) + 1
+	if f.wr then local p = f.wr.partner; wrStopAll(f, 0); setWrestle(f, nil, nil); if p and p.wr then wrStopAll(p, 0); setWrestle(p, nil, nil) end end
+	setBlock(f, false); f.wantBlock = false; f.wantEscape = nil
+	for k, tr in pairs(f.tracks) do if k ~= "idle" then tr:Stop(0.1) end end
+	if not f.tracks.idle.IsPlaying then f.tracks.idle:Play(0.2) end
+	f.loco = nil; f.ko = false; f.busyUntil = 0
+	f.char:SetAttribute("CC_KO", false); f.char:SetAttribute("CC_Wrestle", false)
+	f.hum.Health = health or f.hum.MaxHealth
+	if cf then f.char.HumanoidRootPart.CFrame = cf end
+	return true
+end
 
 RS.CC_Action.OnServerEvent:Connect(function(player, move)
 	local f = player.Character and fighters[player.Character]

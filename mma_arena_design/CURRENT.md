@@ -16,6 +16,7 @@
 - **Moveset v01 (Playtest geprüft):** Jab, Cross, Haken, Aufwärtshaken, Low Kick, Block, Laufen in 4 Richtungen mit Blick zum Gegner. Blender `Fighter_Rigged_v07.blend`, Doku `ROBLOX_MOVESET_V01.md`
 - **Trefferreaktionen v01 (Playtest geprüft):** Reaktion je Schlag, Taumeln, K.o. nach vorne, Hitstop + Kamera-Ruck. Blender `Fighter_Rigged_v08.blend`, Doku `ROBLOX_HIT_REACTIONS_V01.md`
 - **Ringen v01 (Playtest geprüft):** E Takedown, F Sprawl, Guard + Bodenschlag, Leertaste Befreien/Aufstehen, K.o. am Boden. Export `export_wrestling_roblox_v10.py`, Doku `ROBLOX_WRESTLING_V01.md`
+- **Kampfablauf v01 (Playtest geprüft):** 3 Runden à 2:00, Pausen, K.o./Punktsieg, HUD mit Zeit und Banner, Sounds. Doku `ROBLOX_MATCH_V01.md`
 - **Wrestling-Prototyp:** `Wrestling_Prototype_v02.blend` (aktuell: korrigierte Guard-Kontakte, Video `renders/wrestling_v02_guard_punch.mp4`, Doku `WRESTLING_GUARD_V02.md`) – v01 (2 Kämpfer A/B, 6 synchronisierte Action-Paare; Videos `renders/wrestling_v01_success_chain.mp4`, `renders/wrestling_v01_sprawl_defense.mp4`; Doku `WRESTLING_ANIMATIONS.md`; nicht in Roblox getestet)
 - **Fighter:** `Fighter_Design_v03.blend` (aktueller Stand: v02-Körper + slab/boolean-Überarbeitung von Haaren, Gesicht, Shorts, Handschuhen; ohne Rig/Animation). Historie: `Fighter_Design_v02.blend` (enthält auch den Original-Prototyp)
 - **Größenreferenz:** `MMA_Arena_v03_FighterScale.blend` = Kopie von v03 mit verlinktem Fighter im Käfig
