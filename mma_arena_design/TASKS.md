@@ -35,7 +35,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 |---|---|---|
 | A Fußarbeit, Anvisierung, Kamera | erledigt (PC getestet) | Controller/Touch testen |
 | B Schlagreichweite, Trefferprüfung, Kombos | erledigt (PC getestet) | Haken/Uppercut nur Nahdistanz; Gegner-KI muss sich bewegen |
-| C Kicks, Basis-Moveset | offen | Body Kick, High Kick, Front Kick; Standbein/Balance |
+| C Kicks, Basis-Moveset | erledigt (PC getestet) | Fußdrehung beim Pivot; Kampfstile |
 | D Takedowns + Kamera | offen | Griff-Kontakte im Bauskript neu (siehe W1), Kamera in Bodenhöhe (vorbereitet) |
 | E Bodenpositionen, Submissions | offen | Half Guard, Side Control, Mount, Back; RNC, Armbar; paarweise Animationen |
 | Ausdauer | erledigt (B) | Feinabstimmung mit C/D/E |

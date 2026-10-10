@@ -2,6 +2,7 @@
 -- Eingaben fuer PC, Controller und Touch (ContextActionService) + Gegner-Anvisierung.
 --   PC:         Linksklick Jab · Rechtsklick Cross (mit Umschalttaste: zum Koerper) · Q Haken · R Aufwaertshaken · C Low Kick · F halten Block/Sprawl
 --               E Takedown · Leertaste Befreien/Aufstehen (am Boden) · T oder mittlere Maustaste = Anvisieren an/aus
+--               X Body Kick · V High Kick · Z Front Kick
 --   Controller: X Jab · Y Cross · B Haken · R1 Aufwaertshaken · R2 Low Kick · L2 halten Block/Sprawl · L1 Takedown
 --               A Befreien (am Boden, sonst Springen) · R3 Anvisieren an/aus
 --   Touch:      Bildschirm-Knoepfe fuer Jab, Cross, Haken, Block, Takedown, Anvisieren
@@ -38,6 +39,9 @@ bindMove("CC_Cross", "cross", true, Enum.UserInputType.MouseButton2, Enum.KeyCod
 bindMove("CC_Hook", "hook", true, Enum.KeyCode.Q, Enum.KeyCode.ButtonB)
 bindMove("CC_Uppercut", "uppercut", false, Enum.KeyCode.R, Enum.KeyCode.ButtonR1)
 bindMove("CC_LowKick", "lowkick", false, Enum.KeyCode.C, Enum.KeyCode.ButtonR2)
+bindMove("CC_BodyKick", "bodykick", false, Enum.KeyCode.X)
+bindMove("CC_HighKick", "highkick", false, Enum.KeyCode.V)
+bindMove("CC_FrontKick", "frontkick", false, Enum.KeyCode.Z)
 bindMove("CC_Takedown", "takedown", true, Enum.KeyCode.E, Enum.KeyCode.ButtonL1)
 
 CAS:BindAction("CC_Block", function(_, state)

@@ -1,0 +1,41 @@
+{
+ "source": "Fighter_Rigged_v11.blend (unveraendert)",
+ "actions": {
+  "Fighter_BodyKick": {
+   "foot_max_z": 1.1956,
+   "foot_max_forward_y": -1.0224,
+   "foot_at_peak": [
+    0.33,
+    -1.022,
+    1.196
+   ],
+   "stand_foot_slide_m": 0.1692,
+   "lowest_z": -0.0004,
+   "knee_min_deg": 0.403
+  },
+  "Fighter_HighKick": {
+   "foot_max_z": 1.5796,
+   "foot_max_forward_y": -0.7672,
+   "foot_at_peak": [
+    0.201,
+    -0.724,
+    1.58
+   ],
+   "stand_foot_slide_m": 0.1462,
+   "lowest_z": -0.0004,
+   "knee_min_deg": 0.4025
+  },
+  "Fighter_FrontKick": {
+   "foot_max_z": 0.9444,
+   "foot_max_forward_y": -0.8492,
+   "foot_at_peak": [
+    0.134,
+    -0.843,
+    0.944
+   ],
+   "stand_foot_slide_m": 0.03,
+   "lowest_z": -0.0004,
+   "knee_min_deg": 0.4025
+  }
+ }
+}

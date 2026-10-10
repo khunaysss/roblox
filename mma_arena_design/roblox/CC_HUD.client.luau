@@ -68,7 +68,7 @@ hint.Font = Enum.Font.Gotham
 hint.TextSize = 16
 hint.TextColor3 = Color3.new(1, 1, 1)
 hint.TextStrokeTransparency = 0.5
-hint.Text = "WASD laufen · LMB Jab · RMB Cross (+Umschalt: Koerper) · Q Haken · R Uppercut · C Low Kick · F Block/Sprawl · E Takedown · T Ziel · Leertaste Aufstehen"
+hint.Text = "WASD laufen · LMB Jab · RMB Cross (+Umschalt: Koerper) · Q Haken · R Uppercut · C/X/V/Z Kicks · F Block/Sprawl · E Takedown · T Ziel · Leertaste Aufstehen"
 hint.Parent = gui
 
 -- Rundenanzeige oben mittig: Runde, Zeit, Punkte; grosses Banner in der Mitte

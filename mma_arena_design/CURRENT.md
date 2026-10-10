@@ -20,12 +20,13 @@
 - **Schläge v2 (geprüft):** Jab/Cross mit eingedrehter Faust, hinterer Handschuh nicht mehr im Kopf, Low Kick gestreckt, Haken mit mehr Reichweite. Blender `Fighter_Rigged_v09.blend`, Doku `STRIKES_V2.md`
 - **A Fußarbeit + Anvisierung + Kamera (Playtest PC geprüft):** 4 gemischte Lauf-Loops (`Fighter_Rigged_v10.blend`), Umkreisen mit festem Abstand, Kampfkamera mit beiden Kämpfern im Bild. Doku `FOOTWORK_LOCKON_V01.md`
 - **B Schlagreichweite + Trefferprüfung + Ausdauer (Playtest PC geprüft):** Treffer über sichtbare Faust, Schläge mit Schritt, Körperschläge, Kombos mit Puffer, Ausdauer. Blender `Fighter_Rigged_v11.blend`, Doku `STRIKING_V02.md`
+- **C Tritte (Playtest PC geprüft):** Body Kick, High Kick, Front Kick + Treffer-Stopp. Blender `Fighter_Rigged_v12.blend`, Doku `KICKS_V01.md`
 - **Wrestling-Prototyp:** `Wrestling_Prototype_v02.blend` (aktuell: korrigierte Guard-Kontakte, Video `renders/wrestling_v02_guard_punch.mp4`, Doku `WRESTLING_GUARD_V02.md`) – v01 (2 Kämpfer A/B, 6 synchronisierte Action-Paare; Videos `renders/wrestling_v01_success_chain.mp4`, `renders/wrestling_v01_sprawl_defense.mp4`; Doku `WRESTLING_ANIMATIONS.md`; nicht in Roblox getestet)
 - **Fighter:** `Fighter_Design_v03.blend` (aktueller Stand: v02-Körper + slab/boolean-Überarbeitung von Haaren, Gesicht, Shorts, Handschuhen; ohne Rig/Animation). Historie: `Fighter_Design_v02.blend` (enthält auch den Original-Prototyp)
 - **Größenreferenz:** `MMA_Arena_v03_FighterScale.blend` = Kopie von v03 mit verlinktem Fighter im Käfig
   (verlinkt noch aus `Fighter_Prototype_v01.blend` – Änderungen am Fighter erscheinen dort automatisch)
 
 ## Weiterarbeit (Kampfsystem-Überarbeitung, Reihenfolge A–E)
-- **A und B erledigt** (`FOOTWORK_LOCKON_V01.md`, `STRIKING_V02.md`). **Als Nächstes C:** Body Kick, High Kick, Front Kick; danach D (Takedowns + Kamera), E (Bodenpositionen, Submissions). Siehe TASKS.md.
+- **A, B, C erledigt** (`FOOTWORK_LOCKON_V01.md`, `STRIKING_V02.md`, `KICKS_V01.md`). **Als Nächstes D:** Takedown-Kamera (vorbereitet in `CC_Camera`) prüfen, Griff-Kontakte (W1); danach E. Siehe TASKS.md.
 - Arbeitsweise in Studio: Daten aus `export/*_keyframes.luau` über lokalen Server `node` auf 127.0.0.1:8766 (im Ordner `mma_arena_design`) und `ServerStorage.CC_Animations.CC_Loader`; Scripts aus `roblox/` per HttpService (HttpEnabled nur kurz an).
 - Test-Attribute am Gegner: `CC_Passive`, `CC_ForceTD`; am Spieler (Client): `CC_LockTarget`.

@@ -18,6 +18,7 @@ local ANIMS = {
 	mF = "Fighter_MoveF_v01", mB = "Fighter_MoveB_v01", mL = "Fighter_MoveL_v01", mR = "Fighter_MoveR_v01", -- Fussarbeit v10 (gemischt)
 	jab = "Fighter_Jab_v03", cross = "Fighter_Cross_v03", hook = "Fighter_Hook_v03",
 	jabBody = "Fighter_JabBody_v01", crossBody = "Fighter_CrossBody_v01", hitBody = "Fighter_HitBody_v01",
+	bodykick = "Fighter_BodyKick_v01", highkick = "Fighter_HighKick_v01", frontkick = "Fighter_FrontKick_v01",
 	uppercut = "Fighter_Uppercut_v02", lowkick = "Fighter_LowKick_v03",
 	block = "Fighter_Block_v01", blockhit = "Fighter_BlockHit_v01",
 	hit = "Fighter_HitReact_v01", ko = "Fighter_KO_v01",
@@ -37,9 +38,12 @@ local MOVES = {
 	jabBody   = { win = { 0.10, 0.30 }, limb = "LeftHand",  zone = "body", damage = 5,  cost = 5,  lock = 0.45, react = "hitBody",     ko = "koFwd", heavy = false, bodyShot = true },
 	crossBody = { win = { 0.10, 0.31 }, limb = "RightHand", zone = "body", damage = 9,  cost = 8,  lock = 0.60, react = "hitBody",     ko = "koFwd", heavy = true,  bodyShot = true },
 	lowkick   = { win = { 0.36, 0.50 }, limb = "RightFoot", zone = "leg",  damage = 9,  cost = 12, lock = 0.85, react = "hitLeg",      ko = "ko",    heavy = false },
+	bodykick  = { win = { 0.33, 0.52 }, limb = "RightLowerLeg", zone = "body", damage = 11, cost = 14, lock = 0.95, react = "hitBody",     ko = "koFwd", heavy = true,  bodyShot = true },
+	highkick  = { win = { 0.42, 0.62 }, limb = "RightLowerLeg", zone = "head", damage = 18, cost = 18, lock = 1.15, react = "hitHook",     ko = "ko",    heavy = true },
+	frontkick = { win = { 0.28, 0.45 }, limb = "LeftFoot",  zone = "body", damage = 7,  cost = 9,  lock = 0.80, react = "hitBody",     ko = "ko",    heavy = false, bodyShot = true },
 }
 -- Trefferkugeln: Mittelpunkt entlang der Bone-Achse (Studs) und Radius (Studs). Faust = Handschuh-Mitte.
-local LIMB_OFFSET = { LeftHand = 0.45, RightHand = 0.45, RightFoot = 0.25 }
+local LIMB_OFFSET = { LeftHand = 0.45, RightHand = 0.45, RightFoot = 0.25, LeftFoot = 0.25, RightLowerLeg = 0.9 }  -- Roundhouse trifft mit dem Schienbein
 -- Kopfmitte am Oberkoerper verankert: Trefferreaktionen weichen Folgeschlaegen nicht aus
 local ZONES = { head = { bone = "UpperTorso", along = 1.6, radius = 0.95 }, body = { bone = "UpperTorso", along = 0.55, radius = 1.25 },
 	leg = { bone = "LeftUpperLeg", along = 0.9, radius = 1.1 } }   -- Radius = halbe Koerperteil-Dicke + Handschuh bzw. Schienbein
@@ -219,8 +223,15 @@ local function land(attacker, target, move, m, track)
 	addDamage(attacker.char, dmg)
 	if blocked then spend(target, 4) end
 	print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
-	track:AdjustSpeed(0.05)
-	task.delay(blocked and HITSTOP * 0.5 or HITSTOP, function() if track.IsPlaying then track:AdjustSpeed(attacker.animSpeed or 1) end end)
+	-- Treffer-Stopp: Glied bleibt an der Oberflaeche stehen (Hitstop) und springt dann in die Rueckzugsphase,
+	-- statt durch den Koerper des Gegners weiterzulaufen
+	track:AdjustSpeed(0.02)
+	task.delay(blocked and HITSTOP * 0.5 or HITSTOP, function()
+		if not track.IsPlaying then return end
+		local back = m.win[2] + 0.04
+		if track.TimePosition < back then track.TimePosition = back end
+		track:AdjustSpeed(attacker.animSpeed or 1)
+	end)
 	if target.hum.Health <= 0 then
 		print("[CC] K.o.!", target.char.Name, m.ko)
 		interrupt(target); knockout(target, m.ko)
