@@ -36,3 +36,9 @@ Arbeitsanweisung für Animationen in `mma_arena_design/`. Projektregeln aus `CLA
 - Mit dem Skill `animation-check` prüfen (zuerst Messwerte, dann einfache Vorschau).
 - Mit dem Skill `project-handoff` Doku aktualisieren und committen.
 - Keine finalen Renderings, Varianten oder Roblox-Importe ohne Auftrag.
+
+## Paar-Animationen (Ringen, Boden)
+- Vorlage: `mma_arena_design/build_ground_v01.py` (Posen-Funktionen pro Position, `twist()` für Drehen um die eigene Wirbelsäule, Übergang endet exakt in der Ruhepose der nächsten Position).
+- Vorschau unter Windows: Blender hat kein PIL – Workbench-Bilder mit numpy zusammensetzen (`sheet()` im Skript), Kämpfer A rot, B blau.
+- Griffe mit `attach()` (fester Versatz am gegriffenen Bone, höchstens 6 cm Korrektur); keine Korrektur pro Frame.
+- Knie- und Ellbogen-Pole bei Lageänderungen (Rücken ↔ Seite ↔ Bauch) ausdrücklich setzen, sonst klappen Gelenke um.

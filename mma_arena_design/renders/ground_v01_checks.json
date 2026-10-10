@@ -1,0 +1,3922 @@
+{
+ "fps": 24,
+ "source": "Wrestling_Prototype_v03.blend",
+ "sections": {
+  "Ground_Pass_Half": {
+   "actions": [
+    "Ground_Pass_Half_A",
+    "Ground_Pass_Half_B"
+   ],
+   "frames": [
+    1,
+    36
+   ],
+   "events": {
+    "guard_opens": 8,
+    "knee_slide": 20,
+    "half_guard": 36
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.008,
+      -0.38
+     ],
+     "pelvis": [
+      0.008,
+      -0.38,
+      0.56
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.06,
+      -0.52
+     ],
+     "pelvis": [
+      0.06,
+      -0.52,
+      0.46
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.16
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.5,
+   "pelvis_distance_end_m": 0.365,
+   "notes": ""
+  },
+  "Ground_HalfGuard_Idle": {
+   "actions": [
+    "Ground_HalfGuard_Idle_A",
+    "Ground_HalfGuard_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48, frame 49 = frame 1"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.06,
+      -0.52
+     ],
+     "pelvis": [
+      0.06,
+      -0.52,
+      0.46
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.16
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.06,
+      -0.521
+     ],
+     "pelvis": [
+      0.06,
+      -0.521,
+      0.46
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.16
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.365,
+   "pelvis_distance_end_m": 0.364,
+   "notes": ""
+  },
+  "Ground_Pass_Side": {
+   "actions": [
+    "Ground_Pass_Side_A",
+    "Ground_Pass_Side_B"
+   ],
+   "frames": [
+    1,
+    40
+   ],
+   "events": {
+    "hips_up_leg_free": 12,
+    "turning": 24,
+    "side_control": 40
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.06,
+      -0.52
+     ],
+     "pelvis": [
+      0.06,
+      -0.52,
+      0.46
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.16
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.52,
+      -1.02
+     ],
+     "pelvis": [
+      0.52,
+      -1.02,
+      0.42
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.365,
+   "pelvis_distance_end_m": 0.539,
+   "notes": ""
+  },
+  "Ground_Side_Idle": {
+   "actions": [
+    "Ground_Side_Idle_A",
+    "Ground_Side_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48, frame 49 = frame 1"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.52,
+      -1.02
+     ],
+     "pelvis": [
+      0.52,
+      -1.02,
+      0.42
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.52,
+      -1.021
+     ],
+     "pelvis": [
+      0.52,
+      -1.021,
+      0.42
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.539,
+   "pelvis_distance_end_m": 0.539,
+   "notes": ""
+  },
+  "Ground_Side_To_Mount": {
+   "actions": [
+    "Ground_Side_To_Mount_A",
+    "Ground_Side_To_Mount_B"
+   ],
+   "frames": [
+    1,
+    36
+   ],
+   "events": {
+    "knee_up": 12,
+    "knee_across": 22,
+    "mount": 36
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.52,
+      -1.02
+     ],
+     "pelvis": [
+      0.52,
+      -1.02,
+      0.42
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      -1.0
+     ],
+     "pelvis": [
+      0.0,
+      -1.0,
+      0.44
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.539,
+   "pelvis_distance_end_m": 0.12,
+   "notes": ""
+  },
+  "Ground_Mount_Idle": {
+   "actions": [
+    "Ground_Mount_Idle_A",
+    "Ground_Mount_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48, frame 49 = frame 1"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      -1.0
+     ],
+     "pelvis": [
+      0.0,
+      -1.0,
+      0.44
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      -1.001
+     ],
+     "pelvis": [
+      0.0,
+      -1.001,
+      0.44
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.12,
+   "pelvis_distance_end_m": 0.121,
+   "notes": ""
+  },
+  "Ground_Mount_Punch": {
+   "actions": [
+    "Ground_Mount_Punch_A",
+    "Ground_Mount_Punch_B"
+   ],
+   "frames": [
+    1,
+    30
+   ],
+   "events": {
+    "chamber": 5,
+    "punch_contact": 10,
+    "back_in_mount": 23
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      -1.0
+     ],
+     "pelvis": [
+      0.0,
+      -1.0,
+      0.44
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      -1.0
+     ],
+     "pelvis": [
+      0.0,
+      -1.0,
+      0.44
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.12,
+   "pelvis_distance_end_m": 0.12,
+   "notes": ""
+  },
+  "Ground_Mount_To_Back": {
+   "actions": [
+    "Ground_Mount_To_Back_A",
+    "Ground_Mount_To_Back_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "b_turns": "10-40",
+    "a_rises": 12,
+    "hooks_in": 38,
+    "back_control": 48
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      -1.0
+     ],
+     "pelvis": [
+      0.0,
+      -1.0,
+      0.44
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      -0.84
+     ],
+     "pelvis": [
+      0.0,
+      -0.84,
+      0.38
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.12
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.12,
+   "pelvis_distance_end_m": 0.04,
+   "notes": ""
+  },
+  "Ground_Back_Idle": {
+   "actions": [
+    "Ground_Back_Idle_A",
+    "Ground_Back_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48, frame 49 = frame 1"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      -0.84
+     ],
+     "pelvis": [
+      0.0,
+      -0.84,
+      0.38
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.12
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      -0.841
+     ],
+     "pelvis": [
+      0.0,
+      -0.841,
+      0.38
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.12
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.04,
+   "pelvis_distance_end_m": 0.039,
+   "notes": ""
+  },
+  "Sub_RNC": {
+   "actions": [
+    "Sub_RNC_A",
+    "Sub_RNC_B"
+   ],
+   "frames": [
+    1,
+    60
+   ],
+   "events": {
+    "arm_under_chin": 10,
+    "lock": 18,
+    "squeeze_hold": 30,
+    "tap": "38-54"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      -0.84
+     ],
+     "pelvis": [
+      0.0,
+      -0.84,
+      0.38
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.12
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      -0.8
+     ],
+     "pelvis": [
+      0.0,
+      -0.8,
+      0.4
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.12
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.04,
+   "pelvis_distance_end_m": 0.08,
+   "notes": ""
+  },
+  "Sub_Armbar": {
+   "actions": [
+    "Sub_Armbar_A",
+    "Sub_Armbar_B"
+   ],
+   "frames": [
+    1,
+    60
+   ],
+   "events": {
+    "wrist_grab": 10,
+    "pivot": 20,
+    "legs_across": 30,
+    "fall_back_hold": 40,
+    "extension": 48,
+    "tap": "51-57"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      -1.0
+     ],
+     "pelvis": [
+      0.0,
+      -1.0,
+      0.44
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.36,
+      -1.3
+     ],
+     "pelvis": [
+      0.36,
+      -1.3,
+      0.21
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.16
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 0.12,
+   "pelvis_distance_end_m": 0.553,
+   "notes": ""
+  }
+ },
+ "checks": {
+  "Ground_Pass_Half": {
+   "max_penetration": [
+    0.1362,
+    "Gloves:LeftHand#32 in Body:UpperTorso#0",
+    29
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0361,
+     36
+    ],
+    "B": [
+     -0.0277,
+     29
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.0863,
+     29
+    ],
+    "B": [
+     0.1061,
+     15
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0343
+    },
+    "B": {
+     "median_m": 0.0367
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     3,
+     0.051,
+     "A Body:LowerTorso#40 in Body:LeftLowerLeg#682"
+    ],
+    [
+     5,
+     0.085,
+     "A Shorts:LowerTorso#188 in Body:RightLowerLeg#1026"
+    ],
+    [
+     7,
+     0.06,
+     "A Shorts:LowerTorso#268 in Body:RightLowerLeg#1026"
+    ],
+    [
+     9,
+     0.053,
+     "A Gloves:RightHand#374 in Body:LowerTorso#626"
+    ],
+    [
+     11,
+     0.081,
+     "A Shorts:LowerTorso#392 in Body:LeftLowerLeg#682"
+    ],
+    [
+     13,
+     0.07,
+     "A Shorts:LowerTorso#268 in Body:RightLowerLeg#1026"
+    ],
+    [
+     15,
+     0.077,
+     "A Shorts:LowerTorso#516 in Body:RightLowerLeg#1026"
+    ],
+    [
+     17,
+     0.084,
+     "B Body:LowerTorso#970 in Body:LowerTorso#626"
+    ],
+    [
+     19,
+     0.09,
+     "B Body:LowerTorso#970 in Body:LowerTorso#626"
+    ],
+    [
+     21,
+     0.094,
+     "B Body:RightLowerLeg#1026 in Body:LowerTorso#626"
+    ],
+    [
+     23,
+     0.085,
+     "B Body:RightHand#880 in Body:LeftUpperArm#412"
+    ],
+    [
+     25,
+     0.098,
+     "B Body:LowerTorso#970 in Body:LowerTorso#626"
+    ],
+    [
+     27,
+     0.112,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     29,
+     0.136,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     31,
+     0.128,
+     "A Gloves:LeftHand#246 in Body:UpperTorso#0"
+    ],
+    [
+     33,
+     0.11,
+     "A Gloves:LeftHand#246 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.101,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     36,
+     0.104,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "B",
+     23,
+     -0.021,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     25,
+     -0.021,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     27,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "B",
+     29,
+     -0.028,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     31,
+     -0.025,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     31,
+     -0.026,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     33,
+     -0.032,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     33,
+     -0.024,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     35,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     35,
+     -0.023,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     36,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     36,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ]
+   ]
+  },
+  "Ground_HalfGuard_Idle": {
+   "max_penetration": [
+    0.1145,
+    "Gloves:RightHand#374 in Body:UpperTorso#0",
+    21
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0363,
+     3
+    ],
+    "B": [
+     -0.0224,
+     48
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.0036,
+     24
+    ],
+    "B": [
+     0.0005,
+     13
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0026,
+     "seam_step_m": 0.0036
+    },
+    "B": {
+     "median_m": 0.0004,
+     "seam_step_m": 0.0
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.104,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.105,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.106,
+     "B Body:LeftHand#536 in Body:Head#288"
+    ],
+    [
+     7,
+     0.108,
+     "B Body:LeftHand#536 in Body:Head#288"
+    ],
+    [
+     9,
+     0.109,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     11,
+     0.11,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     13,
+     0.111,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     15,
+     0.113,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     17,
+     0.114,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     19,
+     0.114,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     21,
+     0.114,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     23,
+     0.114,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     25,
+     0.114,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     27,
+     0.114,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     29,
+     0.113,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     31,
+     0.112,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     33,
+     0.111,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.11,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     37,
+     0.108,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     39,
+     0.107,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     41,
+     0.106,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     43,
+     0.105,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     45,
+     0.104,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     47,
+     0.104,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     48,
+     0.104,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "A",
+     1,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     1,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     3,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     3,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     5,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     5,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     7,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     7,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     9,
+     -0.035,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     9,
+     -0.021,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     11,
+     -0.034,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     11,
+     -0.02,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     13,
+     -0.033,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     15,
+     -0.032,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     17,
+     -0.031,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     19,
+     -0.03,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     21,
+     -0.029,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     23,
+     -0.028,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     25,
+     -0.027,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     27,
+     -0.027,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     29,
+     -0.027,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     31,
+     -0.028,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     33,
+     -0.028,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     35,
+     -0.029,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     37,
+     -0.03,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "A",
+     39,
+     -0.031,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     39,
+     -0.02,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     41,
+     -0.033,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     41,
+     -0.021,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     43,
+     -0.034,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     43,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     45,
+     -0.035,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     45,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     47,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     47,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "A",
+     48,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     48,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ]
+   ],
+   "loop_frame1_vs_end+1_m": 0.0
+  },
+  "Ground_Pass_Side": {
+   "max_penetration": [
+    0.1324,
+    "Gloves:RightHand#588 in Body:UpperTorso#0",
+    19
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0361,
+     1
+    ],
+    "B": [
+     -0.0261,
+     25
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.0914,
+     22
+    ],
+    "B": [
+     0.0767,
+     4
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0538
+    },
+    "B": {
+     "median_m": 0.0209
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.104,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.104,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.107,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     7,
+     0.117,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     9,
+     0.096,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     11,
+     0.087,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     13,
+     0.086,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     15,
+     0.1,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     17,
+     0.125,
+     "A Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     19,
+     0.132,
+     "A Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     21,
+     0.13,
+     "B Shorts:LowerTorso#392 in Body:LowerTorso#626"
+    ],
+    [
+     23,
+     0.097,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     25,
+     0.117,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     27,
+     0.105,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     29,
+     0.12,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     31,
+     0.125,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     33,
+     0.125,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.118,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     37,
+     0.119,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     39,
+     0.125,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     40,
+     0.126,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "A",
+     1,
+     -0.036,
+     "Body:LeftLowerLeg#682"
+    ],
+    [
+     "B",
+     1,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "B",
+     3,
+     -0.022,
+     "Shorts:LowerTorso#268"
+    ],
+    [
+     "B",
+     21,
+     -0.02,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     23,
+     -0.025,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     25,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     27,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     29,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     31,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     33,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     35,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     37,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     39,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     40,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ]
+   ]
+  },
+  "Ground_Side_Idle": {
+   "max_penetration": [
+    0.1288,
+    "Gloves:RightHand#374 in Body:UpperTorso#0",
+    7
+   ],
+   "floor_min_z": {
+    "A": [
+     0.0018,
+     5
+    ],
+    "B": [
+     -0.0261,
+     1
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.0028,
+     48
+    ],
+    "B": [
+     0.0005,
+     13
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.002,
+     "seam_step_m": 0.0028
+    },
+    "B": {
+     "median_m": 0.0004,
+     "seam_step_m": 0.0
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.126,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.127,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.128,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     7,
+     0.129,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     9,
+     0.129,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     11,
+     0.128,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     13,
+     0.127,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     15,
+     0.125,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     17,
+     0.123,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     19,
+     0.121,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     21,
+     0.118,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     23,
+     0.117,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     25,
+     0.119,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     27,
+     0.121,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     29,
+     0.123,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     31,
+     0.124,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     33,
+     0.124,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.124,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     37,
+     0.123,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     39,
+     0.121,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     41,
+     0.119,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     43,
+     0.12,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     45,
+     0.122,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     47,
+     0.124,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     48,
+     0.125,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "B",
+     1,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     3,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     5,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     7,
+     -0.025,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     9,
+     -0.024,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     11,
+     -0.023,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     13,
+     -0.023,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     15,
+     -0.022,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     17,
+     -0.021,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     19,
+     -0.02,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     31,
+     -0.02,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     33,
+     -0.021,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     35,
+     -0.022,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     37,
+     -0.023,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     39,
+     -0.023,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     41,
+     -0.024,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     43,
+     -0.025,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     45,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     47,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     48,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ]
+   ],
+   "loop_frame1_vs_end+1_m": 1e-06
+  },
+  "Ground_Side_To_Mount": {
+   "max_penetration": [
+    0.1362,
+    "Body:RightHand#880 in Body:UpperTorso#0",
+    7
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0028,
+     29
+    ],
+    "B": [
+     -0.0261,
+     1
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.1834,
+     15
+    ],
+    "B": [
+     0.0699,
+     8
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0482
+    },
+    "B": {
+     "median_m": 0.0
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.126,
+     "B Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.125,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.132,
+     "B Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     7,
+     0.136,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     9,
+     0.127,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     11,
+     0.082,
+     "A Gloves:RightHand#374 in Gloves:LeftHand#230"
+    ],
+    [
+     13,
+     0.058,
+     "A Body:RightHand#880 in Body:LeftUpperArm#412"
+    ],
+    [
+     15,
+     0.062,
+     "A Body:RightFoot#1066 in Body:RightLowerLeg#1026"
+    ],
+    [
+     17,
+     0.077,
+     "B Body:LeftHand#536 in Body:RightLowerArm#824"
+    ],
+    [
+     19,
+     0.09,
+     "B Gloves:RightHand#374 in Body:LowerTorso#40"
+    ],
+    [
+     21,
+     0.08,
+     "B Gloves:LeftHand#32 in Body:LowerTorso#970"
+    ],
+    [
+     23,
+     0.104,
+     "B Gloves:RightHand#374 in Body:LowerTorso#40"
+    ],
+    [
+     25,
+     0.111,
+     "B Body:RightHand#880 in Body:LowerTorso#40"
+    ],
+    [
+     27,
+     0.103,
+     "B Body:RightHand#880 in Body:LowerTorso#40"
+    ],
+    [
+     29,
+     0.115,
+     "B Gloves:RightHand#588 in Body:LowerTorso#40"
+    ],
+    [
+     31,
+     0.091,
+     "A Body:LeftFoot#722 in Body:LowerTorso#970"
+    ],
+    [
+     33,
+     0.106,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.115,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     36,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "B",
+     1,
+     -0.026,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     3,
+     -0.025,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     5,
+     -0.024,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     7,
+     -0.021,
+     "Shorts:LowerTorso#0"
+    ]
+   ],
+   "fast_frames_over_12cm": [
+    [
+     "A",
+     7,
+     0.156,
+     "RightLowerLeg"
+    ],
+    [
+     "A",
+     8,
+     0.155,
+     "RightLowerLeg"
+    ],
+    [
+     "A",
+     14,
+     0.152,
+     "RightLowerLeg"
+    ],
+    [
+     "A",
+     15,
+     0.183,
+     "RightLowerLeg"
+    ],
+    [
+     "A",
+     16,
+     0.178,
+     "RightLowerLeg"
+    ],
+    [
+     "A",
+     17,
+     0.157,
+     "RightLowerLeg"
+    ],
+    [
+     "A",
+     18,
+     0.135,
+     "RightLowerLeg"
+    ],
+    [
+     "A",
+     19,
+     0.13,
+     "RightFoot"
+    ]
+   ]
+  },
+  "Ground_Mount_Idle": {
+   "max_penetration": [
+    0.1249,
+    "Body:RightFoot#1066 in Body:LeftLowerLeg#682",
+    9
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0007,
+     43
+    ],
+    "B": [
+     -0.0153,
+     1
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.0021,
+     24
+    ],
+    "B": [
+     0.0005,
+     13
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0016,
+     "seam_step_m": 0.0021
+    },
+    "B": {
+     "median_m": 0.0004,
+     "seam_step_m": 0.0
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.116,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.116,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     7,
+     0.117,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     9,
+     0.125,
+     "A Body:RightFoot#1066 in Body:LeftLowerLeg#682"
+    ],
+    [
+     11,
+     0.117,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     13,
+     0.117,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     15,
+     0.117,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     17,
+     0.116,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     19,
+     0.116,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     21,
+     0.115,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     23,
+     0.114,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     25,
+     0.113,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     27,
+     0.112,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     29,
+     0.112,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     31,
+     0.112,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     33,
+     0.113,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.113,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     37,
+     0.114,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     39,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     41,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     43,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     45,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     47,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     48,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ]
+   ],
+   "loop_frame1_vs_end+1_m": 0.0
+  },
+  "Ground_Mount_Punch": {
+   "max_penetration": [
+    0.1153,
+    "Body:LeftHand#536 in Body:UpperTorso#0",
+    30
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0006,
+     30
+    ],
+    "B": [
+     -0.0153,
+     1
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.2163,
+     4
+    ],
+    "B": [
+     0.1408,
+     4
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0586
+    },
+    "B": {
+     "median_m": 0.0245
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.076,
+     "B Gloves:RightHand#342 in Body:LeftLowerArm#480"
+    ],
+    [
+     5,
+     0.077,
+     "A Gloves:LeftHand#302 in Body:RightUpperArm#756"
+    ],
+    [
+     7,
+     0.072,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     9,
+     0.085,
+     "A Body:LeftHand#536 in Body:Head#288"
+    ],
+    [
+     11,
+     0.083,
+     "A Gloves:LeftHand#32 in Body:UpperTorso#0"
+    ],
+    [
+     13,
+     0.074,
+     "B Gloves:LeftHand#32 in Gloves:RightHand#572"
+    ],
+    [
+     15,
+     0.057,
+     "A Body:RightFoot#1066 in Body:LowerTorso#626"
+    ],
+    [
+     17,
+     0.057,
+     "A Body:LeftFoot#722 in Body:LowerTorso#970"
+    ],
+    [
+     19,
+     0.057,
+     "A Body:LeftFoot#722 in Body:LowerTorso#970"
+    ],
+    [
+     21,
+     0.057,
+     "A Body:LeftFoot#722 in Body:LowerTorso#970"
+    ],
+    [
+     23,
+     0.075,
+     "B Body:RightHand#856 in Body:LeftLowerArm#480"
+    ],
+    [
+     25,
+     0.057,
+     "A Body:LeftFoot#722 in Body:LowerTorso#970"
+    ],
+    [
+     27,
+     0.111,
+     "B Gloves:LeftHand#302 in Body:LowerTorso#40"
+    ],
+    [
+     29,
+     0.112,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     30,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ]
+   ],
+   "fast_frames_over_12cm": [
+    [
+     "A",
+     3,
+     0.194,
+     "RightHand"
+    ],
+    [
+     "B",
+     3,
+     0.141,
+     "RightHand"
+    ],
+    [
+     "A",
+     4,
+     0.216,
+     "RightHand"
+    ],
+    [
+     "B",
+     4,
+     0.141,
+     "RightHand"
+    ],
+    [
+     "A",
+     7,
+     0.136,
+     "RightHand"
+    ],
+    [
+     "A",
+     8,
+     0.162,
+     "RightHand"
+    ],
+    [
+     "A",
+     9,
+     0.136,
+     "RightHand"
+    ]
+   ]
+  },
+  "Ground_Mount_To_Back": {
+   "max_penetration": [
+    0.1153,
+    "Body:LeftHand#536 in Body:UpperTorso#0",
+    1
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0181,
+     35
+    ],
+    "B": [
+     -0.1459,
+     23
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.0632,
+     33
+    ],
+    "B": [
+     0.2011,
+     25
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.024
+    },
+    "B": {
+     "median_m": 0.0491
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.095,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.108,
+     "B Gloves:RightHand#374 in Body:LowerTorso#40"
+    ],
+    [
+     7,
+     0.101,
+     "B Body:LeftHand#536 in Body:LowerTorso#970"
+    ],
+    [
+     9,
+     0.065,
+     "B Shorts:LowerTorso#268 in Body:RightLowerLeg#1026"
+    ],
+    [
+     11,
+     0.063,
+     "B Shorts:LowerTorso#268 in Body:RightLowerLeg#1026"
+    ],
+    [
+     13,
+     0.064,
+     "A Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     15,
+     0.087,
+     "A Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     17,
+     0.085,
+     "A Gloves:RightHand#588 in Body:UpperTorso#0"
+    ],
+    [
+     19,
+     0.091,
+     "A Gloves:RightHand#374 in Body:LeftUpperArm#412"
+    ],
+    [
+     21,
+     0.085,
+     "A Gloves:RightHand#588 in Body:LeftUpperArm#412"
+    ],
+    [
+     23,
+     0.067,
+     "A Gloves:RightHand#588 in Body:LeftUpperArm#412"
+    ],
+    [
+     25,
+     0.067,
+     "A Gloves:RightHand#588 in Body:LeftLowerArm#480"
+    ],
+    [
+     27,
+     0.079,
+     "A Gloves:RightHand#374 in Body:LeftLowerArm#480"
+    ],
+    [
+     29,
+     0.074,
+     "A Body:RightHand#880 in Body:RightUpperArm#756"
+    ],
+    [
+     31,
+     0.085,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     33,
+     0.1,
+     "A Gloves:RightHand#374 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.096,
+     "A Gloves:LeftHand#302 in Body:UpperTorso#0"
+    ],
+    [
+     37,
+     0.108,
+     "A Gloves:RightHand#644 in Body:UpperTorso#0"
+    ],
+    [
+     39,
+     0.099,
+     "A Gloves:LeftHand#302 in Body:UpperTorso#0"
+    ],
+    [
+     41,
+     0.09,
+     "A Gloves:RightHand#644 in Body:UpperTorso#0"
+    ],
+    [
+     43,
+     0.08,
+     "A Gloves:LeftHand#302 in Body:UpperTorso#0"
+    ],
+    [
+     45,
+     0.08,
+     "A Gloves:LeftHand#32 in Body:LeftLowerArm#480"
+    ],
+    [
+     47,
+     0.078,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     48,
+     0.078,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "B",
+     3,
+     -0.022,
+     "Shorts:LowerTorso#188"
+    ],
+    [
+     "B",
+     5,
+     -0.068,
+     "Body:LeftFoot#722"
+    ],
+    [
+     "B",
+     7,
+     -0.096,
+     "Body:LeftFoot#722"
+    ],
+    [
+     "B",
+     9,
+     -0.086,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     11,
+     -0.108,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     13,
+     -0.129,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     15,
+     -0.139,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     17,
+     -0.138,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     19,
+     -0.131,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     21,
+     -0.146,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     23,
+     -0.146,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     25,
+     -0.117,
+     "Body:RightUpperArm#756"
+    ],
+    [
+     "B",
+     27,
+     -0.136,
+     "Body:LowerTorso#970"
+    ],
+    [
+     "B",
+     29,
+     -0.112,
+     "Shorts:LowerTorso#392"
+    ],
+    [
+     "B",
+     31,
+     -0.091,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     33,
+     -0.069,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     35,
+     -0.076,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     37,
+     -0.079,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     39,
+     -0.081,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     41,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     43,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     45,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     47,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     48,
+     -0.083,
+     "Body:RightFoot#1066"
+    ]
+   ],
+   "fast_frames_over_12cm": [
+    [
+     "B",
+     24,
+     0.138,
+     "RightLowerLeg"
+    ],
+    [
+     "B",
+     25,
+     0.201,
+     "RightLowerLeg"
+    ]
+   ]
+  },
+  "Ground_Back_Idle": {
+   "max_penetration": [
+    0.108,
+    "Gloves:LeftHand#32 in Body:LeftUpperArm#412",
+    41
+   ],
+   "floor_min_z": {
+    "A": [
+     0.0003,
+     1
+    ],
+    "B": [
+     -0.0828,
+     1
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.003,
+     23
+    ],
+    "B": [
+     0.0007,
+     38
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0022,
+     "seam_step_m": 0.003
+    },
+    "B": {
+     "median_m": 0.0005,
+     "seam_step_m": 0.0
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.078,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     3,
+     0.078,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     5,
+     0.078,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     7,
+     0.078,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     9,
+     0.078,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     11,
+     0.078,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     13,
+     0.078,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     15,
+     0.078,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     17,
+     0.079,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     19,
+     0.079,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     21,
+     0.08,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     23,
+     0.08,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     25,
+     0.08,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     27,
+     0.081,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     29,
+     0.081,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     31,
+     0.081,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     33,
+     0.081,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     35,
+     0.08,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     37,
+     0.08,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     39,
+     0.08,
+     "A Gloves:LeftHand#0 in Body:LeftUpperArm#412"
+    ],
+    [
+     41,
+     0.108,
+     "B Gloves:LeftHand#32 in Body:LeftUpperArm#412"
+    ],
+    [
+     43,
+     0.08,
+     "A Gloves:RightHand#374 in Body:RightLowerArm#824"
+    ],
+    [
+     45,
+     0.079,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     47,
+     0.078,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     48,
+     0.078,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "B",
+     1,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     3,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     5,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     7,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     9,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     11,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     13,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     15,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     17,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     19,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     21,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     23,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     25,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     27,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     29,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     31,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     33,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     35,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     37,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     39,
+     -0.082,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     41,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     43,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     45,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     47,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     48,
+     -0.083,
+     "Body:RightFoot#1066"
+    ]
+   ],
+   "loop_frame1_vs_end+1_m": 1e-06
+  },
+  "Sub_RNC": {
+   "max_penetration": [
+    0.1323,
+    "Body:RightLowerArm#824 in Body:UpperTorso#0",
+    7
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0846,
+     9
+    ],
+    "B": [
+     -0.0828,
+     1
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.0973,
+     9
+    ],
+    "B": [
+     0.3708,
+     37
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0
+    },
+    "B": {
+     "median_m": 0.0168
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.078,
+     "A Gloves:RightHand#342 in Body:RightUpperArm#756"
+    ],
+    [
+     3,
+     0.081,
+     "A Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.127,
+     "A Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     7,
+     0.132,
+     "A Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     9,
+     0.094,
+     "A Body:LeftLowerArm#480 in Body:UpperTorso#0"
+    ],
+    [
+     11,
+     0.091,
+     "A Gloves:RightHand#644 in Body:Head#288"
+    ],
+    [
+     13,
+     0.112,
+     "A Body:LeftLowerArm#480 in Body:UpperTorso#0"
+    ],
+    [
+     15,
+     0.086,
+     "A Body:LeftLowerArm#480 in Body:UpperTorso#0"
+    ],
+    [
+     17,
+     0.08,
+     "A Gloves:RightHand#588 in Body:LeftUpperArm#412"
+    ],
+    [
+     19,
+     0.07,
+     "B Gloves:RightHand#374 in Body:LeftLowerArm#480"
+    ],
+    [
+     21,
+     0.076,
+     "A Gloves:LeftHand#302 in Body:Head#288"
+    ],
+    [
+     23,
+     0.095,
+     "A Gloves:LeftHand#302 in Body:Head#288"
+    ],
+    [
+     25,
+     0.106,
+     "A Gloves:LeftHand#302 in Body:Head#288"
+    ],
+    [
+     27,
+     0.11,
+     "A Gloves:LeftHand#302 in Body:Head#288"
+    ],
+    [
+     29,
+     0.109,
+     "A Gloves:LeftHand#302 in Body:Head#288"
+    ],
+    [
+     31,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     33,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     35,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     37,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     39,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     41,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     43,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     45,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     47,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     49,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     51,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     53,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     55,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     57,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     59,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ],
+    [
+     60,
+     0.109,
+     "A Body:LeftLowerArm#480 in Body:Head#288"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "B",
+     1,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     3,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     5,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "A",
+     7,
+     -0.029,
+     "Gloves:RightHand#374"
+    ],
+    [
+     "B",
+     7,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "A",
+     9,
+     -0.085,
+     "Gloves:RightHand#374"
+    ],
+    [
+     "B",
+     9,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "A",
+     11,
+     -0.052,
+     "Gloves:RightHand#374"
+    ],
+    [
+     "B",
+     11,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     13,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     15,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     17,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     19,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     21,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     23,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     25,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     27,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     29,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     31,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     33,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     35,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     37,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     39,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     41,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     43,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     45,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     47,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     49,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     51,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     53,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     55,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     57,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     59,
+     -0.083,
+     "Body:RightFoot#1066"
+    ],
+    [
+     "B",
+     60,
+     -0.083,
+     "Body:RightFoot#1066"
+    ]
+   ],
+   "fast_frames_over_12cm": [
+    [
+     "B",
+     36,
+     0.309,
+     "RightLowerArm"
+    ],
+    [
+     "B",
+     37,
+     0.371,
+     "RightLowerArm"
+    ],
+    [
+     "B",
+     38,
+     0.166,
+     "RightLowerArm"
+    ],
+    [
+     "B",
+     40,
+     0.249,
+     "RightLowerArm"
+    ],
+    [
+     "B",
+     45,
+     0.249,
+     "RightLowerArm"
+    ],
+    [
+     "B",
+     48,
+     0.249,
+     "RightLowerArm"
+    ],
+    [
+     "B",
+     53,
+     0.249,
+     "RightLowerArm"
+    ]
+   ]
+  },
+  "Sub_Armbar": {
+   "max_penetration": [
+    0.1373,
+    "Body:RightLowerArm#824 in Body:UpperTorso#0",
+    27
+   ],
+   "floor_min_z": {
+    "A": [
+     -0.0719,
+     15
+    ],
+    "B": [
+     -0.0434,
+     60
+    ]
+   },
+   "max_step_m": {
+    "A": [
+     0.1378,
+     17
+    ],
+    "B": [
+     0.0782,
+     53
+    ]
+   },
+   "steps": {
+    "A": {
+     "median_m": 0.0612
+    },
+    "B": {
+     "median_m": 0.0279
+    }
+   },
+   "pen_frames_over_5cm": [
+    [
+     1,
+     0.115,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     3,
+     0.119,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     5,
+     0.116,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     7,
+     0.131,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     9,
+     0.122,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     11,
+     0.113,
+     "B Body:LeftHand#536 in Body:UpperTorso#0"
+    ],
+    [
+     13,
+     0.097,
+     "B Gloves:LeftHand#246 in Body:LowerTorso#40"
+    ],
+    [
+     15,
+     0.108,
+     "B Gloves:LeftHand#246 in Body:LowerTorso#40"
+    ],
+    [
+     17,
+     0.086,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     19,
+     0.087,
+     "A Body:RightLowerLeg#1026 in Body:LowerTorso#970"
+    ],
+    [
+     21,
+     0.111,
+     "A Body:LeftLowerLeg#682 in Body:Head#288"
+    ],
+    [
+     23,
+     0.126,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     25,
+     0.128,
+     "B Body:RightHand#880 in Body:UpperTorso#0"
+    ],
+    [
+     27,
+     0.137,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     29,
+     0.129,
+     "A Shorts:LowerTorso#392 in Body:UpperTorso#0"
+    ],
+    [
+     31,
+     0.114,
+     "A Shorts:LowerTorso#392 in Body:UpperTorso#0"
+    ],
+    [
+     33,
+     0.105,
+     "B Gloves:RightHand#572 in Body:UpperTorso#0"
+    ],
+    [
+     35,
+     0.104,
+     "B Gloves:RightHand#572 in Body:UpperTorso#0"
+    ],
+    [
+     37,
+     0.113,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     39,
+     0.123,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     41,
+     0.105,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     43,
+     0.095,
+     "B Body:Head#354 in Body:LowerTorso#626"
+    ],
+    [
+     45,
+     0.112,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     47,
+     0.131,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     49,
+     0.13,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     51,
+     0.13,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     53,
+     0.13,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     55,
+     0.13,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     57,
+     0.13,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     59,
+     0.13,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ],
+    [
+     60,
+     0.13,
+     "B Body:RightLowerArm#824 in Body:UpperTorso#0"
+    ]
+   ],
+   "floor_frames_below_2cm": [
+    [
+     "A",
+     13,
+     -0.034,
+     "Body:LeftFoot#722"
+    ],
+    [
+     "A",
+     15,
+     -0.072,
+     "Body:LeftFoot#722"
+    ],
+    [
+     "B",
+     33,
+     -0.021,
+     "Shorts:LowerTorso#188"
+    ],
+    [
+     "A",
+     35,
+     -0.021,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     35,
+     -0.029,
+     "Shorts:LowerTorso#188"
+    ],
+    [
+     "A",
+     37,
+     -0.022,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     37,
+     -0.037,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "A",
+     39,
+     -0.02,
+     "Shorts:LowerTorso#0"
+    ],
+    [
+     "B",
+     39,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     41,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     43,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     45,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     47,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     49,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     51,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     53,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     55,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     57,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     59,
+     -0.043,
+     "Body:UpperTorso#0"
+    ],
+    [
+     "B",
+     60,
+     -0.043,
+     "Body:UpperTorso#0"
+    ]
+   ],
+   "fast_frames_over_12cm": [
+    [
+     "A",
+     15,
+     0.128,
+     "LeftFoot"
+    ],
+    [
+     "A",
+     16,
+     0.136,
+     "LeftFoot"
+    ],
+    [
+     "A",
+     17,
+     0.138,
+     "LeftFoot"
+    ],
+    [
+     "A",
+     18,
+     0.133,
+     "LeftFoot"
+    ],
+    [
+     "A",
+     19,
+     0.122,
+     "LeftFoot"
+    ],
+    [
+     "A",
+     24,
+     0.124,
+     "RightFoot"
+    ],
+    [
+     "A",
+     25,
+     0.132,
+     "RightFoot"
+    ],
+    [
+     "A",
+     26,
+     0.133,
+     "RightFoot"
+    ],
+    [
+     "A",
+     27,
+     0.126,
+     "RightFoot"
+    ]
+   ]
+  }
+ },
+ "transitions": {
+  "Ground_Guard_Idle@1 -> Ground_Pass_Half@1": 0.0,
+  "Ground_Pass_Half@36 -> Ground_HalfGuard_Idle@1": 0.0,
+  "Ground_HalfGuard_Idle@1 -> Ground_Pass_Side@1": 0.0,
+  "Ground_Pass_Side@40 -> Ground_Side_Idle@1": 0.0,
+  "Ground_Side_Idle@1 -> Ground_Side_To_Mount@1": 0.0,
+  "Ground_Side_To_Mount@36 -> Ground_Mount_Idle@1": 0.0,
+  "Ground_Mount_Idle@1 -> Ground_Mount_Punch@1": 0.0,
+  "Ground_Mount_Punch@30 -> Ground_Mount_Idle@1": 0.0,
+  "Ground_Mount_Idle@1 -> Ground_Mount_To_Back@1": 0.0,
+  "Ground_Mount_To_Back@48 -> Ground_Back_Idle@1": 0.0,
+  "Ground_Back_Idle@1 -> Sub_RNC@1": 0.0,
+  "Ground_Mount_Idle@1 -> Sub_Armbar@1": 0.0,
+  "Ground_HalfGuard_Idle loop 1 vs 49": 0.0,
+  "Ground_Side_Idle loop 1 vs 49": 0.0,
+  "Ground_Mount_Idle loop 1 vs 49": 0.0,
+  "Ground_Back_Idle loop 1 vs 49": 0.0
+ },
+ "grips": [
+  {
+   "rig": "A",
+   "hand": "L",
+   "bone": "B.RightHand",
+   "frames": [
+    10,
+    60
+   ],
+   "pen_before_m": 0.0636,
+   "pen_after_m": 0.079,
+   "iterations": 5
+  },
+  {
+   "rig": "A",
+   "hand": "R",
+   "bone": "B.RightHand",
+   "frames": [
+    10,
+    60
+   ],
+   "pen_before_m": 0.0644,
+   "pen_after_m": 0.0571,
+   "iterations": 5
+  }
+ ],
+ "order": [
+  [
+   "Ground_Pass_Half",
+   36,
+   false
+  ],
+  [
+   "Ground_HalfGuard_Idle",
+   48,
+   true
+  ],
+  [
+   "Ground_Pass_Side",
+   40,
+   false
+  ],
+  [
+   "Ground_Side_Idle",
+   48,
+   true
+  ],
+  [
+   "Ground_Side_To_Mount",
+   36,
+   false
+  ],
+  [
+   "Ground_Mount_Idle",
+   48,
+   true
+  ],
+  [
+   "Ground_Mount_Punch",
+   30,
+   false
+  ],
+  [
+   "Ground_Mount_To_Back",
+   48,
+   false
+  ],
+  [
+   "Ground_Back_Idle",
+   48,
+   true
+  ],
+  [
+   "Sub_RNC",
+   60,
+   false
+  ],
+  [
+   "Sub_Armbar",
+   60,
+   false
+  ]
+ ]
+}

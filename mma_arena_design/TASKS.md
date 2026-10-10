@@ -37,7 +37,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | B Schlagreichweite, Trefferprüfung, Kombos | erledigt (PC getestet) | Haken/Uppercut nur Nahdistanz; Gegner-KI muss sich bewegen |
 | C Kicks, Basis-Moveset | erledigt (PC getestet) | Fußdrehung beim Pivot; Kampfstile |
 | D Takedowns + Kamera | erledigt (PC getestet) | Knie-Griff bis ~10 cm, Sprawl-Kopf bis 11 cm |
-| E Bodenpositionen, Submissions | offen | Half Guard, Side Control, Mount, Back; RNC, Armbar; paarweise Animationen |
+| E Bodenpositionen + Submissions | erledigt (PC getestet) | Überschneidungen 11–14 cm; Aufstehen nur aus der Guard |
 | Ausdauer | erledigt (B) | Feinabstimmung mit C/D/E |
 | Online-Test 2 Spieler | offen | Team-Test in Studio (2 Clients) |
 

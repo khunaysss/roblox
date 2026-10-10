@@ -54,6 +54,7 @@ local WALK_REF = 6        -- Laufzyklen sind fuer WalkSpeed 6 gebaut
 local BLOCK_FACTOR = 0.2  -- Schaden im Block
 local BLOCK_SPEED = 3     -- Laufgeschwindigkeit im Block
 local KO_TIME = 3
+local HP_FLOOR = 0.01       -- Leben faellt nie ganz auf 0: bei 0 verliert der Humanoid dauerhaft seine Standhoehe (Spieler sank nach K.o. 2 Studs in den Boden)
 local STAGGER_HEALTH = 35  -- unter diesem Leben koennen schwere Treffer taumeln lassen
 local HITSTOP = 0.07       -- kurzes Einfrieren des Angriffs beim Treffer
 local REACTIONS = { "hit", "hitStraight", "hitHook", "hitUpper", "hitLeg", "stagger", "hitBody" }
@@ -219,7 +220,7 @@ local function land(attacker, target, move, m, track)
 	local blockFactor = blocked and (m.bodyShot and 0.5 or BLOCK_FACTOR) or 1   -- hohe Deckung schuetzt den Koerper nur halb
 	local tired = attacker.stamina < LOW_STAMINA and 0.7 or 1
 	local dmg = m.damage * blockFactor * tired
-	target.hum.Health = math.max(0, target.hum.Health - dmg)
+	target.hum.Health = math.max(HP_FLOOR, target.hum.Health - dmg)
 	addDamage(attacker.char, dmg)
 	if blocked then spend(target, 4) end
 	print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
@@ -232,7 +233,7 @@ local function land(attacker, target, move, m, track)
 		if track.TimePosition < back then track.TimePosition = back end
 		track:AdjustSpeed(attacker.animSpeed or 1)
 	end)
-	if target.hum.Health <= 0 then
+	if target.hum.Health <= HP_FLOOR then
 		print("[CC] K.o.!", target.char.Name, m.ko)
 		interrupt(target); knockout(target, m.ko)
 		hitFX(target.char, 1.0, "ko"); hitFX(attacker.char, 0.6, "land")
@@ -309,16 +310,19 @@ local function attack(attacker, move)
 end
 
 -- ================= Ringen (Takedown, Sprawl, Guard, Befreiung, Aufstehen) =================
--- Paar-Animationen aus Wrestling_Prototype_v02 (A = Angreifer, B = Verteidiger). Beide HumanoidRootParts werden
+-- Paar-Animationen aus Wrestling_Prototype_v03 (Takedown, Guard) und Ground_Positions_v01 (A = Angreifer, B = Verteidiger). Beide HumanoidRootParts werden
 -- verankert und exakt wie in Blender aufgestellt: B steht 1,5 m (5,357 Studs) vor A und schaut ihn an.
 -- Die Bewegung durch den Raum steckt im Root-Bone; am Ende eines Austauschs werden die HumanoidRootParts auf die
 -- End-Positionen versetzt (rootEnd aus den Daten), dann laufen normale Animationen weiter.
 local WR_GAP = 1.5 / 0.28
 local WR = {}
-for _, pair in ipairs({ "TD_DoubleLeg_Success", "TD_DoubleLeg_Defended", "Ground_Guard_Idle", "Ground_Guard_Punch", "Ground_Guard_Escape", "Ground_GetUp" }) do
+for _, pair in ipairs({ "TD_DoubleLeg_Success", "TD_DoubleLeg_Defended", "Ground_Guard_Idle", "Ground_Guard_Punch", "Ground_Guard_Escape", "Ground_GetUp",
+	"Ground_Pass_Half", "Ground_HalfGuard_Idle", "Ground_Pass_Side", "Ground_Side_Idle", "Ground_Side_To_Mount", "Ground_Mount_Idle",
+	"Ground_Mount_Punch", "Ground_Mount_To_Back", "Ground_Back_Idle", "Sub_RNC", "Sub_Armbar" }) do  -- zweite/dritte Zeile: Ground_Positions_v01 (E)
 	for _, s in ipairs({ "A", "B" }) do
 		local name = "WR_" .. pair .. "_" .. s
-		WR[pair .. "_" .. s] = { anim = anim(name), rootEnd = require(A[name .. "_Data"]).rootEnd }
+		local data = require(A[name .. "_Data"])
+		WR[pair .. "_" .. s] = { anim = anim(name), rootEnd = data.rootEnd, len = (#data.frames - 1) / 24 }
 	end
 end
 local TD_RANGE = 6          -- Studs
@@ -358,6 +362,7 @@ end
 local function setWrestle(f, partner, role)
 	f.wr = role and { role = role, partner = partner } or nil
 	f.char:SetAttribute("CC_Wrestle", role or false)
+	if not role then for _, k in ipairs({ "CC_GroundPos", "CC_SubProgress", "CC_SubName", "CC_SubRole" }) do f.char:SetAttribute(k, nil) end end
 	f.char.HumanoidRootPart.Anchored = role ~= nil or f.char == workspace:FindFirstChild("CC_TrainingDummy")
 end
 
@@ -373,10 +378,237 @@ local function endExchange(a, b, pair)
 	end
 end
 
-local function groundLoop(top, bottom)
-	playPair(top, bottom, "Ground_Guard_Idle", true)
-	top.wr.state = "guard"
+-- ================= Bodenpositionen (E) =================
+-- Positionen: guard -> half -> side -> mount -> back. Oben: E = Position verbessern, Linksklick = Schlag (Guard, Mount),
+-- Q = Submission (Mount: Armbar, Ruecken: Rear Naked Choke). Unten: Leertaste = befreien (eine Position zurueck,
+-- aus der Guard aufstehen). Konter: F kurz nach Beginn des gegnerischen Versuchs -> Animation laeuft rueckwaerts zurueck.
+-- Submission-Duell: Animation haelt an; oben Q haemmern, unten Leertaste haemmern; Fortschritt CC_SubProgress (0..1).
+local POS_IDLE = { guard = "Ground_Guard_Idle", half = "Ground_HalfGuard_Idle", side = "Ground_Side_Idle", mount = "Ground_Mount_Idle", back = "Ground_Back_Idle" }
+local ADVANCE = { guard = { "Ground_Pass_Half", "half" }, half = { "Ground_Pass_Side", "side" }, side = { "Ground_Side_To_Mount", "mount" }, mount = { "Ground_Mount_To_Back", "back" } }
+local RETREAT = { half = { "Ground_Pass_Half", "guard" }, side = { "Ground_Pass_Side", "half" }, mount = { "Ground_Side_To_Mount", "side" }, back = { "Ground_Mount_To_Back", "mount" } }
+local SUBS = { mount = { pair = "Sub_Armbar", hold = 40 / 24, name = "ARMBAR" }, back = { pair = "Sub_RNC", hold = 30 / 24, name = "REAR NAKED CHOKE" } }
+local PUNCH = { guard = { pair = "Ground_Guard_Punch", hit = 11 / 24, dmg = 7 }, mount = { pair = "Ground_Mount_Punch", hit = 10 / 24, dmg = 9 } }
+local ADVANCE_COST, ESCAPE_COST, SUB_COST = 10, 14, 16
+local COUNTER_WINDOW = 0.4      -- s nach Beginn eines Versuchs, in denen F (Spieler) kontert
+local SUB_TIME = 4.0            -- Duell-Dauer; danach befreit sich der Verteidiger
+local SUB_TOP, SUB_BOTTOM = 0.075, 0.085   -- Fortschritt pro Tastendruck
+
+local function isDummy(f) return f.char == workspace:FindFirstChild("CC_TrainingDummy") end
+local function passive(f) return isDummy(f) and f.char:GetAttribute("CC_Passive") end
+local function setPos(top, bottom, pos)
+	top.wr.pos, bottom.wr.pos = pos, pos
+	top.char:SetAttribute("CC_GroundPos", pos); bottom.char:SetAttribute("CC_GroundPos", pos)
 end
+local function groundLoop(top, bottom, pos)
+	pos = pos or "guard"
+	playPair(top, bottom, POS_IDLE[pos], true)
+	top.wr.state = "guard"         -- "guard" = ruhig in der aktuellen Position (Name aus v01)
+	setPos(top, bottom, pos)
+end
+-- Paar-Animation rueckwaerts (Konter / Befreien = Uebergang zurueck); Dauer aus den Blender-Daten
+local function pairLen(pair) return WR[pair .. "_A"].len end
+local function reversePair(top, bottom, pair, from)
+	local ta, tb = wrTrack(top, pair .. "_A"), wrTrack(bottom, pair .. "_B")
+	if not ta.IsPlaying then wrStopAll(top, 0); wrStopAll(bottom, 0); ta:Play(0, 1, 0); tb:Play(0, 1, 0) end
+	local t = from or (pairLen(pair) - 0.02)
+	ta.TimePosition, tb.TimePosition = t, t
+	ta:AdjustSpeed(-1); tb:AdjustSpeed(-1)
+	task.wait(t)
+end
+-- hat der Gegner gekontert? Spieler: F seit Beginn des Versuchs; Trainingsgegner: Zufall
+local function countered(f, t0, chance)
+	if isDummy(f) then return not passive(f) and math.random() < chance end
+	return f.sprawlAt ~= nil and f.sprawlAt >= t0 - 0.15
+end
+
+function groundAdvance(top)
+	local w = top.wr
+	if not w or w.role ~= "top" or w.state ~= "guard" or top.ko then return end
+	local step = ADVANCE[w.pos]; if not step then return end
+	if top.stamina < ADVANCE_COST then top.char:SetAttribute("CC_Tired", os.clock()); return end
+	local bottom = w.partner
+	spend(top, ADVANCE_COST)
+	w.state = "advance"
+	local t0 = os.clock()
+	local ta = playPair(top, bottom, step[1], false)
+	task.wait(COUNTER_WINDOW)
+	if not (top.wr and bottom.wr) then return end
+	if countered(bottom, t0, 0.3) then
+		print(("[CC] %s Position %s -> %s: gekontert"):format(top.char.Name, w.pos, step[2]))
+		hitFX(top.char, 0.15, "block")
+		reversePair(top, bottom, step[1], ta.TimePosition)
+		if top.wr and bottom.wr then groundLoop(top, bottom, w.pos) end
+		return
+	end
+	task.wait(math.max(0, pairLen(step[1]) - ta.TimePosition - 0.03))
+	if not (top.wr and bottom.wr) then return end
+	print(("[CC] %s Position %s -> %s"):format(top.char.Name, w.pos, step[2]))
+	addDamage(top.char, 4)      -- Positionsgewinn zaehlt fuer die Punktwertung
+	groundLoop(top, bottom, step[2])
+end
+
+function groundPunch(top)
+	local w = top.wr
+	if not w or w.role ~= "top" or w.state ~= "guard" or top.ko then return end
+	local p = PUNCH[w.pos]; if not p then return end
+	local bottom = w.partner
+	w.state = "punch"
+	local ta = playPair(top, bottom, p.pair, false)
+	task.delay(p.hit, function()
+		if not (top.wr and bottom.wr) then return end
+		bottom.hum.Health = math.max(HP_FLOOR, bottom.hum.Health - p.dmg)
+		addDamage(top.char, p.dmg)
+		print(("[CC] %s Bodenschlag (%s) -> %s %.0f"):format(top.char.Name, w.pos, bottom.char.Name, bottom.hum.Health))
+		hitFX(bottom.char, 0.5, "hit"); hitFX(top.char, 0.25, "land")
+		ta:AdjustSpeed(0.05); task.delay(HITSTOP, function() if ta.IsPlaying then ta:AdjustSpeed(1) end end)
+	end)
+	ta.Stopped:Wait()
+	if not (top.wr and bottom.wr) then return end
+	if bottom.hum.Health <= HP_FLOOR then
+		-- K.o. am Boden: unten bleibt liegen; aus der Guard steht oben auf, sonst bleibt oben in Position
+		print("[CC] K.o. am Boden!", bottom.char.Name)
+		local tb = wrTrack(bottom, POS_IDLE[w.pos] .. "_B"); tb:Play(0); tb:AdjustSpeed(0)
+		if w.pos == "guard" then
+			local te = wrTrack(top, "Ground_Guard_Escape_A"); te:Play(0.1); te.Stopped:Wait()
+			local tg = wrTrack(top, "Ground_GetUp_A"); tg:Play(0); tg.Stopped:Wait()
+			top.char.HumanoidRootPart.CFrame = top.wrStart * rootOffset(top, WR.Ground_GetUp_A.rootEnd)
+			wrStopAll(top, 0); setWrestle(top, nil, nil)
+		else
+			local ti = wrTrack(top, POS_IDLE[w.pos] .. "_A"); ti:Play(0); ti:AdjustSpeed(0); w.state = "over"
+		end
+		bottom.ko = true; bottom.char:SetAttribute("CC_KO", true); bottom.char:SetAttribute("CC_LastReact", "koGround")
+		task.delay(KO_TIME, function()
+			if not bottom.wr then return end
+			bottom.char.HumanoidRootPart.CFrame = bottom.wrStart * rootOffset(bottom, WR.Ground_Guard_Idle_B.rootEnd)
+			wrStopAll(bottom, 0.3); setWrestle(bottom, nil, nil)
+			if top.wr then wrStopAll(top, 0.3); setWrestle(top, nil, nil) end
+			bottom.hum.Health = bottom.hum.MaxHealth; bottom.ko = false; bottom.char:SetAttribute("CC_KO", false)
+		end)
+		return
+	end
+	groundLoop(top, bottom, w.pos)
+	for _, x in ipairs({ bottom, top }) do
+		if x.wantEscape then task.spawn(groundEscape, x) break end
+	end
+end
+
+function groundSubmit(top)
+	local w = top.wr
+	if not w or w.role ~= "top" or w.state ~= "guard" or top.ko then return end
+	local sub = SUBS[w.pos]; if not sub then return end
+	if top.stamina < SUB_COST then top.char:SetAttribute("CC_Tired", os.clock()); return end
+	local bottom = w.partner
+	spend(top, SUB_COST)
+	w.state = "sub"; top.mash, bottom.mash = 0, 0
+	print(("[CC] %s Submission-Versuch: %s"):format(top.char.Name, sub.name))
+	local ta, tb = playPair(top, bottom, sub.pair, false)
+	for _, x in ipairs({ top, bottom }) do x.char:SetAttribute("CC_SubName", sub.name); x.char:SetAttribute("CC_SubRole", x == top and "attack" or "defend") end
+	task.wait(sub.hold)
+	if not (top.wr and bottom.wr) then return end
+	ta:AdjustSpeed(0); tb:AdjustSpeed(0)
+	-- Duell: Start 0,35; weniger Leben unten -> Griff zieht von selbst zu
+	local p, t0, last = 0.35, os.clock(), os.clock()
+	local dummyNext = 0
+	while top.wr and bottom.wr and p > 0 and p < 1 and os.clock() - t0 < SUB_TIME do
+		local dt = task.wait(); local now = os.clock()
+		for _, x in ipairs({ top, bottom }) do                 -- Trainingsgegner haemmert ca. 4-5 mal pro Sekunde
+			if isDummy(x) and not passive(x) and now >= dummyNext then x.mash += 1; dummyNext = now + 0.18 + math.random() * 0.12 end
+		end
+		p += top.mash * SUB_TOP - bottom.mash * SUB_BOTTOM + dt * 0.10 * (1 - bottom.hum.Health / bottom.hum.MaxHealth)
+		top.mash, bottom.mash = 0, 0
+		p = math.clamp(p, 0, 1)
+		top.char:SetAttribute("CC_SubProgress", p); bottom.char:SetAttribute("CC_SubProgress", p)
+		last = now
+	end
+	for _, x in ipairs({ top, bottom }) do x.char:SetAttribute("CC_SubProgress", nil); x.char:SetAttribute("CC_SubName", nil); x.char:SetAttribute("CC_SubRole", nil) end
+	if not (top.wr and bottom.wr) then return end
+	if p >= 1 then
+		print(("[CC] %s gewinnt per %s gegen %s"):format(top.char.Name, sub.name, bottom.char.Name))
+		ta:AdjustSpeed(1); tb:AdjustSpeed(1)
+		task.wait(pairLen(sub.pair) - sub.hold - 0.05)
+		ta:AdjustSpeed(0); tb:AdjustSpeed(0)
+		w.state = "over"
+		addDamage(top.char, 20)
+		bottom.hum.Health = HP_FLOOR
+		bottom.ko = true; bottom.char:SetAttribute("CC_LastReact", "submission"); bottom.char:SetAttribute("CC_KO", true)
+		hitFX(bottom.char, 0.6, "ko")
+		return
+	end
+	print(("[CC] %s befreit sich aus %s"):format(bottom.char.Name, sub.name))
+	hitFX(top.char, 0.2, "block")
+	reversePair(top, bottom, sub.pair, ta.TimePosition)
+	if top.wr and bottom.wr then groundLoop(top, bottom, w.pos) end
+end
+
+-- Befreien/Aufstehen: aus der Guard wie bisher (Escape + GetUp), sonst eine Position zurueck (Uebergang rueckwaerts)
+function groundEscape(f)
+	local w = f.wr
+	if not w or (w.role ~= "top" and w.role ~= "bottom") then return end
+	local top = w.role == "top" and f or w.partner
+	local bottom = w.role == "bottom" and f or w.partner
+	local st = top.wr.state
+	if st == "sub" then if f == bottom then f.mash = (f.mash or 0) + 1 end return end   -- im Duell: Leertaste haemmern
+	if st == "punch" then f.wantEscape = true return end -- nach dem laufenden Schlag ausfuehren
+	if st ~= "guard" then return end
+	f.wantEscape = nil
+	if top.wr.pos ~= "guard" then
+		if f ~= bottom then return end
+		if bottom.stamina < ESCAPE_COST then bottom.char:SetAttribute("CC_Tired", os.clock()); return end
+		spend(bottom, ESCAPE_COST)
+		local back = RETREAT[top.wr.pos]
+		top.wr.state = "escape"
+		local t0 = os.clock()
+		local ta = wrTrack(top, back[1] .. "_A")
+		wrStopAll(top, 0); wrStopAll(bottom, 0)
+		local tb = wrTrack(bottom, back[1] .. "_B")
+		ta:Play(0, 1, 0); tb:Play(0, 1, 0)
+		local L = pairLen(back[1]) - 0.02
+		ta.TimePosition, tb.TimePosition = L, L; ta:AdjustSpeed(-1); tb:AdjustSpeed(-1)
+		task.wait(COUNTER_WINDOW)
+		if not (top.wr and bottom.wr) then return end
+		if countered(top, t0, 0.3) then
+			print(("[CC] %s Befreiungsversuch gekontert"):format(bottom.char.Name))
+			hitFX(bottom.char, 0.15, "block")
+			local tp = ta.TimePosition
+			ta:AdjustSpeed(1); tb:AdjustSpeed(1)
+			task.wait(math.max(0, L - tp))
+			if top.wr and bottom.wr then groundLoop(top, bottom, top.wr.pos) end
+			return
+		end
+		task.wait(math.max(0, ta.TimePosition))
+		if not (top.wr and bottom.wr) then return end
+		print(("[CC] %s befreit sich: %s -> %s"):format(bottom.char.Name, top.wr.pos, back[2]))
+		groundLoop(top, bottom, back[2])
+		return
+	end
+	top.wr.state = "escape"
+	local ta = playPair(top, bottom, "Ground_Guard_Escape", false)
+	ta.Stopped:Wait()
+	local tg = playPair(top, bottom, "Ground_GetUp", false)
+	tg.Stopped:Wait()
+	endExchange(top, bottom, "Ground_GetUp")
+	print(("[CC] %s und %s stehen wieder"):format(top.char.Name, bottom.char.Name))
+end
+
+-- Trainingsgegner am Boden: oben Schlaege, Position verbessern, Submission; unten befreien
+RunService.Heartbeat:Connect(function()
+	local d = workspace:FindFirstChild("CC_TrainingDummy")
+	local D_ = d and fighters[d]
+	if not (D_ and D_.wr) or D_.ko then return end
+	local w = D_.wr
+	if os.clock() < (D_.groundThink or 0) then return end
+	D_.groundThink = os.clock() + 1.4 + math.random() * 1.2
+	if d:GetAttribute("CC_Passive") then return end
+	if w.role == "top" and w.state == "guard" then
+		local r = math.random()
+		if SUBS[w.pos] and r < 0.3 then task.spawn(groundSubmit, D_)
+		elseif PUNCH[w.pos] and r < 0.75 then task.spawn(groundPunch, D_)
+		elseif ADVANCE[w.pos] and r < 0.95 then task.spawn(groundAdvance, D_)
+		elseif w.pos == "guard" then task.spawn(groundEscape, D_) end
+	elseif w.role == "bottom" and w.partner.wr and w.partner.wr.state == "guard" and math.random() < 0.35 then
+		task.spawn(groundEscape, D_)
+	end
+end)
 
 function tryTakedown(a)
 	if a.ko or a.wr or frozen(a) or os.clock() < a.busyUntil then return end
@@ -424,77 +656,6 @@ function tryTakedown(a)
 	groundLoop(a, b)
 end
 
-function groundPunch(top)
-	local w = top.wr
-	if not w or w.role ~= "top" or w.state ~= "guard" or top.ko then return end
-	local bottom = w.partner
-	w.state = "punch"
-	local ta = playPair(top, bottom, "Ground_Guard_Punch", false)
-	task.delay(11 / 24, function()          -- Schlagkontakt Frame 11
-		if not (top.wr and bottom.wr) then return end
-		bottom.hum.Health = math.max(0, bottom.hum.Health - GROUND_PUNCH_DAMAGE)
-		addDamage(top.char, GROUND_PUNCH_DAMAGE)
-		print(("[CC] %s Bodenschlag -> %s %.0f"):format(top.char.Name, bottom.char.Name, bottom.hum.Health))
-		hitFX(bottom.char, 0.5, "hit"); hitFX(top.char, 0.25, "land")
-		ta:AdjustSpeed(0.05); task.delay(HITSTOP, function() if ta.IsPlaying then ta:AdjustSpeed(1) end end)
-	end)
-	ta.Stopped:Wait()
-	if not (top.wr and bottom.wr) then return end
-	if bottom.hum.Health <= 0 then
-		-- K.o. am Boden: unten bleibt liegen, oben steht auf
-		print("[CC] K.o. am Boden!", bottom.char.Name)
-		local tb = wrTrack(bottom, "Ground_Guard_Idle_B"); tb:Play(0); tb:AdjustSpeed(0)
-		local te = wrTrack(top, "Ground_Guard_Escape_A"); te:Play(0.1); te.Stopped:Wait()
-		local tg = wrTrack(top, "Ground_GetUp_A"); tg:Play(0); tg.Stopped:Wait()
-		top.char.HumanoidRootPart.CFrame = top.wrStart * rootOffset(top, WR.Ground_GetUp_A.rootEnd)
-		wrStopAll(top, 0); setWrestle(top, nil, nil)
-		bottom.ko = true; bottom.char:SetAttribute("CC_KO", true); bottom.char:SetAttribute("CC_LastReact", "koGround")
-		task.delay(KO_TIME, function()
-			bottom.char.HumanoidRootPart.CFrame = bottom.wrStart * rootOffset(bottom, WR.Ground_Guard_Idle_B.rootEnd)
-			wrStopAll(bottom, 0.3); setWrestle(bottom, nil, nil)
-			bottom.hum.Health = bottom.hum.MaxHealth; bottom.ko = false; bottom.char:SetAttribute("CC_KO", false)
-		end)
-		return
-	end
-	groundLoop(top, bottom)
-	for _, x in ipairs({ bottom, top }) do
-		if x.wantEscape then task.spawn(groundEscape, x) break end
-	end
-end
-
--- Befreien/Aufstehen: von unten (Escape) oder oben (aufstehen) - beide nutzen Escape + GetUp
-function groundEscape(f)
-	local w = f.wr
-	if not w or (w.role ~= "top" and w.role ~= "bottom") or w.state == "escape" then return end
-	local top = w.role == "top" and f or w.partner
-	local bottom = w.role == "bottom" and f or w.partner
-	if top.wr.state == "punch" then f.wantEscape = true return end -- nach dem laufenden Schlag ausfuehren
-	f.wantEscape = nil
-	top.wr.state = "escape"
-	local ta = playPair(top, bottom, "Ground_Guard_Escape", false)
-	ta.Stopped:Wait()
-	local tg = playPair(top, bottom, "Ground_GetUp", false)
-	tg.Stopped:Wait()
-	endExchange(top, bottom, "Ground_GetUp")
-	print(("[CC] %s und %s stehen wieder"):format(top.char.Name, bottom.char.Name))
-end
-
--- Trainingsgegner am Boden: oben schlaegt er, unten befreit er sich nach einer Weile
-RunService.Heartbeat:Connect(function()
-	local d = workspace:FindFirstChild("CC_TrainingDummy")
-	local D_ = d and fighters[d]
-	if not (D_ and D_.wr) or D_.ko then return end
-	local w = D_.wr
-	if os.clock() < (D_.groundThink or 0) then return end
-	D_.groundThink = os.clock() + 1.4 + math.random() * 1.2
-	if d:GetAttribute("CC_Passive") then return end
-	if w.role == "top" and w.state == "guard" then
-		if math.random() < 0.8 then task.spawn(groundPunch, D_) else task.spawn(groundEscape, D_) end
-	elseif w.role == "bottom" and w.partner.wr and w.partner.wr.state == "guard" and math.random() < 0.35 then
-		task.spawn(groundEscape, D_)
-	end
-end)
-
 local function hook(p) p.CharacterAdded:Connect(setup); if p.Character then task.spawn(setup, p.Character) end end
 game.Players.PlayerAdded:Connect(hook); for _, p in ipairs(game.Players:GetPlayers()) do hook(p) end
 
@@ -520,9 +681,13 @@ end
 RS.CC_Action.OnServerEvent:Connect(function(player, move)
 	local f = player.Character and fighters[player.Character]
 	if not (f and type(move) == "string") then return end
-	if move == "takedown" then tryTakedown(f)
-	elseif move == "escape" then groundEscape(f)
-	elseif f.wr then if f.wr.role == "top" and move == "jab" then groundPunch(f) end
+	if move == "escape" then groundEscape(f)
+	elseif f.wr then
+		if f.wr.role == "top" and f.wr.state == "sub" then if move == "hook" then f.mash = (f.mash or 0) + 1 end
+		elseif f.wr.role == "top" then
+			if move == "jab" then task.spawn(groundPunch, f) elseif move == "takedown" then task.spawn(groundAdvance, f) elseif move == "hook" then task.spawn(groundSubmit, f) end
+		end
+	elseif move == "takedown" then tryTakedown(f)
 	else attack(f, move) end
 end)
 RS.CC_Block.OnServerEvent:Connect(function(player, on)
@@ -558,7 +723,7 @@ RunService.Heartbeat:Connect(function()
 	nextThink = os.clock() + 0.9 + math.random() * 1.1
 	if bestDist <= 5 then
 		local r = math.random()
-		if r < 0.12 and best.hum.Health > 0 and not best.wr then
+		if r < 0.12 and best.hum.Health > HP_FLOOR and not best.wr then
 			setBlock(D, false)
 			task.spawn(tryTakedown, D)
 		elseif r < 0.37 then

@@ -5,7 +5,9 @@
 --               X Body Kick · V High Kick · Z Front Kick
 --   Controller: X Jab · Y Cross · B Haken · R1 Aufwaertshaken · R2 Low Kick · L2 halten Block/Sprawl · L1 Takedown
 --               A Befreien (am Boden, sonst Springen) · R3 Anvisieren an/aus
---   Touch:      Bildschirm-Knoepfe fuer Jab, Cross, Haken, Block, Takedown, Anvisieren
+--   Am Boden (oben): E/L1 Position verbessern · Linksklick/X Schlag · Q/B Submission (Mount, Ruecken) · F/L2 Konter
+--   Am Boden (unten): Leertaste/A befreien (haemmern im Submission-Duell) · F/L2 Konter
+--   Touch:      Bildschirm-Knoepfe fuer Jab, Cross, Haken, Block, Takedown, Anvisieren, Los (befreien)
 -- Anvisierung: Kaempfer dreht sich weich zum Gegner (seitlich laufen = umkreisen). Loest sich automatisch, wenn der
 -- Gegner weg, K.o. oder weiter als 40 Studs entfernt ist; wird wieder aufgenommen, sobald er verfuegbar ist.
 -- Zustand fuer die Kamera: Attribut CC_LockTarget (Modellname oder leer) am eigenen Charakter.
@@ -55,7 +57,8 @@ CAS:SetTitle("CC_Block", "Block")
 CAS:BindAction("CC_Escape", function(_, state)
 	if state == Enum.UserInputState.Begin and inWrestle() then action:FireServer("escape"); return Enum.ContextActionResult.Sink end
 	return Enum.ContextActionResult.Pass
-end, false, Enum.KeyCode.Space, Enum.KeyCode.ButtonA)
+end, true, Enum.KeyCode.Space, Enum.KeyCode.ButtonA)
+CAS:SetTitle("CC_Escape", "Los")
 
 CAS:BindAction("CC_Lock", function(_, state)
 	if state == Enum.UserInputState.Begin then lockWanted = not lockWanted end

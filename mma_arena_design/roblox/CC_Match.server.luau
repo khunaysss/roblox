@@ -106,7 +106,10 @@ while true do
 			local r = red(); if not r then break end
 			set("ScoreRed", totalRed + damage(r)); set("ScoreBlue", totalBlue + damage(dummy))
 			winner = koWinner()
-			if winner then method = "K.O."; break end
+			if winner then
+				local r, b = fighters(); local loser = winner == "red" and b or r
+				method = (loser and loser:GetAttribute("CC_LastReact") == "submission") and "Submission" or "K.O."; break
+			end
 		end
 		local r = red()
 		totalRed += damage(r); totalBlue += damage(dummy)
@@ -122,7 +125,7 @@ while true do
 		method = "Punktentscheidung"
 		winner = totalRed > totalBlue and "red" or totalBlue > totalRed and "blue" or "draw"
 	end
-	if method == "K.O." then task.wait(1.5) end
+	if method == "K.O." or method == "Submission" then task.wait(1.5) end
 	freeze(true)
 	set("State", "over"); set("Winner", winner)
 	bell(3); crowd(0.8); task.delay(4, function() crowd(0.3) end)

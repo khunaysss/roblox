@@ -70,6 +70,34 @@ hint.TextColor3 = Color3.new(1, 1, 1)
 hint.TextStrokeTransparency = 0.5
 hint.Text = "WASD laufen · LMB Jab · RMB Cross (+Umschalt: Koerper) · Q Haken · R Uppercut · C/X/V/Z Kicks · F Block/Sprawl · E Takedown · T Ziel · Leertaste Aufstehen"
 hint.Parent = gui
+local HINT_STAND = hint.Text
+-- Bodenkampf: Hinweise je Position und Rolle; Submission-Duell als Balken in der Mitte
+local POS_NAME = { guard = "GUARD", half = "HALF GUARD", side = "SIDE CONTROL", mount = "MOUNT", back = "RUECKEN" }
+local posL = Instance.new("TextLabel")
+posL.AnchorPoint = Vector2.new(0.5, 1); posL.Position = UDim2.new(0.5, 0, 1, -48); posL.Size = UDim2.fromOffset(400, 30)
+posL.BackgroundTransparency = 1; posL.Font = Enum.Font.GothamBlack; posL.TextSize = 24; posL.TextColor3 = Color3.fromRGB(255, 220, 60)
+posL.TextStrokeTransparency = 0.3; posL.Text = ""; posL.Parent = gui
+local duel = Instance.new("Frame")
+duel.AnchorPoint = Vector2.new(0.5, 0.5); duel.Position = UDim2.fromScale(0.5, 0.62); duel.Size = UDim2.fromOffset(420, 22)
+duel.BackgroundColor3 = Color3.fromRGB(40, 90, 200); duel.BorderSizePixel = 0; duel.Visible = false; duel.Parent = gui
+local duelFill = Instance.new("Frame"); duelFill.Size = UDim2.fromScale(0.35, 1); duelFill.BackgroundColor3 = Color3.fromRGB(200, 40, 50)
+duelFill.BorderSizePixel = 0; duelFill.Parent = duel
+local duelL = Instance.new("TextLabel"); duelL.AnchorPoint = Vector2.new(0.5, 1); duelL.Position = UDim2.new(0.5, 0, 0, -4); duelL.Size = UDim2.fromOffset(600, 30)
+duelL.BackgroundTransparency = 1; duelL.Font = Enum.Font.GothamBlack; duelL.TextSize = 24; duelL.TextColor3 = Color3.new(1, 1, 1)
+duelL.TextStrokeTransparency = 0.2; duelL.Parent = duel
+local function groundHint(char)
+	local role, pos = char:GetAttribute("CC_Wrestle"), char:GetAttribute("CC_GroundPos")
+	if not role or not pos then return nil end
+	if role == "top" then
+		local t = {}
+		if pos ~= "back" then table.insert(t, "E Position verbessern") end
+		if pos == "guard" or pos == "mount" then table.insert(t, "LMB Schlag") end
+		if pos == "mount" or pos == "back" then table.insert(t, "Q Submission") end
+		table.insert(t, "F Konter"); if pos == "guard" then table.insert(t, "Leertaste Aufstehen") end
+		return table.concat(t, " · ")
+	end
+	return (pos == "guard" and "Leertaste Aufstehen" or "Leertaste Befreien") .. " · F Konter (wenn der Gegner die Position wechselt)"
+end
 
 -- Rundenanzeige oben mittig: Runde, Zeit, Punkte; grosses Banner in der Mitte
 local match = game.ReplicatedStorage:WaitForChild("CC_MatchState", 10)
@@ -100,10 +128,24 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local dh = dummy and dummy:FindFirstChildOfClass("Humanoid")
 	if dh then foeFill.Size = UDim2.fromScale(math.clamp(dh.Health / dh.MaxHealth, 0, 1), 1) end
 	ko.Visible = (char and char:GetAttribute("CC_KO")) or (dummy and dummy:GetAttribute("CC_KO")) or false
+	local loser = (char and char:GetAttribute("CC_KO")) and char or dummy
+	ko.Text = (loser and loser:GetAttribute("CC_LastReact") == "submission") and "SUBMISSION!" or "K.O.!"
 	if char then
 		myStam.Size = UDim2.fromScale(math.clamp((char:GetAttribute("CC_Stamina") or 100) / 100, 0, 1), 1)
 		local tired = char:GetAttribute("CC_Tired")
 		myStam.BackgroundColor3 = (tired and workspace:GetServerTimeNow() - tired < 0.4) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
+	end
+	if char then
+		local gh = groundHint(char)
+		hint.Text = gh or HINT_STAND
+		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or "") or ""
+		local p = char:GetAttribute("CC_SubProgress")
+		duel.Visible = p ~= nil
+		if p then
+			duelFill.Size = UDim2.fromScale(p, 1)
+			local mine = char:GetAttribute("CC_SubRole") == "attack"
+			duelL.Text = (char:GetAttribute("CC_SubName") or "SUBMISSION") .. (mine and "  –  Q haemmern!" or "  –  Leertaste haemmern!")
+		end
 	end
 	if dummy then foeStam.Size = UDim2.fromScale(math.clamp((dummy:GetAttribute("CC_Stamina") or 100) / 100, 0, 1), 1) end
 	if match then
