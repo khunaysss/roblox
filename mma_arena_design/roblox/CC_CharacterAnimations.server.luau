@@ -15,8 +15,8 @@ local function anim(name) local a = Instance.new("Animation"); a.AnimationId = K
 local ANIMS = {
 	idle = "Fighter_Idle_v08", walk = "Fighter_Walk_v01", back = "Fighter_WalkBack_v01",
 	left = "Fighter_StrafeL_v01", right = "Fighter_StrafeR_v01",
-	jab = "Fighter_Jab_v01", cross = "Fighter_Cross_v01", hook = "Fighter_Hook_v01",
-	uppercut = "Fighter_Uppercut_v01", lowkick = "Fighter_LowKick_v01",
+	jab = "Fighter_Jab_v02", cross = "Fighter_Cross_v02", hook = "Fighter_Hook_v02",
+	uppercut = "Fighter_Uppercut_v01", lowkick = "Fighter_LowKick_v02",
 	block = "Fighter_Block_v01", blockhit = "Fighter_BlockHit_v01",
 	hit = "Fighter_HitReact_v01", ko = "Fighter_KO_v01",
 	hitStraight = "Fighter_HitStraight_v01", hitHook = "Fighter_HitHook_v01", hitUpper = "Fighter_HitUpper_v01",

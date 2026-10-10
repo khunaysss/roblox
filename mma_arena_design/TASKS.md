@@ -21,7 +21,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 ## Als Nächstes
 | # | Aufgabe | Wer | Notiz |
 |---|---|---|---|
-| 1 | Jab-Fehler beheben: Faust dreht nicht ein, hinterer Handschuh bis 1,2 cm im Kopf | Claude | `FIGHTER_JAB_V04.md` |
+| 1 | erledigt: Jab-Fehler (Faust, Handschuh im Kopf), auch Cross/Haken/Low Kick verbessert | Claude | `STRIKES_V2.md` |
 | 2 | erledigt: Cross, Hook, Uppercut, Low Kick, Block, Reaktionen, Schritte, K.o. (`ROBLOX_MOVESET_V01.md`, `ROBLOX_HIT_REACTIONS_V01.md`) | Claude | |
 | 2b | erledigt: Runden, Zeit, Sieg/Niederlage, Sounds (`ROBLOX_MATCH_V01.md`) | Claude | `ROBLOX_PROTOTYPE_V02.md` |
 | 3 | Weitere Animationen nach Roblox bringen: wie Idle als KeyframeSequence (Blender-Daten + Achsenumrechnung), nicht per FBX | Claude | `ROBLOX_IMPORT_TEST_V01.md` |

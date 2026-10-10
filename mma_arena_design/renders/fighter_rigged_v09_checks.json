@@ -1,0 +1,41 @@
+{
+ "source": "Fighter_Rigged_v08.blend (unveraendert)",
+ "actions": {
+  "Fighter_Jab_v2": {
+   "rear_glove_into_head_m": 0.0,
+   "lead_glove_into_head_m": 0.0,
+   "lowest_z": -0.0005,
+   "lead_elbow_min_deg": 11.9939,
+   "right_knee_min_bend_deg": 35.7736,
+   "lead_glove_reach_y_min": -0.8808,
+   "left_hand_roll_deg_max": 155.0
+  },
+  "Fighter_LowKick_v2": {
+   "rear_glove_into_head_m": 0.0021,
+   "lead_glove_into_head_m": 0.0,
+   "lowest_z": -0.0004,
+   "lead_elbow_min_deg": 89.031,
+   "right_knee_min_bend_deg": 0.4059,
+   "lead_glove_reach_y_min": -0.3763,
+   "left_hand_roll_deg_max": 0.0
+  },
+  "Fighter_Hook_v2": {
+   "rear_glove_into_head_m": 0.0054,
+   "lead_glove_into_head_m": 0.0,
+   "lowest_z": -0.0005,
+   "lead_elbow_min_deg": 43.4699,
+   "right_knee_min_bend_deg": 24.966,
+   "lead_glove_reach_y_min": -0.666,
+   "left_hand_roll_deg_max": 25.0
+  },
+  "Fighter_Cross_v2": {
+   "rear_glove_into_head_m": 0.0,
+   "lead_glove_into_head_m": 0.0,
+   "lowest_z": -0.0004,
+   "lead_elbow_min_deg": 92.8541,
+   "right_knee_min_bend_deg": 13.0386,
+   "lead_glove_reach_y_min": -0.4159,
+   "left_hand_roll_deg_max": 0.0
+  }
+ }
+}
