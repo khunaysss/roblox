@@ -705,7 +705,7 @@ D.hum.HealthChanged:Connect(function(h) fill.Size = UDim2.fromScale(math.max(h, 
 --   weit weg -> Druck nach vorn; in Distanz (Wunschabstand) -> umkreisen, Richtungswechsel, kleine Vor-/Rueckschritte;
 --   Angriff: in Reichweite schlagen/treten, sonst erst hineinsteppen; nach Kombinationen oft wieder heraus;
 --   wenig Leben/Ausdauer -> mehr Abstand; am Gitter -> zur Mitte hin kreisen.
--- CC_Passive = Trainingsmodus (steht nur und dreht sich), CC_ForceTD = Test-Takedown.
+-- CC_Passive = Trainingsmodus (steht nur und dreht sich), CC_ForceTD = Test-Takedown, CC_NoTD = Test ohne Takedowns.
 local root0 = dummy.HumanoidRootPart
 root0.Anchored = false
 pcall(function() root0:SetNetworkOwner(nil) end)
@@ -771,11 +771,13 @@ RunService.Heartbeat:Connect(function(dt)
 		move = fwd + right * circleDir * 0.25              -- Druck nach vorn, leicht versetzt
 	else
 		local radial = math.clamp((dist - want) * 0.8, -1, 1)
+		if math.abs(dist - want) < 0.35 then radial = 0 end
 		move = fwd * radial + right * circleDir * 0.75
 		if off.Magnitude > CAGE_SAFE + 1.5 then move += -off.Unit * 0.6 end
 	end
-	if D.blocking then move *= 0.4 end
-	D.hum:Move(move.Magnitude > 0.05 and move.Unit * math.min(move.Magnitude, 1) or Vector3.zero, false)
+	-- immer volle Geschwindigkeit oder Stillstand (wie Tastatur): bei Teilgeschwindigkeit sind die Lauf-Loops nur halb
+	-- eingeblendet und die Fuesse rutschen (gemessen: Median 54 % der Koerpergeschwindigkeit)
+	D.hum:Move(move.Magnitude > 0.35 and move.Unit or Vector3.zero, false)
 	-- ---- laufende Kombination fortsetzen ----
 	if combo and now >= comboAt and not busy then
 		local m = table.remove(combo, 1)
@@ -791,7 +793,7 @@ RunService.Heartbeat:Connect(function(dt)
 	nextThink = now + 0.45 + math.random() * 0.6
 	if dist <= 5.5 then
 		local r = math.random()
-		if r < 0.07 and best.hum.Health > HP_FLOOR and not best.wr and dist <= 5 then
+		if r < 0.07 and best.hum.Health > HP_FLOOR and not best.wr and dist <= 5 and not dummy:GetAttribute("CC_NoTD") then   -- CC_NoTD: Test ohne Takedowns
 			setBlock(D, false); task.spawn(tryTakedown, D)
 		elseif r < 0.27 and (best.char:GetAttribute("CC_Loco") ~= "idle" or math.random() < 0.5) then
 			setBlock(D, true)

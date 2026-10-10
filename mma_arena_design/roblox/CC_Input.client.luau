@@ -4,10 +4,11 @@
 --               E Takedown · Leertaste Befreien/Aufstehen (am Boden) · T oder mittlere Maustaste = Anvisieren an/aus
 --               X Body Kick · V High Kick · Z Front Kick
 --   Controller: X Jab · Y Cross · B Haken · R1 Aufwaertshaken · R2 Low Kick · L2 halten Block/Sprawl · L1 Takedown
+--               Steuerkreuz links Body Kick · rechts High Kick · unten Front Kick (oben ist bei Roblox fuer Menues reserviert)
 --               A Befreien (am Boden, sonst Springen) · R3 Anvisieren an/aus
 --   Am Boden (oben): E/L1 Position verbessern · Linksklick/X Schlag · Q/B Submission (Mount, Ruecken) · F/L2 Konter
 --   Am Boden (unten): Leertaste/A befreien (haemmern im Submission-Duell) · F/L2 Konter
---   Touch:      Bildschirm-Knoepfe fuer Jab, Cross, Haken, Block, Takedown, Anvisieren, Los (befreien)
+--   Touch:      Bildschirm-Knoepfe fuer Jab, Cross, Haken, Upper, Low, Kick, High, Block, Takedown, Anvisieren, Los (befreien)
 -- Anvisierung: Kaempfer dreht sich weich zum Gegner (seitlich laufen = umkreisen). Loest sich automatisch, wenn der
 -- Gegner weg, K.o. oder weiter als 40 Studs entfernt ist; wird wieder aufgenommen, sobald er verfuegbar ist.
 -- Zustand fuer die Kamera: Attribut CC_LockTarget (Modellname oder leer) am eigenen Charakter.
@@ -34,16 +35,16 @@ local function bindMove(name, move, touch, ...)
 		end
 		return Enum.ContextActionResult.Pass
 	end, touch, ...)
-	if touch then CAS:SetTitle(name, ({ jab = "Jab", cross = "Cross", hook = "Haken", takedown = "TD" })[move] or move) end
+	if touch then CAS:SetTitle(name, ({ jab = "Jab", cross = "Cross", hook = "Haken", takedown = "TD", uppercut = "Upper", lowkick = "Low", bodykick = "Kick", highkick = "High" })[move] or move) end
 end
 bindMove("CC_Jab", "jab", true, Enum.UserInputType.MouseButton1, Enum.KeyCode.ButtonX)
 bindMove("CC_Cross", "cross", true, Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonY)
 bindMove("CC_Hook", "hook", true, Enum.KeyCode.Q, Enum.KeyCode.ButtonB)
-bindMove("CC_Uppercut", "uppercut", false, Enum.KeyCode.R, Enum.KeyCode.ButtonR1)
-bindMove("CC_LowKick", "lowkick", false, Enum.KeyCode.C, Enum.KeyCode.ButtonR2)
-bindMove("CC_BodyKick", "bodykick", false, Enum.KeyCode.X)
-bindMove("CC_HighKick", "highkick", false, Enum.KeyCode.V)
-bindMove("CC_FrontKick", "frontkick", false, Enum.KeyCode.Z)
+bindMove("CC_Uppercut", "uppercut", true, Enum.KeyCode.R, Enum.KeyCode.ButtonR1)
+bindMove("CC_LowKick", "lowkick", true, Enum.KeyCode.C, Enum.KeyCode.ButtonR2)
+bindMove("CC_BodyKick", "bodykick", true, Enum.KeyCode.X, Enum.KeyCode.DPadLeft)
+bindMove("CC_HighKick", "highkick", true, Enum.KeyCode.V, Enum.KeyCode.DPadRight)
+bindMove("CC_FrontKick", "frontkick", false, Enum.KeyCode.Z, Enum.KeyCode.DPadDown)
 bindMove("CC_Takedown", "takedown", true, Enum.KeyCode.E, Enum.KeyCode.ButtonL1)
 
 CAS:BindAction("CC_Block", function(_, state)

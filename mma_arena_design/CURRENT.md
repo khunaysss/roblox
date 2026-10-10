@@ -30,6 +30,7 @@
 
 ## Weiterarbeit (Kampfsystem-Überarbeitung, Reihenfolge A–E)
 - **A–E erledigt** (`FOOTWORK_LOCKON_V01.md`, `STRIKING_V02.md`, `KICKS_V01.md`, `TAKEDOWNS_V03.md`, `GROUND_V01.md`). **Als Nächstes Abschnitt 7:** Trainingsgegner bewegt sich im Stand, Zwei-Spieler-Test (Studio: Test → Clients 2), Controller/Touch, Spieler-Konter (F) gezielt testen. Siehe TASKS.md.
-- **Abschnitt 7 begonnen (2026-10-10):** Trainingsgegner läuft jetzt (Humanoid:Move, nicht mehr verankert): umkreisen, Wunschabstand 4,6, hineinsteppen + Kombinationen, heraus, weg vom Gitter. Kurzer Playtest: Gegner kommt heran, trifft (Cross, Body Kick), Takedown + Bodenkampf laufen. **Noch nicht gemessen** (Abstand, Fußgleiten, Gitter, Höhe) – Messung brach ab. Danach: Zwei-Spieler-Test, Controller/Touch.
+- **Abschnitt 7 (2026-10-10, `SECTION7_V01.md`):** Trainingsgegner läuft und kämpft (gemessen), Controller-Tasten geprüft (Studio-Simulation) und Tritte aufs Steuerkreuz gelegt, Touch-Knöpfe ergänzt (nicht getestet), Spieler-Konter F am Boden geprüft. **Offen:** Zwei-Spieler-Test (Studio → Test → Clients und Server: 2 Spieler, Lokaler Server → Start), Touch (Geräte-Emulator), echter Controller.
+- **Studio-Place jetzt:** „CageChampions“ in der Gruppe ANIMEXGANG (Place-ID 106346306418073), nicht mehr nur die lokale .rbxl.
 - Arbeitsweise in Studio: Daten aus `export/*_keyframes.luau` über lokalen Server `node` auf 127.0.0.1:8766 (im Ordner `mma_arena_design`) und `ServerStorage.CC_Animations.CC_Loader`; Scripts aus `roblox/` per HttpService (HttpEnabled nur kurz an).
 - Test-Attribute am Gegner: `CC_Passive`, `CC_ForceTD`; am Spieler (Client): `CC_LockTarget`.
