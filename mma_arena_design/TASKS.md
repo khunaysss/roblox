@@ -36,7 +36,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | A Fußarbeit, Anvisierung, Kamera | erledigt (PC getestet) | Controller/Touch testen |
 | B Schlagreichweite, Trefferprüfung, Kombos | erledigt (PC getestet) | Haken/Uppercut nur Nahdistanz; Gegner-KI muss sich bewegen |
 | C Kicks, Basis-Moveset | erledigt (PC getestet) | Fußdrehung beim Pivot; Kampfstile |
-| D Takedowns + Kamera | offen | Griff-Kontakte im Bauskript neu (siehe W1), Kamera in Bodenhöhe (vorbereitet) |
+| D Takedowns + Kamera | erledigt (PC getestet) | Knie-Griff bis ~10 cm, Sprawl-Kopf bis 11 cm |
 | E Bodenpositionen, Submissions | offen | Half Guard, Side Control, Mount, Back; RNC, Armbar; paarweise Animationen |
 | Ausdauer | erledigt (B) | Feinabstimmung mit C/D/E |
 | Online-Test 2 Spieler | offen | Team-Test in Studio (2 Clients) |
@@ -44,7 +44,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 ## Offen (Wrestling-Prototyp, siehe `WRESTLING_GUARD_V02.md`)
 | # | Aufgabe | Wer |
 |---|---|---|
-| W1 | Handschuh-Überlappungen korrigieren: Griffe am Knie bis ca. 13 cm, in der Guard bis ca. 7–8 cm. Versuch 2026-10-10 (Handschuh-Ziel automatisch aus dem Gegner schieben, auch zeitlich geglättet) verworfen: Hände sprangen bis 13–26 cm pro Frame (vorher 0,6 cm), Überlappung teils größer. Lösung: Griffziele im Bauskript `build_wrestling_v02.py` neu setzen | Claude |
+| W1 | Handschuh-Überlappungen korrigieren: **2026-10-10 in v03 verbessert** (Griffe mit festem Versatz, siehe TAKEDOWNS_V03.md); Rest: Knie-Griff ~10 cm. Griffe am Knie bis ca. 13 cm, in der Guard bis ca. 7–8 cm. Versuch 2026-10-10 (Handschuh-Ziel automatisch aus dem Gegner schieben, auch zeitlich geglättet) verworfen: Hände sprangen bis 13–26 cm pro Frame (vorher 0,6 cm), Überlappung teils größer. Lösung: Griffziele im Bauskript `build_wrestling_v02.py` neu setzen | Claude |
 | W2 | Arm- und Fallbewegungen weicher gestalten (Schuss Frame 13–15, Fallbewegungen) | Claude |
 | W3 | Guard-Landung und Escape ohne starke Durchdringung (bis 6,9 bzw. 8,5 cm) | Claude |
 | W4 | Aufstehbewegung und Übergänge zwischen den Abschnitten prüfen | Claude |

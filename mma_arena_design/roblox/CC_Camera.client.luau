@@ -2,6 +2,7 @@
 -- Kampfkamera bei aktiver Anvisierung (Attribut CC_LockTarget am eigenen Charakter):
 --   - Blickpunkt = Mitte zwischen beiden Kaempfern (Brusthoehe; am Boden Hoehe der Koerper ueber die Root-Bones)
 --   - Kamera hinter/schraeg ueber dem eigenen Kaempfer, Abstand waechst mit dem Abstand der Kaempfer -> beide sichtbar
+--   - Takedown/Boden: Ansicht wird in WR_BLEND s weich zur Seitenansicht ueberblendet, Kamerageschwindigkeit begrenzt
 --   - weich nachgefuehrt (exponentiell), keine Spruenge; Wand-/Deckenschutz per Raycast (Gitter und Kaempfer ausgenommen)
 -- Ohne Anvisierung: normale Roblox-Kamera.
 local RunService = game:GetService("RunService")
@@ -12,7 +13,10 @@ local FOLLOW = 7          -- Nachfuehr-Rate Position (1/s)
 local AIM = 9             -- Nachfuehr-Rate Blickpunkt (1/s)
 local SIDE = 4.0          -- ueber die rechte Schulter, damit der Gegner neben dem eigenen Kaempfer sichtbar ist
 local CAGE_R = 14.5       -- Kamera bleibt innerhalb des Kaefigs
+local MAX_SPEED = 32      -- Kamera bewegt sich hoechstens so schnell (Studs/s): keine Schwenk-Spruenge beim Takedown
+local WR_BLEND = 0.6      -- Sekunden fuer den Wechsel Stand <-> Bodenkampf-Ansicht
 local camPos, aimPos = nil, nil
+local wrW = 0             -- 0 = Stand-Ansicht, 1 = Bodenkampf-Ansicht (weich ueberblendet)
 
 local function bodyPoint(model)
 	-- im Ringkampf stehen die HumanoidRootParts still; die sichtbare Position steckt im Root-Bone
@@ -54,15 +58,17 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 
 	local me, foe = bodyPoint(char), bodyPoint(target)
 	local wrestling = char:GetAttribute("CC_Wrestle")
+	wrW = math.clamp(wrW + (wrestling and 1 or -1) * dt / WR_BLEND, 0, 1)
+	local w = wrW * wrW * (3 - 2 * wrW)   -- weich ein/aus
 	local mid = (me + foe) / 2
 	local gap = (Vector3.new(foe.X, 0, foe.Z) - Vector3.new(me.X, 0, me.Z)).Magnitude
-	local aim = mid + Vector3.new(0, wrestling and 0.6 or 1.2, 0)
+	local aim = mid + Vector3.new(0, 1.2 - 0.6 * w, 0)
 	-- Richtung: hinter dem eigenen Kaempfer (vom Gegner weg); im Ringkampf seitlich auf die Szene
 	local away = Vector3.new(me.X - foe.X, 0, me.Z - foe.Z)
 	away = away.Magnitude > 0.1 and away.Unit or -char.HumanoidRootPart.CFrame.LookVector
 	local right = Vector3.new(-away.Z, 0, away.X)
-	local dist = math.clamp(9 + gap * 0.85, 11, 24)
-	local height = wrestling and 5.5 or math.clamp(4 + gap * 0.18, 4.5, 7.5)
+	local dist = math.clamp(9 + gap * 0.85, 11, 24) * (1 - w) + 8.5 * w   -- am Boden naeher dran
+	local height = math.clamp(4 + gap * 0.18, 4.5, 7.5) * (1 - w) + 4.2 * w
 	-- Kaefigmitte (Kamera bleibt innerhalb von CAGE_R)
 	local center = Vector3.new(0, 0, 0)
 	local arena = workspace:FindFirstChild("CC_Arena")
@@ -71,11 +77,10 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	local function inside(p) return Vector3.new(p.X - center.X, 0, p.Z - center.Z).Magnitude <= CAGE_R end
 	local function candidate(dirH, d)
 		local r = Vector3.new(-dirH.Z, 0, dirH.X)
-		if wrestling then return aim + dirH * d + Vector3.new(0, height, 0) end
-		return aim + dirH * d + r * SIDE + Vector3.new(0, height, 0)
+		return aim + dirH * d + r * SIDE * (1 - w) + Vector3.new(0, height, 0)
 	end
 	-- Grundrichtung: hinter dem eigenen Kaempfer; im Ringkampf seitlich auf die Szene
-	local baseDir = wrestling and (right * 0.85 + away * 0.35).Unit or away
+	local baseDir = (away * (1 - w) + (right * 0.85 + away * 0.35).Unit * w).Unit
 	-- Kandidaten (Winkel um den Blickpunkt x Abstand) bewerten: im Kaefig UND beide Kaempfer (Fuesse bis Kopf) im Bild;
 	-- bevorzugt: wenig Schwenk gegenueber "hinter dem Spieler" und nah am Wunschabstand
 	local vp = cam.ViewportSize
@@ -94,15 +99,16 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	for _, deg in ipairs({ 0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90, 110, -110 }) do
 		local c = math.cos(math.rad(deg)); local s_ = math.sin(math.rad(deg))
 		local dH = Vector3.new(baseDir.X * c - baseDir.Z * s_, 0, baseDir.X * s_ + baseDir.Z * c)
-		local d = dist + 4
-		while d >= 7 do
+		-- Stand: vom weitesten Abstand nach innen (bewaehrte Ansicht); Boden: vom Wunschabstand nach aussen (moeglichst nah)
+		local d0, d1, step = dist + 4, 7, -1
+		if w > 0.5 then d0, d1, step = dist, dist + 8, 0.5 end
+		for d = d0, d1, step do
 			local p = candidate(dH, d)
 			if inside(p) and framed(p) then
 				local score = math.abs(deg) * 0.12 + math.abs(d - dist) * 0.5
 				if score < bestScore then want, bestScore = p, score end
 				break
 			end
-			d -= 1
 		end
 	end
 	-- notfalls: hoch ueber der Mitte (Uebersicht), damit nie ein Kaempfer verloren geht
@@ -113,7 +119,10 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	if hit then want = hit.Position - dir.Unit * 0.8 end
 
 	if not camPos then camPos, aimPos = want, aim end
-	camPos = camPos:Lerp(want, 1 - math.exp(-FOLLOW * dt))
+	local nextPos = camPos:Lerp(want, 1 - math.exp(-FOLLOW * dt))
+	local step = nextPos - camPos
+	if step.Magnitude > MAX_SPEED * dt then nextPos = camPos + step.Unit * MAX_SPEED * dt end
+	camPos = nextPos
 	aimPos = aimPos:Lerp(aim, 1 - math.exp(-AIM * dt))
 	cam.CFrame = CFrame.lookAt(camPos, aimPos)
 end)
