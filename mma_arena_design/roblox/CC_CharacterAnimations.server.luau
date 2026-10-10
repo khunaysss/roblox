@@ -363,7 +363,7 @@ local function setWrestle(f, partner, role)
 	f.wr = role and { role = role, partner = partner } or nil
 	f.char:SetAttribute("CC_Wrestle", role or false)
 	if not role then for _, k in ipairs({ "CC_GroundPos", "CC_SubProgress", "CC_SubName", "CC_SubRole" }) do f.char:SetAttribute(k, nil) end end
-	f.char.HumanoidRootPart.Anchored = role ~= nil or f.char == workspace:FindFirstChild("CC_TrainingDummy")
+	f.char.HumanoidRootPart.Anchored = role ~= nil
 end
 
 -- Austausch beenden: beide stehen wieder; HumanoidRootParts auf die End-Positionen des letzten Paars versetzen
@@ -696,16 +696,42 @@ RS.CC_Block.OnServerEvent:Connect(function(player, on)
 	if f and on then f.sprawlAt = os.clock() end -- F gedrueckt = Sprawl-Versuch gegen Takedowns
 end)
 
--- Trainingsgegner: dreht sich zum Spieler, greift in Reichweite an, blockt manchmal
 local dummy = workspace:WaitForChild("CC_TrainingDummy")
 local D = setup(dummy)
 local fill = dummy.HumanoidRootPart.HealthBar.Frame.Fill
 D.hum.HealthChanged:Connect(function(h) fill.Size = UDim2.fromScale(math.max(h, 0) / D.hum.MaxHealth, 1) end)
-local nextThink = 0
-local DUMMY_MOVES = { "jab", "jab", "cross", "lowkick", "hook" }
-RunService.Heartbeat:Connect(function()
-	if D.ko or D.wr then return end
+-- Trainingsgegner (Section 7): bewegt sich wie ein Kaempfer. Laeuft ueber Humanoid:Move (Server-Physik, nicht mehr verankert),
+-- dadurch spielen die Fussarbeit-Loops automatisch. Verhalten:
+--   weit weg -> Druck nach vorn; in Distanz (Wunschabstand) -> umkreisen, Richtungswechsel, kleine Vor-/Rueckschritte;
+--   Angriff: in Reichweite schlagen/treten, sonst erst hineinsteppen; nach Kombinationen oft wieder heraus;
+--   wenig Leben/Ausdauer -> mehr Abstand; am Gitter -> zur Mitte hin kreisen.
+-- CC_Passive = Trainingsmodus (steht nur und dreht sich), CC_ForceTD = Test-Takedown.
+local root0 = dummy.HumanoidRootPart
+root0.Anchored = false
+pcall(function() root0:SetNetworkOwner(nil) end)
+D.hum.AutoRotate = false
+local DUMMY_RANGE = { jab = 4.4, cross = 4.4, hook = 3.2, uppercut = 3.0, lowkick = 3.2, bodykick = 3.8, highkick = 3.0, frontkick = 4.0, jabBody = 4.4, crossBody = 4.4 }
+local DUMMY_COMBOS = { { "jab" }, { "jab", "cross" }, { "jab", "jab", "cross" }, { "cross", "hook" }, { "jab", "lowkick" }, { "bodykick" },
+	{ "frontkick" }, { "jab", "cross", "hook" }, { "jabBody", "cross" }, { "highkick" }, { "lowkick" }, { "uppercut", "hook" } }
+local WANT_DIST = 4.6          -- Wunschabstand (knapp ausserhalb der Jab-Reichweite)
+local CAGE_SAFE = 11.5         -- ab hier Richtung Mitte kreisen
+local TURN = 10                -- Drehrate zum Gegner (1/s)
+local nextThink, circleDir, nextSwitch, stepUntil, stepDir = 0, 1, 0, 0, 0
+local combo, comboAt = nil, 0
+local function arenaCenter()
+	local arena = workspace:FindFirstChild("CC_Arena")
+	local c = arena and arena:FindFirstChild("Platform_Canvas_FightSurface", true)
+	return c and Vector3.new(c.Position.X, 0, c.Position.Z) or Vector3.zero
+end
+local CENTER = arenaCenter()
+local lastAnchored = false
+RunService.Heartbeat:Connect(function(dt)
 	local root = dummy.HumanoidRootPart
+	if root.Anchored ~= lastAnchored then        -- nach dem Ringkampf wieder vom Server steuern
+		lastAnchored = root.Anchored
+		if not root.Anchored then pcall(function() root:SetNetworkOwner(nil) end) end
+	end
+	if D.ko or D.wr then return end
 	local best, bestDist
 	for char, f in pairs(fighters) do
 		if f ~= D and not f.ko then
@@ -713,25 +739,77 @@ RunService.Heartbeat:Connect(function()
 			if not bestDist or dist < bestDist then best, bestDist = f, dist end
 		end
 	end
-	if not best then setBlock(D, false) return end
+	if not best then setBlock(D, false); D.hum:Move(Vector3.zero) return end
 	local tp = best.char.HumanoidRootPart.Position
-	local look = Vector3.new(tp.X, root.Position.Y, tp.Z)
-	if (look - root.Position).Magnitude > 0.1 then root.CFrame = root.CFrame:Lerp(CFrame.lookAt(root.Position, look), 0.15) end
+	local toT = Vector3.new(tp.X - root.Position.X, 0, tp.Z - root.Position.Z)
+	local dist = toT.Magnitude
+	-- zum Gegner drehen (nur Drehung, Position bleibt der Physik ueberlassen)
+	if dist > 0.1 then
+		local goal = CFrame.lookAt(root.Position, root.Position + toT)
+		root.CFrame = root.CFrame:Lerp(goal, 1 - math.exp(-TURN * dt))
+	end
 	if dummy:GetAttribute("CC_ForceTD") then dummy:SetAttribute("CC_ForceTD", nil); task.spawn(tryTakedown, D) return end -- Test: Takedown sofort
-	if dummy:GetAttribute("CC_Passive") then setBlock(D, false) return end -- Trainingsmodus: steht nur und dreht sich
-	if os.clock() < nextThink then return end
-	nextThink = os.clock() + 0.9 + math.random() * 1.1
-	if bestDist <= 5 then
+	if dummy:GetAttribute("CC_Passive") or frozen(D) then setBlock(D, false); D.hum:Move(Vector3.zero) return end
+	local now = os.clock()
+	local fwd = dist > 0.1 and toT.Unit or root.CFrame.LookVector
+	local right = Vector3.new(-fwd.Z, 0, fwd.X)
+	local hurt = D.hum.Health < 35 or D.stamina < 30
+	local want = WANT_DIST + (hurt and 1.2 or 0)
+	-- ---- Bewegung ----
+	if now > nextSwitch then circleDir = -circleDir; nextSwitch = now + 1.2 + math.random() * 2.0 end
+	local off = Vector3.new(root.Position.X, 0, root.Position.Z) - CENTER
+	if off.Magnitude > CAGE_SAFE then                     -- am Gitter: in die Richtung kreisen, die zur Mitte fuehrt
+		circleDir = (right:Dot(-off) >= 0) and 1 or -1
+	end
+	local move
+	local busy = now < D.busyUntil
+	if busy then
+		move = Vector3.zero                                -- waehrend eines Schlags nicht laufen (Schritt steckt in der Animation)
+	elseif now < stepUntil then
+		move = fwd * stepDir                               -- kurzer Schritt hinein / heraus
+	elseif dist > want + 2.5 then
+		move = fwd + right * circleDir * 0.25              -- Druck nach vorn, leicht versetzt
+	else
+		local radial = math.clamp((dist - want) * 0.8, -1, 1)
+		move = fwd * radial + right * circleDir * 0.75
+		if off.Magnitude > CAGE_SAFE + 1.5 then move += -off.Unit * 0.6 end
+	end
+	if D.blocking then move *= 0.4 end
+	D.hum:Move(move.Magnitude > 0.05 and move.Unit * math.min(move.Magnitude, 1) or Vector3.zero, false)
+	-- ---- laufende Kombination fortsetzen ----
+	if combo and now >= comboAt and not busy then
+		local m = table.remove(combo, 1)
+		if m and dist <= (DUMMY_RANGE[m] or 4) + 0.6 then attack(D, m); comboAt = now + 0.05 else combo = nil end
+		if combo and #combo == 0 then
+			combo = nil
+			if math.random() < 0.55 then stepDir, stepUntil = -1, now + 0.6 + 0.35 end   -- nach der Kombination heraus
+		end
+		return
+	end
+	-- ---- Entscheidung ----
+	if now < nextThink or busy then return end
+	nextThink = now + 0.45 + math.random() * 0.6
+	if dist <= 5.5 then
 		local r = math.random()
-		if r < 0.12 and best.hum.Health > HP_FLOOR and not best.wr then
-			setBlock(D, false)
-			task.spawn(tryTakedown, D)
-		elseif r < 0.37 then
+		if r < 0.07 and best.hum.Health > HP_FLOOR and not best.wr and dist <= 5 then
+			setBlock(D, false); task.spawn(tryTakedown, D)
+		elseif r < 0.27 and (best.char:GetAttribute("CC_Loco") ~= "idle" or math.random() < 0.5) then
 			setBlock(D, true)
-			task.delay(0.8 + math.random() * 0.6, function() setBlock(D, false) end)
+			task.delay(0.6 + math.random() * 0.6, function() setBlock(D, false) end)
+		elseif r < 0.75 and not hurt or r < 0.55 then
+			setBlock(D, false)
+			local c = table.clone(DUMMY_COMBOS[math.random(#DUMMY_COMBOS)])
+			local first = c[1]
+			if dist > (DUMMY_RANGE[first] or 4) then
+				stepDir, stepUntil = 1, now + math.clamp((dist - (DUMMY_RANGE[first] or 4) + 0.3) / 8, 0.1, 0.35)   -- erst hineinsteppen
+				comboAt = stepUntil
+			else
+				comboAt = now
+			end
+			combo = c
 		else
 			setBlock(D, false)
-			attack(D, DUMMY_MOVES[math.random(#DUMMY_MOVES)])
+			if math.random() < 0.4 then stepDir, stepUntil = (math.random() < 0.5 and 1 or -1), now + 0.25 end    -- Finte / Rhythmus
 		end
 	else
 		setBlock(D, false)
