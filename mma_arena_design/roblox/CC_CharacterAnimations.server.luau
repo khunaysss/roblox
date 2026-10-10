@@ -1,8 +1,10 @@
 -- ServerScriptService.CC_CharacterAnimations
--- Cage Champions Prototyp v04: komplettes Steh-Moveset fuer Spieler und Trainingsgegner.
+-- Cage Champions Prototyp v05: Steh-Moveset + schlagabhaengige Trefferreaktionen, Taumeln, K.o. vorne/hinten, Hitstop.
 --   Bewegung: Idle, Walk vor/zurueck, Strafe links/rechts (Richtung relativ zur Blickrichtung)
 --   Angriffe: Jab, Cross, Hook, Uppercut, LowKick   Verteidigung: Block (halten), BlockHit
---   Treffer: HitReact, K.o. (3 s liegen, dann volle Leben)
+--   Treffer: Jab/Cross -> HitStraight, Haken -> HitHook, Aufwaertshaken -> HitUpper, Low Kick -> HitLeg,
+--            schwerer Treffer bei wenig Leben -> Stagger; K.o. nach Haken nach vorne, sonst nach hinten (3 s liegen)
+--   Wer getroffen wird, verliert seinen laufenden Angriff (Unterbrechung).
 -- Animationen ueber temporaere Studio-IDs (RegisterKeyframeSequence); fuer das veroeffentlichte Spiel
 -- muessen sie in die Gruppe ANIMEXGANG (7160158) hochgeladen und die IDs hier eingetragen werden.
 local KSP = game:GetService("KeyframeSequenceProvider")
@@ -17,21 +19,26 @@ local ANIMS = {
 	uppercut = "Fighter_Uppercut_v01", lowkick = "Fighter_LowKick_v01",
 	block = "Fighter_Block_v01", blockhit = "Fighter_BlockHit_v01",
 	hit = "Fighter_HitReact_v01", ko = "Fighter_KO_v01",
+	hitStraight = "Fighter_HitStraight_v01", hitHook = "Fighter_HitHook_v01", hitUpper = "Fighter_HitUpper_v01",
+	hitLeg = "Fighter_HitLeg_v01", stagger = "Fighter_Stagger_v01", koFwd = "Fighter_KOForward_v01",
 }
 for k, n in pairs(ANIMS) do ANIMS[k] = anim(n) end
 
 -- Angriffswerte: Trefferzeitpunkt (s), Reichweite (Studs), Schaden, Sperrzeit bis zur naechsten Aktion (s)
 local MOVES = {
-	jab      = { hit = 0.21, range = 4.5, damage = 6,  lock = 0.55 },
-	cross    = { hit = 0.25, range = 4.7, damage = 10, lock = 0.75 },
-	hook     = { hit = 0.33, range = 4.3, damage = 12, lock = 0.85 },
-	uppercut = { hit = 0.38, range = 4.1, damage = 14, lock = 0.85 },
-	lowkick  = { hit = 0.42, range = 4.6, damage = 9,  lock = 1.00 },
+	jab      = { hit = 0.21, range = 4.5, damage = 6,  lock = 0.55, react = "hitStraight", ko = "ko",    heavy = false },
+	cross    = { hit = 0.25, range = 4.7, damage = 10, lock = 0.75, react = "hitStraight", ko = "ko",    heavy = true },
+	hook     = { hit = 0.33, range = 4.3, damage = 12, lock = 0.85, react = "hitHook",     ko = "koFwd", heavy = true },
+	uppercut = { hit = 0.38, range = 4.1, damage = 14, lock = 0.85, react = "hitUpper",    ko = "ko",    heavy = true },
+	lowkick  = { hit = 0.42, range = 4.6, damage = 9,  lock = 1.00, react = "hitLeg",      ko = "ko",    heavy = false },
 }
 local WALK_REF = 6        -- Laufzyklen sind fuer WalkSpeed 6 gebaut
 local BLOCK_FACTOR = 0.2  -- Schaden im Block
 local BLOCK_SPEED = 3     -- Laufgeschwindigkeit im Block
 local KO_TIME = 3
+local STAGGER_HEALTH = 35  -- unter diesem Leben koennen schwere Treffer taumeln lassen
+local HITSTOP = 0.07       -- kurzes Einfrieren des Angriffs beim Treffer
+local REACTIONS = { "hit", "hitStraight", "hitHook", "hitUpper", "hitLeg", "stagger" }
 
 local fighters = {}
 local LOCO = { "walk", "back", "left", "right" }
@@ -89,14 +96,15 @@ local function setBlock(f, on)
 	end
 end
 
-local function knockout(f)
+local function knockout(f, kind)
 	setBlock(f, false)
 	f.ko = true
 	f.hum.WalkSpeed = 0
-	for k, tr in pairs(f.tracks) do if k ~= "idle" and k ~= "ko" then tr:Stop(0.1) end end
+	for k, tr in pairs(f.tracks) do if k ~= "idle" and k ~= (kind or "ko") then tr:Stop(0.1) end end
 	f.loco = nil
-	local ko = f.tracks.ko
+	local ko = f.tracks[kind or "ko"]
 	ko:Play(0.1)
+	f.char:SetAttribute("CC_LastReact", kind or "ko")
 	task.delay(ko.Length - 0.05, function() if f.ko then ko:AdjustSpeed(0) end end)
 	f.char:SetAttribute("CC_KO", true)
 	task.delay(KO_TIME, function()
@@ -115,27 +123,66 @@ local function inFront(attacker, target, range)
 	return flat.Magnitude <= range and flat.Magnitude > 0 and a.CFrame.LookVector:Dot(flat.Unit) > 0.5
 end
 
+-- Treffer-Effekt an die beteiligten Spieler (Kamera-Ruck, Aufblitzen); Staerke 0..1
+local function hitFX(char, strength, kind)
+	local p = game.Players:GetPlayerFromCharacter(char)
+	if p then RS.CC_HitFX:FireClient(p, strength, kind) end
+end
+
+-- laufenden Angriff abbrechen (wer getroffen wird, schlaegt nicht weiter)
+local function interrupt(f)
+	f.attackToken = (f.attackToken or 0) + 1
+	for move in pairs(MOVES) do
+		if f.tracks[move].IsPlaying then f.tracks[move]:Stop(0.08) end
+	end
+end
+
+local function react(target, kind, lock)
+	for _, k in ipairs(REACTIONS) do if k ~= kind and target.tracks[k].IsPlaying then target.tracks[k]:Stop(0.05) end end
+	target.tracks[kind]:Play(0.03)
+	target.char:SetAttribute("CC_LastReact", kind)
+	target.busyUntil = math.max(target.busyUntil, os.clock() + lock)
+end
+
 local function attack(attacker, move)
 	local m = MOVES[move]
 	if not m or attacker.ko or attacker.blocking or os.clock() < attacker.busyUntil then return end
 	attacker.busyUntil = os.clock() + m.lock
-	attacker.tracks[move]:Play(0.05)
+	attacker.attackToken = (attacker.attackToken or 0) + 1
+	local token = attacker.attackToken
+	local track = attacker.tracks[move]
+	track:Play(0.05)
 	task.delay(m.hit, function()
-		if attacker.ko or not attacker.char.Parent then return end
+		if attacker.ko or not attacker.char.Parent or attacker.attackToken ~= token then return end
 		for _, target in pairs(fighters) do
 			if target ~= attacker and not target.ko and inFront(attacker, target, m.range) then
 				local blocked = target.blocking
 				local dmg = blocked and m.damage * BLOCK_FACTOR or m.damage
 				target.hum.Health = math.max(0, target.hum.Health - dmg)
 				print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
+				-- Hitstop: der Schlag haelt im Treffermoment kurz an
+				track:AdjustSpeed(0.05)
+				task.delay(blocked and HITSTOP * 0.5 or HITSTOP, function() if track.IsPlaying then track:AdjustSpeed(1) end end)
 				if target.hum.Health <= 0 then
-					print("[CC] K.o.!", target.char.Name)
-					knockout(target)
+					print("[CC] K.o.!", target.char.Name, m.ko)
+					interrupt(target)
+					knockout(target, m.ko)
+					hitFX(target.char, 1.0, "ko"); hitFX(attacker.char, 0.6, "land")
 				elseif blocked then
 					target.tracks.blockhit:Play(0.03)
+					hitFX(target.char, 0.15, "block"); hitFX(attacker.char, 0.1, "block")
 				else
-					target.busyUntil = math.max(target.busyUntil, os.clock() + 0.25)
-					target.tracks.hit:Play(0.05)
+					interrupt(target)
+					if m.heavy and target.hum.Health < STAGGER_HEALTH and math.random() < 0.6 then
+						react(target, "stagger", 1.1)
+						target.hum.WalkSpeed = 2
+						task.delay(1.1, function() if not target.ko and not target.blocking then target.hum.WalkSpeed = target.speed end end)
+						hitFX(target.char, 0.8, "stagger")
+					else
+						react(target, m.react, m.heavy and 0.4 or 0.3)
+						hitFX(target.char, m.heavy and 0.5 or 0.3, "hit")
+					end
+					hitFX(attacker.char, m.heavy and 0.3 or 0.15, "land")
 				end
 			end
 		end
@@ -175,6 +222,7 @@ RunService.Heartbeat:Connect(function()
 	local tp = best.char.HumanoidRootPart.Position
 	local look = Vector3.new(tp.X, root.Position.Y, tp.Z)
 	if (look - root.Position).Magnitude > 0.1 then root.CFrame = root.CFrame:Lerp(CFrame.lookAt(root.Position, look), 0.15) end
+	if dummy:GetAttribute("CC_Passive") then setBlock(D, false) return end -- Trainingsmodus: steht nur und dreht sich
 	if os.clock() < nextThink then return end
 	nextThink = os.clock() + 0.9 + math.random() * 1.1
 	if bestDist <= 5 then
