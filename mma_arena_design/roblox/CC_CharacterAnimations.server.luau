@@ -30,8 +30,8 @@ local ANIMS = {
 	mF = "Fighter_MoveF_v01", mB = "Fighter_MoveB_v01", mL = "Fighter_MoveL_v01", mR = "Fighter_MoveR_v01", -- Fussarbeit v10 (gemischt)
 	jab = "Fighter_Jab_v03", cross = "Fighter_Cross_v03", hook = "Fighter_Hook_v03",
 	jabBody = "Fighter_JabBody_v01", crossBody = "Fighter_CrossBody_v01", hitBody = "Fighter_HitBody_v01",
-	bodykick = "Fighter_BodyKick_v01", highkick = "Fighter_HighKick_v01", frontkick = "Fighter_FrontKick_v01",
-	uppercut = "Fighter_Uppercut_v02", lowkick = "Fighter_LowKick_v03",
+	bodykick = "Fighter_BodyKick_v2", highkick = "Fighter_HighKick_v2", frontkick = "Fighter_FrontKick_v2",   -- Tritte v16: Ganzkoerper (Pivot, Huefte, Arme)
+	uppercut = "Fighter_Uppercut_v02", lowkick = "Fighter_LowKick_v4",
 	block = "Fighter_Block_v01", blockhit = "Fighter_BlockHit_v01",
 	hit = "Fighter_HitReact_v01", ko = "Fighter_KO_v01",
 	hitStraight = "Fighter_HitStraight_v01", hitHook = "Fighter_HitHook_v01", hitUpper = "Fighter_HitUpper_v01",
@@ -49,10 +49,10 @@ local MOVES = {
 	uppercut  = { win = { 0.32, 0.46 }, limb = "RightHand", zone = "head", damage = 14, cost = 11, lock = 0.72, react = "hitUpper",    ko = "ko",    heavy = true },
 	jabBody   = { win = { 0.10, 0.30 }, limb = "LeftHand",  zone = "body", damage = 5,  cost = 5,  lock = 0.45, react = "hitBody",     ko = "koFwd", heavy = false, bodyShot = true },
 	crossBody = { win = { 0.10, 0.31 }, limb = "RightHand", zone = "body", damage = 9,  cost = 8,  lock = 0.60, react = "hitBody",     ko = "koFwd", heavy = true,  bodyShot = true },
-	lowkick   = { win = { 0.36, 0.50 }, limb = "RightFoot", zone = "leg",  damage = 9,  cost = 12, lock = 0.85, react = "hitLeg",      ko = "ko",    heavy = false },
-	bodykick  = { win = { 0.33, 0.52 }, limb = "RightLowerLeg", zone = "body", damage = 11, cost = 14, lock = 0.95, react = "hitBody",     ko = "koFwd", heavy = true,  bodyShot = true },
-	highkick  = { win = { 0.42, 0.62 }, limb = "RightLowerLeg", zone = "head", damage = 18, cost = 18, lock = 1.15, react = "hitHook",     ko = "ko",    heavy = true },
-	frontkick = { win = { 0.28, 0.45 }, limb = "LeftFoot",  zone = "body", damage = 7,  cost = 9,  lock = 0.80, react = "hitBody",     ko = "ko",    heavy = false, bodyShot = true },
+	lowkick   = { win = { 0.30, 0.45 }, limb = "RightFoot", zone = "leg",  damage = 9,  cost = 12, lock = 0.82, react = "hitLeg",      ko = "ko",    heavy = false },
+	bodykick  = { win = { 0.34, 0.50 }, limb = "RightLowerLeg", zone = "body", damage = 11, cost = 14, lock = 0.98, react = "hitBody",     ko = "koFwd", heavy = true,  bodyShot = true },
+	highkick  = { win = { 0.40, 0.64 }, limb = "RightLowerLeg", zone = "head", damage = 18, cost = 18, lock = 1.15, react = "hitHook",     ko = "ko",    heavy = true },
+	frontkick = { win = { 0.30, 0.40 }, limb = "LeftFoot",  zone = "body", damage = 7,  cost = 9,  lock = 0.80, react = "hitBody",     ko = "ko",    heavy = false, bodyShot = true },
 }
 -- Trefferkugeln: Mittelpunkt entlang der Bone-Achse (Studs) und Radius (Studs). Faust = Handschuh-Mitte.
 local LIMB_OFFSET = { LeftHand = 0.45, RightHand = 0.45, RightFoot = 0.25, LeftFoot = 0.25, RightLowerLeg = 0.9 }  -- Roundhouse trifft mit dem Schienbein

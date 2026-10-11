@@ -74,3 +74,27 @@
   - Stoß- und Beintritt des Spielers selbst (gleicher Code wie beim Gegner geprüft)
   - Block-Animation am Boden
   - zwei echte Spieler, Controller, Touch
+
+## Abschnitt 3 – Tritte mit Ganzkörperbewegung (erledigt)
+- **Neue Versionen** (`build_fighter_rigged_v16.py` → `Fighter_Rigged_v16.blend`, Export `export_actions_roblox_v18.py`):
+  - `Fighter_LowKick_v4` (20 Frames), `Fighter_BodyKick_v2` (24), `Fighter_HighKick_v2` (28), `Fighter_FrontKick_v2` (20)
+  - im Kampfskript eingesetzt; die alten Actions bleiben erhalten
+  - in Studio geladen, **noch nicht hochgeladen**
+- **Bewegung:**
+  - Gewicht geht vor dem Tritt über den Standfuß.
+  - Bei Roundhouse-Tritten macht der Standfuß einen echten kleinen Schritt hinein (hebt ab, setzt 20–28 cm vor) und am Ende wieder zurück.
+  - Danach dreht er auf dem Ballen: Low Kick 45°, Body Kick 78°, High Kick 88° mit leicht angehobener Ferse.
+  - Hüftrotation bis 86°, Rücklage des Oberkörpers, Kopf bleibt am Ziel.
+  - Der hintere Arm schwingt als Gegengewicht nach unten/hinten, der vordere Handschuh bleibt am Kinn. Rückkehr in die Deckung.
+  - **Roundhouse:** Knie hoch und eingedreht, strecken, über das Ausholen zurück, Fuß setzt hinten ab. Spann bzw. Schienbein voraus.
+  - **Front Kick:** Knie heben, strecken (Hüfte schiebt vor, Ballen voraus), kontrolliert zurück, absetzen.
+- **Prüfwerte** (`renders/fighter_rigged_v16_checks.json`):
+  - Knie beim Ausholen mindestens 68°, beim Treffer höchstens 162° (nie ganz durchgestreckt).
+  - Ballen des Standfußes in der Standphase: 0,2–1,1 cm Bewegung. Beim High Kick 6 cm durch das Anheben der Ferse auf den Ballen.
+  - Ende = Kampfhaltung (Abweichung 0).
+- **Trefferfenster** an die Treffer-Frames angepasst: Low 0,30–0,45 s, Body 0,34–0,50 s, High 0,40–0,64 s, Front 0,30–0,40 s.
+- **Geprüft in Studio** (Trainingsgegner passiv):
+  - Alle vier Tritte treffen aus 4,4 Studs (normale Kampfdistanz).
+  - Aus 6,3 Studs verfehlen alle (kleinster Abstand zur Zone 0,14–1,67 Studs).
+  - Erster Versuch ohne Schritt: alle Roundhouse-Tritte verfehlten. Die alten Tritte trafen nur, weil der Standfuß bis 18 cm rutschte.
+- **Nicht getestet:** Ansicht der neuen Tritte bei normaler Geschwindigkeit im Spiel (nur Blender-Vorschaubilder), zwei Spieler. Zusätzliche Tritt-Varianten: keine (nur Verbesserungen).
