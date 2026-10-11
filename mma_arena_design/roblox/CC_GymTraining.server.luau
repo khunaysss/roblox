@@ -195,13 +195,16 @@ local function finish(p, s, reason)
 	local tp = rate >= 0.9 and 3 or rate >= 0.6 and 2 or rate >= 0.3 and 1 or 0
 	if tp > 0 then profile(p, "train", s.kindDef.stat, tp) end
 	profile(p, "xp", s.hits)
-	local statName = s.kindDef.stat == "Power" and "Schlagkraft" or "Kondition"
-	notice(p, ("%s: %d/%d getroffen – %s +%d TP, +%d XP"):format(s.kindDef.label, s.hits, s.n, statName, tp, s.hits))
+	-- Ergebnis fuer die Trainings-Anzeige (CC_Minigame): echte Belohnung wie oben vergeben
+	p:SetAttribute("CC_TrainResult", HS:JSONEncode({ id = s.id, kind = s.kind, label = s.kindDef.label, stat = s.kindDef.stat,
+		hits = s.hits, n = s.n, tp = tp, xp = s.hits, reason = reason }))
 	print(("[CC] Training %s %s: %d/%d (%s) -> %d TP"):format(p.Name, s.kind, s.hits, s.n, reason, tp))
 end
 
+local lastStation = {}         -- [player] = { marker, kind } fuer "Nochmal"
 local function start(p, marker, kind)
 	if not canTrain(p) then return end
+	lastStation[p] = { marker, kind }
 	local def = KINDS[kind]
 	local char = p.Character
 	local root = char.HumanoidRootPart
@@ -234,6 +237,14 @@ end
 
 -- Rueckmeldung des Clients je Aufgabe
 trainEv.OnServerEvent:Connect(function(p, what, id, i)
+	if what == "again" then                                         -- gleiche Station noch einmal
+		local l, c = lastStation[p], p.Character
+		local root = c and c:FindFirstChild("HumanoidRootPart")
+		if l and root and l[1].Parent and (root.Position - l[1].Position).Magnitude < 14 then
+			task.spawn(function() local ok, err = pcall(start, p, l[1], l[2]); if not ok then warn("[CC] Nochmal: " .. tostring(err)) end end)
+		end
+		return
+	end
 	local s = sessions[p]
 	if not s or id ~= s.id or type(i) ~= "number" or i < 1 or i > s.n or s.done[i] then return end
 	local now = workspace:GetServerTimeNow()
@@ -297,7 +308,7 @@ local STATIONS = {
 	end },
 	character_customization = { "Spiegel", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
 	locker = { "Spind", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
-	read_plan = { "Trainingsplan", "Ansehen", function(p) notice(p, statText(p)) end },
+	read_plan = { "Trainingsplan", "Ansehen", function(p) p:SetAttribute("CC_OpenPlan", os.clock()) end },
 }
 
 local n = 0
@@ -318,5 +329,5 @@ for _, marker in ipairs(folder:GetChildren()) do
 		n += 1
 	end
 end
-Players.PlayerRemoving:Connect(function(p) local s = sessions[p]; if s then clearProps(s); sessions[p] = nil end end)
+Players.PlayerRemoving:Connect(function(p) local s = sessions[p]; if s then clearProps(s); sessions[p] = nil end; lastStation[p] = nil end)
 print("[CC] Gym-Training: " .. n .. " Stationen (Minispiele)")

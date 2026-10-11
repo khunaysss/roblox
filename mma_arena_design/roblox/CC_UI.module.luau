@@ -148,6 +148,12 @@ local ICONS = {
 		return S.cut(S.union(table.unpack(parts)), S.circle(32, 32, 7.5))
 	end,
 	menu = function() return S.union(S.seg(14, 18, 50, 18, W), S.seg(14, 32, 50, 32, W), S.seg(14, 46, 50, 46, W)) end,
+	-- Editor-Kategorien
+	hair = function() return S.union(S.ring(32, 36, 17, W), S.cut(S.circle(32, 33, 19.5), S.box(32, 47, 24, 13))) end,
+	beard = function() return S.union(S.ring(32, 30, 17, W), S.both(S.circle(32, 30, 19.5), S.box(32, 45, 24, 12))) end,
+	face = function() return S.union(S.ring(32, 32, 22, W), S.circle(24, 27, 3.6), S.circle(40, 27, 3.6), S.arc(32, 33, 11, 25, 155, W * 0.8)) end,
+	skin = function() return S.union(S.circle(32, 39, 15), S.poly({ 32, 7, 45.5, 31, 18.5, 31 })) end,
+	shorts = function() return S.poly({ 13, 14, 51, 14, 54, 50, 37, 50, 32, 31, 27, 50, 10, 50 }) end,
 	back = function() return S.line({ 38, 15, 22, 32, 38, 49 }, W + 1) end,
 	next = function() return S.line({ 26, 15, 42, 32, 26, 49 }, W + 1) end,
 	check = function() return S.line({ 15, 33, 27, 45, 49, 20 }, W + 1) end,
@@ -220,7 +226,7 @@ function UI.chamferContent(kind)
 	local key = "chamfer_" .. kind
 	if cache[key] == nil then
 		local f = chamferShape()
-		if kind == "outline" then f = S.outline(f, 2.5) end
+		if kind == "outline" then f = S.outline(f, 2.5) elseif kind == "outline_thick" then f = S.outline(f, 4) end
 		cache[key] = raster(CH, f, CH) or false
 	end
 	return cache[key] or nil
@@ -261,7 +267,7 @@ function UI.chamfer(props, kind, cut)
 end
 function UI.panel(props)
 	props.ImageColor3 = props.ImageColor3 or UI.C.bg1
-	props.ImageTransparency = props.ImageTransparency or 0.08
+	props.ImageTransparency = props.ImageTransparency or 0.02
 	local cut = props.Cut; props.Cut = nil
 	return UI.chamfer(props, "fill", cut or 16)
 end
@@ -276,8 +282,8 @@ function UI.icon(name, props)
 end
 
 function UI.label(props)
-	local l = UI.new("TextLabel", { BackgroundTransparency = 1, FontFace = UI.F.body, TextSize = 16, TextColor3 = UI.C.text,
-		TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center, Size = UDim2.new(1, 0, 0, 22), TextWrapped = true })
+	local l = UI.new("TextLabel", { BackgroundTransparency = 1, FontFace = UI.F.body, TextColor3 = UI.C.text,
+		TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Center, Size = UDim2.new(1, 0, 0, 24), TextSize = 17, TextWrapped = true })
 	for k, v in pairs(props) do if k ~= "Parent" then l[k] = v end end
 	if props.Parent then l.Parent = props.Parent end
 	return l
@@ -292,23 +298,26 @@ function UI.bar(props, color)
 	return f, fill
 end
 
--- Auswahlrahmen fuer Controller-Fokus (Roblox klont dieses Objekt)
-local function selectionImage()
-	local content = UI.chamferContent("outline")
-	local s = UI.new("ImageLabel", { BackgroundTransparency = 1, Size = UDim2.new(1, 8, 1, 8), Position = UDim2.fromOffset(-4, -4),
-		ImageColor3 = UI.C.text, ScaleType = Enum.ScaleType.Slice, SliceCenter = Rect.new(CUT + 1, CUT + 1, CH - CUT - 1, CH - CUT - 1), SliceScale = 12 / CUT })
-	if content then s.ImageContent = content else UI.new("UIStroke", { Color = UI.C.text, Thickness = 2, Parent = s }) end
-	return s
+-- Roter Rahmen fuer Hover und Controller-Fokus (gleiches Aussehen fuer Maus und Controller);
+-- das Roblox-Auswahlbild wird durch ein unsichtbares ersetzt.
+function UI.ring(parent, cut, color)
+	local content = UI.chamferContent("outline_thick")
+	local r = UI.new("ImageLabel", { Name = "FocusRing", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ImageColor3 = color or UI.C.red,
+		ScaleType = Enum.ScaleType.Slice, SliceCenter = Rect.new(CUT + 1, CUT + 1, CH - CUT - 1, CH - CUT - 1), SliceScale = (cut or 12) / CUT, ZIndex = 5, Visible = false, Parent = parent })
+	if content then r.ImageContent = content else UI.new("UIStroke", { Color = color or UI.C.red, Thickness = 3, Parent = r }) end
+	return r
 end
+local function selectionImage() return UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1) }) end
+UI.noSelectionImage = selectionImage
 
 -- Knopf. opts: Parent, Text, Sub, Icon, Size, Style ("nav" | "primary" | "secondary" | "danger" | "ghost"),
 -- LayoutOrder, Disabled, Badge, OnClick. Zustaende ueber Attribute "Selected" und "Disabled".
 local STYLE = {
-	nav = { bg = "bg1", tr = 0.18, hover = "bg2", sel = "red", title = 26, h = 74, cut = 16 },
+	nav = { bg = "bg1", tr = 0.03, hover = "bg2", sel = "red", title = 27, h = 76, cut = 16 },
 	primary = { bg = "red", tr = 0, hover = "red", sel = "red", title = 22, h = 58 },
-	secondary = { bg = "bg2", tr = 0.05, hover = "bg3", sel = "red", title = 20, h = 54 },
-	danger = { bg = "bg2", tr = 0.05, hover = "redDark", sel = "red", title = 20, h = 54 },
-	ghost = { bg = "bg1", tr = 0.4, hover = "bg2", sel = "red", title = 16, h = 40 },
+	secondary = { bg = "bg2", tr = 0, hover = "bg3", sel = "red", title = 20, h = 54 },
+	danger = { bg = "bg2", tr = 0, hover = "redDark", sel = "red", title = 20, h = 54 },
+	ghost = { bg = "bg1", tr = 0.1, hover = "bg2", sel = "red", title = 17, h = 44 },
 }
 function UI.button(opts)
 	local st = STYLE[opts.Style or "secondary"]
@@ -316,8 +325,9 @@ function UI.button(opts)
 		Size = opts.Size or UDim2.new(1, 0, 0, st.h), LayoutOrder = opts.LayoutOrder or 0, Selectable = true, Name = opts.Name or (opts.Text or "Button") })
 	b.SelectionImageObject = selectionImage()
 	local bg = UI.chamfer({ Size = UDim2.fromScale(1, 1), ImageColor3 = UI.C[st.bg], ImageTransparency = st.tr, ZIndex = 1, Parent = b }, "fill", opts.Cut or st.cut or 12)
-	local accent = UI.new("Frame", { BackgroundColor3 = UI.C.red, BorderSizePixel = 0, Size = UDim2.new(0, 4, 1, -16), Position = UDim2.fromOffset(0, 8),
+	local accent = UI.new("Frame", { BackgroundColor3 = UI.C.red, BorderSizePixel = 0, Size = UDim2.new(0, 6, 1, -16), Position = UDim2.fromOffset(0, 8),
 		Visible = false, ZIndex = 3, Parent = b })
+	local ring = UI.ring(b, opts.Cut or st.cut or 12, opts.Style == "primary" and UI.C.text or UI.C.red)
 	local x = 18
 	local icon
 	if opts.Icon then
@@ -332,7 +342,7 @@ function UI.button(opts)
 	local sub
 	if opts.Sub then
 		title.TextYAlignment = Enum.TextYAlignment.Bottom
-		sub = UI.label({ Text = opts.Sub, TextSize = 14, TextColor3 = UI.C.dim, ZIndex = 3, TextYAlignment = Enum.TextYAlignment.Top,
+		sub = UI.label({ Text = opts.Sub, TextSize = 17, TextColor3 = UI.C.dim, ZIndex = 3, TextYAlignment = Enum.TextYAlignment.Top,
 			TextWrapped = false, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.new(0, x, 0.6, 0), Size = UDim2.new(1, -x - 12, 0.4, 0), Parent = b })
 	end
 	local badge
@@ -343,9 +353,11 @@ function UI.button(opts)
 		local hot = (hover or focus) and not dis
 		local col = sel and UI.C[st.sel] or (hot and UI.C[st.hover] or UI.C[st.bg])
 		if opts.Style == "primary" and hot then col = UI.C.red:Lerp(Color3.new(1, 1, 1), 0.12) end
+		if dis and opts.Style == "primary" then col = UI.C.bg2 end
 		TweenService:Create(bg, TweenInfo.new(0.12), { ImageColor3 = col, ImageTransparency = (sel or hot) and 0 or st.tr }):Play()
 		if not UI.chamferContent("fill") then bg.BackgroundColor3 = col end
 		accent.Visible = (hot and not sel and opts.Style ~= "primary")
+		ring.Visible = hot
 		local fg = dis and UI.C.mute or UI.C.text
 		title.TextColor3 = fg
 		if icon then icon.ImageColor3 = fg end
@@ -372,7 +384,7 @@ end
 function UI.tag(props)
 	local t = UI.chamfer({ AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, 22), ImageColor3 = props.Color or UI.C.bg3, ImageTransparency = 0 }, "fill", 6)
 	UI.new("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8), Parent = t })
-	UI.label({ Text = props.Text, FontFace = UI.F.bold, TextSize = 12, TextColor3 = props.TextColor or UI.C.text, AutomaticSize = Enum.AutomaticSize.X,
+	UI.label({ Text = props.Text, FontFace = UI.F.bold, TextSize = 13, TextColor3 = props.TextColor or UI.C.text, AutomaticSize = Enum.AutomaticSize.X,
 		Size = UDim2.fromScale(0, 1), TextXAlignment = Enum.TextXAlignment.Center, ZIndex = (props.ZIndex or 1) + 1, Parent = t })
 	for k, v in pairs(props) do if k ~= "Parent" and k ~= "Text" and k ~= "Color" and k ~= "TextColor" then t[k] = v end end
 	if props.Parent then t.Parent = props.Parent end
@@ -381,9 +393,9 @@ end
 
 -- Tastensymbol fuer Hinweise (Text in einem Kaestchen, z. B. "E", "LEER", "A")
 function UI.key(text, props)
-	local k = UI.chamfer({ AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(26, 26), ImageColor3 = UI.C.text, ImageTransparency = 0 }, "fill", 5)
+	local k = UI.chamfer({ AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(30, 30), ImageColor3 = UI.C.text, ImageTransparency = 0 }, "fill", 6)
 	UI.new("UIPadding", { PaddingLeft = UDim.new(0, 7), PaddingRight = UDim.new(0, 7), Parent = k })
-	UI.label({ Text = text, FontFace = UI.F.bold, TextSize = 13, TextColor3 = UI.C.bg0, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromScale(0, 1),
+	UI.label({ Text = text, FontFace = UI.F.bold, TextSize = 15, TextColor3 = UI.C.bg0, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromScale(0, 1),
 		TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 3, Parent = k })
 	for kk, v in pairs(props or {}) do if kk ~= "Parent" then k[kk] = v end end
 	if props and props.Parent then k.Parent = props.Parent end
@@ -412,7 +424,7 @@ function UI.hints(props)
 			local key = dev == "pad" and e.pad or e.pc
 			if key then
 				UI.key(key, { LayoutOrder = i * 2, Parent = row })
-				UI.label({ Text = e.text, TextSize = 14, TextColor3 = UI.C.dim, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, 26),
+				UI.label({ Text = e.text, TextSize = 16, TextColor3 = UI.C.dim, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, 30),
 					TextWrapped = false, LayoutOrder = i * 2 + 1, Parent = row })
 			end
 		end
@@ -429,7 +441,7 @@ end
 
 -- Skaliert eine Vollbild-Ebene auf eine virtuelle Hoehe von 900 (Groesse = 1/scale, damit sie den Bildschirm fuellt)
 function UI.autoscale(frame, designH)
-	designH = designH or 900
+	designH = designH or 720
 	local s = UI.new("UIScale", { Parent = frame })
 	local cam = workspace.CurrentCamera
 	local function upd()
@@ -446,6 +458,98 @@ end
 -- Controller: erstes waehlbares Element fokussieren, wenn mit Gamepad gespielt wird
 function UI.focus(obj)
 	if obj and UI.device() == "pad" then GuiService.SelectedObject = obj end
+end
+
+-- gemeinsame Hover/Fokus-Logik fuer Karten und Farbfelder
+local function hotState(b, refresh)
+	local st = { hover = false, focus = false }
+	b.MouseEnter:Connect(function() st.hover = true; refresh() end)
+	b.MouseLeave:Connect(function() st.hover = false; refresh() end)
+	b.SelectionGained:Connect(function() st.focus = true; refresh() end)
+	b.SelectionLost:Connect(function() st.focus = false; refresh() end)
+	b.AttributeChanged:Connect(refresh)
+	return st
+end
+
+-- Auswahlkarte mit Vorschau (ViewportFrame). opts: Parent, Text, Size, LayoutOrder, Locked, OnClick.
+-- Zustaende: Attribut "Selected" (rot, Haken), "Locked" (Schloss, nicht waehlbar); Hover/Fokus = roter Rahmen.
+function UI.optionCard(opts)
+	local b = UI.new("TextButton", { Text = "", AutoButtonColor = false, BackgroundTransparency = 1, Size = opts.Size or UDim2.fromOffset(150, 176),
+		LayoutOrder = opts.LayoutOrder or 0, Name = opts.Text or "Card" })
+	b.SelectionImageObject = selectionImage()
+	local bg = UI.chamfer({ Size = UDim2.fromScale(1, 1), ImageColor3 = UI.C.bg2, ImageTransparency = 0, Parent = b }, "fill", 12)
+	local vp = UI.new("ViewportFrame", { BackgroundColor3 = UI.C.bg1, BackgroundTransparency = 0, BorderSizePixel = 0, Position = UDim2.fromOffset(8, 8),
+		Size = UDim2.new(1, -16, 1, -48), Ambient = Color3.fromRGB(200, 200, 210), LightColor = Color3.fromRGB(255, 255, 255), LightDirection = Vector3.new(-0.4, -0.6, -1),
+		ZIndex = 2, Parent = b })
+	local name = UI.label({ Text = opts.Text or "", FontFace = UI.F.bold, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Center, TextWrapped = false,
+		TextTruncate = Enum.TextTruncate.AtEnd, AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 6, 1, -8), Size = UDim2.new(1, -12, 0, 26), ZIndex = 3, Parent = b })
+	local check = UI.chamfer({ Size = UDim2.fromOffset(30, 30), AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -4, 0, 4), ImageColor3 = UI.C.red, ImageTransparency = 0, ZIndex = 6, Visible = false, Parent = b }, "fill", 6)
+	UI.icon("check", { Size = UDim2.fromOffset(20, 20), Position = UDim2.fromOffset(5, 5), ZIndex = 7, Parent = check })
+	local lock = UI.icon("lock", { Size = UDim2.fromOffset(34, 34), AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(0.5, 0, 0.42, 0), ImageColor3 = UI.C.dim, ZIndex = 6, Visible = false, Parent = b })
+	local ring = UI.ring(b, 12, UI.C.red)
+	local st
+	local function refresh()
+		local sel, locked = b:GetAttribute("Selected"), b:GetAttribute("Locked")
+		local hot = st and (st.hover or st.focus)
+		ring.Visible = hot or sel
+		ring.ImageColor3 = sel and UI.C.red or UI.C.text:Lerp(UI.C.red, 0.6)
+		check.Visible = sel and true or false
+		lock.Visible = locked and true or false
+		vp.ImageTransparency = locked and 0.7 or 0
+		bg.ImageColor3 = sel and UI.C.redDark or (hot and UI.C.bg3 or UI.C.bg2)
+		name.TextColor3 = locked and UI.C.mute or UI.C.text
+	end
+	st = hotState(b, refresh)
+	b:SetAttribute("Locked", opts.Locked or false)
+	b.Activated:Connect(function() if not b:GetAttribute("Locked") and opts.OnClick then opts.OnClick(b) end end)
+	refresh()
+	if opts.Parent then b.Parent = opts.Parent end
+	return b, vp
+end
+
+-- Farbfeld. opts: Parent, Color, Size, LayoutOrder, OnClick, Name
+function UI.swatch(opts)
+	local b = UI.new("TextButton", { Text = "", AutoButtonColor = false, BackgroundTransparency = 1, Size = opts.Size or UDim2.fromOffset(56, 56),
+		LayoutOrder = opts.LayoutOrder or 0, Name = opts.Name or "Swatch" })
+	b.SelectionImageObject = selectionImage()
+	UI.chamfer({ Size = UDim2.new(1, -10, 1, -10), Position = UDim2.fromOffset(5, 5), ImageColor3 = opts.Color, ImageTransparency = 0, Parent = b }, "fill", 8)
+	local check = UI.icon("check", { Size = UDim2.fromOffset(24, 24), AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), ZIndex = 4, Visible = false, Parent = b })
+	local ring = UI.ring(b, 10, UI.C.red)
+	local st
+	local function refresh()
+		local sel = b:GetAttribute("Selected")
+		ring.Visible = sel or (st and (st.hover or st.focus)) or false
+		ring.ImageColor3 = sel and UI.C.red or UI.C.text
+		check.Visible = sel and true or false
+		local c = opts.Color
+		check.ImageColor3 = (c.R * 0.3 + c.G * 0.59 + c.B * 0.11) > 0.6 and UI.C.bg0 or UI.C.text
+	end
+	st = hotState(b, refresh)
+	b.Activated:Connect(function() if opts.OnClick then opts.OnClick(b) end end)
+	refresh()
+	if opts.Parent then b.Parent = opts.Parent end
+	return b
+end
+
+-- Abfrage-Fenster (modal). buttons = { { Text=, Style=, OnClick= }, ... }; schliesst sich nach jedem Knopf.
+function UI.dialog(parent, title, text, buttons)
+	local dim = UI.new("TextButton", { Name = "Dialog", Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.new(0, 0, 0), BackgroundTransparency = 0.35,
+		Size = UDim2.fromScale(1, 1), ZIndex = 80, Modal = true, Selectable = false, Parent = parent })
+	local box = UI.panel({ AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(520, 230), ZIndex = 81, Parent = dim })
+	UI.label({ Text = title, FontFace = UI.F.title, TextSize = 28, Position = UDim2.fromOffset(28, 22), Size = UDim2.new(1, -56, 0, 34), ZIndex = 82, Parent = box })
+	UI.label({ Text = text, TextSize = 17, TextColor3 = UI.C.dim, TextYAlignment = Enum.TextYAlignment.Top, Position = UDim2.fromOffset(28, 66), Size = UDim2.new(1, -56, 0, 60), ZIndex = 82, Parent = box })
+	local row = UI.new("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 28, 1, -22), Size = UDim2.new(1, -56, 0, 54), ZIndex = 82, Parent = box })
+	UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 12), HorizontalAlignment = Enum.HorizontalAlignment.Right, SortOrder = Enum.SortOrder.LayoutOrder, Parent = row })
+	local first
+	for i, bd in ipairs(buttons) do
+		local b = UI.button({ Text = bd.Text, Style = bd.Style or "secondary", Size = UDim2.fromOffset(200, 54), LayoutOrder = i, Parent = row,
+			OnClick = function() dim:Destroy(); if bd.OnClick then bd.OnClick() end end })
+		for _, d in ipairs(b:GetDescendants()) do if d:IsA("GuiObject") then d.ZIndex += 82 end end
+		b.ZIndex = 83
+		first = first or b
+	end
+	UI.focus(first)
+	return dim
 end
 
 return UI

@@ -9,6 +9,8 @@
 --   Fire(player, "xp", menge) | Fire(player, "train", "Power"|"Cardio"|"Wrestling"|"Grappling", punkte)
 --   | Fire(player, "result", "win"|"loss"|"draw", methode) | Fire(player, "look", { hair=, beard=, face=, skin=, hairColor= })
 -- Aussehen (CC_Customize liest es): Attribut CC_Look am Spieler (JSON).
+-- Speicherstand fuer die UI: Attribut CC_SaveStatus = "ok|<zeit>" | "error|<zeit>" | "offline|<zeit>" (nach jedem Speicherversuch).
+-- Aussehen wird sofort gespeichert (hoechstens alle 7 s pro Spieler), alles andere alle 120 s und beim Verlassen.
 -- Ohne DataStore-Zugriff (z. B. Studio ohne API-Freigabe) laeuft alles nur fuer die Sitzung.
 local Players = game:GetService("Players")
 local DSS = game:GetService("DataStoreService")
@@ -88,12 +90,24 @@ local function load(plr)
 	profiles[plr] = p
 	publish(plr)
 end
+local function status(plr, s) if plr.Parent then plr:SetAttribute("CC_SaveStatus", s .. "|" .. tostring(workspace:GetServerTimeNow())) end end
 local function save(plr)
 	local p = profiles[plr]
-	if not (store and p and plr:GetAttribute("CC_ProfileSaved")) then return end   -- nie ein nicht geladenes Profil ueberschreiben
+	if not (store and p and plr:GetAttribute("CC_ProfileSaved")) then if p then status(plr, "offline") end; return false end   -- nie ein nicht geladenes Profil ueberschreiben
 	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs, stats = p.stats, tp = p.tp, look = p.look }
 	local ok, err = pcall(function() store:SetAsync("u_" .. plr.UserId, copy) end)
-	if ok then p.dirty = false else warn("[CC] Profil speichern fehlgeschlagen: " .. tostring(err)) end
+	if ok then p.dirty = false; p.lastSave = os.clock() else warn("[CC] Profil speichern fehlgeschlagen: " .. tostring(err)) end
+	status(plr, ok and "ok" or "error")
+	return ok
+end
+-- bald speichern (DataStore-Grenze: ein Schreibvorgang pro Schluessel alle ~6 s)
+local function saveSoon(plr)
+	local p = profiles[plr]; if not p or p.saveQueued then return end
+	p.saveQueued = true
+	task.delay(math.max(0, 7 - (os.clock() - (p.lastSave or -100))), function()
+		p.saveQueued = false
+		if profiles[plr] == p then save(plr) end
+	end)
 end
 
 event.Event:Connect(function(plr, kind, a, b)
@@ -104,6 +118,7 @@ event.Event:Connect(function(plr, kind, a, b)
 		local p = profiles[plr]
 		for k, v in pairs(a) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end
 		p.dirty = true; publish(plr)
+		saveSoon(plr)
 	elseif kind == "result" then
 		local p = profiles[plr]
 		if a == "win" then

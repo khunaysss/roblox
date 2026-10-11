@@ -128,6 +128,7 @@ toast.Font = Enum.Font.GothamBold; toast.TextSize = 18; toast.TextColor3 = Color
 Instance.new("UICorner", toast).CornerRadius = UDim.new(0, 8)
 local toastUntil = 0
 local function showToast(text, color)
+	if true then return end   -- Meldungen zeigt jetzt CC_GymHUD (UI-Ueberarbeitung Schritt 2)
 	toast.Text = text; toast.TextColor3 = color or Color3.new(1, 1, 1); toast.Visible = true; toastUntil = os.clock() + 3
 end
 local STAT_DE = { Power = "Schlagkraft", Cardio = "Kondition", Wrestling = "Ringen", Grappling = "Bodenkampf" }
