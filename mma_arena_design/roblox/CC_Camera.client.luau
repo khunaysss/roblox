@@ -14,8 +14,11 @@ local AIM = 9             -- Nachfuehr-Rate Blickpunkt (1/s)
 local SIDE = 4.0          -- ueber die rechte Schulter, damit der Gegner neben dem eigenen Kaempfer sichtbar ist
 local CAGE_R = 14.5       -- Kamera bleibt innerhalb des Kaefigs
 local MAX_SPEED = 32      -- Kamera bewegt sich hoechstens so schnell (Studs/s): keine Schwenk-Spruenge beim Takedown
-local WR_BLEND = 0.6      -- Sekunden fuer den Wechsel Stand <-> Bodenkampf-Ansicht
+local WR_BLEND = 0.9      -- Sekunden fuer den Wechsel Stand <-> Bodenkampf-Ansicht
 local camPos, aimPos = nil, nil
+local filt = {}            -- geglaettete Koerperpunkte je Modell (Ausreisser beim Animationswechsel abfangen)
+local BODY_MAX_SPEED = 14  -- Studs/s: schneller bewegt sich kein Koerper sichtbar; groessere Spruenge = Wechsel-Frame
+local groundSide = nil   -- Bodenansicht: Seite (+1/-1), beim Eintritt festgelegt
 local wrW = 0             -- 0 = Stand-Ansicht, 1 = Bodenkampf-Ansicht (weich ueberblendet)
 
 local function bodyPoint(model)
@@ -43,85 +46,133 @@ local function ignoreList()
 end
 local params = RaycastParams.new(); params.FilterType = Enum.RaycastFilterType.Exclude
 local lastIgnore = 0
+-- Koerperpunkt mit Glaettung: beim Wechsel zweier Ringkampf-Animationen steht der Root-Bone fuer einen Frame
+-- auf der Ruheposition (Sprung um mehrere Studs); solche Spruenge werden auf BODY_MAX_SPEED begrenzt und weich nachgezogen.
+local function smoothBody(model, dt)
+	local p = bodyPoint(model)
+	if not p then return nil end
+	local s = filt[model]
+	if not s or (p - s).Magnitude > 25 then filt[model] = p; return p end   -- neu oder teleportiert (Rundenstart)
+	local d = p - s
+	local maxStep = BODY_MAX_SPEED * dt
+	if d.Magnitude > maxStep then d = d.Unit * maxStep end
+	s = s + d
+	filt[model] = s
+	return s
+end
+-- Ziel: anvisiertes Modell; im Ringkampf/Boden immer der Kampfgegner (auch wenn die Anvisierung aus ist)
+local function fightTarget(char)
+	local n = char:GetAttribute("CC_LockTarget")
+	if (not n or n == "") and char:GetAttribute("CC_Wrestle") then n = char:GetAttribute("CC_Opponent") end
+	return n and n ~= "" and workspace:FindFirstChild(n) or nil
+end
+local FLOOR_CLEAR = 1.6    -- Kamera bleibt so weit ueber dem Kaefigboden
 
 RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, function(dt)  -- vor dem Treffer-Ruck (CC_HitFX, +1)
 	local char = player.Character
-	local targetName = char and char:GetAttribute("CC_LockTarget")
-	local target = targetName and targetName ~= "" and workspace:FindFirstChild(targetName)
+	local target = char and fightTarget(char)
 	if not (char and target and char:FindFirstChild("HumanoidRootPart") and target:FindFirstChild("HumanoidRootPart")) then
 		if cam.CameraType == Enum.CameraType.Scriptable and not player:GetAttribute("CC_Minigame") and not player:GetAttribute("CC_UIBlock") then cam.CameraType = Enum.CameraType.Custom end   -- Training-Kamera (CC_Minigame) nicht stoeren
 		camPos, aimPos = nil, nil
+		filt = {}
 		return
 	end
 	cam.CameraType = Enum.CameraType.Scriptable
 	if os.clock() - lastIgnore > 2 then params.FilterDescendantsInstances = ignoreList(); lastIgnore = os.clock() end
 
-	local me, foe = bodyPoint(char), bodyPoint(target)
+	local me, foe = smoothBody(char, dt), smoothBody(target, dt)
+	if not (me and foe) then return end
 	local wrestling = char:GetAttribute("CC_Wrestle")
 	wrW = math.clamp(wrW + (wrestling and 1 or -1) * dt / WR_BLEND, 0, 1)
 	local w = wrW * wrW * (3 - 2 * wrW)   -- weich ein/aus
 	local mid = (me + foe) / 2
 	local gap = (Vector3.new(foe.X, 0, foe.Z) - Vector3.new(me.X, 0, me.Z)).Magnitude
-	local aim = mid + Vector3.new(0, 1.2 - 0.6 * w, 0)
-	-- Richtung: hinter dem eigenen Kaempfer (vom Gegner weg); im Ringkampf seitlich auf die Szene
-	local away = Vector3.new(me.X - foe.X, 0, me.Z - foe.Z)
-	away = away.Magnitude > 0.1 and away.Unit or -char.HumanoidRootPart.CFrame.LookVector
-	local right = Vector3.new(-away.Z, 0, away.X)
-	local dist = math.clamp(9 + gap * 0.85, 11, 24) * (1 - w) + 8.5 * w   -- am Boden naeher dran
-	local height = math.clamp(4 + gap * 0.18, 4.5, 7.5) * (1 - w) + 4.2 * w
 	-- Kaefigmitte (Kamera bleibt innerhalb von CAGE_R)
 	local center = Vector3.new(0, 0, 0)
 	local arena = workspace:FindFirstChild("CC_Arena")
 	local canvas = arena and arena:FindFirstChild("Platform_Canvas_FightSurface", true)
 	if canvas then center = Vector3.new(canvas.Position.X, 0, canvas.Position.Z) end
 	local function inside(p) return Vector3.new(p.X - center.X, 0, p.Z - center.Z).Magnitude <= CAGE_R end
-	local function candidate(dirH, d)
-		local r = Vector3.new(-dirH.Z, 0, dirH.X)
-		return aim + dirH * d + r * SIDE * (1 - w) + Vector3.new(0, height, 0)
-	end
-	-- Grundrichtung: hinter dem eigenen Kaempfer; im Ringkampf seitlich auf die Szene
-	local baseDir = (away * (1 - w) + (right * 0.85 + away * 0.35).Unit * w).Unit
-	-- Kandidaten (Winkel um den Blickpunkt x Abstand) bewerten: im Kaefig UND beide Kaempfer (Fuesse bis Kopf) im Bild;
-	-- bevorzugt: wenig Schwenk gegenueber "hinter dem Spieler" und nah am Wunschabstand
+	local away = Vector3.new(me.X - foe.X, 0, me.Z - foe.Z)
+	away = away.Magnitude > 0.1 and away.Unit or -char.HumanoidRootPart.CFrame.LookVector
 	local vp = cam.ViewportSize
 	local tv = math.tan(math.rad(cam.FieldOfView) / 2) * 0.82
 	local th = tv * (vp.X / math.max(vp.Y, 1))
+
+	-- ---- Stand-Ansicht: hinter dem eigenen Kaempfer; Kandidaten (Winkel x Abstand), beide Kaempfer im Bild ----
+	local aimS = mid + Vector3.new(0, 1.2, 0)
+	local distS = math.clamp(9 + gap * 0.85, 11, 24)
+	local heightS = math.clamp(4 + gap * 0.18, 4.5, 7.5)
 	local pts = { me + Vector3.new(0, -0.6, 0), me + Vector3.new(0, 2.6, 0), foe + Vector3.new(0, -0.6, 0), foe + Vector3.new(0, 2.6, 0) }
-	local function framed(p)
-		local cf = CFrame.lookAt(p, aim)
+	local function framed(p, a)
+		local cf = CFrame.lookAt(p, a)
 		for _, q in ipairs(pts) do
 			local l = cf:PointToObjectSpace(q)
 			if l.Z > -2 or math.abs(l.X / -l.Z) > th or math.abs(l.Y / -l.Z) > tv then return false end
 		end
 		return true
 	end
-	local want, bestScore = nil, math.huge
-	for _, deg in ipairs({ 0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90, 110, -110 }) do
-		local c = math.cos(math.rad(deg)); local s_ = math.sin(math.rad(deg))
-		local dH = Vector3.new(baseDir.X * c - baseDir.Z * s_, 0, baseDir.X * s_ + baseDir.Z * c)
-		-- Stand: vom weitesten Abstand nach innen (bewaehrte Ansicht); Boden: vom Wunschabstand nach aussen (moeglichst nah)
-		local d0, d1, step = dist + 4, 7, -1
-		if w > 0.5 then d0, d1, step = dist, dist + 8, 0.5 end
-		for d = d0, d1, step do
-			local p = candidate(dH, d)
-			if inside(p) and framed(p) then
-				local score = math.abs(deg) * 0.12 + math.abs(d - dist) * 0.5
-				if score < bestScore then want, bestScore = p, score end
-				break
+	local wantS, bestScore = nil, math.huge
+	if w < 0.999 then
+		for _, deg in ipairs({ 0, 15, -15, 30, -30, 45, -45, 60, -60, 75, -75, 90, -90, 110, -110 }) do
+			local c = math.cos(math.rad(deg)); local s_ = math.sin(math.rad(deg))
+			local dH = Vector3.new(away.X * c - away.Z * s_, 0, away.X * s_ + away.Z * c)
+			local r = Vector3.new(-dH.Z, 0, dH.X)
+			for d = distS + 4, 7, -1 do
+				local p = aimS + dH * d + r * SIDE + Vector3.new(0, heightS, 0)
+				if inside(p) and framed(p, aimS) then
+					local score = math.abs(deg) * 0.12 + math.abs(d - distS) * 0.5
+					if score < bestScore then wantS, bestScore = p, score end
+					break
+				end
 			end
 		end
+		-- notfalls: hoch ueber der Mitte (Uebersicht), damit nie ein Kaempfer verloren geht
+		if not wantS then wantS = aimS + away * 6 + Vector3.new(0, 14 + gap * 0.3, 0) end
 	end
-	-- notfalls: hoch ueber der Mitte (Uebersicht), damit nie ein Kaempfer verloren geht
-	if not want then want = aim + baseDir * 6 + Vector3.new(0, 14 + gap * 0.3, 0) end
+
+	-- ---- Boden-Ansicht: stetig (keine Kandidatenwechsel = kein Wackeln). Seite wird beim Eintritt festgelegt
+	-- (die Seite, auf der die Kamera gerade ist) und nur gewechselt, wenn sie ausserhalb des Kaefigs laege. ----
+	local aimG = mid + Vector3.new(0, 0.6, 0)
+	local wantG
+	if wrestling or w > 0 then
+		local line = Vector3.new(foe.X - me.X, 0, foe.Z - me.Z)
+		line = line.Magnitude > 0.1 and line.Unit or -away
+		local perp = Vector3.new(-line.Z, 0, line.X)
+		if not groundSide then
+			local ref = camPos or (aimG + away * 10)
+			groundSide = ((ref - mid):Dot(perp) >= 0) and 1 or -1
+		end
+		-- Abstand aus der Ausdehnung der Szene (Kaempfer-Abstand + Koerperlaenge am Boden), stetig
+		local span = gap + 3.5
+		local dG = math.clamp(span / (2 * th) + 3.0, 8, 13)
+		local function g(side)
+			local dir = (perp * side * 0.92 + away * 0.38).Unit
+			return aimG + dir * dG + Vector3.new(0, 3.6 + dG * 0.12, 0)
+		end
+		wantG = g(groundSide)
+		if not inside(wantG) and inside(g(-groundSide)) then groundSide = -groundSide; wantG = g(groundSide) end
+	end
+	if not wrestling and w <= 0 then groundSide = nil end
+
+	local aim = wantG and aimS:Lerp(aimG, w) or aimS
+	local want
+	if not wantS then want = wantG
+	elseif not wantG then want = wantS
+	else want = wantS:Lerp(wantG, w) end
 	-- Wand-/Deckenschutz: vom Blickpunkt zur Wunschposition casten
 	local dir = want - aim
 	local hit = workspace:Raycast(aim, dir, params)
 	if hit then want = hit.Position - dir.Unit * 0.8 end
+	-- nie unter/durch den Boden
+	local floorY = (canvas and canvas.Position.Y or 0) + FLOOR_CLEAR
+	if want.Y < floorY then want = Vector3.new(want.X, floorY, want.Z) end
 
 	if not camPos then camPos, aimPos = want, aim end
 	local nextPos = camPos:Lerp(want, 1 - math.exp(-FOLLOW * dt))
 	local step = nextPos - camPos
-	if step.Magnitude > MAX_SPEED * dt then nextPos = camPos + step.Unit * MAX_SPEED * dt end
+	local maxSpeed = MAX_SPEED * (1 - 0.55 * math.min(1, wrW * (1 - wrW) * 4))   -- waehrend des Ueberblendens langsamer schwenken
+	if step.Magnitude > maxSpeed * dt then nextPos = camPos + step.Unit * maxSpeed * dt end
 	camPos = nextPos
 	aimPos = aimPos:Lerp(aim, 1 - math.exp(-AIM * dt))
 	cam.CFrame = CFrame.lookAt(camPos, aimPos)

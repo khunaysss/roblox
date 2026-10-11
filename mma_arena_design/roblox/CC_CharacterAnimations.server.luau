@@ -406,11 +406,17 @@ local function rootOffset(f, v)
 	local _, yaw = o:ToEulerAnglesYXZ()
 	return CFrame.new(o.Position.X, 0, o.Position.Z) * CFrame.Angles(0, yaw, 0)
 end
+-- Wechsel mit kurzer Ueberblendung (WR_FADE): ohne sie steht der Root-Bone einen Frame lang auf der Ruheposition
+-- (sichtbarer Sprung des Koerpers und Kamera-Ruck beim Takedown/Positionswechsel)
+local WR_FADE = 0.06
 local function playPair(a, b, pair, looped)
 	local ta, tb = wrTrack(a, pair .. "_A"), wrTrack(b, pair .. "_B")
-	wrStopAll(a, 0); wrStopAll(b, 0)
+	for _, x in ipairs({ { a, ta }, { b, tb } }) do
+		for _, tr in pairs(x[1].wrTracks or {}) do if tr ~= x[2] and tr.IsPlaying then tr:Stop(WR_FADE) end end
+	end
 	ta.Looped = looped or false; tb.Looped = looped or false
-	ta:Play(0, 1, 1); tb:Play(0, 1, 1)
+	if ta.IsPlaying then ta:Stop(0) end; if tb.IsPlaying then tb:Stop(0) end
+	ta:Play(WR_FADE, 1, 1); tb:Play(WR_FADE, 1, 1)
 	return ta, tb
 end
 local function setWrestle(f, partner, role)
@@ -422,6 +428,7 @@ end
 
 -- Austausch beenden: beide stehen wieder; HumanoidRootParts auf die End-Positionen des letzten Paars versetzen
 local function endExchange(a, b, pair)
+	if not (a.wr and b.wr) then return end   -- schon zurueckgesetzt (Rundenende, Abbruch, Spieler weg)
 	for _, x in ipairs({ { a, "A" }, { b, "B" } }) do
 		local f, s = x[1], x[2]
 		local start = f.wrStart
@@ -643,6 +650,7 @@ function groundEscape(f)
 	top.wr.state = "escape"
 	local ta = playPair(top, bottom, "Ground_Guard_Escape", false)
 	ta.Stopped:Wait()
+	if not (top.wr and bottom.wr) then return end
 	local tg = playPair(top, bottom, "Ground_GetUp", false)
 	tg.Stopped:Wait()
 	endExchange(top, bottom, "Ground_GetUp")
@@ -698,13 +706,20 @@ function tryTakedown(a)
 	local defended
 	if isDummy then defended = math.random() < math.max(0.1, 0.3 - 0.01 * stat(a, "Wrestling"))
 	else defended = b.sprawlAt ~= nil and math.abs(b.sprawlAt - shotAt) <= SPRAWL_WINDOW + 0.01 * stat(b, "Wrestling") - 0.005 * stat(a, "Wrestling") end
-	if a.ko or b.ko then return end
+	if a.ko or b.ko or not (a.wr and b.wr) then
+		for _, f in ipairs({ a, b }) do if f.wr then setWrestle(f, nil, nil) end; f.busyUntil = 0 end
+		return
+	end
 	local pair = defended and "TD_DoubleLeg_Defended" or "TD_DoubleLeg_Success"
 	print(("[CC] %s Takedown -> %s: %s"):format(a.char.Name, b.char.Name, defended and "Sprawl (abgewehrt)" or "erfolgreich"))
 	if defended then reward(b, "train", "Wrestling", 2) else reward(a, "train", "Wrestling", 2) end
 	local ta = playPair(a, b, pair, false)
 	hitFX(a.char, 0.25, "land"); hitFX(b.char, defended and 0.2 or 0.6, defended and "block" or "hit")
 	ta.Stopped:Wait()
+	if not (a.wr and b.wr and a.char.Parent and b.char.Parent) then      -- waehrenddessen zurueckgesetzt oder Spieler weg
+		for _, f in ipairs({ a, b }) do if f.wr then wrStopAll(f, 0.1); setWrestle(f, nil, nil); f.busyUntil = 0 end end
+		return
+	end
 	if defended then
 		endExchange(a, b, pair)
 		return

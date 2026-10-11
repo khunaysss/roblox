@@ -55,9 +55,12 @@ CAS:BindAction("CC_Block", function(_, state)
 end, true, Enum.KeyCode.F, Enum.KeyCode.ButtonL2)
 CAS:SetTitle("CC_Block", "Block")
 
--- Befreien/Aufstehen nur am Boden; sonst bleibt Leertaste/A normales Springen
+-- Befreien/Aufstehen nur am Boden. Im 1-gegen-1-Kampf (CC_Opponent) kein Springen: Leertaste/A wird dort geschluckt;
+-- ausserhalb des Kampfs bleibt Leertaste/A normales Springen.
+local function inFight() local c = player.Character; return c and c:GetAttribute("CC_Opponent") ~= nil end
 CAS:BindAction("CC_Escape", function(_, state)
 	if state == Enum.UserInputState.Begin and inWrestle() then action:FireServer("escape"); return Enum.ContextActionResult.Sink end
+	if inFight() then return Enum.ContextActionResult.Sink end
 	return Enum.ContextActionResult.Pass
 end, true, Enum.KeyCode.Space, Enum.KeyCode.ButtonA)
 CAS:SetTitle("CC_Escape", "Los")
@@ -117,6 +120,10 @@ RunService.RenderStepped:Connect(function(dt)
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	local root = char and char:FindFirstChild("HumanoidRootPart")
 	if not (hum and root) then return end
+	-- Springen im Kampf aus (auch Touch-Sprungknopf und Controller); ausserhalb wieder an (ausser das Hauptmenue sperrt)
+	local noJump = char:GetAttribute("CC_Opponent") ~= nil or player:GetAttribute("CC_UIBlock") ~= nil
+	if hum:GetStateEnabled(Enum.HumanoidStateType.Jumping) == noJump then hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, not noJump) end
+	if noJump and hum.Jump then hum.Jump = false end
 	if not char:GetAttribute("CC_Opponent") and not inWrestle() and not root.Anchored and not char:GetAttribute("CC_Frozen") and not player:GetAttribute("CC_UIBlock") then
 		local sprint = UIS:IsKeyDown(Enum.KeyCode.LeftShift) or sprintPad
 		local want = sprint and CASUAL_RUN or CASUAL_WALK
