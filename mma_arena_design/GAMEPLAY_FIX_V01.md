@@ -174,3 +174,10 @@
   - Bilder an beiden Plätzen.
   - Den XP-Wert habe ich nach dem ersten Durchgang halbiert und den Ausdauerverlust gemildert; diese beiden Änderungen sind nicht erneut getestet.
 - **Nicht getestet:** Touch-Knöpfe auf echtem Gerät, Controller LB/RB, zwei Spieler (es gibt nur ein Laufband; ein zweiter Spieler kann es nicht gleichzeitig nutzen, weil die Station dann belegt ist – nicht geprüft).
+
+## Upload (offen, Schritt für den Nutzer)
+- **Was neu dazukommt:** 34 neue Animationen. Sie liegen als `export/anim_rbxmx/*.rbxmx` bereit (Bodenlagen `DN_*`, Tritte v17, Gehen/Laufen v17, Fußarbeit `Fighter_Step*`, Übungen `Fighter_ExBench_*`/`Fighter_ExCurl_*`).
+- **Warum der Upload nötig ist:** Bis dahin laufen sie nur in Studio-Einzeltests (temporäre IDs). Mit mehreren Spielern stehen die Figuren sonst in T-Pose.
+- **Was der Nutzer tun muss:** `upload_starten.ps1` ausführen. Gruppe ANIMEXGANG 7160158, Schlüssel wie bisher; schon hochgeladene Animationen werden übersprungen.
+- **Was danach passiert:** Ich trage die neuen IDs aus `roblox/CC_AnimIds.luau` in Studio ein.
+- **Alles in diesem Auftrag** wurde nur mit einem Spieler in Studio getestet. Noch fehlen: echte Zwei-Spieler-Tests, Controller und Touch auf echten Geräten.
