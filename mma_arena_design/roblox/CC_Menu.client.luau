@@ -10,7 +10,7 @@ local gui = script.Parent
 gui.ResetOnSpawn = false
 
 local panel = Instance.new("Frame")
-panel.AnchorPoint = Vector2.new(0, 0.5); panel.Position = UDim2.new(0, 24, 0.5, 0); panel.Size = UDim2.fromOffset(320, 300)
+panel.AnchorPoint = Vector2.new(0, 0.5); panel.Position = UDim2.new(0, 24, 0.5, 0); panel.Size = UDim2.fromOffset(320, 470)
 panel.BackgroundColor3 = Color3.fromRGB(18, 18, 22); panel.BackgroundTransparency = 0.12; panel.BorderSizePixel = 0; panel.Parent = gui
 Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 10)
 local pad = Instance.new("UIPadding", panel)
@@ -34,7 +34,22 @@ label("CAGE CHAMPIONS", 30, Enum.Font.GothamBlack, Color3.fromRGB(255, 220, 60),
 local trainingB = button("TRAINING", Color3.fromRGB(40, 90, 200), 2)
 local pvpB = button("GEGEN SPIELER", Color3.fromRGB(200, 40, 50), 3)
 local cancelB = button("ABBRECHEN", Color3.fromRGB(70, 70, 78), 4)
-local status = label("", 16, Enum.Font.GothamBold, Color3.fromRGB(220, 220, 225), 5, 60)
+local status = label("", 16, Enum.Font.GothamBold, Color3.fromRGB(220, 220, 225), 5, 44)
+-- Profil (CC_Profile): Level, XP-Balken, Werte mit Trainingspunkten, Bilanz
+local levelL = label("", 18, Enum.Font.GothamBlack, Color3.fromRGB(255, 220, 60), 6, 22)
+local function bar(order, color)
+	local f = Instance.new("Frame"); f.Size = UDim2.new(1, 0, 0, 8); f.BackgroundColor3 = Color3.fromRGB(40, 40, 46); f.BorderSizePixel = 0; f.LayoutOrder = order; f.Parent = panel
+	local fill = Instance.new("Frame"); fill.Size = UDim2.fromScale(0, 1); fill.BackgroundColor3 = color; fill.BorderSizePixel = 0; fill.Parent = f
+	return fill
+end
+local xpFill = bar(7, Color3.fromRGB(255, 200, 40))
+local STAT_NAMES = { { "Power", "Schlagkraft" }, { "Cardio", "Kondition" }, { "Wrestling", "Ringen" }, { "Grappling", "Bodenkampf" } }
+local statRows = {}
+for i, s_ in ipairs(STAT_NAMES) do
+	local l = label("", 14, Enum.Font.GothamBold, Color3.fromRGB(220, 220, 225), 7 + i * 2, 16)
+	statRows[s_[1]] = { l, bar(8 + i * 2, Color3.fromRGB(80, 150, 255)), s_[2] }
+end
+local recordL = label("", 14, Enum.Font.Gotham, Color3.fromRGB(190, 190, 198), 20, 18)
 
 trainingB.Activated:Connect(function() menuEvent:FireServer("training") end)
 pvpB.Activated:Connect(function() menuEvent:FireServer("pvp") end)
@@ -62,4 +77,14 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		table.insert(lines, "Wähle einen Modus.")
 	end
 	status.Text = table.concat(lines, "\n")
+	local lv, xp, nx = player:GetAttribute("CC_Level") or 1, player:GetAttribute("CC_XP") or 0, player:GetAttribute("CC_XPNext") or 100
+	levelL.Text = ("LEVEL %d   ·   %d / %d XP"):format(lv, xp, nx)
+	xpFill.Size = UDim2.fromScale(math.clamp(xp / nx, 0, 1), 1)
+	for key, row in pairs(statRows) do
+		local v, tp = player:GetAttribute("CC_" .. key) or 0, player:GetAttribute("CC_" .. key .. "TP") or 0
+		row[1].Text = ("%s  %d / 20"):format(row[3], v)
+		row[2].Size = UDim2.fromScale(math.clamp((v + tp / 10) / 20, 0, 1), 1)
+	end
+	recordL.Text = ("Bilanz %d-%d   ·   K.o. %d   ·   Sub %d%s"):format(player:GetAttribute("CC_Wins") or 0, player:GetAttribute("CC_Losses") or 0,
+		player:GetAttribute("CC_KOs") or 0, player:GetAttribute("CC_Subs") or 0, player:GetAttribute("CC_ProfileSaved") and "" or "  (nicht gespeichert)")
 end)

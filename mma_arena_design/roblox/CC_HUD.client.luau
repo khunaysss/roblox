@@ -120,6 +120,43 @@ bannerSub.AnchorPoint = Vector2.new(0.5, 0); bannerSub.Position = UDim2.new(0.5,
 bannerSub.BackgroundTransparency = 1; bannerSub.Font = Enum.Font.GothamBold; bannerSub.TextSize = 26
 bannerSub.TextColor3 = Color3.fromRGB(255, 220, 60); bannerSub.TextStrokeTransparency = 0.3; bannerSub.Parent = gui
 
+-- Hinweise: Training/Level/Werte (Attribute am Spieler von CC_Profile / CC_GymTraining)
+local toast = Instance.new("TextLabel")
+toast.AnchorPoint = Vector2.new(0.5, 0); toast.Position = UDim2.new(0.5, 0, 0, 92); toast.Size = UDim2.fromOffset(700, 34)
+toast.BackgroundColor3 = Color3.fromRGB(18, 18, 22); toast.BackgroundTransparency = 0.25; toast.BorderSizePixel = 0
+toast.Font = Enum.Font.GothamBold; toast.TextSize = 18; toast.TextColor3 = Color3.new(1, 1, 1); toast.Visible = false; toast.Parent = gui
+Instance.new("UICorner", toast).CornerRadius = UDim.new(0, 8)
+local toastUntil = 0
+local function showToast(text, color)
+	toast.Text = text; toast.TextColor3 = color or Color3.new(1, 1, 1); toast.Visible = true; toastUntil = os.clock() + 3
+end
+local STAT_DE = { Power = "Schlagkraft", Cardio = "Kondition", Wrestling = "Ringen", Grappling = "Bodenkampf" }
+player:GetAttributeChangedSignal("CC_Notice"):Connect(function()
+	local t = player:GetAttribute("CC_Notice"); if t then showToast(t:match("^(.*)|") or t) end
+end)
+player:GetAttributeChangedSignal("CC_LevelUp"):Connect(function()
+	showToast("LEVEL UP! Level " .. tostring(player:GetAttribute("CC_LevelUp")), Color3.fromRGB(255, 220, 60))
+end)
+player:GetAttributeChangedSignal("CC_StatUp"):Connect(function()
+	local s_, v = tostring(player:GetAttribute("CC_StatUp")):match("^(%w+):(%d+)")
+	if s_ then showToast((STAT_DE[s_] or s_) .. " steigt auf " .. v .. "!", Color3.fromRGB(120, 190, 255)) end
+end)
+local exBar = Instance.new("Frame")
+exBar.AnchorPoint = Vector2.new(0.5, 0.5); exBar.Position = UDim2.fromScale(0.5, 0.7); exBar.Size = UDim2.fromOffset(360, 16)
+exBar.BackgroundColor3 = Color3.fromRGB(30, 30, 34); exBar.BorderSizePixel = 0; exBar.Visible = false; exBar.Parent = gui
+local exFill = Instance.new("Frame"); exFill.BackgroundColor3 = Color3.fromRGB(80, 200, 120); exFill.BorderSizePixel = 0; exFill.Parent = exBar
+local exL = Instance.new("TextLabel"); exL.AnchorPoint = Vector2.new(0.5, 1); exL.Position = UDim2.new(0.5, 0, 0, -4); exL.Size = UDim2.fromOffset(360, 24)
+exL.BackgroundTransparency = 1; exL.Font = Enum.Font.GothamBold; exL.TextSize = 18; exL.TextColor3 = Color3.new(1, 1, 1); exL.TextStrokeTransparency = 0.4; exL.Parent = exBar
+game:GetService("RunService").RenderStepped:Connect(function()
+	if toast.Visible and os.clock() > toastUntil then toast.Visible = false end
+	local ex = player:GetAttribute("CC_Exercise")
+	exBar.Visible = ex ~= nil
+	if ex then
+		local name, t0, dur = ex:match("^(.-)|([%d%.]+)|([%d%.]+)$")
+		local k = (t0 and dur) and math.clamp((workspace:GetServerTimeNow() - tonumber(t0)) / tonumber(dur), 0, 1) or 0
+		exFill.Size = UDim2.fromScale(k, 1); exL.Text = (name or "Training") .. " … (nicht bewegen)"
+	end
+end)
 game:GetService("RunService").RenderStepped:Connect(function()
 	local char = player.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
@@ -136,7 +173,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local loser = (char and char:GetAttribute("CC_KO")) and char or dummy
 	ko.Text = (loser and loser:GetAttribute("CC_LastReact") == "submission") and "SUBMISSION!" or "K.O.!"
 	if char then
-		myStam.Size = UDim2.fromScale(math.clamp((char:GetAttribute("CC_Stamina") or 100) / 100, 0, 1), 1)
+		myStam.Size = UDim2.fromScale(math.clamp((char:GetAttribute("CC_Stamina") or 100) / (char:GetAttribute("CC_StaminaMax") or 100), 0, 1), 1)
 		local tired = char:GetAttribute("CC_Tired")
 		myStam.BackgroundColor3 = (tired and workspace:GetServerTimeNow() - tired < 0.4) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
 	end
@@ -152,7 +189,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 			duelL.Text = (char:GetAttribute("CC_SubName") or "SUBMISSION") .. (mine and "  –  Q haemmern!" or "  –  Leertaste haemmern!")
 		end
 	end
-	if dummy then foeStam.Size = UDim2.fromScale(math.clamp((dummy:GetAttribute("CC_Stamina") or 100) / 100, 0, 1), 1) end
+	if dummy then foeStam.Size = UDim2.fromScale(math.clamp((dummy:GetAttribute("CC_Stamina") or 100) / (dummy:GetAttribute("CC_StaminaMax") or 100), 0, 1), 1) end
 	if match then
 		local st, t = match:GetAttribute("State"), match:GetAttribute("TimeLeft") or 0
 		roundL.Text = st == "over" and "ENDE" or ("RUNDE " .. tostring(match:GetAttribute("Round") or 1) .. " / 3")

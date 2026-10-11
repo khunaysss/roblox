@@ -69,7 +69,10 @@ local function updateQueueAttrs()
 end
 local current = nil         -- laufender Kampf: { red = Player, blue = Player | nil, mode = "training" | "pvp" }
 local function isFighting(p) return current ~= nil and (current.red == p or current.blue == p) end
-menu.OnServerEvent:Connect(function(p, what)
+-- Menue-Wahl: vom Client (CC_Menu) oder serverseitig (ServerStorage.CC_MenuServer, z. B. Trainer im Gym)
+local menuServer = game.ServerStorage:FindFirstChild("CC_MenuServer") or Instance.new("BindableEvent")
+menuServer.Name = "CC_MenuServer"; menuServer.Parent = game.ServerStorage
+local function onMenu(p, what)
 	if type(what) ~= "string" then return end
 	local i = inQueue(p)
 	if what == "cancel" then
@@ -81,7 +84,9 @@ menu.OnServerEvent:Connect(function(p, what)
 		p:SetAttribute("CC_Queue", what)
 	end
 	updateQueueAttrs()
-end)
+end
+menu.OnServerEvent:Connect(onMenu)
+menuServer.Event:Connect(onMenu)
 Players.PlayerRemoving:Connect(function(p)
 	local i = inQueue(p); if i then table.remove(queue, i) end
 	updateQueueAttrs()
@@ -147,6 +152,11 @@ local function present(m)                    -- beide Kaempfer noch da?
 	local r, b = chars(m)
 	return r ~= nil and r.Parent ~= nil and m.red.Parent ~= nil, b ~= nil and b.Parent ~= nil and (not m.blue or m.blue.Parent ~= nil)
 end
+-- Fortschritt (CC_Profile): Spieler gegen Spieler zaehlt in die Bilanz, Training gibt nur XP; jede Runde trainiert Kondition
+local function profile(p, kind, a, b)
+	local ev = game.ServerStorage:FindFirstChild("CC_ProfileEvent")
+	if ev and p and p.Parent then ev:Fire(p, kind, a, b) end
+end
 local function koWinner(m)
 	local r, b = chars(m)
 	if r and r:GetAttribute("CC_KO") then return "blue" end
@@ -196,6 +206,7 @@ local function runMatch(m)
 		local r, b = chars(m)
 		totalRed += damage(r); totalBlue += damage(b)
 		set("ScoreRed", totalRed); set("ScoreBlue", totalBlue)
+		for _, p in ipairs({ m.red, m.blue }) do profile(p, "train", "Cardio", 2) end
 		if winner then break end
 		freeze(m, true)
 		bell(3)
@@ -215,6 +226,13 @@ local function runMatch(m)
 	set("Banner", winner == "draw" and "UNENTSCHIEDEN" or (wname .. " GEWINNT"))
 	set("BannerSub", method .. string.format("   ·   %d : %d", totalRed, totalBlue))
 	print(("[CC] Kampf vorbei: %s (%s) %d:%d"):format(winner, method, totalRed, totalBlue))
+	for side, p in pairs({ red = m.red, blue = m.blue or false }) do
+		if p then
+			local res = winner == "draw" and "draw" or (winner == side and "win" or "loss")
+			if m.mode == "pvp" then profile(p, "result", res, method)
+			else profile(p, "xp", res == "win" and 30 or 15) end
+		end
+	end
 	for t = OVER_TIME, 1, -1 do set("TimeLeft", t); task.wait(1) end
 	-- zurueck in die Lobby
 	freeze(m, false)

@@ -55,6 +55,20 @@ local LIMB_OFFSET = { LeftHand = 0.45, RightHand = 0.45, RightFoot = 0.25, LeftF
 local ZONES = { head = { bone = "UpperTorso", along = 1.6, radius = 0.95 }, body = { bone = "UpperTorso", along = 0.55, radius = 1.25 },
 	leg = { bone = "LeftUpperLeg", along = 0.9, radius = 1.1 } }   -- Radius = halbe Koerperteil-Dicke + Handschuh bzw. Schienbein
 local STAMINA_MAX, STAMINA_REGEN, STAMINA_DELAY = 100, 16, 0.6
+-- Kaempfer-Werte (0..20) setzt CC_Profile als Attribute am Spieler (CC_Power, CC_Cardio, CC_Wrestling, CC_Grappling);
+-- der Trainingsgegner hat 0. Wirkung: Schlagkraft +1,5 % Schaden je Punkt, Kondition +2 Ausdauer und +2 % Erholung,
+-- Ringen: laengeres Sprawl-Fenster bzw. seltener abgewehrt, Bodenkampf: +2,5 % Wirkung je Tastendruck im Submission-Duell.
+local function stat(f, name)
+	local p = f and game.Players:GetPlayerFromCharacter(f.char)
+	return p and math.clamp(p:GetAttribute("CC_" .. name) or 0, 0, 20) or 0
+end
+-- Fortschritt melden (CC_Profile): Trainingspunkte/XP fuer den Spieler hinter einem Kaempfer
+local function reward(f, kind, a, b)
+	local p = f and game.Players:GetPlayerFromCharacter(f.char)
+	local ev = p and game.ServerStorage:FindFirstChild("CC_ProfileEvent")
+	if ev then ev:Fire(p, kind, a, b) end
+end
+local function staminaMax(f) return STAMINA_MAX + 2 * stat(f, "Cardio") end
 local LOW_STAMINA = 25          -- darunter: weniger Schaden, langsamere Schlaege
 local BUFFER = 0.30             -- Eingabe so viele Sekunden vor Ende der Sperre wird gepuffert (Kombination)
 local WALK_REF = 6        -- Laufzyklen sind fuer WalkSpeed 6 gebaut
@@ -215,8 +229,10 @@ end
 -- Ausdauer-Erholung (nicht waehrend Block und kurz nach einer Aktion)
 RunService.Heartbeat:Connect(function(dt)
 	for _, f in pairs(fighters) do
-		if f.stamina < STAMINA_MAX and os.clock() - f.lastSpend > STAMINA_DELAY and not f.blocking then
-			f.stamina = math.min(STAMINA_MAX, f.stamina + STAMINA_REGEN * dt)
+		local smax = staminaMax(f)
+		if f.char:GetAttribute("CC_StaminaMax") ~= smax then f.char:SetAttribute("CC_StaminaMax", smax) end
+		if f.stamina < smax and os.clock() - f.lastSpend > STAMINA_DELAY and not f.blocking then
+			f.stamina = math.min(smax, f.stamina + STAMINA_REGEN * (1 + 0.02 * stat(f, "Cardio")) * dt)
 			f.char:SetAttribute("CC_Stamina", math.floor(f.stamina + 0.5))
 		end
 	end
@@ -226,7 +242,7 @@ local function land(attacker, target, move, m, track)
 	local blocked = target.blocking
 	local blockFactor = blocked and (m.bodyShot and 0.5 or BLOCK_FACTOR) or 1   -- hohe Deckung schuetzt den Koerper nur halb
 	local tired = attacker.stamina < LOW_STAMINA and 0.7 or 1
-	local dmg = m.damage * blockFactor * tired
+	local dmg = m.damage * blockFactor * tired * (1 + 0.015 * stat(attacker, "Power"))
 	target.hum.Health = math.max(HP_FLOOR, target.hum.Health - dmg)
 	addDamage(attacker.char, dmg)
 	if blocked then spend(target, 4) end
@@ -432,7 +448,7 @@ function groundAdvance(top)
 	local w = top.wr
 	if not w or w.role ~= "top" or w.state ~= "guard" or top.ko then return end
 	local step = ADVANCE[w.pos]; if not step then return end
-	if top.stamina < ADVANCE_COST then top.char:SetAttribute("CC_Tired", os.clock()); return end
+	if top.stamina < ADVANCE_COST then top.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
 	local bottom = w.partner
 	spend(top, ADVANCE_COST)
 	w.state = "advance"
@@ -450,6 +466,7 @@ function groundAdvance(top)
 	task.wait(math.max(0, pairLen(step[1]) - ta.TimePosition - 0.03))
 	if not (top.wr and bottom.wr) then return end
 	print(("[CC] %s Position %s -> %s"):format(top.char.Name, w.pos, step[2]))
+	reward(top, "train", "Grappling", 1)
 	addDamage(top.char, 4)      -- Positionsgewinn zaehlt fuer die Punktwertung
 	groundLoop(top, bottom, step[2])
 end
@@ -463,8 +480,9 @@ function groundPunch(top)
 	local ta = playPair(top, bottom, p.pair, false)
 	task.delay(p.hit, function()
 		if not (top.wr and bottom.wr) then return end
-		bottom.hum.Health = math.max(HP_FLOOR, bottom.hum.Health - p.dmg)
-		addDamage(top.char, p.dmg)
+		local dmg = p.dmg * (1 + 0.015 * stat(top, "Power"))
+		bottom.hum.Health = math.max(HP_FLOOR, bottom.hum.Health - dmg)
+		addDamage(top.char, dmg)
 		print(("[CC] %s Bodenschlag (%s) -> %s %.0f"):format(top.char.Name, w.pos, bottom.char.Name, bottom.hum.Health))
 		hitFX(bottom.char, 0.5, "hit"); hitFX(top.char, 0.25, "land")
 		ta:AdjustSpeed(0.05); task.delay(HITSTOP, function() if ta.IsPlaying then ta:AdjustSpeed(1) end end)
@@ -503,7 +521,7 @@ function groundSubmit(top)
 	local w = top.wr
 	if not w or w.role ~= "top" or w.state ~= "guard" or top.ko then return end
 	local sub = SUBS[w.pos]; if not sub then return end
-	if top.stamina < SUB_COST then top.char:SetAttribute("CC_Tired", os.clock()); return end
+	if top.stamina < SUB_COST then top.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
 	local bottom = w.partner
 	spend(top, SUB_COST)
 	w.state = "sub"; top.mash, bottom.mash = 0, 0
@@ -521,7 +539,7 @@ function groundSubmit(top)
 		for _, x in ipairs({ top, bottom }) do                 -- Trainingsgegner haemmert ca. 4-5 mal pro Sekunde
 			if isDummy(x) and not passive(x) and now >= dummyNext then x.mash += 1; dummyNext = now + 0.18 + math.random() * 0.12 end
 		end
-		p += top.mash * SUB_TOP - bottom.mash * SUB_BOTTOM + dt * 0.10 * (1 - bottom.hum.Health / bottom.hum.MaxHealth)
+		p += top.mash * SUB_TOP * (1 + 0.025 * stat(top, "Grappling")) - bottom.mash * SUB_BOTTOM * (1 + 0.025 * stat(bottom, "Grappling")) + dt * 0.10 * (1 - bottom.hum.Health / bottom.hum.MaxHealth)
 		top.mash, bottom.mash = 0, 0
 		p = math.clamp(p, 0, 1)
 		top.char:SetAttribute("CC_SubProgress", p); bottom.char:SetAttribute("CC_SubProgress", p)
@@ -531,6 +549,7 @@ function groundSubmit(top)
 	if not (top.wr and bottom.wr) then return end
 	if p >= 1 then
 		print(("[CC] %s gewinnt per %s gegen %s"):format(top.char.Name, sub.name, bottom.char.Name))
+		reward(top, "train", "Grappling", 3)
 		ta:AdjustSpeed(1); tb:AdjustSpeed(1)
 		task.wait(pairLen(sub.pair) - sub.hold - 0.05)
 		ta:AdjustSpeed(0); tb:AdjustSpeed(0)
@@ -542,6 +561,7 @@ function groundSubmit(top)
 		return
 	end
 	print(("[CC] %s befreit sich aus %s"):format(bottom.char.Name, sub.name))
+	reward(bottom, "train", "Grappling", 2)
 	hitFX(top.char, 0.2, "block")
 	reversePair(top, bottom, sub.pair, ta.TimePosition)
 	if top.wr and bottom.wr then groundLoop(top, bottom, w.pos) end
@@ -560,7 +580,7 @@ function groundEscape(f)
 	f.wantEscape = nil
 	if top.wr.pos ~= "guard" then
 		if f ~= bottom then return end
-		if bottom.stamina < ESCAPE_COST then bottom.char:SetAttribute("CC_Tired", os.clock()); return end
+		if bottom.stamina < ESCAPE_COST then bottom.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
 		spend(bottom, ESCAPE_COST)
 		local back = RETREAT[top.wr.pos]
 		top.wr.state = "escape"
@@ -585,6 +605,7 @@ function groundEscape(f)
 		task.wait(math.max(0, ta.TimePosition))
 		if not (top.wr and bottom.wr) then return end
 		print(("[CC] %s befreit sich: %s -> %s"):format(bottom.char.Name, top.wr.pos, back[2]))
+		reward(bottom, "train", "Grappling", 1)
 		groundLoop(top, bottom, back[2])
 		return
 	end
@@ -644,10 +665,12 @@ function tryTakedown(a)
 	local isDummy = b.char == workspace:FindFirstChild("CC_TrainingDummy")
 	task.wait(SPRAWL_WINDOW)
 	local defended
-	if isDummy then defended = math.random() < 0.3 else defended = b.sprawlAt ~= nil and math.abs(b.sprawlAt - shotAt) <= SPRAWL_WINDOW end
+	if isDummy then defended = math.random() < math.max(0.1, 0.3 - 0.01 * stat(a, "Wrestling"))
+	else defended = b.sprawlAt ~= nil and math.abs(b.sprawlAt - shotAt) <= SPRAWL_WINDOW + 0.01 * stat(b, "Wrestling") - 0.005 * stat(a, "Wrestling") end
 	if a.ko or b.ko then return end
 	local pair = defended and "TD_DoubleLeg_Defended" or "TD_DoubleLeg_Success"
 	print(("[CC] %s Takedown -> %s: %s"):format(a.char.Name, b.char.Name, defended and "Sprawl (abgewehrt)" or "erfolgreich"))
+	if defended then reward(b, "train", "Wrestling", 2) else reward(a, "train", "Wrestling", 2) end
 	local ta = playPair(a, b, pair, false)
 	hitFX(a.char, 0.25, "land"); hitFX(b.char, defended and 0.2 or 0.6, defended and "block" or "hit")
 	ta.Stopped:Wait()
