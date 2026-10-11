@@ -30,6 +30,14 @@ local function animOf(name)
 end
 local COMBO = { animOf("Fighter_Jab_v03"), animOf("Fighter_Cross_v03"), animOf("Fighter_Hook_v03"), animOf("Fighter_Uppercut_v02") }
 local EX = { bench = animOf("Fighter_ExBenchPress_v01"), curl = animOf("Fighter_ExCurl_v01"), jack = animOf("Fighter_ExJumpingJack_v2") }
+-- Gewichtstraining als einzelne Wiederholungen (Fighter_Rigged_v18): Ruhepose (Loop) + je Treffer genau eine Wiederholung,
+-- die letzten zwei langsamer mit Anstrengung (Grind), ein Fehler = Fehlversuch (stockt, Zittern). Alle starten/enden in der Ruhepose.
+local function maybeAnim(name) return (IDS[name] or ANIM:FindFirstChild(name)) and animOf(name) or nil end
+local EXR = {
+	bench = { rest = maybeAnim("Fighter_ExBench_Rest"), rep = maybeAnim("Fighter_ExBench_Rep"), grind = maybeAnim("Fighter_ExBench_Grind"), fail = maybeAnim("Fighter_ExBench_Fail") },
+	curl = { rest = maybeAnim("Fighter_ExCurl_Rest"), repL = maybeAnim("Fighter_ExCurl_RepL"), repR = maybeAnim("Fighter_ExCurl_RepR"),
+		grindL = maybeAnim("Fighter_ExCurl_GrindL"), grindR = maybeAnim("Fighter_ExCurl_GrindR"), failL = maybeAnim("Fighter_ExCurl_FailL"), failR = maybeAnim("Fighter_ExCurl_FailR") },
+}
 
 local trainEv = RS:FindFirstChild("CC_Train") or Instance.new("RemoteEvent"); trainEv.Name = "CC_Train"; trainEv.Parent = RS
 local propsF = workspace:FindFirstChild("CC_Props") or Instance.new("Folder"); propsF.Name = "CC_Props"; propsF.Parent = workspace
@@ -184,6 +192,8 @@ local function finish(p, s, reason)
 	sessions[p] = nil
 	p:SetAttribute("CC_Minigame", nil)
 	if s.track then s.track:Stop(0.3) end
+	if s.restTrack then s.restTrack:Stop(0.3) end
+	for _, t in pairs(s.repTracks or {}) do if t.IsPlaying then t:Stop(0.25) end end
 	clearProps(s)
 	local root = s.root
 	if root and root.Parent then
@@ -216,7 +226,12 @@ local function start(p, marker, kind)
 	sessions[p] = s
 	s.dir = place(p, marker, kind)
 	root.Anchored = true
-	if def.anim and animator then
+	local set = def.anim and EXR[def.anim]
+	if set and set.rest and animator then                          -- Gewichte: Ruhepose halten, Wiederholungen einzeln
+		s.reps, s.animator, s.repTracks = set, animator, {}
+		s.restTrack = animator:LoadAnimation(set.rest); s.restTrack.Priority = Enum.AnimationPriority.Action; s.restTrack.Looped = true
+		s.restTrack:Play(0.3)
+	elseif def.anim and animator then
 		s.track = animator:LoadAnimation(EX[def.anim]); s.track.Priority = Enum.AnimationPriority.Action; s.track.Looped = true
 		s.track:Play(0.3); s.track:AdjustSpeed(0)                  -- steht still bis zum ersten Treffer
 	end
@@ -235,8 +250,30 @@ local function start(p, marker, kind)
 	task.delay(s.deadline - workspace:GetServerTimeNow() + 1.0, function() finish(p, s, "Zeit") end)
 end
 
+-- eine Wiederholung abspielen (Treffer) bzw. Fehlversuch; Dauer passt in den Takt, damit die naechste Eingabe frei ist
+local function playRep(s, i, ok)
+	local side = s.kind == "curl" and ((s.keys[i] == "Q") and "L" or "R") or ""
+	local base = (not ok) and "fail" or (i >= s.n - 1 and "grind" or "rep")   -- letzte zwei: langsamer mit Anstrengung
+	local key = base .. side
+	if not s.reps[key] then return end
+	local tr = s.repTracks[key]
+	if not tr then
+		tr = s.animator:LoadAnimation(s.reps[key]); tr.Priority = Enum.AnimationPriority.Action2; tr.Looped = false
+		s.repTracks[key] = tr
+	end
+	for _, t in pairs(s.repTracks) do if t ~= tr and t.IsPlaying then t:Stop(0.12) end end   -- Ende jeder Wiederholung = Ruhepose -> weicher Uebergang
+	local dur = s.kindDef.interval * (base == "rep" and 0.85 or 0.98)
+	if tr.IsPlaying then tr:Stop(0) end
+	tr:Play(0.08, 1, tr.Length / dur)
+end
+
 -- Rueckmeldung des Clients je Aufgabe
 trainEv.OnServerEvent:Connect(function(p, what, id, i)
+	if what == "abort" then                                         -- Minispiel abbrechen (Ruecktaste / Select): sauber beenden
+		local s_ = sessions[p]
+		if s_ and s_.id == id then finish(p, s_, "Abbruch") end
+		return
+	end
 	if what == "again" then                                         -- gleiche Station noch einmal
 		local l, c = lastStation[p], p.Character
 		local root = c and c:FindFirstChild("HumanoidRootPart")
@@ -261,6 +298,8 @@ trainEv.OnServerEvent:Connect(function(p, what, id, i)
 				local tr = animator:LoadAnimation(COMBO[(s.combo - 1) % #COMBO + 1]); tr.Priority = Enum.AnimationPriority.Action; tr:Play(0.05)
 			end
 			task.delay(0.18, function() swing(s.marker, s.dir or Vector3.new(1, 0, 0), 5 + math.min(s.combo, 6)); hitSound(s.marker) end)
+		elseif s.reps then
+			playRep(s, i, true)
 		elseif s.track then
 			-- eine Wiederholung im Takt abspielen (Animationstempo an den Takt angepasst)
 			local repLen = s.track.Length / (s.kind == "curl" and 2 or 1)
@@ -270,6 +309,8 @@ trainEv.OnServerEvent:Connect(function(p, what, id, i)
 	else
 		s.misses += 1
 		if s.kind == "bag" then s.combo = 0
+		elseif s.reps then
+			playRep(s, i, false)
 		elseif s.track then
 			s.track:AdjustSpeed(0.15)                                   -- Stocken: Kaempfer kaempft mit dem Gewicht
 			local mark = now
@@ -330,4 +371,7 @@ for _, marker in ipairs(folder:GetChildren()) do
 	end
 end
 Players.PlayerRemoving:Connect(function(p) local s = sessions[p]; if s then clearProps(s); sessions[p] = nil end; lastStation[p] = nil end)
+-- Charakter weg (Reset/Tod) waehrend einer Uebung: Sitzung sauber beenden (Gewichte weg, kein Haengenbleiben)
+local function hookChar(p) p.CharacterRemoving:Connect(function() local s = sessions[p]; if s then finish(p, s, "Abbruch") end end) end
+Players.PlayerAdded:Connect(hookChar); for _, p in ipairs(Players:GetPlayers()) do hookChar(p) end
 print("[CC] Gym-Training: " .. n .. " Stationen (Minispiele)")

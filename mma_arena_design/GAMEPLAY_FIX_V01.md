@@ -124,3 +124,26 @@
   - Studio: Gegnerausrichtung und Kampfkamera unverändert aktiv.
 - **Hinweis:** Bei Kampftempo 8 Studs/s ist ein Schritt 0,56 m lang (4 Schritte pro Sekunde). Kürzere Schritte gingen nur mit langsamerem Kampftempo; das Spieltempo ist unverändert.
 - **Nicht getestet:** Wirkung in Bewegung mit eigenen Augen (nur Messwerte und Blender-Vorschau), Controller-Stick mit Teilgeschwindigkeit, zwei Spieler.
+
+## Abschnitt 5 – Gewichtstraining (erledigt)
+- **Neue Animationen als einzelne Wiederholungen** (`build_fighter_rigged_v18.py` → `Fighter_Rigged_v18.blend`, Export `export_actions_roblox_v20.py`; in Studio geladen, **noch nicht hochgeladen**). Alle beginnen und enden in derselben Ruhepose (Abweichung 0 mm).
+  - Bankdrücken: `Fighter_ExBench_Rest` (Stange oben, Atmen), `_Rep` (kontrolliert zur Brust, kurz halten, hochdrücken), `_Grind` (langsamer, Haltepunkt mit leichtem Zittern, Brust gespannt, Kopf presst), `_Fail` (Druck bleibt in der Mitte stecken, Zittern, dann mühsam nach oben).
+  - Kurzhanteln: `Fighter_ExCurl_Rest`, `_RepL/R`, `_GrindL/R`, `_FailL/R`.
+    - Das Handgelenk läuft auf einem Kreisbogen um den festen Ellbogen (Oberarm bewegt sich 1,3–2,4 cm, vorher 11 cm).
+    - Das Handgelenk dreht beim Hochkommen ein.
+- **Synchron mit dem Minispiel** (`CC_GymTraining`):
+  - Jeder Treffer spielt genau eine Wiederholung (Curls: Q = links, E = rechts), die in den Takt passt.
+  - Die letzten zwei Wiederholungen laufen als Grind, ein Fehler als Fehlversuch.
+  - Vorher lief eine Schleife weiter oder blieb mitten in der Bewegung stehen.
+  - Wechsel blenden in 0,08–0,12 s, da Start und Ende die Ruhepose sind: keine Sprünge.
+- **Gewichte:** Langhantel und Kurzhanteln gehen sichtbar mit den Händen (geprüft im Bild). Griffbreite der Stange wie zuvor (Hände 0,76–0,80 m auseinander).
+- **Ende und Abbruch:**
+  - Neu ist Abbrechen mit Rücktaste bzw. Controller Select (Hinweis unten rechts). Es gibt XP für die Treffer, keine TP-Stufe ohne genug Treffer, keine doppelte Auszahlung.
+  - Verschwindet der Charakter während der Übung (Reset), wird die Sitzung sauber beendet.
+  - Danach: Gewichte entfernt, Rack-Stange wieder sichtbar, Figur frei, Kamera normal.
+- **Geprüft in Studio:**
+  - Bankdrücken mit 7 Treffern und 1 Fehler → Ergebnis 7/8, +2 TP; Bilder von Fehlversuch und Grind.
+  - Bankdrücken ohne Eingaben: 8 Fehlversuche ohne Fehler im Ablauf.
+  - Curls nach 2 Wiederholungen abgebrochen: keine Gewichte mehr, Figur frei, nur noch die Locker-Animation aktiv.
+  - Konsole ohne Fehler.
+- **Nicht getestet:** Charakter-Reset während der Übung, Controller-Select, zwei Spieler gleichzeitig an verschiedenen Geräten.

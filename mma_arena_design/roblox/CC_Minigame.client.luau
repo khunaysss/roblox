@@ -42,6 +42,7 @@ local howRow = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fr
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = howRow })
 local progL = UI.label({ Text = "", FontFace = F.bold, TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 80), Size = UDim2.new(1, 0, 0, 20), Parent = card })
 local _, progFill = UI.bar({ Position = UDim2.fromOffset(0, 104), Size = UDim2.new(1, 0, 0, 6), Parent = card }, C.green)
+UI.hints({ AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -40, 1, -32), Entries = { { pc = "RÜCKTASTE", pad = "SELECT", text = "Abbrechen" } }, Parent = canvas })
 
 -- Countdown und Rueckmeldung
 local countL = UI.label({ Text = "", FontFace = F.title, TextSize = 96, TextXAlignment = Enum.TextXAlignment.Center, AnchorPoint = Vector2.new(0.5, 0.5),
@@ -145,12 +146,16 @@ local function bindInput(on)
 	if on then
 		CAS:BindActionAtPriority("CC_Minigame", function(_, state, input)
 			if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Sink end
+			if input.KeyCode == Enum.KeyCode.Backspace or input.KeyCode == Enum.KeyCode.ButtonSelect then   -- abbrechen
+				if game_ then trainEv:FireServer("abort", game_.id) end
+				return Enum.ContextActionResult.Sink
+			end
 			local key = KEYMAP[input.KeyCode] or PAD[input.KeyCode]
 			if game_ and game_.game == "rhythm" and input.KeyCode == Enum.KeyCode.ButtonA then key = game_.keys[1] == "Space" and "Space" or key end
 			if key then press(key) end
 			return Enum.ContextActionResult.Sink
 		end, false, 3000, Enum.KeyCode.Q, Enum.KeyCode.E, Enum.KeyCode.R, Enum.KeyCode.F, Enum.KeyCode.Space,
-			Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY, Enum.KeyCode.ButtonB, Enum.KeyCode.ButtonA)
+			Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY, Enum.KeyCode.ButtonB, Enum.KeyCode.ButtonA, Enum.KeyCode.Backspace, Enum.KeyCode.ButtonSelect)
 	else
 		CAS:UnbindAction("CC_Minigame")
 	end
