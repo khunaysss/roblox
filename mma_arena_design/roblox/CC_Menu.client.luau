@@ -120,7 +120,7 @@ cancelB.Activated:Connect(function() menuEvent:FireServer("cancel") end)
 
 game:GetService("RunService").RenderStepped:Connect(function()
 	local char = player.Character
-	local inMatch = char and char:GetAttribute("CC_Opponent") ~= nil
+	local inMatch = (char and char:GetAttribute("CC_Opponent") ~= nil) or player:GetAttribute("CC_Minigame") ~= nil   -- auch waehrend Gym-Training ausblenden
 	panel.Visible = not inMatch
 	if inMatch then custom.Visible = false; return end
 	local look = currentLook()

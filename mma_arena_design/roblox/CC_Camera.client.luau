@@ -49,7 +49,7 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	local targetName = char and char:GetAttribute("CC_LockTarget")
 	local target = targetName and targetName ~= "" and workspace:FindFirstChild(targetName)
 	if not (char and target and char:FindFirstChild("HumanoidRootPart") and target:FindFirstChild("HumanoidRootPart")) then
-		if cam.CameraType == Enum.CameraType.Scriptable then cam.CameraType = Enum.CameraType.Custom end
+		if cam.CameraType == Enum.CameraType.Scriptable and not player:GetAttribute("CC_Minigame") then cam.CameraType = Enum.CameraType.Custom end   -- Training-Kamera (CC_Minigame) nicht stoeren
 		camPos, aimPos = nil, nil
 		return
 	end

@@ -1,0 +1,13 @@
+{
+ "source": "Fighter_Rigged_v14.blend (unveraendert)",
+ "actions": {
+  "Fighter_ExJumpingJack_v2": {
+   "frames": 17,
+   "lowest_body_z": -0.0004,
+   "knee_min_deg": 0.4025,
+   "elbow_min_deg": 143.5569,
+   "stance_slip_mps": 0.0,
+   "loop_error_m": 0.0
+  }
+ }
+}
