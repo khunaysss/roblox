@@ -30,7 +30,7 @@ local STATS = { { "Power", "Schlagkraft" }, { "Cardio", "Kondition" }, { "Wrestl
 local STAT_DE = { Power = "Schlagkraft", Cardio = "Kondition", Wrestling = "Ringen", Grappling = "Bodenkampf" }
 local WHERE = {
 	Power = "Sandsack, Hantelbank oder Kurzhanteln",
-	Cardio = "Hampelmann auf der Trainingsmatte · jede Kampfrunde",
+	Cardio = "Laufband, Hampelmann auf der Trainingsmatte · jede Kampfrunde",
 	Wrestling = "Takedowns und Sprawls im Kampf",
 	Grappling = "Positionen, Befreien und Submissions im Kampf",
 }
@@ -81,7 +81,7 @@ local function updateTask()
 	end
 	local v, tp = attr("CC_" .. best, 0), attr("CC_" .. best .. "TP", 0)
 	taskTitle.Text = STAT_DE[best] .. " trainieren"
-	taskSub.Text = ("%s · noch %d TP bis %s %d"):format(best == "Power" and "Sandsack, Hantelbank, Kurzhanteln" or "Hampelmann auf der Matte",
+	taskSub.Text = ("%s · noch %d TP bis %s %d"):format(best == "Power" and "Sandsack, Hantelbank, Kurzhanteln" or "Laufband oder Hampelmann",
 		10 - tp, STAT_DE[best], v + 1)
 end
 
@@ -130,7 +130,7 @@ local gymFolder = workspace:WaitForChild("CC_GymInteractions", 20)
 local TRAINS = {
 	punch_bag = "Schlagkraft · Tastenfolge", punch_bag_standing = "Schlagkraft · Tastenfolge",
 	bench_press = "Schlagkraft · Rhythmus", bench_dumbbell = "Schlagkraft · Rhythmus",
-	stretch_spot = "Kondition · Rhythmus", coach_talk = "Trainingskampf (ohne Bilanz)",
+	stretch_spot = "Kondition · Rhythmus", treadmill = "Kondition · Tempo halten", coach_talk = "Trainingskampf (ohne Bilanz)",
 	character_customization = "Aussehen ändern", locker = "Aussehen ändern", read_plan = "Werte und Trainingsorte",
 }
 local function isGymPrompt(p) return gymFolder and p:IsA("ProximityPrompt") and p:IsDescendantOf(gymFolder) end

@@ -147,3 +147,30 @@
   - Curls nach 2 Wiederholungen abgebrochen: keine Gewichte mehr, Figur frei, nur noch die Locker-Animation aktiv.
   - Konsole ohne Fehler.
 - **Nicht getestet:** Charakter-Reset während der Übung, Controller-Select, zwei Spieler gleichzeitig an verschiedenen Geräten.
+
+## Abschnitt 6 – Laufband mit Minispiel (erledigt)
+- **Modell:** `roblox/setup_treadmill_v01.luau` (in Studio ausgeführt), `CC_Gym.Treadmill_1`, 31 Teile.
+  - Farbwelt des Gyms: dunkles Metall, schwarzes Band, rote Markierung, weiße Akzente.
+  - Konsole mit Tempoanzeige; Rollen, Seitenschienen, Handläufe.
+  - Platz: freier Betonboden vor der Ostwand, Konsole zur Wand. Der erste Platz lag auf der roten Mattenfläche und wurde versetzt.
+  - Interaktionspunkt `CC_GymInteractions.Treadmill_1`.
+- **Band:** 14 Lamellen bewegen sich mit der Bandgeschwindigkeit (Attribut am Modell vom Server), für alle Spieler sichtbar. Die Konsole zeigt km/h.
+- **Läufer:** steht verankert auf dem Band.
+  - Gehen bzw. Laufen (v17) auf der Stelle; der Standfuß gleitet mit dem Band.
+  - Abspieltempo = Bandtempo / gebaute Geschwindigkeit; Wechsel Gehen → Laufen ab ~8 km/h (überblendet).
+- **Minispiel** (30 s, `CC_GymTraining` + `CC_Minigame`):
+  - Zieltempo wechselt alle 5–7,5 s zwischen 6 und 13 km/h, Zielbereich ±0,8 km/h.
+  - Q/E bzw. LB/RB bzw. zwei Bildschirmknöpfe halten = langsamer/schneller (3,5 km/h pro Sekunde).
+  - Zu schnell kostet Ausdauer; ist sie leer („ERSCHÖPFT“), wird man langsamer und kann nicht beschleunigen. Zu langsam bringt keine Sekunden.
+  - Anzeige: Skala 3–16 km/h mit grünem Zielbereich, eigenes Tempo, Ausdauer, Restzeit, Sekunden im Zielbereich, Rückmeldung (IM ZIEL / ZU SCHNELL / ZU LANGSAM).
+- **Belohnung** über das vorhandene System (`finish`):
+  - Sekunden im Zielbereich / 30 → 3/2/1 TP Kondition; XP = Sekunden / 2 (höchstens 15).
+  - Einmalig pro Durchgang, auch bei Abbruch (Rücktaste/Select) nur einmal.
+- **Ende/Abbruch:** zurück an den Startpunkt, frei beweglich, Band stoppt, Locker-Tempo wieder 6,4.
+- **Geprüft in Studio** (Tempo per Skript geregelt bzw. absichtlich zu schnell):
+  - Ganzer Durchgang: 24/30 s → +2 TP Kondition, Figur frei, Band 0.
+  - Zu schnell: Ausdauer leer → ERSCHÖPFT.
+  - Abbruch nach 5 s: sauber beendet.
+  - Bilder an beiden Plätzen.
+  - Den XP-Wert habe ich nach dem ersten Durchgang halbiert und den Ausdauerverlust gemildert; diese beiden Änderungen sind nicht erneut getestet.
+- **Nicht getestet:** Touch-Knöpfe auf echtem Gerät, Controller LB/RB, zwei Spieler (es gibt nur ein Laufband; ein zweiter Spieler kann es nicht gleichzeitig nutzen, weil die Station dann belegt ist – nicht geprüft).

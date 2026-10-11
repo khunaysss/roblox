@@ -53,6 +53,7 @@ local KINDS = {
 	bag = { label = "Sandsack", stat = "Power", game = "seq", n = 10, time = 7.0, cam = "side" },
 	bench = { label = "Bankdrücken", stat = "Power", game = "rhythm", n = 8, interval = 1.2, keys = { "Space" }, anim = "bench", prop = "barbell", cam = "bench" },
 	curl = { label = "Kurzhantel-Curls", stat = "Power", game = "rhythm", n = 10, interval = 0.95, keys = { "Q", "E" }, anim = "curl", prop = "dumbbells", cam = "front" },
+	tread = { label = "Laufband", stat = "Cardio", game = "tread", n = 30, time = 30, keys = { "Q", "E" }, cam = "side" },   -- Laufband: 30 s Tempo halten
 	jack = { label = "Hampelmann", stat = "Cardio", game = "rhythm", n = 14, interval = 0.62, keys = { "Space" }, anim = "jack", cam = "front" },
 }
 local SEQ_KEYS = { "Q", "E", "R", "F" }
@@ -168,6 +169,14 @@ local function place(p, marker, kind)
 		if not dir or dir.Magnitude < 0.3 then dir = marker.Size.X > marker.Size.Z and Vector3.new(1, 0, 0) or Vector3.new(0, 0, 1) end
 		dir = dir.Unit
 		root.CFrame = CFrame.lookAt(c + dir * 0.6, c + dir * 5)        -- Blick = Richtung Fuesse (die Animation liegt nach hinten)
+	elseif kind == "tread" then
+		-- auf dem Band stehen, Blick zur Konsole (+X); Hoehe = Bandoberkante + Standhoehe des HumanoidRootPart (wie auf dem Boden)
+		local c = marker:GetAttribute("CC_BeltCenter") or marker.Position
+		local rp = RaycastParams.new(); rp.FilterDescendantsInstances = { p.Character }
+		local hit = workspace:Raycast(root.Position, Vector3.new(0, -10, 0), rp)
+		local standH = hit and (y - hit.Position.Y) or 3.05
+		local pos = Vector3.new(c.X, (marker:GetAttribute("CC_BeltTop") or 0.63) + standH, c.Z)
+		root.CFrame = CFrame.lookAt(pos, pos + Vector3.new(1, 0, 0))
 	elseif kind == "jack" then
 		-- Mitte der Matte, Blick entlang der Matte in die Halle (nicht zur Wand)
 		local c = Vector3.new(marker.Position.X, y, marker.Position.Z)
@@ -194,20 +203,26 @@ local function finish(p, s, reason)
 	if s.track then s.track:Stop(0.3) end
 	if s.restTrack then s.restTrack:Stop(0.3) end
 	for _, t in pairs(s.repTracks or {}) do if t.IsPlaying then t:Stop(0.25) end end
+	if s.tread then
+		for _, t in pairs(s.tread.tracks) do t:Stop(0.3) end
+		if s.tread.model then s.tread.model:SetAttribute("CC_BeltSpeed", 0); s.tread.model:SetAttribute("CC_BeltKmh", 0) end
+		p:SetAttribute("CC_Tread", nil)
+	end
 	clearProps(s)
 	local root = s.root
 	if root and root.Parent then
-		if s.kind == "bench" then root.CFrame = s.startCF end
+		if s.kind == "bench" or s.kind == "tread" then root.CFrame = s.startCF end   -- von Bank/Band zurueck an den Ausgangspunkt
 		root.Anchored = false
 	end
 	if not p.Parent then return end
 	local rate = s.hits / s.n
 	local tp = rate >= 0.9 and 3 or rate >= 0.6 and 2 or rate >= 0.3 and 1 or 0
 	if tp > 0 then profile(p, "train", s.kindDef.stat, tp) end
-	profile(p, "xp", s.hits)
+	local xp = s.kind == "tread" and math.floor(s.hits / 2) or s.hits   -- Laufband: 30 s -> hoechstens 15 XP (vergleichbar mit den anderen Stationen)
+	profile(p, "xp", xp)
 	-- Ergebnis fuer die Trainings-Anzeige (CC_Minigame): echte Belohnung wie oben vergeben
 	p:SetAttribute("CC_TrainResult", HS:JSONEncode({ id = s.id, kind = s.kind, label = s.kindDef.label, stat = s.kindDef.stat,
-		hits = s.hits, n = s.n, tp = tp, xp = s.hits, reason = reason }))
+		hits = s.hits, n = s.n, tp = tp, xp = xp, reason = reason }))
 	print(("[CC] Training %s %s: %d/%d (%s) -> %d TP"):format(p.Name, s.kind, s.hits, s.n, reason, tp))
 end
 
@@ -244,7 +259,19 @@ local function start(p, marker, kind)
 	end
 	s.keys = keys
 	s.t0 = workspace:GetServerTimeNow() + LEAD
-	s.deadline = def.game == "seq" and (s.t0 + def.time) or (s.t0 + def.n * def.interval + 0.6)
+	s.deadline = (def.game == "seq" or def.game == "tread") and (s.t0 + def.time) or (s.t0 + def.n * def.interval + 0.6)
+	if def.game == "tread" and animator then                        -- Laufband: Gehen/Laufen auf der Stelle (Standfuss gleitet mit dem Band)
+		local tr = {}
+		for k, n in pairs({ walk = "Fighter_CasualWalk_v2", run = "Fighter_CasualRun_v3", stand = "Fighter_CasualIdle_v01" }) do
+			local a = maybeAnim(n)
+			if a then
+				tr[k] = animator:LoadAnimation(a); tr[k].Priority = Enum.AnimationPriority.Action; tr[k].Looped = true
+				tr[k]:Play(0.3, k == "stand" and 1 or 0.001, 1)
+			end
+		end
+		s.tread = { speed = 0, target = 7.0, lastTarget = 7.0, nextChange = s.t0 + 6, stamina = 100, inBand = 0, input = 0, tracks = tr, lastPub = 0,
+			model = workspace:FindFirstChild("CC_Gym") and workspace.CC_Gym:FindFirstChild("Treadmill_1") }
+	end
 	p:SetAttribute("CC_Minigame", HS:JSONEncode({ id = s.id, kind = kind, game = def.game, label = def.label, keys = keys,
 		interval = def.interval, n = def.n, time = def.time, start = s.t0, cam = def.cam }))
 	task.delay(s.deadline - workspace:GetServerTimeNow() + 1.0, function() finish(p, s, "Zeit") end)
@@ -269,6 +296,11 @@ end
 
 -- Rueckmeldung des Clients je Aufgabe
 trainEv.OnServerEvent:Connect(function(p, what, id, i)
+	if what == "tempo" then                                         -- Laufband: -1 langsamer, 0 nichts, +1 schneller (gehalten)
+		local s_ = sessions[p]
+		if s_ and s_.tread and s_.id == id and (i == -1 or i == 0 or i == 1) then s_.tread.input = i end
+		return
+	end
 	if what == "abort" then                                         -- Minispiel abbrechen (Ruecktaste / Select): sauber beenden
 		local s_ = sessions[p]
 		if s_ and s_.id == id then finish(p, s_, "Abbruch") end
@@ -320,6 +352,46 @@ trainEv.OnServerEvent:Connect(function(p, what, id, i)
 	end
 	if s.hits + s.misses >= s.n then task.delay(0.5, function() finish(p, s, "fertig") end) end
 end)
+-- ---------- Laufband: Tempo (km/h), wechselndes Zieltempo, Ausdauer, Wertung ----------
+-- Zielbereich +-0,8 km/h. Im Bereich sammelt man Sekunden (= Treffer, n = 30). Zu schnell kostet Ausdauer (leer -> man wird
+-- langsamer und kann nicht beschleunigen), zu langsam gibt keine Sekunden. Belohnung ueber finish() wie bei allen Uebungen.
+local T_BAND, T_MIN, T_MAX, T_ACCEL = 0.8, 3.0, 16.0, 3.5
+local WALK_MPS, RUN_MPS = 1.80, 4.20
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+	local now = workspace:GetServerTimeNow()
+	for p, s in pairs(sessions) do
+		local t = s.tread
+		if t and now >= s.t0 then
+			if now >= t.nextChange then                              -- neues Zieltempo (deutlich anders als das vorige)
+				local nt
+				repeat nt = math.random(12, 26) / 2 until math.abs(nt - t.target) >= 2
+				t.target = nt; t.nextChange = now + 5 + math.random() * 2.5
+			end
+			local tired = t.stamina <= 0
+			local dv = t.input * T_ACCEL * dt
+			if tired then dv = math.min(dv, 0) - 1.5 * dt end
+			t.speed = math.clamp(t.speed + dv, T_MIN, T_MAX)
+			if now - s.t0 < 0.3 and t.speed < 4 then t.speed = 4 end                 -- Band laeuft an
+			local over = t.speed - (t.target + T_BAND)
+			if over > 0 then t.stamina = math.max(0, t.stamina - (5 + 6 * over) * dt)
+			else t.stamina = math.min(100, t.stamina + 5 * dt) end
+			if math.abs(t.speed - t.target) <= T_BAND then t.inBand += dt end
+			s.hits = math.min(s.n, math.floor(t.inBand + 0.5))
+			-- Animation: Gehen bis ~8 km/h, darueber Laufen; Abspieltempo = Bandgeschwindigkeit / gebaute Geschwindigkeit
+			local mps = t.speed / 3.6
+			local runK = math.clamp((mps - 2.1) / 0.5, 0, 1)
+			if t.tracks.walk then t.tracks.walk:AdjustWeight(math.max(1 - runK, 0.001), 0.2); t.tracks.walk:AdjustSpeed(mps / WALK_MPS) end
+			if t.tracks.run then t.tracks.run:AdjustWeight(math.max(runK, 0.001), 0.2); t.tracks.run:AdjustSpeed(mps / RUN_MPS) end
+			if t.tracks.stand and t.tracks.stand.IsPlaying then t.tracks.stand:Stop(0.3) end
+			if now - t.lastPub > 0.1 then
+				t.lastPub = now
+				p:SetAttribute("CC_Tread", ("%.2f|%.1f|%.0f|%.2f|%.2f|%s"):format(t.speed, t.target, t.stamina, math.max(0, s.deadline - now), t.inBand, tired and "1" or "0"))
+				if t.model then t.model:SetAttribute("CC_BeltSpeed", mps / 0.28); t.model:SetAttribute("CC_BeltKmh", t.speed) end
+			end
+		end
+	end
+end)
+
 -- Wiederholungs-Animation nach einem Treffer anhalten, wenn der naechste Takt nicht getroffen wird
 game:GetService("RunService").Heartbeat:Connect(function()
 	local now = workspace:GetServerTimeNow()
@@ -349,6 +421,7 @@ local STATIONS = {
 	end },
 	character_customization = { "Spiegel", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
 	locker = { "Spind", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
+	treadmill = { "Laufband", "Laufen", function(p, m) start(p, m, "tread") end },
 	read_plan = { "Trainingsplan", "Ansehen", function(p) p:SetAttribute("CC_OpenPlan", os.clock()) end },
 }
 
