@@ -40,7 +40,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | E Bodenpositionen + Submissions | erledigt (PC getestet) | Überschneidungen 11–14 cm; Aufstehen nur aus der Guard |
 | 7 Gegner-KI, Eingabegeräte | teilweise (PC, Controller simuliert) | Zwei-Spieler-Test, Touch, echter Controller |
 | Menü, Lobby, Spieler gegen Spieler | Training getestet | echter Zwei-Spieler-Test |
-| Animations-Upload (ANIMEXGANG) | vorbereitet | Freigabe des Nutzers |
+| Animations-Upload (ANIMEXGANG) | erledigt (64 IDs, geprüft) | neue Animationen jeweils nachladen |
 | Ausdauer | erledigt (B) | Feinabstimmung mit C/D/E |
 | Online-Test 2 Spieler | offen | Team-Test in Studio (2 Clients) |
 

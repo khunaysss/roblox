@@ -1,4 +1,6 @@
-# Animations-Upload (freigegeben 2026-10-11, Gruppe ANIMEXGANG 7160158)
+# Animations-Upload (erledigt 2026-10-11, Gruppe ANIMEXGANG 7160158)
+
+**Erledigt:** alle 64 hochgeladen (vom Nutzer gestartet), IDs in `roblox/CC_AnimIds.luau` und in Studio (`ServerStorage.CC_Animations.CC_AnimIds`). Geprüft: alle 64 laden in Roblox, Längen gleich wie in Studio; Charaktere spielen die hochgeladenen IDs. **Neue oder geänderte Animationen** müssen erneut hochgeladen werden (Datei in export/anim_rbxmx ersetzen bzw. Eintrag in CC_AnimIds löschen, dann upload_starten.ps1).
 
 ## Warum
 Mit temporären Studio-IDs laufen die Animationen nur im Einzel-Test. Beim Test mit 2 Clients und im echten Spiel bekommen die Spieler nur leere Animationen (Länge 0), die Kämpfer stehen in der T-Pose (geprüft 2026-10-11).
