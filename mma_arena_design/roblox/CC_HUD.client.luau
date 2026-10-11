@@ -85,7 +85,21 @@ duelFill.BorderSizePixel = 0; duelFill.Parent = duel
 local duelL = Instance.new("TextLabel"); duelL.AnchorPoint = Vector2.new(0.5, 1); duelL.Position = UDim2.new(0.5, 0, 0, -4); duelL.Size = UDim2.fromOffset(600, 30)
 duelL.BackgroundTransparency = 1; duelL.Font = Enum.Font.GothamBlack; duelL.TextSize = 24; duelL.TextColor3 = Color3.new(1, 1, 1)
 duelL.TextStrokeTransparency = 0.2; duelL.Parent = duel
+local DOWN_NAME = { back = "RÜCKENLAGE", side = "SEITENLAGE", seated = "SITZEND", kneel = "KNIEND" }
 local function groundHint(char)
+	local down = char:GetAttribute("CC_Down")
+	if down then
+		local t = { "Leertaste Aufstehen" }
+		if down ~= "kneel" then table.insert(t, "E höher (Seite/Sitzen/Knien)") end
+		if down == "back" then table.insert(t, "LMB Stoßtritt"); table.insert(t, "C Beintritt") end
+		table.insert(t, "F Block")
+		return table.concat(t, " · ")
+	end
+	local oppName = char:GetAttribute("CC_Opponent")
+	local opp = oppName and workspace:FindFirstChild(oppName)
+	if opp and opp:GetAttribute("CC_Down") and not char:GetAttribute("CC_Wrestle") then
+		return "Gegner am Boden: C Low Kick auf die Beine" .. (opp:GetAttribute("CC_Down") == "back" and " · E in die Guard" or "")
+	end
 	local role, pos = char:GetAttribute("CC_Wrestle"), char:GetAttribute("CC_GroundPos")
 	if not role or not pos then return nil end
 	if role == "top" then
@@ -93,7 +107,7 @@ local function groundHint(char)
 		if pos ~= "back" then table.insert(t, "E Position verbessern") end
 		if pos == "guard" or pos == "mount" then table.insert(t, "LMB Schlag") end
 		if pos == "mount" or pos == "back" then table.insert(t, "Q Submission") end
-		table.insert(t, "F Konter"); if pos == "guard" then table.insert(t, "Leertaste Aufstehen") end
+		table.insert(t, "F Konter"); if pos == "guard" then table.insert(t, "Leertaste Aufstehen (Gegner bleibt liegen)") end
 		return table.concat(t, " · ")
 	end
 	return (pos == "guard" and "Leertaste Aufstehen" or "Leertaste Befreien") .. " · F Konter (wenn der Gegner die Position wechselt)"
@@ -181,7 +195,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	if char then
 		local gh = groundHint(char)
 		hint.Text = gh or (inMatch and HINT_STAND or "")
-		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or "") or ""
+		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or DOWN_NAME[char:GetAttribute("CC_Down")] or "") or ""
 		local p = char:GetAttribute("CC_SubProgress")
 		duel.Visible = p ~= nil
 		if p then

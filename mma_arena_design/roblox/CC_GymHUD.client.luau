@@ -109,6 +109,12 @@ end
 player:GetAttributeChangedSignal("CC_Notice"):Connect(function()
 	local t = player:GetAttribute("CC_Notice"); if t then toast(t:match("^(.*)|") or t, C.text, "warn") end
 end)
+-- Bodenlage: Aufstehen nicht moeglich, weil der Gegner direkt am Koerper steht
+local function hookChar(c)
+	c:GetAttributeChangedSignal("CC_DownBlocked"):Connect(function() toast("Gegner zu nah – erst Abstand schaffen (Stoßtritt)", C.warn, "warn") end)
+end
+player.CharacterAdded:Connect(hookChar)
+if player.Character then hookChar(player.Character) end
 player:GetAttributeChangedSignal("CC_LevelUp"):Connect(function()
 	toast("LEVEL UP!  Level " .. tostring(player:GetAttribute("CC_LevelUp")), C.gold, "star")
 end)

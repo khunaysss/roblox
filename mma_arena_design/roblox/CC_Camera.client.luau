@@ -63,7 +63,7 @@ end
 -- Ziel: anvisiertes Modell; im Ringkampf/Boden immer der Kampfgegner (auch wenn die Anvisierung aus ist)
 local function fightTarget(char)
 	local n = char:GetAttribute("CC_LockTarget")
-	if (not n or n == "") and char:GetAttribute("CC_Wrestle") then n = char:GetAttribute("CC_Opponent") end
+	if (not n or n == "") and (char:GetAttribute("CC_Wrestle") or char:GetAttribute("CC_Down")) then n = char:GetAttribute("CC_Opponent") end
 	return n and n ~= "" and workspace:FindFirstChild(n) or nil
 end
 local FLOOR_CLEAR = 1.6    -- Kamera bleibt so weit ueber dem Kaefigboden
@@ -82,7 +82,7 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 
 	local me, foe = smoothBody(char, dt), smoothBody(target, dt)
 	if not (me and foe) then return end
-	local wrestling = char:GetAttribute("CC_Wrestle")
+	local wrestling = char:GetAttribute("CC_Wrestle") or char:GetAttribute("CC_Down")   -- selbst am Boden: Bodenansicht
 	wrW = math.clamp(wrW + (wrestling and 1 or -1) * dt / WR_BLEND, 0, 1)
 	local w = wrW * wrW * (3 - 2 * wrW)   -- weich ein/aus
 	local mid = (me + foe) / 2

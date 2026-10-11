@@ -113,7 +113,7 @@ local MOVE_KEYS = { "mF", "mB", "mL", "mR" }
 -- Locker-Modus: ausserhalb eines Kampfs (kein CC_Opponent) aufrecht stehen, normal gehen (1,80 m/s = 6,4 Studs/s) und laufen
 -- (4,2 m/s = 15 Studs/s); Abspieltempo = Geschwindigkeit / gebaute Geschwindigkeit. Im Kampf: Kampfstellung + Fussarbeit.
 local CASUAL_WALK_REF, CASUAL_RUN_REF = 1.80 / 0.28, 4.20 / 0.28
-local function isCasual(f) return not f.char:GetAttribute("CC_Opponent") and not f.wr and not f.ko end
+local function isCasual(f) return not f.char:GetAttribute("CC_Opponent") and not f.wr and not f.down and not f.ko end
 local function ensure(tr, w) if not tr.IsPlaying then tr:Play(0.25, w or 1, 1) end end
 RunService.Heartbeat:Connect(function()
 	for _, f in pairs(fighters) do
@@ -134,7 +134,7 @@ RunService.Heartbeat:Connect(function()
 			t.cRun:AdjustWeight(math.max(amount * runK, 0.001), 0.15); t.cRun:AdjustSpeed(math.max(speed, 0.5) / CASUAL_RUN_REF)
 			local dom = amount < 0.05 and "idle" or (runK > 0.5 and "run" or "walk")
 			if dom ~= f.loco then f.loco = dom; f.char:SetAttribute("CC_Loco", dom) end
-		elseif root and not f.ko and not f.wr then
+		elseif root and not f.ko and not f.wr and not f.down then
 			if f.mode ~= "fight" then
 				f.mode = "fight"
 				for _, k in ipairs({ "cIdle", "cWalk", "cRun" }) do t[k]:Stop(0.25) end
@@ -312,7 +312,7 @@ end
 
 local function attack(attacker, move)
 	local m = MOVES[move]
-	if not m or attacker.ko or attacker.blocking or attacker.wr or frozen(attacker) then return end
+	if not m or attacker.ko or attacker.blocking or attacker.wr or attacker.down or frozen(attacker) then return end
 	local now = os.clock()
 	if now < attacker.busyUntil then
 		-- Kombination: kurz vor Ende der Sperre gedrueckt -> genau EINE Eingabe merken (kein Dauerfeuer)
@@ -349,7 +349,7 @@ local function attack(attacker, move)
 		local fist = bonePos(attacker.char, m.limb, LIMB_OFFSET[m.limb])
 		if not fist then return end
 		for _, target in pairs(fighters) do
-			if target ~= attacker and not target.ko and not target.wr then
+			if target ~= attacker and not target.ko and not target.wr and not target.down then   -- keine Kopftritte/Stomps gegen Liegende
 				local z = ZONES[m.zone]
 				local zp = bonePos(target.char, z.bone, z.along)
 				if zp then dmin = math.min(dmin, (fist - zp).Magnitude - z.radius) end
@@ -647,15 +647,395 @@ function groundEscape(f)
 		groundLoop(top, bottom, back[2])
 		return
 	end
+	if f == top and DOWN_OK then topDisengage(top) return end       -- oben: aufstehen, unten bleibt liegen
 	top.wr.state = "escape"
 	local ta = playPair(top, bottom, "Ground_Guard_Escape", false)
 	ta.Stopped:Wait()
 	if not (top.wr and bottom.wr) then return end
+	if DOWN_OK then                                                  -- unten: weggedrueckt, bleibt sitzend am Boden
+		enterDown(bottom, "seated", 0.15)
+		local tg = wrTrack(top, "Ground_GetUp_A")
+		for _, t in pairs(top.wrTracks) do if t ~= tg and t.IsPlaying then t:Stop(0.1) end end
+		tg.Looped = false; tg:Play(0.1, 1, 1.1)
+		task.wait(36 / 24 / 1.1)
+		if not top.wr then return end
+		top.char.HumanoidRootPart.CFrame = top.wrStart * rootOffset(top, WR.Ground_GetUp_A.rootEnd)
+		wrStopAll(top, 0.1); setWrestle(top, nil, nil); top.busyUntil = os.clock() + 0.2
+		print(("[CC] %s befreit sich aus der Guard und bleibt sitzend"):format(bottom.char.Name))
+		return
+	end
 	local tg = playPair(top, bottom, "Ground_GetUp", false)
 	tg.Stopped:Wait()
 	endExchange(top, bottom, "Ground_GetUp")
 	print(("[CC] %s und %s stehen wieder"):format(top.char.Name, bottom.char.Name))
 end
+
+-- ================= Bodenlagen: einer liegt/sitzt/kniet, der andere steht (Gameplay-Ueberarbeitung Abschnitt 2) =================
+-- Einzel-Animationen aus Down_Positions_v01.blend (DN_*): Rueckenlage (defensive Guard), seitliche Lage, sitzende Abwehr,
+-- kniende Position; Uebergaenge nach oben (E), technisches Aufstehen (Leertaste): Ruecken -> Seite -> Sitzen -> Stand
+-- (Ground_GetUp_B), aus dem Sitzen (Ground_GetUp_B) und aus dem Knien. Aufstehen dauert und wird durch Treffer unterbrochen;
+-- steht der Gegner direkt am Koerper, geht es nicht ("Abstand schaffen"). Unten: Block (F), Stosstritt nach oben (Linksklick),
+-- Fersentritt gegen das Knie (C). Oben stehend: Low Kick gegen die Beine (C), E = in die Guard des Liegenden einsteigen.
+-- Keine Kopftritte/Stomps: Schlaege und andere Tritte treffen einen Liegenden nicht.
+-- Der Liegende ist verankert (HumanoidRootPart = seine Ringkampf-Position); am Ende des Aufstehens wird er auf die
+-- End-Position der Animation versetzt (rootEnd), wie beim Ringkampf.
+local DN = {}
+for _, n in ipairs({ "Down_Back_Idle", "Down_Back_Block", "Down_Side_Idle", "Down_Seated_Idle", "Down_Kneel_Idle", "Down_Back_To_Side",
+	"Down_Side_To_Seated", "Down_Seated_To_Kneel", "Down_GetUp_Kneel", "Down_UpKick", "Down_LegKick", "Down_Hit", "Stand_LegKickDown" }) do
+	local key = "DN_" .. n
+	local mod = A:FindFirstChild(key .. "_Data")
+	if mod and (A:FindFirstChild(key) or ANIM_IDS[key]) then
+		local data = require(mod)
+		DN[n] = { anim = anim(key), rootEnd = data.rootEnd, len = (#data.frames - 1) / 24 }
+	end
+end
+DOWN_OK = DN.Down_Back_Idle ~= nil      -- global: wird schon in groundEscape (weiter oben) gebraucht
+local DOWN_IDLE = { back = "Down_Back_Idle", side = "Down_Side_Idle", seated = "Down_Seated_Idle", kneel = "Down_Kneel_Idle" }
+local UP_NEXT = { back = { "Down_Back_To_Side", "side" }, side = { "Down_Side_To_Seated", "seated" }, seated = { "Down_Seated_To_Kneel", "kneel" } }
+local GETUP_COST = { back = 14, side = 12, seated = 10, kneel = 6 }
+local POSTURE_COST, UPKICK_COST, LEGKICK_COST, LEGKICK_DOWN_COST = 4, 8, 6, 8
+local GETUP_SPEED = 1.25          -- Aufstehen etwas zuegiger als in Blender gebaut (Ruecken bis Stand ca. 2,6 s)
+local PRESSURE_DIST = 4.2         -- Studs (1,2 m) vom Becken: steht der Gegner so nah, ist Aufstehen nicht moeglich
+local DOWN_TURN = 1.6             -- rad/s: Liegender dreht sich zum Gegner
+local UPKICK = { win = { 6 / 24, 10 / 24 }, limb = "RightFoot", dmg = 6, push = 4.5, targets = { "LowerTorso", "LeftUpperLeg", "RightUpperLeg" }, radius = 1.35 }
+local LEGKICK = { win = { 5 / 24, 9 / 24 }, limb = "LeftFoot", dmg = 5, targets = { "LeftLowerLeg", "RightLowerLeg", "LeftUpperLeg", "RightUpperLeg" }, radius = 1.5 }
+local LEGKICK_DOWN = { win = { 11 / 24, 15 / 24 }, limbs = { { "RightLowerLeg", 0.9 }, { "RightFoot", 0.1 } }, dmg = 5,
+	targets = { "LeftLowerLeg", "RightLowerLeg", "LeftFoot", "RightFoot", "LeftUpperLeg", "RightUpperLeg" }, radius = 1.4 }
+
+local function dnTrack(f, n)
+	f.dnTracks = f.dnTracks or {}
+	if not f.dnTracks[n] then
+		local d = DN[n]; if not d then return nil end
+		f.dnTracks[n] = f.hum.Animator:LoadAnimation(d.anim)
+	end
+	return f.dnTracks[n]
+end
+local function dnStopAll(f, fade, except)
+	for _, tr in pairs(f.dnTracks or {}) do if tr ~= except and tr.IsPlaying then tr:Stop(fade or 0.1) end end
+end
+local function dnPlay(f, n, fade, speed, looped)
+	local tr = dnTrack(f, n); if not tr then return nil end
+	dnStopAll(f, fade, tr)
+	for _, t in pairs(f.wrTracks or {}) do if t.IsPlaying then t:Stop(fade) end end
+	tr.Looped = looped or false
+	if tr.IsPlaying then tr:Stop(0) end
+	tr:Play(fade or 0.1, 1, speed or 1)
+	return tr
+end
+local function opponentOf(f)
+	local n = f.char:GetAttribute("CC_Opponent")
+	local c = n and workspace:FindFirstChild(n)
+	return c and fighters[c]
+end
+local function setDownAttr(f)
+	f.char:SetAttribute("CC_Down", f.down and f.down.state or nil)
+	f.char:SetAttribute("CC_DownBusy", f.down and f.down.busy or nil)
+end
+local function downIdle(f, fade)
+	local d = f.down; if not d then return end
+	local n = DOWN_IDLE[d.state]
+	if d.state == "back" and f.downBlock then n = "Down_Back_Block" end
+	dnPlay(f, n, fade or 0.15, 1, true)
+end
+-- in eine Bodenlage wechseln (aus dem Ringkampf: HumanoidRootPart bleibt auf der Ringkampf-Position)
+function enterDown(f, state, fade)
+	if not DOWN_OK then return false end
+	stopStanding(f)
+	if f.wr then f.wr = nil; f.char:SetAttribute("CC_Wrestle", false) end
+	for _, k in ipairs({ "CC_GroundPos", "CC_SubProgress", "CC_SubName", "CC_SubRole" }) do f.char:SetAttribute(k, nil) end
+	f.char.HumanoidRootPart.Anchored = true
+	f.down = { state = state, token = (f.downToken or 0) + 1 }
+	f.downToken = f.down.token
+	f.downHitAt = 0
+	f.busyUntil = 0
+	setDownAttr(f)
+	downIdle(f, fade or 0.3)
+	return true
+end
+-- Bodenlage verlassen (stehend): HumanoidRootPart auf die End-Position der Aufsteh-Animation
+local function leaveDown(f, rootEnd)
+	local root = f.char.HumanoidRootPart
+	if rootEnd then root.CFrame = root.CFrame * rootOffset(f, rootEnd) end
+	dnStopAll(f, 0); wrStopAll(f, 0)
+	f.down = nil; f.downBlock = false
+	setDownAttr(f)
+	root.Anchored = false
+	f.busyUntil = os.clock() + 0.2
+	if not f.tracks.idle.IsPlaying then f.tracks.idle:Play(0) end
+end
+function clearDown(f)            -- Reset (Runde, Kampfende): ohne Versatz
+	if not f.down then return end
+	f.downToken = (f.downToken or 0) + 1
+	dnStopAll(f, 0.1)
+	f.down = nil; f.downBlock = false
+	setDownAttr(f)
+end
+local function downBodyPos(f) return bonePos(f.char, "LowerTorso") or f.char.HumanoidRootPart.Position end
+-- steht der Gegner direkt am Koerper?
+local function underPressure(f)
+	local o = opponentOf(f)
+	if not o or o.ko or o.down or o.wr then return false end
+	local d = (o.char.HumanoidRootPart.Position - downBodyPos(f)) * Vector3.new(1, 0, 1)
+	return d.Magnitude < PRESSURE_DIST
+end
+-- warten; bricht ab bei Treffer oder Reset. Rueckgabe: "ok" | "hit" | "reset"
+local function downWait(f, token, seconds, since)
+	local t0 = os.clock()
+	while os.clock() - t0 < seconds do
+		task.wait(0.03)
+		if not f.down or f.down.token ~= token or f.ko or not f.char.Parent then return "reset" end
+		if f.downHitAt > since then return "hit" end
+	end
+	return "ok"
+end
+
+-- Aufstehen (Leertaste): Stufen bis zum Stand; Treffer unterbricht -> zurueck in die Lage der aktuellen Stufe
+function downGetUp(f)
+	local d = f.down
+	if not d or d.busy or f.ko or frozen(f) then return end
+	if underPressure(f) then f.char:SetAttribute("CC_DownBlocked", workspace:GetServerTimeNow()); return end
+	local cost = GETUP_COST[d.state]
+	if f.stamina < cost then f.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	spend(f, cost)
+	d.busy = "getup"; setDownAttr(f)
+	local token, since = d.token, os.clock()
+	local stages = {}
+	local st = d.state
+	while st == "back" or st == "side" do table.insert(stages, UP_NEXT[st]); st = UP_NEXT[st][2] end
+	for _, s in ipairs(stages) do
+		local tr = dnPlay(f, s[1], 0.1, GETUP_SPEED)
+		local r = downWait(f, token, DN[s[1]].len / GETUP_SPEED, since)
+		if r == "reset" then return end
+		if r == "hit" then d.busy = nil; downIdle(f, 0.2); setDownAttr(f); return end
+		d.state = s[2]; setDownAttr(f)
+		if tr then tr:AdjustSpeed(0) end
+	end
+	-- letzte Stufe: aus dem Sitzen = Ground_GetUp_B (technisches Aufstehen), aus dem Knien = Down_GetUp_Kneel
+	local tr, len, rootEnd
+	if d.state == "kneel" then
+		tr = dnPlay(f, "Down_GetUp_Kneel", 0.1, GETUP_SPEED); len = DN.Down_GetUp_Kneel.len; rootEnd = DN.Down_GetUp_Kneel.rootEnd
+	else
+		tr = wrTrack(f, "Ground_GetUp_B")
+		dnStopAll(f, 0.12)
+		for _, t in pairs(f.wrTracks) do if t ~= tr and t.IsPlaying then t:Stop(0.1) end end
+		tr.Looped = false; tr:Play(0.12, 1, GETUP_SPEED); len = WR.Ground_GetUp_B.len; rootEnd = WR.Ground_GetUp_B.rootEnd
+	end
+	-- unterbrechbar, solange noch nicht aufrecht (erste 70 %)
+	local r = downWait(f, token, len * 0.7 / GETUP_SPEED, since)
+	if r == "reset" then return end
+	if r == "hit" then
+		if tr then tr:Stop(0.2) end
+		d.busy = nil; downIdle(f, 0.25); setDownAttr(f)
+		print(("[CC] %s Aufstehen unterbrochen (%s)"):format(f.char.Name, d.state))
+		return
+	end
+	r = downWait(f, token, len * 0.3 / GETUP_SPEED - 0.02, math.huge)
+	if r == "reset" then return end
+	leaveDown(f, rootEnd)
+	reward(f, "train", "Grappling", 1)
+	print(("[CC] %s steht wieder auf"):format(f.char.Name))
+end
+-- Haltung nach oben (E): Ruecken -> Seite -> Sitzen -> Knien
+function downPosture(f)
+	local d = f.down
+	if not d or d.busy or f.ko or frozen(f) then return end
+	local nx = UP_NEXT[d.state]; if not nx then return end
+	if f.stamina < POSTURE_COST then f.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	spend(f, POSTURE_COST)
+	d.busy = "trans"; setDownAttr(f)
+	local token, since = d.token, os.clock()
+	local tr = dnPlay(f, nx[1], 0.1, 1.1)
+	local r = downWait(f, token, DN[nx[1]].len / 1.1, since)
+	if r == "reset" then return end
+	if r == "ok" then d.state = nx[2]; if tr then tr:AdjustSpeed(0) end end
+	print(("[CC] %s am Boden: %s"):format(f.char.Name, d.state))
+	d.busy = nil; setDownAttr(f); downIdle(f, 0.1)
+end
+-- Treffer-Pruefung ueber Bones (Glied des Angreifers gegen Ziel-Bones des Gegners)
+local function limbHits(att, limbs, target, targets, radius)
+	for _, l in ipairs(limbs) do
+		local p = bonePos(att.char, l[1], l[2])
+		if p then
+			for _, b in ipairs(targets) do
+				local q = bonePos(target.char, b, 0.3)
+				if q and (p - q).Magnitude <= radius then return true end
+			end
+		end
+	end
+	return false
+end
+local function pushBack(target, from, studs)
+	local root = target.char.HumanoidRootPart
+	if root.Anchored then return end
+	local dir = (root.Position - from) * Vector3.new(1, 0, 1)
+	if dir.Magnitude < 0.1 then return end
+	dir = dir.Unit
+	task.spawn(function()
+		for _ = 1, 8 do
+			if not root.Parent or root.Anchored then return end
+			root.CFrame = root.CFrame + dir * (studs / 8)
+			task.wait()
+		end
+	end)
+end
+-- Tritt vom Boden (Rueckenlage): "up" = Stosstritt (Abstand), "leg" = Fersentritt gegen das Knie
+function downKick(f, kind)
+	local d = f.down
+	if not d or d.busy or d.state ~= "back" or f.ko or frozen(f) then return end
+	local k = kind == "up" and UPKICK or LEGKICK
+	local cost = kind == "up" and UPKICK_COST or LEGKICK_COST
+	if f.stamina < cost then f.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	spend(f, cost)
+	d.busy = "kick"; setDownAttr(f)
+	local token, since = d.token, os.clock()
+	local name = kind == "up" and "Down_UpKick" or "Down_LegKick"
+	local tr = dnPlay(f, name, 0.06, 1)
+	local o = opponentOf(f)
+	local t0 = os.clock(); local hit = false
+	while os.clock() - t0 < DN[name].len do
+		task.wait()
+		if not f.down or f.down.token ~= token then return end
+		local t = os.clock() - t0
+		if not hit and o and not o.ko and not o.down and not o.wr and t >= k.win[1] and t <= k.win[2] and limbHits(f, { { k.limb, 0.1 } }, o, k.targets, k.radius) then
+			hit = true
+			local dmg = k.dmg * (o.blocking and 0.5 or 1) * (1 + 0.015 * stat(f, "Power"))
+			o.hum.Health = math.max(HP_FLOOR, o.hum.Health - dmg)
+			addDamage(f.char, dmg)
+			interrupt(o); react(o, kind == "up" and "hitBody" or "hitLeg", 0.35)
+			hitFX(o.char, 0.35, "hit"); hitFX(f.char, 0.2, "land")
+			if kind == "up" then pushBack(o, downBodyPos(f), k.push) end
+			if tr then tr:AdjustSpeed(0.05); task.delay(HITSTOP, function() if tr.IsPlaying then tr:AdjustSpeed(1) end end) end
+			print(("[CC] %s %s vom Boden -> %s %.0f"):format(f.char.Name, kind == "up" and "Stosstritt" or "Beintritt", o.char.Name, o.hum.Health))
+		end
+		if f.downHitAt > since then break end
+	end
+	if f.down and f.down.token == token then d.busy = nil; setDownAttr(f); downIdle(f, 0.12) end
+end
+-- Liegender wird getroffen (Beintritt des Stehenden)
+local function downTakeHit(f, dmg, attacker)
+	local blocked = f.downBlock
+	dmg = dmg * (blocked and 0.4 or 1)
+	f.hum.Health = math.max(HP_FLOOR, f.hum.Health - dmg)
+	addDamage(attacker.char, dmg)
+	f.downHitAt = os.clock()
+	hitFX(f.char, blocked and 0.15 or 0.4, blocked and "block" or "hit"); hitFX(attacker.char, 0.25, "land")
+	spend(f, blocked and 3 or 5)
+	if f.down and not f.down.busy and f.down.state == "back" and not blocked then
+		local token = f.down.token
+		dnPlay(f, "Down_Hit", 0.04, 1)
+		task.delay(DN.Down_Hit.len, function() if f.down and f.down.token == token and not f.down.busy then downIdle(f, 0.12) end end)
+	end
+	if f.hum.Health <= HP_FLOOR and f.down then
+		print("[CC] K.o. am Boden (Beintritte)", f.char.Name)
+		f.ko = true; f.char:SetAttribute("CC_KO", true); f.char:SetAttribute("CC_LastReact", "koGround")
+		local tr = f.dnTracks and f.dnTracks[DOWN_IDLE[f.down.state]]; if tr then tr:AdjustSpeed(0) end
+		hitFX(f.char, 1.0, "ko")
+	end
+end
+-- Stehender tritt die Beine des Liegenden (Low Kick nach unten)
+function legKickDown(att, target)
+	if att.ko or att.wr or att.down or frozen(att) or os.clock() < att.busyUntil then return end
+	if att.stamina < LEGKICK_DOWN_COST then att.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	spend(att, LEGKICK_DOWN_COST)
+	setBlock(att, false)
+	local d = DN.Stand_LegKickDown
+	att.busyUntil = os.clock() + d.len * 0.92
+	att.attackToken = (att.attackToken or 0) + 1
+	local token = att.attackToken
+	for k in pairs(MOVES) do local tr = att.tracks[k]; if tr.IsPlaying then tr:Stop(0.06) end end
+	local tr = dnTrack(att, "Stand_LegKickDown"); tr.Looped = false; tr.Priority = Enum.AnimationPriority.Action2; tr:Play(0.06)
+	local t0 = os.clock(); local hit = false
+	while os.clock() - t0 < LEGKICK_DOWN.win[2] + 0.02 do
+		task.wait()
+		if att.attackToken ~= token or att.ko then return end
+		local t = os.clock() - t0
+		if not hit and t >= LEGKICK_DOWN.win[1] and target.down and not target.ko and limbHits(att, LEGKICK_DOWN.limbs, target, LEGKICK_DOWN.targets, LEGKICK_DOWN.radius) then
+			hit = true
+			downTakeHit(target, LEGKICK_DOWN.dmg * (1 + 0.015 * stat(att, "Power")), att)
+			tr:AdjustSpeed(0.05); task.delay(HITSTOP, function() if tr.IsPlaying then tr:AdjustSpeed(1) end end)
+			print(("[CC] %s Low Kick am Boden -> %s %.0f"):format(att.char.Name, target.char.Name, target.hum.Health))
+		end
+	end
+end
+-- Stehender steigt in die Guard des Liegenden ein (E): nur gegen Rueckenlage, nahe an den Beinen
+function enterGuardFromStand(a, b)
+	if a.ko or a.wr or a.down or frozen(a) or os.clock() < a.busyUntil then return end
+	local d = b.down
+	if not d or d.state ~= "back" or d.busy or b.ko then return end
+	local Cb = b.char.HumanoidRootPart.CFrame
+	local Ca = Cb * CFrame.Angles(0, math.pi, 0) * CFrame.new(0, 0, WR_GAP)
+	local standCF = Ca * rootOffset(a, WR.Ground_GetUp_A.rootEnd)       -- dort steht A am Ende von Ground_GetUp_A
+	if ((a.char.HumanoidRootPart.Position - standCF.Position) * Vector3.new(1, 0, 1)).Magnitude > 4.5 then return end
+	if a.stamina < ADVANCE_COST then a.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	spend(a, ADVANCE_COST)
+	stopStanding(a)
+	a.busyUntil = math.huge
+	d.busy = "guard"; setDownAttr(b)
+	local root = a.char.HumanoidRootPart
+	root.Anchored = true
+	local from = root.CFrame
+	for i = 1, 8 do root.CFrame = from:Lerp(standCF, i / 8); task.wait() end
+	-- Ground_GetUp_A rueckwaerts ab dem Stand (Frame 36): A geht zwischen den Beinen auf die Knie
+	local tg = wrTrack(a, "Ground_GetUp_A"); wrStopAll(a, 0)
+	tg.Looped = false; tg:Play(0.15, 1, 0); tg.TimePosition = 35 / 24; tg:AdjustSpeed(-1.3)
+	task.wait(35 / 24 / 1.3)
+	if not (b.down and b.down.busy == "guard") or a.ko or b.ko or not a.char.Parent or not b.char.Parent then
+		tg:Stop(0.2); root.CFrame = standCF; root.Anchored = false; a.busyUntil = 0
+		if b.down then b.down.busy = nil; setDownAttr(b) end
+		return
+	end
+	clearDown(b)
+	setWrestle(a, b, "top"); setWrestle(b, a, "bottom")
+	a.wrStart, b.wrStart = Ca, Cb
+	root.CFrame = Ca
+	a.busyUntil, b.busyUntil = 0, 0
+	local ta, tb = wrTrack(a, POS_IDLE.guard .. "_A"), wrTrack(b, POS_IDLE.guard .. "_B")
+	tg:Stop(0.35)
+	for _, x in ipairs({ { a, ta }, { b, tb } }) do
+		for _, t in pairs(x[1].wrTracks) do if t ~= x[2] and t ~= tg and t.IsPlaying then t:Stop(0.35) end end
+		x[2].Looped = true; x[2]:Play(0.35, 1, 1)
+	end
+	a.wr.state = "guard"; setPos(a, b, "guard")
+	print(("[CC] %s steigt in die Guard von %s ein"):format(a.char.Name, b.char.Name))
+end
+-- Oben in der Guard: aufstehen und den Gegner unten liegen lassen (Leertaste oben)
+function topDisengage(top)
+	local w = top.wr
+	if not w or w.role ~= "top" or w.state ~= "guard" or w.pos ~= "guard" or top.ko or not DOWN_OK then return end
+	local bottom = w.partner
+	if top.stamina < ESCAPE_COST * 0.5 then top.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	spend(top, ESCAPE_COST * 0.5)
+	w.state = "escape"
+	enterDown(bottom, "back", 0.35)
+	local tg = wrTrack(top, "Ground_GetUp_A")
+	for _, t in pairs(top.wrTracks) do if t ~= tg and t.IsPlaying then t:Stop(0.3) end end
+	tg.Looped = false; tg:Play(0.3, 1, 1.2); tg.TimePosition = 4 / 24
+	task.wait((36 - 4) / 24 / 1.2)
+	if not top.wr then return end
+	top.char.HumanoidRootPart.CFrame = top.wrStart * rootOffset(top, WR.Ground_GetUp_A.rootEnd)
+	wrStopAll(top, 0.1); setWrestle(top, nil, nil); top.busyUntil = os.clock() + 0.2
+	print(("[CC] %s steht auf, %s bleibt liegen"):format(top.char.Name, bottom.char.Name))
+end
+-- Liegender dreht sich langsam zum stehenden Gegner (nur in Ruhe)
+RunService.Heartbeat:Connect(function(dt)
+	for _, f in pairs(fighters) do
+		local d = f.down
+		if d and not d.busy and not f.ko then
+			local o = opponentOf(f)
+			if o and not o.down and not o.wr then
+				local root = f.char.HumanoidRootPart
+				local to = (o.char.HumanoidRootPart.Position - root.Position) * Vector3.new(1, 0, 1)
+				if to.Magnitude > 0.5 then
+					local look = root.CFrame.LookVector * Vector3.new(1, 0, 1)
+					local ang = math.atan2(look.Unit:Cross(to.Unit).Y, look.Unit:Dot(to.Unit))
+					if math.abs(ang) > math.rad(15) then
+						root.CFrame = root.CFrame * CFrame.Angles(0, math.clamp(ang, -DOWN_TURN * dt, DOWN_TURN * dt), 0)
+					end
+				end
+			end
+		end
+	end
+end)
 
 -- Trainingsgegner am Boden: oben Schlaege, Position verbessern, Submission; unten befreien
 RunService.Heartbeat:Connect(function()
@@ -678,11 +1058,11 @@ RunService.Heartbeat:Connect(function()
 end)
 
 function tryTakedown(a)
-	if a.ko or a.wr or frozen(a) or os.clock() < a.busyUntil then return end
+	if a.ko or a.wr or a.down or frozen(a) or os.clock() < a.busyUntil then return end
 	-- Ziel: naechster Gegner vor A in Reichweite
 	local b, bd
 	for _, f in pairs(fighters) do
-		if f ~= a and not f.ko and not f.wr then
+		if f ~= a and not f.ko and not f.wr and not f.down then
 			local d = (f.char.HumanoidRootPart.Position - a.char.HumanoidRootPart.Position) * Vector3.new(1, 0, 1)
 			if d.Magnitude <= TD_RANGE and a.char.HumanoidRootPart.CFrame.LookVector:Dot(d.Unit) > 0.4 and (not bd or d.Magnitude < bd) then b, bd = f, d.Magnitude end
 		end
@@ -744,6 +1124,7 @@ resetEvent.OnInvoke = function(char, cf, health)
 	if not f then return false end
 	f.attackToken = (f.attackToken or 0) + 1
 	if f.wr then local p = f.wr.partner; wrStopAll(f, 0); setWrestle(f, nil, nil); if p and p.wr then wrStopAll(p, 0); setWrestle(p, nil, nil) end end
+	if f.down then clearDown(f); f.char.HumanoidRootPart.Anchored = false end
 	setBlock(f, false); f.wantBlock = false; f.wantEscape = nil
 	for k, tr in pairs(f.tracks) do if k ~= "idle" then tr:Stop(0.1) end end
 	if not f.tracks.idle.IsPlaying then f.tracks.idle:Play(0.2) end
@@ -759,6 +1140,18 @@ RS.CC_Action.OnServerEvent:Connect(function(player, move)
 	local f = player.Character and fighters[player.Character]
 	if not (f and type(move) == "string") then return end
 	if not f.char:GetAttribute("CC_Opponent") then return end   -- in der Lobby wird nicht gekaempft
+	if f.down then                                                   -- am Boden (liegend/sitzend/kniend), Gegner steht
+		if move == "escape" then task.spawn(downGetUp, f)
+		elseif move == "takedown" then task.spawn(downPosture, f)
+		elseif move == "jab" or move == "cross" or move == "jabBody" or move == "crossBody" then task.spawn(downKick, f, "up")
+		elseif move == "lowkick" or move == "bodykick" or move == "frontkick" then task.spawn(downKick, f, "leg") end
+		return
+	end
+	local opp = not f.wr and opponentOf(f)
+	if opp and opp.down then                                         -- stehend gegen Liegenden: nur Beine treten oder in die Guard
+		if move == "lowkick" then task.spawn(legKickDown, f, opp) return end
+		if move == "takedown" then task.spawn(enterGuardFromStand, f, opp) return end
+	end
 	if move == "escape" then groundEscape(f)
 	elseif f.wr then
 		if f.wr.role == "top" and f.wr.state == "sub" then if move == "hook" then f.mash = (f.mash or 0) + 1 end
@@ -771,7 +1164,10 @@ end)
 RS.CC_Block.OnServerEvent:Connect(function(player, on)
 	local f = player.Character and fighters[player.Character]
 	if f and on and not f.char:GetAttribute("CC_Opponent") then return end
-	if f and not f.wr then setBlock(f, on == true) end
+	if f and f.down then                                              -- Block am Boden: enge Deckung (Rueckenlage) und weniger Schaden
+		f.downBlock = on == true
+		if not f.down.busy then downIdle(f, 0.12) end
+	elseif f and not f.wr then setBlock(f, on == true) end
 	if f and on then f.sprawlAt = os.clock() end -- F gedrueckt = Sprawl-Versuch gegen Takedowns
 end)
 
@@ -784,7 +1180,8 @@ D.hum.HealthChanged:Connect(function(h) fill.Size = UDim2.fromScale(math.max(h, 
 --   weit weg -> Druck nach vorn; in Distanz (Wunschabstand) -> umkreisen, Richtungswechsel, kleine Vor-/Rueckschritte;
 --   Angriff: in Reichweite schlagen/treten, sonst erst hineinsteppen; nach Kombinationen oft wieder heraus;
 --   wenig Leben/Ausdauer -> mehr Abstand; am Gitter -> zur Mitte hin kreisen.
--- CC_Passive = Trainingsmodus (steht nur und dreht sich), CC_ForceTD = Test-Takedown, CC_NoTD = Test ohne Takedowns.
+-- CC_Passive = Trainingsmodus (steht nur und dreht sich), CC_ForceTD = Test-Takedown, CC_NoTD = Test ohne Takedowns,
+-- CC_ForceLegKick = Test: sofort Low Kick gegen den liegenden Gegner.
 local root0 = dummy.HumanoidRootPart
 root0.Anchored = false
 pcall(function() root0:SetNetworkOwner(nil) end)
@@ -811,6 +1208,20 @@ RunService.Heartbeat:Connect(function(dt)
 		if not root.Anchored then pcall(function() root:SetNetworkOwner(nil) end) end
 	end
 	if D.ko or D.wr then return end
+	if D.down then                                                   -- Trainingsgegner liegt: aufstehen, Tritte, Haltung
+		local nowD = os.clock()
+		if nowD >= (D.downThink or 0) and not D.down.busy and not dummy:GetAttribute("CC_Passive") and dummy:GetAttribute("CC_InMatch") ~= false then
+			D.downThink = nowD + 0.8 + math.random() * 0.9
+			local o = opponentOf(D)
+			local dist = o and ((o.char.HumanoidRootPart.Position - downBodyPos(D)) * Vector3.new(1, 0, 1)).Magnitude or 99
+			local r = math.random()
+			if D.down.state == "back" and dist < 5.5 and r < 0.55 then task.spawn(downKick, D, dist < 4.2 and "up" or "leg")
+			elseif dist >= PRESSURE_DIST and r < 0.8 then task.spawn(downGetUp, D)
+			elseif r < 0.9 then task.spawn(downPosture, D) end
+		end
+		D.hum:Move(Vector3.zero)
+		return
+	end
 	-- nur im Trainingskampf aktiv (CC_Match setzt CC_InMatch und CC_Opponent); Gegner = CC_Opponent, sonst der naechste
 	if dummy:GetAttribute("CC_InMatch") == false then setBlock(D, false); D.hum:Move(Vector3.zero) return end
 	local best, bestDist
@@ -832,6 +1243,21 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 	if dummy:GetAttribute("CC_ForceTD") then dummy:SetAttribute("CC_ForceTD", nil); task.spawn(tryTakedown, D) return end -- Test: Takedown sofort
 	if dummy:GetAttribute("CC_Passive") or frozen(D) then setBlock(D, false); D.hum:Move(Vector3.zero) return end
+	if best.down then                                                -- Gegner liegt: an die Beine heran, Low Kicks oder in die Guard
+		local bp = downBodyPos(best)
+		local toB = (bp - root.Position) * Vector3.new(1, 0, 1)
+		local dB = toB.Magnitude
+		setBlock(D, false)
+		if dummy:GetAttribute("CC_ForceLegKick") then dummy:SetAttribute("CC_ForceLegKick", nil); task.spawn(legKickDown, D, best) end   -- Test-Attribut
+		D.hum:Move((dB > 6.0 and toB.Unit) or (dB < 4.8 and -toB.Unit) or Vector3.zero, false)
+		if os.clock() >= nextThink and os.clock() >= D.busyUntil and dB <= 6.6 then
+			nextThink = os.clock() + 1.4 + math.random() * 1.2
+			local r = math.random()
+			if r < 0.4 then task.spawn(legKickDown, D, best)
+			elseif r < 0.7 and best.down.state == "back" then task.spawn(enterGuardFromStand, D, best) end
+		end
+		return
+	end
 	local now = os.clock()
 	local fwd = dist > 0.1 and toT.Unit or root.CFrame.LookVector
 	local right = Vector3.new(-fwd.Z, 0, fwd.X)

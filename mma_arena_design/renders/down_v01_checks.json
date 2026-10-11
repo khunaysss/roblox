@@ -1,0 +1,1105 @@
+{
+ "fps": 24,
+ "source": "Ground_Positions_v01.blend",
+ "sections": {
+  "Down_Back_Idle": {
+   "actions": [
+    "Down_Back_Idle_A",
+    "Down_Back_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.63,
+   "pelvis_distance_end_m": 5.63,
+   "notes": ""
+  },
+  "Down_Back_Block": {
+   "actions": [
+    "Down_Back_Block_A",
+    "Down_Back_Block_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.63,
+   "pelvis_distance_end_m": 5.63,
+   "notes": ""
+  },
+  "Down_Side_Idle": {
+   "actions": [
+    "Down_Side_Idle_A",
+    "Down_Side_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.1,
+      -0.98
+     ],
+     "pelvis": [
+      0.1,
+      -0.98,
+      0.21
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.1,
+      -0.98
+     ],
+     "pelvis": [
+      0.1,
+      -0.98,
+      0.21
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.731,
+   "pelvis_distance_end_m": 5.731,
+   "notes": ""
+  },
+  "Down_Seated_Idle": {
+   "actions": [
+    "Down_Seated_Idle_A",
+    "Down_Seated_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.16,
+      -1.1
+     ],
+     "pelvis": [
+      0.16,
+      -1.1,
+      0.21
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.16,
+      -1.1
+     ],
+     "pelvis": [
+      0.16,
+      -1.1,
+      0.21
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.852,
+   "pelvis_distance_end_m": 5.852,
+   "notes": ""
+  },
+  "Down_Kneel_Idle": {
+   "actions": [
+    "Down_Kneel_Idle_A",
+    "Down_Kneel_Idle_B"
+   ],
+   "frames": [
+    1,
+    48
+   ],
+   "events": {
+    "loop": "1-48"
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.04,
+      -1.22
+     ],
+     "pelvis": [
+      0.04,
+      -1.22,
+      0.5
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.04,
+      -1.22
+     ],
+     "pelvis": [
+      0.04,
+      -1.22,
+      0.5
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.97,
+   "pelvis_distance_end_m": 5.97,
+   "notes": ""
+  },
+  "Down_Back_To_Side": {
+   "actions": [
+    "Down_Back_To_Side_A",
+    "Down_Back_To_Side_B"
+   ],
+   "frames": [
+    1,
+    12
+   ],
+   "events": {
+    "roll": 6,
+    "side": 12
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.1,
+      -0.98
+     ],
+     "pelvis": [
+      0.1,
+      -0.98,
+      0.21
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.63,
+   "pelvis_distance_end_m": 5.731,
+   "notes": ""
+  },
+  "Down_Side_To_Seated": {
+   "actions": [
+    "Down_Side_To_Seated_A",
+    "Down_Side_To_Seated_B"
+   ],
+   "frames": [
+    1,
+    14
+   ],
+   "events": {
+    "sit_up": 7,
+    "seated": 14
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.1,
+      -0.98
+     ],
+     "pelvis": [
+      0.1,
+      -0.98,
+      0.21
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.16,
+      -1.1
+     ],
+     "pelvis": [
+      0.16,
+      -1.1,
+      0.21
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.731,
+   "pelvis_distance_end_m": 5.852,
+   "notes": ""
+  },
+  "Down_Seated_To_Kneel": {
+   "actions": [
+    "Down_Seated_To_Kneel_A",
+    "Down_Seated_To_Kneel_B"
+   ],
+   "frames": [
+    1,
+    16
+   ],
+   "events": {
+    "hips_up": 6,
+    "leg_back": 11,
+    "kneel": 16
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.16,
+      -1.1
+     ],
+     "pelvis": [
+      0.16,
+      -1.1,
+      0.21
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.04,
+      -1.22
+     ],
+     "pelvis": [
+      0.04,
+      -1.22,
+      0.5
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.852,
+   "pelvis_distance_end_m": 5.97,
+   "notes": ""
+  },
+  "Down_GetUp_Kneel": {
+   "actions": [
+    "Down_GetUp_Kneel_A",
+    "Down_GetUp_Kneel_B"
+   ],
+   "frames": [
+    1,
+    16
+   ],
+   "events": {
+    "push_up": 7,
+    "standing": 12,
+    "stance": 16
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.04,
+      -1.22
+     ],
+     "pelvis": [
+      0.04,
+      -1.22,
+      0.5
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -1.3
+     ],
+     "pelvis": [
+      0.0,
+      -1.3,
+      0.865
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.97,
+   "pelvis_distance_end_m": 6.05,
+   "notes": ""
+  },
+  "Down_UpKick": {
+   "actions": [
+    "Down_UpKick_A",
+    "Down_UpKick_B"
+   ],
+   "frames": [
+    1,
+    16
+   ],
+   "events": {
+    "chamber": 5,
+    "impact": 8,
+    "hit_window": "7-10",
+    "back": 16
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.63,
+   "pelvis_distance_end_m": 5.63,
+   "notes": ""
+  },
+  "Down_LegKick": {
+   "actions": [
+    "Down_LegKick_A",
+    "Down_LegKick_B"
+   ],
+   "frames": [
+    1,
+    14
+   ],
+   "events": {
+    "chamber": 4,
+    "impact": 7,
+    "hit_window": "6-9",
+    "back": 14
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.63,
+   "pelvis_distance_end_m": 5.63,
+   "notes": ""
+  },
+  "Down_Hit": {
+   "actions": [
+    "Down_Hit_A",
+    "Down_Hit_B"
+   ],
+   "frames": [
+    1,
+    10
+   ],
+   "events": {
+    "impact": 3
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      4.75
+     ],
+     "pelvis": [
+      0.0,
+      4.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 5.63,
+   "pelvis_distance_end_m": 5.63,
+   "notes": ""
+  },
+  "Stand_LegKickDown": {
+   "actions": [
+    "Stand_LegKickDown_A",
+    "Stand_LegKickDown_B"
+   ],
+   "frames": [
+    1,
+    22
+   ],
+   "events": {
+    "step_in": 6,
+    "chamber": 10,
+    "impact": 13,
+    "hit_window": "12-14",
+    "stance": 22
+   },
+   "start": {
+    "A": {
+     "root": [
+      0.0,
+      0.75
+     ],
+     "pelvis": [
+      0.0,
+      0.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "end": {
+    "A": {
+     "root": [
+      0.0,
+      0.75
+     ],
+     "pelvis": [
+      0.0,
+      0.75,
+      0.865
+     ]
+    },
+    "B": {
+     "root": [
+      0.0,
+      -0.88
+     ],
+     "pelvis": [
+      0.0,
+      -0.88,
+      0.13
+     ]
+    }
+   },
+   "pelvis_distance_start_m": 1.63,
+   "pelvis_distance_end_m": 1.63,
+   "notes": ""
+  }
+ },
+ "checks": {
+  "Down_Back_Idle": {
+   "lowest_z_m": -0.015,
+   "knee_min_max_deg": [
+    74,
+    141
+   ],
+   "elbow_min_max_deg": [
+    85,
+    102
+   ]
+  },
+  "Down_Back_Block": {
+   "lowest_z_m": -0.015,
+   "knee_min_max_deg": [
+    77,
+    85
+   ],
+   "elbow_min_max_deg": [
+    71,
+    79
+   ]
+  },
+  "Down_Side_Idle": {
+   "lowest_z_m": -0.016,
+   "knee_min_max_deg": [
+    45,
+    75
+   ],
+   "elbow_min_max_deg": [
+    108,
+    180
+   ]
+  },
+  "Down_Seated_Idle": {
+   "lowest_z_m": -0.006,
+   "knee_min_max_deg": [
+    34,
+    77
+   ],
+   "elbow_min_max_deg": [
+    104,
+    180
+   ]
+  },
+  "Down_Kneel_Idle": {
+   "lowest_z_m": -0.0,
+   "knee_min_max_deg": [
+    67,
+    99
+   ],
+   "elbow_min_max_deg": [
+    66,
+    73
+   ]
+  },
+  "Down_Back_To_Side": {
+   "lowest_z_m": -0.042,
+   "knee_min_max_deg": [
+    45,
+    141
+   ],
+   "elbow_min_max_deg": [
+    34,
+    180
+   ]
+  },
+  "Down_Side_To_Seated": {
+   "lowest_z_m": -0.035,
+   "knee_min_max_deg": [
+    32,
+    77
+   ],
+   "elbow_min_max_deg": [
+    89,
+    180
+   ]
+  },
+  "Down_Seated_To_Kneel": {
+   "lowest_z_m": -0.032,
+   "knee_min_max_deg": [
+    29,
+    112
+   ],
+   "elbow_min_max_deg": [
+    43,
+    180
+   ]
+  },
+  "Down_GetUp_Kneel": {
+   "lowest_z_m": -0.0,
+   "knee_min_max_deg": [
+    67,
+    144
+   ],
+   "elbow_min_max_deg": [
+    49,
+    101
+   ]
+  },
+  "Down_UpKick": {
+   "lowest_z_m": -0.015,
+   "knee_min_max_deg": [
+    74,
+    180
+   ],
+   "elbow_min_max_deg": [
+    75,
+    101
+   ]
+  },
+  "Down_LegKick": {
+   "lowest_z_m": -0.031,
+   "knee_min_max_deg": [
+    67,
+    180
+   ],
+   "elbow_min_max_deg": [
+    76,
+    108
+   ]
+  },
+  "Down_Hit": {
+   "lowest_z_m": -0.025,
+   "knee_min_max_deg": [
+    72,
+    141
+   ],
+   "elbow_min_max_deg": [
+    71,
+    101
+   ]
+  },
+  "Stand_LegKickDown": {
+   "lowest_z_m": -0.02,
+   "knee_min_max_deg": [
+    70,
+    180
+   ],
+   "elbow_min_max_deg": [
+    20,
+    180
+   ]
+  },
+  "Stand_LegKickDown_contact_m": [
+   [
+    11,
+    0.765
+   ],
+   [
+    12,
+    0.434
+   ],
+   [
+    13,
+    0.325
+   ],
+   [
+    14,
+    0.418
+   ],
+   [
+    15,
+    0.687
+   ]
+  ]
+ },
+ "transitions": {
+  "Ground_Guard_Idle@1 -> Down_Back_Idle@1": 0.4632,
+  "Down_Back_Idle@1 -> Down_Back_To_Side@1": 0.0,
+  "Down_Back_To_Side@12 -> Down_Side_Idle@1": 0.0,
+  "Down_Side_Idle@1 -> Down_Side_To_Seated@1": 0.0,
+  "Down_Side_To_Seated@14 -> Down_Seated_Idle@1": 0.01,
+  "Ground_Guard_Escape@52 -> Down_Seated_Idle@1": 0.04,
+  "Down_Seated_Idle@1 -> Ground_GetUp@1": 0.04,
+  "Down_Seated_Idle@1 -> Down_Seated_To_Kneel@1": 0.0,
+  "Down_Seated_To_Kneel@16 -> Down_Kneel_Idle@1": 0.0824,
+  "Down_Kneel_Idle@1 -> Down_GetUp_Kneel@1": 0.0,
+  "Down_Back_Idle@1 -> Down_UpKick@1": 0.0,
+  "Down_UpKick@16 -> Down_Back_Idle@1": 0.0,
+  "Down_Back_Idle@1 -> Down_LegKick@1": 0.0,
+  "Down_Back_Idle@1 -> Down_Back_Block@1": 0.2341,
+  "Down_Back_Idle@1 -> Down_Hit@1": 0.0
+ },
+ "order": [
+  [
+   "Down_Back_Idle",
+   48,
+   true
+  ],
+  [
+   "Down_Back_Block",
+   48,
+   true
+  ],
+  [
+   "Down_Side_Idle",
+   48,
+   true
+  ],
+  [
+   "Down_Seated_Idle",
+   48,
+   true
+  ],
+  [
+   "Down_Kneel_Idle",
+   48,
+   true
+  ],
+  [
+   "Down_Back_To_Side",
+   12,
+   false
+  ],
+  [
+   "Down_Side_To_Seated",
+   14,
+   false
+  ],
+  [
+   "Down_Seated_To_Kneel",
+   16,
+   false
+  ],
+  [
+   "Down_GetUp_Kneel",
+   16,
+   false
+  ],
+  [
+   "Down_UpKick",
+   16,
+   false
+  ],
+  [
+   "Down_LegKick",
+   14,
+   false
+  ],
+  [
+   "Down_Hit",
+   10,
+   false
+  ],
+  [
+   "Stand_LegKickDown",
+   22,
+   false
+  ]
+ ]
+}

@@ -23,7 +23,7 @@ local lockWanted = true          -- Spieler-Einstellung (Standard: an)
 local LOCK_RANGE = 40
 local TURN_RATE = 14             -- wie schnell der Kaempfer zum Gegner dreht (1/s)
 
-local function inWrestle() local c = player.Character; return c and c:GetAttribute("CC_Wrestle") end
+local function inWrestle() local c = player.Character; return c and (c:GetAttribute("CC_Wrestle") or c:GetAttribute("CC_Down")) end   -- Ringkampf oder Bodenlage
 local UIS = game:GetService("UserInputService")
 local BODY = { jab = "jabBody", cross = "crossBody" }   -- mit gehaltener Umschalttaste zum Koerper
 local function bindMove(name, move, touch, ...)

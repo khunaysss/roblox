@@ -23,3 +23,54 @@
   - Rundenende am Boden: Ringkampf aufgelöst, Kampfkamera zurück.
   - Größter Kamerasprung pro Frame: 0,46 Studs.
 - **Nicht getestet:** Spieler verlässt das Spiel mitten im Ringkampf (braucht 2 Clients), Controller und Touch.
+
+## Abschnitt 2 – Bodenkampf und Aufstehen (erledigt)
+- **Neue Animationen** (`build_down_v01.py` → `Down_Positions_v01.blend`, Export `export_down_roblox_v01.py` → `export/DN_*_v01_keyframes.luau`; in Studio geladen, **noch nicht hochgeladen**):
+  - Rückenlage mit defensiver Guard, enge Deckung, seitliche Lage, kniende Position
+  - Übergänge Rücken → Seite → Sitzen → Knien, Aufstehen aus dem Knien
+  - Stoßtritt nach oben, Fersentritt gegen das Knie, Treffer-Reaktion am Boden
+  - für den Stehenden: Low Kick gegen die Beine des Liegenden
+- **Wiederverwendet:**
+  - Sitzende Abwehr = Ende von `Ground_Guard_Escape_B`
+  - Technisches Aufstehen aus dem Sitzen = `Ground_GetUp_B`
+  - Aufstehen bzw. Einsteigen des Oberen = `Ground_GetUp_A` (vorwärts bzw. rückwärts)
+- **Prüfwerte** (`renders/down_v01_checks.json`):
+  - Körper höchstens 4 cm im Boden (Liegen auf dem Rücken). Der aufgestützte Handschuh lag erst 11 cm tief und wurde korrigiert.
+  - Alle Übergänge enden in der Ruhepose des Ziels (Abweichung 0–8 cm).
+  - Low-Kick-Kontakt: 0,33 m vom Unterschenkel.
+- **Ablauf:**
+  - **Oben in der Guard:** Leertaste = aufstehen, der Gegner bleibt auf dem Rücken liegen.
+  - **Unten in der Guard:** Leertaste = wegdrücken, man bleibt sitzend am Boden. Vorher standen beide sofort auf.
+  - **Am Boden:**
+    - Leertaste = aufstehen. Aus dem Rücken geht es über die Seite und das Sitzen (ca. 2,6 s), aus dem Sitzen ca. 1,6 s, aus dem Knien 0,6 s.
+    - E = Haltung nach oben (Rücken → Seite → Sitzen → Knien).
+    - F = Block (enge Deckung, 60 % weniger Schaden).
+    - Linksklick = Stoßtritt (schiebt einen nahen Gegner 4,5 Studs weg), C = Fersentritt gegen das Knie.
+  - **Aufstehen unter Druck:**
+    - Steht der Gegner näher als 1,2 m am Becken, geht Aufstehen nicht; es erscheint eine Meldung.
+    - Ein Treffer während der ersten 70 % bricht das Aufstehen ab.
+    - Aufstehen kostet Ausdauer.
+  - **Stehend gegen Liegenden:**
+    - C = Low Kick gegen die Beine. Der Treffer wird über den Abstand Schienbein/Fuß zu den Bein-Bones geprüft.
+    - E = in die Guard einsteigen (nur gegen Rückenlage, nahe an den Beinen).
+    - Alle anderen Schläge und Tritte treffen Liegende nicht: keine Kopftritte, keine Stomps.
+  - Der Liegende dreht sich langsam zum Gegner.
+  - HUD zeigt Lage und erlaubte Aktionen.
+  - Kamera: Bodenansicht, wenn man selbst liegt.
+- **Trainingsgegner:**
+  - Liegend: Stoßtritt bzw. Beintritt, wenn man nah ist, sonst Aufstehen oder Haltung wechseln.
+  - Stehend gegen Liegenden: an die Beine heran, Low Kick (40 %) oder Einsteigen in die Guard.
+  - Test-Attribut `CC_ForceLegKick`.
+- **Geprüft in Studio** (1 Spieler gegen den Trainingsgegner):
+  - Oben aufstehen: Gegner bleibt liegen.
+  - Low Kick am Boden: trifft aus 5,8 Studs, verfehlt aus 9 Studs. Schläge gegen den Liegenden: kein Schaden.
+  - Einsteigen in die Guard: Position passt.
+  - Gegner liegt: Stoßtritt schiebt den Spieler weg, dann technisches Aufstehen.
+  - Spieler unten in der Guard: Leertaste → sitzend.
+  - Aufstehen bei zu nahem Gegner: abgelehnt.
+  - Aufstehen mit Low Kick nach 0,5 s: abgebrochen.
+  - Rundenende im Sitzen: Bodenlage zur Pause aufgelöst.
+- **Nicht getestet:**
+  - Stoß- und Beintritt des Spielers selbst (gleicher Code wie beim Gegner geprüft)
+  - Block-Animation am Boden
+  - zwei echte Spieler, Controller, Touch
