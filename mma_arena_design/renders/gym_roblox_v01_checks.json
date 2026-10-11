@@ -1,0 +1,54 @@
+{
+ "source": "training_gym_v02.blend (nur gelesen)",
+ "source_meshes": 239,
+ "export_meshes": 433,
+ "split_objects": 146,
+ "triangles": 23534,
+ "fbx_bytes": 1123548,
+ "collision": 37,
+ "interactions": 33,
+ "lights": 35,
+ "ref": "Floor_Concrete",
+ "ref_center_m": [
+  0.0,
+  0.0,
+  -0.05
+ ],
+ "bbox_studs": [
+  64.286,
+  0.357,
+  50.0
+ ],
+ "textured_materials": [
+  "GY_Bag_Fabric",
+  "GY_Cork",
+  "GY_Floor_Concrete_Warm",
+  "GY_Floor_Rubber_Tiles",
+  "GY_Leather_Black_Worn",
+  "GY_Leather_Red_Worn",
+  "GY_Locker_Floor_Tiles",
+  "GY_Logo",
+  "GY_Mat_logo",
+  "GY_P1",
+  "GY_P2",
+  "GY_P3",
+  "GY_Plan",
+  "GY_Plan_Rounds",
+  "GY_Plan_Week",
+  "GY_Poster_Tournament",
+  "GY_Sign_Ausgang",
+  "GY_Sign_Umkleide",
+  "GY_Style_pad",
+  "GY_Style_sign",
+  "GY_Timer",
+  "GY_Wall_Paint",
+  "GY_Wood_Warm"
+ ],
+ "glow_materials": [
+  "GY_Lamp_Diffuser",
+  "GY_Mirror_Light",
+  "GY_Timer",
+  "GY_Window_Daylight"
+ ],
+ "transparent_materials": []
+}

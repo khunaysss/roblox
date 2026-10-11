@@ -39,10 +39,16 @@ local function corners()
 	local y = canvasY() + 3                   -- HumanoidRootPart-Mitte 3 Studs ueber den Fuessen
 	return CFrame.lookAt(Vector3.new(0, y, 7), Vector3.new(0, y, -7)), CFrame.lookAt(Vector3.new(0, y, -7), Vector3.new(0, y, 7))
 end
--- Lobby: Hallenboden vor dem Kaefig (Blick zum Kaefig); Spieler werden nebeneinander aufgestellt
+-- Lobby: im Trainings-Gym (Workspace.CC_Gym, Boden y = 0, Mitte x = 160), sonst Hallenboden vor dem Kaefig; Spieler nebeneinander
 local LOBBY_Y = 3                              -- Hallenboden (0) + 3
 local function lobbyCF(i)
-	local x = ((i or 1) % 7 - 3) * 3
+	local k = ((i or 1) % 7 - 3) * 2.5
+	local gym = workspace:FindFirstChild("CC_Gym")
+	if gym then                                  -- Startort im Trainings-Gym: hinter dem Eingang, Blick in die Halle
+		local x = 160 + 20 + k
+		return CFrame.lookAt(Vector3.new(x, LOBBY_Y, 19), Vector3.new(x, LOBBY_Y, 0))
+	end
+	local x = k
 	return CFrame.lookAt(Vector3.new(x, LOBBY_Y, 25), Vector3.new(x, LOBBY_Y, 0))
 end
 
