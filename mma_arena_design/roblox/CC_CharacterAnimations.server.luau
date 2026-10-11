@@ -25,13 +25,13 @@ local function anim(name)
 end
 local ANIMS = {
 	idle = "Fighter_Idle_v08", walk = "Fighter_Walk_v01", back = "Fighter_WalkBack_v01",
-	cIdle = "Fighter_CasualIdle_v01", cWalk = "Fighter_CasualWalk_v01", cRun = "Fighter_CasualRun_v02",   -- locker (ausserhalb des Kampfs, v13)
+	cIdle = "Fighter_CasualIdle_v01", cWalk = "Fighter_CasualWalk_v2", cRun = "Fighter_CasualRun_v3",   -- locker (ausserhalb des Kampfs; Gehen/Laufen v17)
 	left = "Fighter_StrafeL_v01", right = "Fighter_StrafeR_v01",
-	mF = "Fighter_MoveF_v01", mB = "Fighter_MoveB_v01", mL = "Fighter_MoveL_v01", mR = "Fighter_MoveR_v01", -- Fussarbeit v10 (gemischt)
+	mF = "Fighter_StepF", mB = "Fighter_StepB", mL = "Fighter_StepL", mR = "Fighter_StepR", -- Fussarbeit v17: Schritt-Nachziehen (gemischt)
 	jab = "Fighter_Jab_v03", cross = "Fighter_Cross_v03", hook = "Fighter_Hook_v03",
 	jabBody = "Fighter_JabBody_v01", crossBody = "Fighter_CrossBody_v01", hitBody = "Fighter_HitBody_v01",
-	bodykick = "Fighter_BodyKick_v2", highkick = "Fighter_HighKick_v2", frontkick = "Fighter_FrontKick_v2",   -- Tritte v16: Ganzkoerper (Pivot, Huefte, Arme)
-	uppercut = "Fighter_Uppercut_v02", lowkick = "Fighter_LowKick_v4",
+	bodykick = "Fighter_BodyKick_v3", highkick = "Fighter_HighKick_v3", frontkick = "Fighter_FrontKick_v3",   -- Tritte v17 (= v16 mit flachem Standfuss)
+	uppercut = "Fighter_Uppercut_v02", lowkick = "Fighter_LowKick_v5",
 	block = "Fighter_Block_v01", blockhit = "Fighter_BlockHit_v01",
 	hit = "Fighter_HitReact_v01", ko = "Fighter_KO_v01",
 	hitStraight = "Fighter_HitStraight_v01", hitHook = "Fighter_HitHook_v01", hitUpper = "Fighter_HitUpper_v01",
@@ -151,7 +151,7 @@ RunService.Heartbeat:Connect(function()
 			local sum = w.mF + w.mB + w.mL + w.mR
 			for _, k in ipairs(MOVE_KEYS) do
 				local wk = sum > 0 and (w[k] / sum) * amount or 0
-				t[k]:AdjustWeight(math.max(wk, 0.001), 0.12)
+				t[k]:AdjustWeight(math.max(wk, 0.001), 0.18)       -- weiche Starts, Stopps und Richtungswechsel
 				t[k]:AdjustSpeed(math.max(speed, 0.5) / WALK_REF)
 			end
 			local dom = amount < 0.05 and "idle" or (math.abs(fwd) >= math.abs(side) and (fwd > 0 and "walk" or "back") or (side > 0 and "right" or "left"))

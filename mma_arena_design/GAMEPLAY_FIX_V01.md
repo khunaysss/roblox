@@ -98,3 +98,29 @@
   - Aus 6,3 Studs verfehlen alle (kleinster Abstand zur Zone 0,14–1,67 Studs).
   - Erster Versuch ohne Schritt: alle Roundhouse-Tritte verfehlten. Die alten Tritte trafen nur, weil der Standfuß bis 18 cm rutschte.
 - **Nicht getestet:** Ansicht der neuen Tritte bei normaler Geschwindigkeit im Spiel (nur Blender-Vorschaubilder), zwei Spieler. Zusätzliche Tritt-Varianten: keine (nur Verbesserungen).
+
+## Abschnitt 4 – Gehen, Rennen und Footwork (erledigt)
+- **Neue Version** (`build_fighter_rigged_v17.py` → `Fighter_Rigged_v17.blend`, Export `export_actions_roblox_v19.py`; in Studio geladen und eingesetzt, **noch nicht hochgeladen**):
+  - `Fighter_CasualWalk_v2`, `Fighter_CasualRun_v3`, `Fighter_StepF/B/L/R`
+  - die Tritte erneut als `Fighter_LowKick_v5`, `BodyKick_v3`, `HighKick_v3`, `FrontKick_v3`
+- **Fehler aus v16 behoben:**
+  - Der Fußknochen zeigt in Ruhe 20° nach vorn unten. Die absolute Ausrichtung des Standfußes hob dadurch die Zehen um ~20° an.
+  - Jetzt wird relativ zur Ruhelage gedreht; tiefster Punkt im Stand 1 cm statt 5 cm über dem Boden.
+  - Die v16-Tritte bleiben in der Datei, im Spiel laufen die v17-Tritte.
+- **Gehen im Gym:**
+  - Ferse setzt auf (Zehen hoch), der Fuß rollt ab, die Zehen drücken ab (Knöchel dreht um den Ballen).
+  - Becken dreht ±7°, Schultern gegen ±12°, Kopf bleibt nach vorn.
+  - Arme schwingen gegengleich und beugen vorn im Ellbogen.
+- **Rennen:** Vorlage, Knie vor, Ferse hoch, Landung auf dem Mittelfuß, Arme ~90° gebeugt pumpen gegengleich.
+- **Kampf-Fußarbeit:** Schritt-Nachziehen statt Gehen.
+  - Vorwärts setzt der vordere Fuß zuerst, rückwärts der hintere; seitlich zuerst der Fuß in Laufrichtung.
+  - Die Füße kreuzen nie (Abstand mindestens 0,48 m) und heben nur 2,5 cm ab, kein Hüpfen.
+  - Becken und Schultern zeigen den Abdruck; Deckung bleibt oben.
+  - Alle vier Richtungen laufen in derselben Phase, damit Diagonalen mischbar sind.
+- **Übergänge:** Gewichte der Fußarbeit-Loops blenden in 0,18 s statt 0,12 s; Abspieltempo bleibt Geschwindigkeit/Sollgeschwindigkeit.
+- **Geprüft:**
+  - Blender: Standfuß der Fußarbeit gleitet in allen vier Richtungen höchstens 0,05 m/s gegen die Sollbewegung. Gehen: Bodenkontakt mit Abrollen im Mittel 0,10 m/s.
+  - Studio, Kampf, Tempo 8, rückwärts: Standfuß 8 Frames lang unbewegt (0,00 Studs), Schwung 2 Studs in ~0,13 s.
+  - Studio: Gegnerausrichtung und Kampfkamera unverändert aktiv.
+- **Hinweis:** Bei Kampftempo 8 Studs/s ist ein Schritt 0,56 m lang (4 Schritte pro Sekunde). Kürzere Schritte gingen nur mit langsamerem Kampftempo; das Spieltempo ist unverändert.
+- **Nicht getestet:** Wirkung in Bewegung mit eigenen Augen (nur Messwerte und Blender-Vorschau), Controller-Stick mit Teilgeschwindigkeit, zwei Spieler.
