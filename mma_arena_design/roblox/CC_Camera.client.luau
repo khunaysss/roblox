@@ -126,3 +126,31 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	aimPos = aimPos:Lerp(aim, 1 - math.exp(-AIM * dt))
 	cam.CFrame = CFrame.lookAt(camPos, aimPos)
 end)
+
+-- Ausserhalb des Kampfs (normale Roblox-Kamera): Kamera nicht in Waende/Geraete schieben.
+-- In diesem Place fehlt das Roblox-Kameramodul (PlayerModule) und damit dessen Hindernis-Ausweichen;
+-- deshalb hier: vom Kopf zur Kamera casten und die Kamera vor das erste Hindernis setzen.
+local popParams = RaycastParams.new(); popParams.FilterType = Enum.RaycastFilterType.Exclude
+local popIgnoreAt = 0
+RunService:BindToRenderStep("CC_CameraPopper", Enum.RenderPriority.Camera.Value + 2, function()
+	if cam.CameraType ~= Enum.CameraType.Custom then return end
+	local char = player.Character
+	local head = char and char:FindFirstChild("HumanoidRootPart")
+	if not head then return end
+	if os.clock() - popIgnoreAt > 2 then
+		local list = {}
+		for _, m in ipairs(workspace:GetChildren()) do
+			if m:IsA("Model") and m:FindFirstChildOfClass("Humanoid") then table.insert(list, m) end
+		end
+		popParams.FilterDescendantsInstances = list; popIgnoreAt = os.clock()
+	end
+	local from = head.Position + Vector3.new(0, 2.2, 0)
+	local to = cam.CFrame.Position
+	local d = to - from
+	if d.Magnitude < 0.5 then return end
+	local hit = workspace:Raycast(from, d, popParams)
+	if hit then
+		local p = hit.Position - d.Unit * 0.6
+		cam.CFrame = CFrame.new(p) * (cam.CFrame - cam.CFrame.Position)
+	end
+end)

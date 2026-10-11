@@ -16,7 +16,11 @@ local floor = model:FindFirstChild(data.ref.parts[1], true)
 assert(floor and floor:IsA("BasePart"), "Bezugsboden fehlt: " .. tostring(data.ref.parts[1]))
 local floorCenter = GYM_CENTER - Vector3.new(0, data.ref.size[2] / 2, 0)
 model:PivotTo(model:GetPivot() + (floorCenter - floor.Position))
-local function world(p) return floorCenter + Vector3.new(p[1], p[2], p[3]) end
+-- Der FBX-Import dreht das Modell um 180 Grad um Y (gemessen: Sack, Trainer-Tisch, Spinde, Tuer liegen bei (-x, y, -z)).
+-- Daten aus Blender (Roblox-Achsen, relativ zur Bodenmitte) deshalb ebenfalls um 180 Grad drehen.
+local FLIP = CFrame.Angles(0, math.pi, 0)
+local BASE = CFrame.new(floorCenter) * FLIP
+local function world(p) return BASE * Vector3.new(p[1], p[2], p[3]) end
 
 -- 2) Teile: Farbe, Material, Kollision
 local function starts(s, list) for _, x in ipairs(list) do if s:sub(1, #x) == x then return true end end return false end
@@ -70,7 +74,7 @@ for _, c in ipairs(data.collision) do
 	pt.Name = c.name; pt.Anchored = true; pt.Transparency = 1; pt.CanCollide = true; pt.CanTouch = false; pt.CastShadow = false
 	local r, w = c.rot, world(c.pos)
 	pt.Size = Vector3.new(math.max(c.size[1], 0.2), math.max(c.size[2], 0.2), math.max(c.size[3], 0.2))
-	pt.CFrame = CFrame.new(w.X, w.Y, w.Z, r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9])
+	pt.CFrame = BASE * CFrame.new(c.pos[1], c.pos[2], c.pos[3], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9])
 	pt.Parent = colF
 end
 
@@ -80,7 +84,7 @@ lightF.Name = "CC_GymLights"; lightF:ClearAllChildren(); lightF.Parent = model
 local nLights = 0
 for _, l in ipairs(data.lights) do
 	if l.type ~= "SUN" then
-		local pos, dir = world(l.pos), Vector3.new(l.dir[1], l.dir[2], l.dir[3])
+		local pos, dir = world(l.pos), FLIP * Vector3.new(l.dir[1], l.dir[2], l.dir[3])
 		local pt = Instance.new("Part")
 		pt.Name = l.name; pt.Size = Vector3.new(0.4, 0.4, 0.4); pt.Anchored = true; pt.Transparency = 1
 		pt.CanCollide = false; pt.CanQuery = false; pt.CanTouch = false; pt.CastShadow = false

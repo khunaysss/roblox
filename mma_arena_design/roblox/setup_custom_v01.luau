@@ -1,12 +1,12 @@
 -- Einmalige Einrichtung der Anpassungs-Vorlagen in Studio (Edit-Modus).
--- Voraussetzung: export/Fighter_Custom_v01.fbx ueber Import 3D importiert (Rig: Custom, Centimeter, Faktor 1)
--- und export/Fighter_Custom_v01_data.luau als ServerStorage.CC_CustomData (ModuleScript).
+-- Voraussetzung: export/Fighter_Custom_v02.fbx (v01 enthielt nur die sichtbare Standard-Variante) ueber Import 3D importiert (Rig: Custom, Centimeter, Faktor 1)
+-- und export/Fighter_Custom_v02_data.luau als ServerStorage.CC_CustomData (ModuleScript).
 -- Ergebnis: ServerStorage.CC_Custom.<Variante>.<Teil> mit Attribut CC_C0 (Versatz zum HumanoidRootPart wie beim Basis-Charakter:
 -- Teilposition - Root-Bone - 3 Studs, weil das HumanoidRootPart 3 Studs ueber dem Root-Bone sitzt).
 local SS = game:GetService("ServerStorage")
 local data = require(SS:WaitForChild("CC_CustomData"))
-local model = workspace:FindFirstChild("Fighter_Custom_v01")
-assert(model, "Importiertes Modell Fighter_Custom_v01 nicht gefunden")
+local model = workspace:FindFirstChild("Fighter_Custom_v02") or workspace:FindFirstChild("Fighter_Custom_v01")
+assert(model, "Importiertes Modell Fighter_Custom_v02 nicht gefunden")
 local root = model:FindFirstChild("Root", true)
 assert(root and root:IsA("Bone"), "Root-Bone fehlt")
 

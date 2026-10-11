@@ -54,3 +54,11 @@ Stand: 2026-10-11. Studio-Place „CageChampions“ (Gruppe ANIMEXGANG). Nicht v
   - Hautton „dunkel“ und Haarfarbe „blond“ (inklusive Brauen) werden sofort angewendet und gespeichert.
   - Panel als Standbild geprüft. Testwerte danach zurückgesetzt.
 - **Nicht geprüft (wartet auf Import):** Wechsel von Frisur, Bart und Gesicht, also ob die skinned Teile am Kopf mitlaufen.
+
+## Gym in Studio (2026-10-12)
+- **Import und Einrichtung:** Nutzer hat importiert, `setup_gym_v01` ausgeführt. `CC_Gym`: Bodenmitte (160, 0, 0), 433 Teile gefärbt, 22 Teile mit genauer Kollision, 96 fest, 37 COL-Teile, 34 Lampen, 33 Interaktionspunkte.
+- **Fehler gefunden und behoben:** Der FBX-Import dreht das Modell um 180° um Y, deshalb lagen Punkte, Kollision und Lampen zuerst gespiegelt. Jetzt liegen Marker und Modell 0–2 Studs auseinander.
+- **Startort:** Spieler starten im Gym hinter dem Eingang (HRP-Höhe 3,05). 19 Trainingsstationen mit Hinweis (E).
+- **Sandsack mit E getestet:** Kombination läuft, Schlagkraft +1 TP. Standbild geprüft.
+- **Kamera:** Außerhalb des Kampfs steckte die Kamera in Geräten, weil das Roblox-Kameramodul im Place fehlt. Neu: Hindernis-Ausweichen in `CC_Camera`, geprüft per Standbild.
+- **Anpassung:** Der erste Import enthielt nur die Standard-Variante, weil ausgeblendete Varianten nicht exportiert wurden. Behoben in `export_custom_parts_v02.py` → `export/Fighter_Custom_v02.fbx` (34 Teile). Wartet auf erneuten Import.

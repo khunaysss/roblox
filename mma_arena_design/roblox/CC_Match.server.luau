@@ -45,8 +45,8 @@ local function lobbyCF(i)
 	local k = ((i or 1) % 7 - 3) * 2.5
 	local gym = workspace:FindFirstChild("CC_Gym")
 	if gym then                                  -- Startort im Trainings-Gym: hinter dem Eingang, Blick in die Halle
-		local x = 160 + 20 + k
-		return CFrame.lookAt(Vector3.new(x, LOBBY_Y, 19), Vector3.new(x, LOBBY_Y, 0))
+		local x = 160 - 20 + k                    -- Eingang liegt nach dem Import bei z = -25 (Modell um 180 Grad gedreht)
+		return CFrame.lookAt(Vector3.new(x, LOBBY_Y, -19), Vector3.new(x, LOBBY_Y, 0))
 	end
 	local x = k
 	return CFrame.lookAt(Vector3.new(x, LOBBY_Y, 25), Vector3.new(x, LOBBY_Y, 0))
