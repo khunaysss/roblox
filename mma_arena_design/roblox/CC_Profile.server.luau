@@ -7,7 +7,8 @@
 --   CC_Power/CC_Cardio/CC_Wrestling/CC_Grappling (Wert) und CC_PowerTP ... (Trainingspunkte 0..9), CC_ProfileSaved (bool).
 -- Andere Skripte melden ueber ServerStorage.CC_ProfileEvent (BindableEvent):
 --   Fire(player, "xp", menge) | Fire(player, "train", "Power"|"Cardio"|"Wrestling"|"Grappling", punkte)
---   | Fire(player, "result", "win"|"loss"|"draw", methode)
+--   | Fire(player, "result", "win"|"loss"|"draw", methode) | Fire(player, "look", { hair=, beard=, face=, skin=, hairColor= })
+-- Aussehen (CC_Customize liest es): Attribut CC_Look am Spieler (JSON).
 -- Ohne DataStore-Zugriff (z. B. Studio ohne API-Freigabe) laeuft alles nur fuer die Sitzung.
 local Players = game:GetService("Players")
 local DSS = game:GetService("DataStoreService")
@@ -30,7 +31,8 @@ event.Name = "CC_ProfileEvent"; event.Parent = SS
 
 local profiles = {}            -- [player] = Tabelle
 local function default()
-	local p = { v = 1, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {} }
+	local p = { v = 1, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
+		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 } }
 	for _, s in ipairs(STATS) do p.stats[s] = 0; p.tp[s] = 0 end
 	return p
 end
@@ -41,6 +43,7 @@ local function publish(plr)
 	plr:SetAttribute("CC_Level", p.level); plr:SetAttribute("CC_XP", p.xp); plr:SetAttribute("CC_XPNext", xpNext(p.level))
 	plr:SetAttribute("CC_Wins", p.wins); plr:SetAttribute("CC_Losses", p.losses); plr:SetAttribute("CC_KOs", p.kos); plr:SetAttribute("CC_Subs", p.subs)
 	for _, s in ipairs(STATS) do plr:SetAttribute("CC_" .. s, p.stats[s]); plr:SetAttribute("CC_" .. s .. "TP", p.tp[s]) end
+	plr:SetAttribute("CC_Look", game:GetService("HttpService"):JSONEncode(p.look))
 end
 
 local function addXP(plr, n)
@@ -75,7 +78,8 @@ local function load(plr)
 	end
 	local p = default()
 	if type(data) == "table" then
-		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and p[k] ~= nil then p[k] = v end end
+		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and k ~= "look" and p[k] ~= nil then p[k] = v end end
+		if type(data.look) == "table" then for k, v in pairs(data.look) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end end
 		for _, s in ipairs(STATS) do
 			if type(data.stats) == "table" and tonumber(data.stats[s]) then p.stats[s] = math.clamp(math.floor(data.stats[s]), 0, STAT_MAX) end
 			if type(data.tp) == "table" and tonumber(data.tp[s]) then p.tp[s] = math.clamp(math.floor(data.tp[s]), 0, TP_PER_LEVEL - 1) end
@@ -87,7 +91,7 @@ end
 local function save(plr)
 	local p = profiles[plr]
 	if not (store and p and plr:GetAttribute("CC_ProfileSaved")) then return end   -- nie ein nicht geladenes Profil ueberschreiben
-	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs, stats = p.stats, tp = p.tp }
+	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs, stats = p.stats, tp = p.tp, look = p.look }
 	local ok, err = pcall(function() store:SetAsync("u_" .. plr.UserId, copy) end)
 	if ok then p.dirty = false else warn("[CC] Profil speichern fehlgeschlagen: " .. tostring(err)) end
 end
@@ -96,6 +100,10 @@ event.Event:Connect(function(plr, kind, a, b)
 	if typeof(plr) ~= "Instance" or not plr:IsA("Player") or not profiles[plr] then return end
 	if kind == "xp" then addXP(plr, tonumber(a) or 0)
 	elseif kind == "train" then train(plr, a, tonumber(b) or 1)
+	elseif kind == "look" and type(a) == "table" then
+		local p = profiles[plr]
+		for k, v in pairs(a) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end
+		p.dirty = true; publish(plr)
 	elseif kind == "result" then
 		local p = profiles[plr]
 		if a == "win" then

@@ -5,6 +5,7 @@
 --   Matten (stretch_spot): Dehnen/Ausdauer -> Kondition (Cardio)
 --   Trainer-Tisch (coach_talk): Trainingskampf gegen den Trainingsgegner (wie Menue TRAINING)
 --   Trainingsplan (read_plan): zeigt die eigenen Werte
+--   Spiegel/Spinde in der Umkleide (character_customization, locker): oeffnet die Kaempfer-Anpassung im Menue
 -- Fortschritt ueber ServerStorage.CC_ProfileEvent (CC_Profile). Hinweise an den Spieler: Attribut CC_Notice ("Text|Zeit").
 -- Bank und Matten haben noch keine eigene Animation (Kaempfer steht in Kampfhaltung, Fortschrittsbalken im HUD).
 local Players = game:GetService("Players")
@@ -145,6 +146,8 @@ local STATIONS = {
 		local be = SS:FindFirstChild("CC_MenuServer")      -- gleiche Warteschlange wie das Menue (CC_Match)
 		if be then be:Fire(p, "training") end
 	end },
+	character_customization = { "Spiegel", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
+	locker = { "Spind", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
 	read_plan = { "Trainingsplan", "Ansehen", function(p) notice(p, statText(p)) end },
 }
 
