@@ -62,3 +62,7 @@ Stand: 2026-10-11. Studio-Place „CageChampions“ (Gruppe ANIMEXGANG). Nicht v
 - **Sandsack mit E getestet:** Kombination läuft, Schlagkraft +1 TP. Standbild geprüft.
 - **Kamera:** Außerhalb des Kampfs steckte die Kamera in Geräten, weil das Roblox-Kameramodul im Place fehlt. Neu: Hindernis-Ausweichen in `CC_Camera`, geprüft per Standbild.
 - **Anpassung:** Der erste Import enthielt nur die Standard-Variante, weil ausgeblendete Varianten nicht exportiert wurden. Behoben in `export_custom_parts_v02.py` → `export/Fighter_Custom_v02.fbx` (34 Teile). Wartet auf erneuten Import.
+- **Anpassung eingerichtet (2026-10-12):** Fighter_Custom_v02 importiert. `setup_custom_v01` hat 34 Teile in `ServerStorage.CC_Custom` eingerichtet; der Versatz der Quiff-Kappe weicht 0,0000 Studs vom Basis-Charakter ab.
+  - Im Playtest gewechselt zu Seitenscheitel, Vollbart und „freundlich“: Teile ausgetauscht. Standbild zeigt sie am Kopf in Kampfhaltung, sie bewegen sich mit.
+  - Testaussehen danach zurückgesetzt.
+  - Nicht geprüft: alle 4 × 3 × 3 Kombinationen einzeln, Locken (3 840 Dreiecke) auf dem Handy.
