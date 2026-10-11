@@ -16,7 +16,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 ## In Arbeit
 | Aufgabe | Wer | Datei |
 |---|---|---|
-| – | – | – |
+| UI-Überarbeitung: 1 erledigt (Designsystem, Hauptmenü); als Nächstes 2 Charakter-Editor + Gym-UI, 3 Suche + Vorstellung, 4 Kampf-HUD + Ergebnis, 5 Tutorial + Einstellungen + Gesamttest | Claude | `UI_DESIGN_V01.md` |
 
 ## Als Nächstes
 | # | Aufgabe | Wer | Notiz |

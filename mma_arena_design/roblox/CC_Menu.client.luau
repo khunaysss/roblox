@@ -113,6 +113,8 @@ done.Activated:Connect(function() custom.Visible = false end)
 fighterB.Activated:Connect(function() custom.Visible = not custom.Visible end)
 -- Umkleide im Gym (Interaktionspunkt) oeffnet ebenfalls die Anpassung
 player:GetAttributeChangedSignal("CC_OpenCustomize"):Connect(function() custom.Visible = true end)
+-- Hauptmenue (CC_MainMenu) schliesst die Anpassung beim Verlassen der Seite MEIN KAEMPFER
+player:GetAttributeChangedSignal("CC_CloseCustomize"):Connect(function() custom.Visible = false end)
 
 trainingB.Activated:Connect(function() menuEvent:FireServer("training") end)
 pvpB.Activated:Connect(function() menuEvent:FireServer("pvp") end)
@@ -121,7 +123,7 @@ cancelB.Activated:Connect(function() menuEvent:FireServer("cancel") end)
 game:GetService("RunService").RenderStepped:Connect(function()
 	local char = player.Character
 	local inMatch = (char and char:GetAttribute("CC_Opponent") ~= nil) or player:GetAttribute("CC_Minigame") ~= nil   -- auch waehrend Gym-Training ausblenden
-	panel.Visible = not inMatch
+	panel.Visible = false   -- ersetzt durch das Hauptmenue (CC_MainMenu); Anpassungsfenster bleibt bis Schritt 2
 	if inMatch then custom.Visible = false; return end
 	local look = currentLook()
 	for key, e in pairs(valueLabels) do

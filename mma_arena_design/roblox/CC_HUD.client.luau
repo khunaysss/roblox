@@ -179,7 +179,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	end
 	if char then
 		local gh = groundHint(char)
-		hint.Text = gh or (inMatch and HINT_STAND or "Lobby: Modus im Menü links wählen")
+		hint.Text = gh or (inMatch and HINT_STAND or "")
 		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or "") or ""
 		local p = char:GetAttribute("CC_SubProgress")
 		duel.Visible = p ~= nil

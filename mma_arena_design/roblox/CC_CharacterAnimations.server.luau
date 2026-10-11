@@ -14,6 +14,10 @@ local A = game.ServerStorage.CC_Animations
 -- Hochgeladene Animationen (Gruppe ANIMEXGANG): ServerStorage.CC_Animations.CC_AnimIds = ModuleScript { [Name] = Asset-ID }.
 -- Fehlt eine ID, wird die temporaere Studio-ID benutzt (funktioniert nur in Studio).
 local ANIM_IDS = A:FindFirstChild("CC_AnimIds") and require(A.CC_AnimIds) or {}
+-- Fuer Client-UI (Hauptmenue-Buehne): ausgewaehlte IDs als Attribute an ReplicatedStorage
+for _, n in ipairs({ "Fighter_Idle_v08", "Fighter_CasualIdle_v01" }) do
+	if ANIM_IDS[n] then game.ReplicatedStorage:SetAttribute("CC_AnimId_" .. n, ANIM_IDS[n]) end
+end
 local function anim(name)
 	local a = Instance.new("Animation")
 	a.AnimationId = ANIM_IDS[name] and ("rbxassetid://" .. tostring(ANIM_IDS[name])) or KSP:RegisterKeyframeSequence(A[name])

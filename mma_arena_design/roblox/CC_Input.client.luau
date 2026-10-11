@@ -28,6 +28,7 @@ local UIS = game:GetService("UserInputService")
 local BODY = { jab = "jabBody", cross = "crossBody" }   -- mit gehaltener Umschalttaste zum Koerper
 local function bindMove(name, move, touch, ...)
 	CAS:BindAction(name, function(_, state)
+		if player:GetAttribute("CC_UIBlock") then return Enum.ContextActionResult.Pass end   -- Hauptmenue offen
 		if state == Enum.UserInputState.Begin then
 			local m = move
 			if BODY[m] and (UIS:IsKeyDown(Enum.KeyCode.LeftShift) or UIS:IsKeyDown(Enum.KeyCode.RightShift)) then m = BODY[m] end
@@ -116,7 +117,7 @@ RunService.RenderStepped:Connect(function(dt)
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	local root = char and char:FindFirstChild("HumanoidRootPart")
 	if not (hum and root) then return end
-	if not char:GetAttribute("CC_Opponent") and not inWrestle() and not root.Anchored and not char:GetAttribute("CC_Frozen") then
+	if not char:GetAttribute("CC_Opponent") and not inWrestle() and not root.Anchored and not char:GetAttribute("CC_Frozen") and not player:GetAttribute("CC_UIBlock") then
 		local sprint = UIS:IsKeyDown(Enum.KeyCode.LeftShift) or sprintPad
 		local want = sprint and CASUAL_RUN or CASUAL_WALK
 		if hum.WalkSpeed ~= want then hum.WalkSpeed = want end
