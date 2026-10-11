@@ -1,16 +1,28 @@
-# Animations-Upload (vorbereitet, NICHT ausgeführt)
+# Animations-Upload (freigegeben 2026-10-11, Gruppe ANIMEXGANG 7160158)
 
-- Ziel: Gruppe **ANIMEXGANG (7160158)**. Upload nur nach ausdrücklicher Freigabe des Nutzers.
-- Ohne Upload laufen die Animationen nur in Studio (temporäre IDs über `KeyframeSequenceProvider:RegisterKeyframeSequence`).
-- Vorbereitet:
-  - `ServerStorage.CC_Animations.CC_AnimIds` (ModuleScript, zunächst leer): `[KeyframeSequence-Name] = Asset-ID`.
-  - `CC_CharacterAnimations` nimmt eine eingetragene ID automatisch, sonst die temporäre.
-- **64 Animationen** (alle als KeyframeSequence in `ServerStorage.CC_Animations` vorhanden):
-  - **30 Steh-Animationen:**
-    - Idle_v08, Walk/WalkBack/StrafeL/StrafeR_v01, MoveF/B/L/R_v01
-    - Jab_v03, Cross_v03, Hook_v03, Uppercut_v02, JabBody/CrossBody_v01, LowKick_v03, BodyKick/HighKick/FrontKick_v01
-    - Block/BlockHit_v01
-    - HitReact/HitStraight/HitHook/HitUpper/HitLeg/HitBody/Stagger_v01
-    - KO/KOForward_v01
-  - **34 Paar-Animationen `WR_*`:** Takedown, Guard, Positionen, Submissions; je A und B.
-- Ablauf nach Freigabe: in Studio jede KeyframeSequence als Animation für die Gruppe hochladen (Animation Editor → Veröffentlichen, oder per Studio-Skript über AssetService) und die IDs in `CC_AnimIds` eintragen. Danach testen.
+## Warum
+Mit temporären Studio-IDs laufen die Animationen nur im Einzel-Test. Beim Test mit 2 Clients und im echten Spiel bekommen die Spieler nur leere Animationen (Länge 0), die Kämpfer stehen in der T-Pose (geprüft 2026-10-11).
+
+## Stand
+- Studios direkte Upload-Funktion (`AssetService:CreateAssetAsync`) ist von Roblox gesperrt („not available yet“).
+- Weg: Roblox Open Cloud Assets API (Animation als .rbxmx).
+- `export/anim_rbxmx/*.rbxmx`: 64 Animationen, direkt aus den KeyframeSequences in Studio geschrieben (Loop, Priorität, Keyframes, Posen, Easing).
+- `upload_animations_v01.js` lädt sie hoch und schreibt `roblox/CC_AnimIds.luau`. Bei einem Abbruch macht ein erneuter Start weiter.
+- `CC_CharacterAnimations` nimmt eingetragene IDs automatisch (`ServerStorage.CC_Animations.CC_AnimIds`).
+
+## Schritte für den Nutzer
+1. **API-Schlüssel für die Gruppe** auf create.roblox.com:
+   - Oben links als Ersteller die Gruppe **ANIMEXGANG** wählen, dann **Open Cloud → API Keys → Create API Key**.
+   - Zugriff: **Assets** mit **Read** und **Write**.
+   - Erlaubte IP: `0.0.0.0/0` oder die eigene IP. Ablaufdatum nach Wunsch.
+   - Den Schlüssel geheim halten und nicht in den Chat schreiben.
+2. **PowerShell im Ordner `mma_arena_design`:**
+   - Test mit 1 Animation:
+     ```powershell
+     $env:CC_ROBLOX_API_KEY = "<Schlüssel>"; node upload_animations_v01.js --test
+     ```
+   - Wenn „OK … -> <Zahl>“ kommt, den Rest hochladen:
+     ```powershell
+     node upload_animations_v01.js
+     ```
+3. Danach setzt Claude `CC_AnimIds` in Studio ein und testet mit 2 Clients.
