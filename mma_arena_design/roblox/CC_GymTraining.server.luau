@@ -7,7 +7,8 @@
 --   Trainingsplan (read_plan): zeigt die eigenen Werte
 --   Spiegel/Spinde in der Umkleide (character_customization, locker): oeffnet die Kaempfer-Anpassung im Menue
 -- Fortschritt ueber ServerStorage.CC_ProfileEvent (CC_Profile). Hinweise an den Spieler: Attribut CC_Notice ("Text|Zeit").
--- Bank und Matten haben noch keine eigene Animation (Kaempfer steht in Kampfhaltung, Fortschrittsbalken im HUD).
+-- Uebungs-Animationen (Fighter_Rigged_v13): Bankdruecken (liegt auf der Bank, Kopf unter der Stange), Kurzhantel-Curls, Hampelmann.
+-- Waehrend einer Uebung ist das HumanoidRootPart verankert (kein Wegschieben durch die Bank, kein Laufen).
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -27,6 +28,7 @@ local function animOf(name)
 end
 local COMBO = { animOf("Fighter_Jab_v03"), animOf("Fighter_Cross_v03"), animOf("Fighter_Hook_v03"), animOf("Fighter_Jab_v03"), animOf("Fighter_Uppercut_v02") }
 local COMBO_GAP = { 0.42, 0.55, 0.62, 0.42, 0.7 }
+local EX = { bench = animOf("Fighter_ExBenchPress_v01"), curl = animOf("Fighter_ExCurl_v01"), jack = animOf("Fighter_ExJumpingJack_v01") }
 
 local function profile(p, kind, a, b)
 	local ev = SS:FindFirstChild("CC_ProfileEvent")
@@ -88,7 +90,8 @@ local function bagCombo(p, marker)
 	local hum = p.Character:FindFirstChildOfClass("Humanoid")
 	local animator = hum and hum:FindFirstChildOfClass("Animator")
 	local dir = faceStation(p, marker, 3.6)
-	hum.WalkSpeed = 0
+	local root = p.Character.HumanoidRootPart
+	root.Anchored = true
 	for i, a in ipairs(COMBO) do
 		if not p.Character then break end
 		local tr = animator:LoadAnimation(a)
@@ -100,29 +103,54 @@ local function bagCombo(p, marker)
 		if s then task.delay(0.2, function() local c = s:Clone(); c.Parent = marker; c:Play(); game:GetService("Debris"):AddItem(c, 2) end) end
 		task.wait(COMBO_GAP[i])
 	end
-	if hum.Parent then hum.WalkSpeed = 8 end
+	if root.Parent then root.Anchored = false end
 	profile(p, "train", "Power", 1); profile(p, "xp", 3)
 	notice(p, "Sandsack: Schlagkraft +1 Trainingspunkt")
 	busy[p] = nil
 end
 
-local function holdExercise(p, marker, statName, seconds, label)
+-- Aufstellung je Uebung: Bank = auf der Bank liegend (Becken nahe Bankmitte, Fuesse vom Rack weg), sonst vor bzw. auf der Station
+local function place(p, marker, kind)
+	local root = p.Character.HumanoidRootPart
+	local y = root.Position.Y
+	if kind == "bench" then
+		local rack = folder:FindFirstChild("Power_Rack")
+		local c = Vector3.new(marker.Position.X, y, marker.Position.Z)
+		local dir
+		if rack then dir = c - Vector3.new(rack.Position.X, y, rack.Position.Z) end
+		if not dir or dir.Magnitude < 0.3 then dir = marker.Size.X > marker.Size.Z and Vector3.new(1, 0, 0) or Vector3.new(0, 0, 1) end
+		dir = dir.Unit
+		root.CFrame = CFrame.lookAt(c + dir * 0.6, c + dir * 5)        -- Blick = Richtung Fuesse (Animation liegt nach hinten)
+	elseif kind == "jack" then
+		local c = Vector3.new(marker.Position.X, y, marker.Position.Z)
+		local toward = Vector3.new(160, y, 0)                             -- Blick in die Halle
+		root.CFrame = CFrame.lookAt(c, (toward - c).Magnitude > 0.5 and toward or c + Vector3.new(0, 0, 1))
+	else
+		faceStation(p, marker, 2.6)
+	end
+end
+
+local function holdExercise(p, marker, statName, seconds, label, kind)
 	if not canTrain(p) then return end
 	busy[p] = true
 	local hum = p.Character:FindFirstChildOfClass("Humanoid")
-	faceStation(p, marker, 2.2)
-	hum.WalkSpeed = 0
+	local animator = hum and hum:FindFirstChildOfClass("Animator")
+	local root = p.Character.HumanoidRootPart
+	local startCF = root.CFrame
+	place(p, marker, kind)
+	root.Anchored = true
+	local tr = animator and EX[kind] and animator:LoadAnimation(EX[kind])
+	if tr then tr.Priority = Enum.AnimationPriority.Action; tr.Looped = true; tr:Play(0.3) end
 	p:SetAttribute("CC_Exercise", label .. "|" .. tostring(workspace:GetServerTimeNow()) .. "|" .. seconds)
-	local root, t0 = p.Character.HumanoidRootPart, os.clock()
-	local start = root.Position
-	local ok = true
-	while os.clock() - t0 < seconds do
-		task.wait(0.1)
-		if not p.Character or (root.Position - start).Magnitude > 2 then ok = false; break end
-	end
+	local t0 = os.clock()
+	while os.clock() - t0 < seconds and p.Character and root.Parent do task.wait(0.1) end
 	p:SetAttribute("CC_Exercise", nil)
-	if hum.Parent then hum.WalkSpeed = 8 end
-	if ok then
+	if tr then tr:Stop(0.3) end
+	if root.Parent then
+		if kind == "bench" then root.CFrame = startCF end            -- vom Liegen zurueck an den Ausgangspunkt
+		root.Anchored = false
+	end
+	if p.Character then
 		profile(p, "train", statName, 1); profile(p, "xp", 3)
 		notice(p, label .. ": " .. (statName == "Power" and "Schlagkraft" or "Kondition") .. " +1 Trainingspunkt")
 	end
@@ -138,9 +166,9 @@ end
 local STATIONS = {
 	punch_bag = { "Sandsack", "Schlagen", function(p, m) bagCombo(p, m) end },
 	punch_bag_standing = { "Standsack", "Schlagen", function(p, m) bagCombo(p, m) end },
-	bench_dumbbell = { "Hantelbank", "Trainieren", function(p, m) holdExercise(p, m, "Power", 4, "Hanteln") end },
-	bench_press = { "Bankdrücken", "Trainieren", function(p, m) holdExercise(p, m, "Power", 4, "Bankdrücken") end },
-	stretch_spot = { "Matte", "Konditionstraining", function(p, m) holdExercise(p, m, "Cardio", 5, "Kondition") end },
+	bench_dumbbell = { "Kurzhanteln", "Curls", function(p, m) holdExercise(p, m, "Power", 5, "Kurzhantel-Curls", "curl") end },
+	bench_press = { "Hantelbank", "Bankdrücken", function(p, m) holdExercise(p, m, "Power", 5, "Bankdrücken", "bench") end },
+	stretch_spot = { "Matte", "Hampelmann", function(p, m) holdExercise(p, m, "Cardio", 5, "Hampelmann", "jack") end },
 	coach_talk = { "Trainer", "Trainingskampf starten", function(p)
 		notice(p, "Trainer: Zeig mir, was du kannst! Trainingskampf startet …")
 		local be = SS:FindFirstChild("CC_MenuServer")      -- gleiche Warteschlange wie das Menue (CC_Match)

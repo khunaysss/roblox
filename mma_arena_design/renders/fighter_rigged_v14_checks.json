@@ -1,0 +1,53 @@
+{
+ "source": "Fighter_Rigged_v12.blend (unveraendert)",
+ "actions": {
+  "Fighter_CasualIdle": {
+   "frames": 49,
+   "lowest_body_z": -0.0004,
+   "knee_min_deg": 12.6638,
+   "elbow_min_deg": 166.2578,
+   "stance_slip_mps": 0.0,
+   "loop_error_m": 0.0
+  },
+  "Fighter_CasualWalk": {
+   "frames": 19,
+   "lowest_body_z": -0.0001,
+   "knee_min_deg": 0.4025,
+   "elbow_min_deg": 158.4817,
+   "stance_slip_mps": 0.1778,
+   "loop_error_m": 0.0
+  },
+  "Fighter_CasualRun": {
+   "frames": 13,
+   "lowest_body_z": -0.0005,
+   "knee_min_deg": 19.4999,
+   "elbow_min_deg": 66.8091,
+   "stance_slip_mps": 4.9504,
+   "loop_error_m": 0.0
+  },
+  "Fighter_ExBenchPress": {
+   "frames": 41,
+   "lowest_body_z": -0.0004,
+   "knee_min_deg": 87.6405,
+   "elbow_min_deg": 57.6152,
+   "stance_slip_mps": 0.0,
+   "loop_error_m": 0.0
+  },
+  "Fighter_ExCurl": {
+   "frames": 41,
+   "lowest_body_z": -0.0004,
+   "knee_min_deg": 16.5879,
+   "elbow_min_deg": 83.189,
+   "stance_slip_mps": 0.0,
+   "loop_error_m": 0.0
+  },
+  "Fighter_ExJumpingJack": {
+   "frames": 21,
+   "lowest_body_z": -0.0004,
+   "knee_min_deg": 0.4025,
+   "elbow_min_deg": 141.7327,
+   "stance_slip_mps": 0.0,
+   "loop_error_m": 0.0
+  }
+ }
+}

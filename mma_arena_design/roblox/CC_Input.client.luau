@@ -106,11 +106,22 @@ RunService:BindToRenderStep("CC_LockMove", Enum.RenderPriority.Input.Value + 1, 
 	end
 	if dir.Magnitude > 0.01 then hum:Move(dir.Unit * math.min(mv.Magnitude, 1), false) end
 end)
+-- Locker-Modus (kein Kampf): normales Gehtempo, Umschalttaste bzw. linker Stick gedrueckt = Laufen.
+-- Waehrend Uebungen (verankert) und eingefroren nichts aendern.
+local CASUAL_WALK, CASUAL_RUN = 6.4, 15
+local sprintPad = false
+UIS.InputBegan:Connect(function(i) if i.KeyCode == Enum.KeyCode.ButtonL3 then sprintPad = not sprintPad end end)
 RunService.RenderStepped:Connect(function(dt)
 	local char = player.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	local root = char and char:FindFirstChild("HumanoidRootPart")
 	if not (hum and root) then return end
+	if not char:GetAttribute("CC_Opponent") and not inWrestle() and not root.Anchored and not char:GetAttribute("CC_Frozen") then
+		local sprint = UIS:IsKeyDown(Enum.KeyCode.LeftShift) or sprintPad
+		local want = sprint and CASUAL_RUN or CASUAL_WALK
+		if hum.WalkSpeed ~= want then hum.WalkSpeed = want end
+		if hum.MoveDirection.Magnitude < 0.1 then sprintPad = false end
+	end
 	if inWrestle() or char:GetAttribute("CC_KO") then
 		hum.AutoRotate = false
 		char:SetAttribute("CC_LockTarget", inWrestle() and (current and current.Name or "") or "")

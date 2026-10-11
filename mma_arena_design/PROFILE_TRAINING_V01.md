@@ -66,3 +66,24 @@ Stand: 2026-10-11. Studio-Place „CageChampions“ (Gruppe ANIMEXGANG). Nicht v
   - Im Playtest gewechselt zu Seitenscheitel, Vollbart und „freundlich“: Teile ausgetauscht. Standbild zeigt sie am Kopf in Kampfhaltung, sie bewegen sich mit.
   - Testaussehen danach zurückgesetzt.
   - Nicht geprüft: alle 4 × 3 × 3 Kombinationen einzeln, Locken (3 840 Dreiecke) auf dem Handy.
+
+## Locker-Modus + Gym-Animationen (2026-10-12)
+- **Blender** (`build_fighter_rigged_v13.py` → `Fighter_Rigged_v13.blend`, Laufen korrigiert in `build_fighter_rigged_v14.py` → `Fighter_Rigged_v14.blend`).
+  - Export: `export_actions_roblox_v15.py` bzw. `v16`. Prüfwerte: `renders/fighter_rigged_v13_checks.json` und `v14`.
+  - Locker stehen (48 Frames), Gehen (18 Frames, 1,80 m/s), Laufen (12 Frames, 4,2 m/s; v13 hatte 14 Frames und ein zu langes Bein-Ziel).
+  - Bankdrücken (liegt auf dem Rücken, Root −90° um X), Kurzhantel-Curls, Hampelmann; alle als Loops.
+- **Spiel:**
+  - Ohne Kampf (`CC_Opponent` fehlt) spielt locker Stehen/Gehen/Laufen. Gehtempo 6,4, mit Umschalttaste (Controller: L3) Laufen mit 15.
+  - Im Kampf wieder Kampfstellung und Fußarbeit mit Tempo 8 (beim Kampfstart zurückgesetzt).
+  - **Gym-Stationen:**
+    - Hantelbank: der Kämpfer liegt auf der Bank, Kopf zur Stange.
+    - Kurzhanteln: Curls.
+    - Matten: Hampelmann.
+    - HumanoidRootPart während der Übung verankert.
+- **Geprüft (Studio, Spieler):**
+  - Gehen: Fußgleiten 0,06 bei 6,4 Studs/s.
+  - Laufen: 0,28 bei 15 Studs/s (v13 hatte 3,64).
+  - Bankdrücken, Hampelmann und Curls je mit Standbild; nach der Bank wieder an der Ausgangsstelle (Höhe 3,06).
+  - Wechsel zur Kampfstellung beim Trainingskampf (Loop 1,33 s, Tempo 8).
+- **Upload:** 6 neue Animationen als `export/anim_rbxmx/*.rbxmx` vorbereitet. Upload durch den Nutzer nötig (`upload_starten.ps1`); ohne Upload laufen sie nur im Einzeltest in Studio.
+- Nicht geprüft: Controller-Sprint (L3), Dummy im Locker-Modus beim Parken.

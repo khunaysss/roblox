@@ -21,6 +21,7 @@ local function anim(name)
 end
 local ANIMS = {
 	idle = "Fighter_Idle_v08", walk = "Fighter_Walk_v01", back = "Fighter_WalkBack_v01",
+	cIdle = "Fighter_CasualIdle_v01", cWalk = "Fighter_CasualWalk_v01", cRun = "Fighter_CasualRun_v02",   -- locker (ausserhalb des Kampfs, v13)
 	left = "Fighter_StrafeL_v01", right = "Fighter_StrafeR_v01",
 	mF = "Fighter_MoveF_v01", mB = "Fighter_MoveB_v01", mL = "Fighter_MoveL_v01", mR = "Fighter_MoveR_v01", -- Fussarbeit v10 (gemischt)
 	jab = "Fighter_Jab_v03", cross = "Fighter_Cross_v03", hook = "Fighter_Hook_v03",
@@ -90,7 +91,7 @@ local function setup(char)
 	hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
 	local t = {}
 	for k, a in pairs(ANIMS) do t[k] = animator:LoadAnimation(a) end
-	for _, k in ipairs({ "idle", "walk", "back", "left", "right", "mF", "mB", "mL", "mR" }) do t[k].Looped = true end
+	for _, k in ipairs({ "idle", "walk", "back", "left", "right", "mF", "mB", "mL", "mR", "cIdle", "cWalk", "cRun" }) do t[k].Looped = true end
 	t.idle:Play(0.2)
 	-- die vier Fussarbeit-Loops laufen immer synchron mit; nur ihre Gewichte aendern sich (Diagonalen, weiche Wechsel)
 	for _, k in ipairs({ "mF", "mB", "mL", "mR" }) do t[k]:Play(0, 0.001, 1) end
@@ -105,11 +106,36 @@ end
 -- Fussarbeit: vier synchrone Loops (vor/zurueck/links/rechts) nach Bewegungsrichtung relativ zur Blickrichtung gewichtet.
 -- Abspieltempo = tatsaechliche Geschwindigkeit / 6 (Loops sind fuer WalkSpeed 6 gebaut) -> Standfuss bleibt stehen.
 local MOVE_KEYS = { "mF", "mB", "mL", "mR" }
+-- Locker-Modus: ausserhalb eines Kampfs (kein CC_Opponent) aufrecht stehen, normal gehen (1,80 m/s = 6,4 Studs/s) und laufen
+-- (4,2 m/s = 15 Studs/s); Abspieltempo = Geschwindigkeit / gebaute Geschwindigkeit. Im Kampf: Kampfstellung + Fussarbeit.
+local CASUAL_WALK_REF, CASUAL_RUN_REF = 1.80 / 0.28, 4.20 / 0.28
+local function isCasual(f) return not f.char:GetAttribute("CC_Opponent") and not f.wr and not f.ko end
+local function ensure(tr, w) if not tr.IsPlaying then tr:Play(0.25, w or 1, 1) end end
 RunService.Heartbeat:Connect(function()
 	for _, f in pairs(fighters) do
 		local root = f.char:FindFirstChild("HumanoidRootPart")
 		local t = f.tracks
-		if root and not f.ko and not f.wr then
+		if root and isCasual(f) then
+			if f.mode ~= "casual" then
+				f.mode = "casual"
+				t.idle:Stop(0.3)
+				for _, k in ipairs(MOVE_KEYS) do t[k]:Stop(0.2) end
+				for _, k in ipairs({ "block", "blockhit" }) do t[k]:Stop(0.2) end
+			end
+			ensure(t.cIdle); ensure(t.cWalk, 0.001); ensure(t.cRun, 0.001)
+			local v = root.AssemblyLinearVelocity; local speed = Vector3.new(v.X, 0, v.Z).Magnitude
+			local amount = math.clamp((speed - 0.4) / 2.0, 0, 1)
+			local runK = math.clamp((speed - 9) / 4, 0, 1)
+			t.cWalk:AdjustWeight(math.max(amount * (1 - runK), 0.001), 0.15); t.cWalk:AdjustSpeed(math.max(speed, 0.5) / CASUAL_WALK_REF)
+			t.cRun:AdjustWeight(math.max(amount * runK, 0.001), 0.15); t.cRun:AdjustSpeed(math.max(speed, 0.5) / CASUAL_RUN_REF)
+			local dom = amount < 0.05 and "idle" or (runK > 0.5 and "run" or "walk")
+			if dom ~= f.loco then f.loco = dom; f.char:SetAttribute("CC_Loco", dom) end
+		elseif root and not f.ko and not f.wr then
+			if f.mode ~= "fight" then
+				f.mode = "fight"
+				for _, k in ipairs({ "cIdle", "cWalk", "cRun" }) do t[k]:Stop(0.25) end
+				ensure(t.idle)
+			end
 			if f.wantBlock and not f.blocking and os.clock() >= f.busyUntil then setBlock(f, true) end
 			if not t.mF.IsPlaying then for _, k in ipairs(MOVE_KEYS) do t[k]:Play(0, 0.001, 1) end end -- nach K.o./Reset wieder anwerfen (synchron)
 			local v = root.AssemblyLinearVelocity; v = Vector3.new(v.X, 0, v.Z)
@@ -128,6 +154,7 @@ RunService.Heartbeat:Connect(function()
 			if dom ~= f.loco then f.loco = dom; f.char:SetAttribute("CC_Loco", dom) end
 		elseif t then
 			for _, k in ipairs(MOVE_KEYS) do if t[k] then t[k]:AdjustWeight(0.001, 0.1) end end
+			if f.mode == "casual" then f.mode = nil; for _, k in ipairs({ "cIdle", "cWalk", "cRun" }) do t[k]:Stop(0.2) end end
 		end
 	end
 end)
@@ -701,7 +728,8 @@ resetEvent.OnInvoke = function(char, cf, health)
 	setBlock(f, false); f.wantBlock = false; f.wantEscape = nil
 	for k, tr in pairs(f.tracks) do if k ~= "idle" then tr:Stop(0.1) end end
 	if not f.tracks.idle.IsPlaying then f.tracks.idle:Play(0.2) end
-	f.loco = nil; f.ko = false; f.busyUntil = 0
+	f.loco = nil; f.ko = false; f.busyUntil = 0; f.mode = nil
+	f.hum.WalkSpeed = f.speed                 -- Kampftempo; in der Lobby setzt der Client das Locker-Tempo
 	f.char:SetAttribute("CC_KO", false); f.char:SetAttribute("CC_Wrestle", false)
 	f.hum.Health = health or f.hum.MaxHealth
 	if cf then f.char.HumanoidRootPart.CFrame = cf end
