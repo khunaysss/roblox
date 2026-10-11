@@ -41,6 +41,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | 7 Gegner-KI, Eingabegeräte | teilweise (PC, Controller simuliert) | Zwei-Spieler-Test, Touch, echter Controller |
 | Menü, Lobby, Spieler gegen Spieler | Training getestet | echter Zwei-Spieler-Test |
 | Animations-Upload (ANIMEXGANG) | erledigt (64 IDs, geprüft) | neue Animationen jeweils nachladen |
+| Fortschritt/Speichern, Gym-Training, Anpassung | gebaut, teilweise getestet | Gym- und Anpassungs-Import (Nutzer), danach Einrichtung + Test |
 | Ausdauer | erledigt (B) | Feinabstimmung mit C/D/E |
 | Online-Test 2 Spieler | offen | Team-Test in Studio (2 Clients) |
 
