@@ -46,6 +46,13 @@ local function lobbyCF(i)
 	return CFrame.lookAt(Vector3.new(x, LOBBY_Y, 25), Vector3.new(x, LOBBY_Y, 0))
 end
 
+-- Shorts-Farbe nach Ecke: Rot (Standard des Charakters) / Blau (wie der Trainingsgegner)
+local SHORTS = { red = Color3.new(0.564706, 0.0823529, 0.117647), blue = Color3.new(0.117647, 0.235294, 0.627451) }
+local function paint(c, side)
+	local s = c and c:FindFirstChild("Fighter_Shorts", true)
+	if s and s:IsA("BasePart") then s.Color = SHORTS[side] end
+end
+
 -- ---------------- Warteschlange ----------------
 local queue = {}            -- { player, mode }
 local function inQueue(p) for i, e in ipairs(queue) do if e[1] == p then return i end end end
@@ -81,6 +88,7 @@ local function toLobby(p)
 		lobbyCount += 1
 		reset:Invoke(c, lobbyCF(lobbyCount), nil)
 		c:SetAttribute("CC_Opponent", nil); c:SetAttribute("CC_Frozen", false)
+		paint(c, "red")
 	end
 end
 local function hookPlayer(p)
@@ -127,6 +135,7 @@ local function placeBoth(m, heal)
 	if r then reset:Invoke(r, cr, heal and math.min(100, r.Humanoid.Health + heal) or nil) end
 	if b then reset:Invoke(b, cb, heal and math.min(100, b.Humanoid.Health + heal) or nil) end
 	if r and b then r:SetAttribute("CC_Opponent", b.Name); b:SetAttribute("CC_Opponent", r.Name) end
+	paint(r, "red"); paint(b, "blue")
 end
 local function present(m)                    -- beide Kaempfer noch da?
 	local r, b = chars(m)
