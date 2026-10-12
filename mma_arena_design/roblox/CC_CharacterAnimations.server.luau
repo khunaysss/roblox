@@ -273,7 +273,8 @@ local function land(attacker, target, move, m, track)
 	local blocked = target.blocking
 	local blockFactor = blocked and (m.bodyShot and 0.5 or BLOCK_FACTOR) or 1   -- hohe Deckung schuetzt den Koerper nur halb
 	local tired = attacker.stamina < LOW_STAMINA and 0.7 or 1
-	local dmg = m.damage * blockFactor * tired * (1 + 0.015 * stat(attacker, "Power"))
+	local lvDmg = (attacker.char == workspace:FindFirstChild("CC_TrainingDummy") and DummyLevel) and DummyLevel().dmg or 1   -- Trainingsgegner-Stufe
+	local dmg = m.damage * blockFactor * tired * lvDmg * (1 + 0.015 * stat(attacker, "Power"))
 	target.hum.Health = math.max(HP_FLOOR, target.hum.Health - dmg)
 	addDamage(attacker.char, dmg)
 	if blocked then spend(target, 4) end
@@ -1045,12 +1046,13 @@ end)
 -- Attribut CC_Difficulty am Trainingsgegner (setzt CC_Match aus der Menue-Auswahl): "passiv" | "anfaenger" | "fortgeschritten".
 --   reaction = Denkpause im Stand (min, zusaetzlich zufaellig, s); aggr = Anteil Angriffe je Entscheidung; combo = max. Kombolaenge;
 --   block = Blockchance je Entscheidung; td = Takedownchance je Entscheidung; ground = Bodenkampfstaerke (1 = volles Verhalten:
---   Tempo der Bodenentscheidungen, Submission-, Konter-, Befreiungs- und Sprawl-Chance werden damit skaliert); regen = Leben/s.
+--   Tempo der Bodenentscheidungen, Submission-, Konter-, Befreiungs- und Sprawl-Chance werden damit skaliert); regen = Leben/s;
+--   dmg = Schadensfaktor seiner Schlaege und Tritte.
 -- "fortgeschritten" = das bisherige vollstaendige Verhalten (Reaktion >= 0,45 s).
 local DUMMY_LEVELS = {
-	passiv = { reaction = { 1.0, 0.5 }, aggr = 0, combo = 0, block = 0, td = 0, ground = 0, regen = 4 },
-	anfaenger = { reaction = { 1.1, 0.9 }, aggr = 0.32, combo = 2, block = 0.12, td = 0.015, ground = 0.35, regen = 0 },
-	fortgeschritten = { reaction = { 0.45, 0.6 }, aggr = 0.48, combo = 3, block = 0.20, td = 0.07, ground = 1.0, regen = 0 },
+	passiv = { reaction = { 1.0, 0.5 }, aggr = 0, combo = 0, block = 0, td = 0, ground = 0, regen = 4, dmg = 0 },
+	anfaenger = { reaction = { 1.3, 1.0 }, aggr = 0.26, combo = 2, block = 0.12, td = 0.015, ground = 0.35, regen = 0, dmg = 0.55 },
+	fortgeschritten = { reaction = { 0.45, 0.6 }, aggr = 0.48, combo = 3, block = 0.20, td = 0.07, ground = 1.0, regen = 0, dmg = 1 },
 }
 function DummyLevel()
 	local d = workspace:FindFirstChild("CC_TrainingDummy")

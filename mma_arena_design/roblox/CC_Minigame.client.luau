@@ -277,11 +277,12 @@ end
 local function stopGame()
 	game_ = nil
 	gui.Enabled = false
-	-- Interaktionen erst wieder an, wenn keine Sitzung laeuft, 0,6 s vergangen sind und E/X losgelassen ist
-	-- (sonst startet dieselbe Station durch den letzten Tastendruck gleich neu)
+	-- Interaktionen erst wieder an, wenn keine Sitzung laeuft, das Ergebnis geschlossen ist, 0,6 s vergangen sind und E/X losgelassen ist
+	-- (sonst startet dieselbe Station durch den letzten Tastendruck bzw. ein E auf dem Ergebnis gleich neu)
 	local endedAt = os.clock()
 	task.spawn(function()
-		while game_ or os.clock() - endedAt < 0.6 or UIS:IsKeyDown(Enum.KeyCode.E) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonX) do
+		task.wait(0.3)                                   -- Ergebnis kommt kurz nach dem Ende vom Server
+		while game_ or resGui.Enabled or os.clock() - endedAt < 0.6 or UIS:IsKeyDown(Enum.KeyCode.E) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonX) do
 			task.wait(0.05)
 			if game_ then return end
 		end
@@ -328,7 +329,7 @@ CAS:BindActionAtPriority("CC_TrainResultClose", function(_, st)
 	if not resGui.Enabled then return Enum.ContextActionResult.Pass end
 	if st == Enum.UserInputState.Begin then closeResult() end
 	return Enum.ContextActionResult.Sink
-end, false, 3050, Enum.KeyCode.Backspace, Enum.KeyCode.ButtonB)
+end, false, 3050, Enum.KeyCode.Backspace, Enum.KeyCode.ButtonB, Enum.KeyCode.E)   -- E schliesst nur das Ergebnis (startet die Station nicht neu)
 
 -- Laufband-Lamellen bewegen sich mit der Bandgeschwindigkeit (Attribut am Modell, vom Server) - fuer alle Spieler sichtbar
 local beltT = 0
