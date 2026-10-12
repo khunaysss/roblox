@@ -34,17 +34,26 @@ end
 
 local myFill = bar("Player", 0, Color3.fromRGB(200, 40, 50), "DU")
 local foeFill = bar("Opponent", 1, Color3.fromRGB(40, 90, 200), "GEGNER")
--- Ausdauer: schmaler gelber Balken unter den Lebensbalken
+-- Ausdauer: gelber Balken unter den Lebensbalken, mit Beschriftung; wird bei wenig Ausdauer rot und blinkt
 local function sbar(anchorX)
 	local frame = Instance.new("Frame")
 	frame.AnchorPoint = Vector2.new(anchorX, 0)
 	frame.Position = UDim2.new(anchorX, anchorX == 0 and 20 or -20, 0, 50)
-	frame.Size = UDim2.fromOffset(320, 8); frame.BackgroundColor3 = Color3.fromRGB(25, 25, 28); frame.BorderSizePixel = 0; frame.Parent = gui
+	frame.Size = UDim2.fromOffset(320, 14); frame.BackgroundColor3 = Color3.fromRGB(25, 25, 28); frame.BorderSizePixel = 0; frame.Parent = gui
 	local fill = Instance.new("Frame"); fill.AnchorPoint = Vector2.new(anchorX, 0); fill.Position = UDim2.fromScale(anchorX, 0)
 	fill.Size = UDim2.fromScale(1, 1); fill.BackgroundColor3 = Color3.fromRGB(240, 200, 40); fill.BorderSizePixel = 0; fill.Parent = frame
-	return fill
+	local t = Instance.new("TextLabel"); t.Name = "Label"; t.BackgroundTransparency = 1; t.Size = UDim2.fromScale(1, 1); t.ZIndex = 2
+	t.Font = Enum.Font.GothamBold; t.TextSize = 11; t.TextColor3 = Color3.new(1, 1, 1); t.TextStrokeTransparency = 0.4; t.Text = "AUSDAUER"; t.Parent = frame
+	return fill, t
 end
-local myStam, foeStam = sbar(0), sbar(1)
+local myStam, myStamL = sbar(0)
+local foeStam = sbar(1)
+-- Zustand unter der eigenen Ausdauer: BLOCK / WENIG AUSDAUER
+local stateL = Instance.new("TextLabel")
+stateL.Position = UDim2.fromOffset(20, 68); stateL.Size = UDim2.fromOffset(320, 22); stateL.BackgroundTransparency = 1
+stateL.Font = Enum.Font.GothamBlack; stateL.TextSize = 18; stateL.TextXAlignment = Enum.TextXAlignment.Left
+stateL.TextStrokeTransparency = 0.3; stateL.Text = ""; stateL.Parent = gui
+local LOW_STAMINA = 25   -- wie im Kampfskript: darunter weniger Schaden und langsamere Schlaege
 
 local ko = Instance.new("TextLabel")
 ko.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -188,9 +197,17 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local loser = (char and char:GetAttribute("CC_KO")) and char or dummy
 	ko.Text = (loser and loser:GetAttribute("CC_LastReact") == "submission") and "SUBMISSION!" or "K.O.!"
 	if char then
-		myStam.Size = UDim2.fromScale(math.clamp((char:GetAttribute("CC_Stamina") or 100) / (char:GetAttribute("CC_StaminaMax") or 100), 0, 1), 1)
+		local stam = char:GetAttribute("CC_Stamina") or 100
+		myStam.Size = UDim2.fromScale(math.clamp(stam / (char:GetAttribute("CC_StaminaMax") or 100), 0, 1), 1)
 		local tired = char:GetAttribute("CC_Tired")
-		myStam.BackgroundColor3 = (tired and workspace:GetServerTimeNow() - tired < 0.4) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
+		local low = stam < LOW_STAMINA
+		local blink = low and (os.clock() * 3) % 1 < 0.5
+		myStam.BackgroundColor3 = ((tired and workspace:GetServerTimeNow() - tired < 0.4) or blink) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
+		myStamL.Text = "AUSDAUER " .. math.floor(stam + 0.5)
+		local blocking = char:GetAttribute("CC_Block")
+		stateL.Visible = inMatch
+		stateL.Text = blocking and "BLOCK" or (low and "WENIG AUSDAUER" or "")
+		stateL.TextColor3 = blocking and Color3.fromRGB(120, 190, 255) or Color3.fromRGB(255, 90, 70)
 	end
 	if char then
 		local gh = groundHint(char)

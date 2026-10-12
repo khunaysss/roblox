@@ -342,6 +342,10 @@ local function attack(attacker, move)
 		local t = (os.clock() - t0) * speed
 		if done or attacker.ko or not attacker.char.Parent or attacker.attackToken ~= token or t > m.win[2] then
 			conn:Disconnect()
+			-- Schlag ist regulaer ausgelaufen und war deutlich zu weit weg: Hinweis fuer den Spieler (CC_HitFX zeigt "ZU WEIT")
+			if not done and attacker.attackToken == token and not attacker.ko and dmin > 1.5 and dmin < math.huge then
+				attacker.char:SetAttribute("CC_OutOfRange", workspace:GetServerTimeNow())
+			end
 			if not done and workspace:GetAttribute("CC_DebugHits") then print(("[CC] %s %s verfehlt, kleinster Abstand zur Zone %.2f"):format(attacker.char.Name, move, dmin)) end
 			return
 		end

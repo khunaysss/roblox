@@ -91,12 +91,24 @@ local function load(plr)
 	publish(plr)
 end
 local function status(plr, s) if plr.Parent then plr:SetAttribute("CC_SaveStatus", s .. "|" .. tostring(workspace:GetServerTimeNow())) end end
+-- Speichern: pro Spieler nie parallel (p.saving). Wer waehrenddessen speichern will, wartet auf den laufenden Vorgang
+-- und speichert danach nur, wenn sich seitdem etwas geaendert hat (p.dirty). UpdateAsync mit bis zu 3 Versuchen (1 s / 2 s Pause).
 local function save(plr)
 	local p = profiles[plr]
 	if not (store and p and plr:GetAttribute("CC_ProfileSaved")) then if p then status(plr, "offline") end; return false end   -- nie ein nicht geladenes Profil ueberschreiben
-	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs, stats = p.stats, tp = p.tp, look = p.look }
-	local ok, err = pcall(function() store:SetAsync("u_" .. plr.UserId, copy) end)
-	if ok then p.dirty = false; p.lastSave = os.clock() else warn("[CC] Profil speichern fehlgeschlagen: " .. tostring(err)) end
+	while p.saving do task.wait(0.1) end
+	if not p.dirty then return true end
+	p.saving = true; p.dirty = false
+	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs,
+		stats = table.clone(p.stats), tp = table.clone(p.tp), look = table.clone(p.look) }
+	local ok, err
+	for i = 1, 3 do
+		ok, err = pcall(function() store:UpdateAsync("u_" .. plr.UserId, function() return copy end) end)
+		if ok then break end
+		if i < 3 then task.wait(i) end
+	end
+	if ok then p.lastSave = os.clock() else p.dirty = true; warn("[CC] Profil " .. plr.UserId .. " nicht gespeichert (3 Versuche): " .. tostring(err)) end
+	p.saving = false
 	status(plr, ok and "ok" or "error")
 	return ok
 end
@@ -133,11 +145,24 @@ end)
 
 Players.PlayerAdded:Connect(load)
 for _, plr in ipairs(Players:GetPlayers()) do task.spawn(load, plr) end
-Players.PlayerRemoving:Connect(function(plr) save(plr); profiles[plr] = nil end)
-game:BindToClose(function() for plr in pairs(profiles) do task.spawn(save, plr) end task.wait(3) end)
+-- Verlassen und Server-Ende: jeder Spieler wird hoechstens einmal zusaetzlich gespeichert (save wartet auf laufende Vorgaenge, ohne Aenderung kein Schreiben)
+local pending = 0
+local function finalSave(plr)
+	local p = profiles[plr]; if not p or p.closing then return end
+	p.closing = true; pending += 1
+	save(plr)
+	pending -= 1
+	if profiles[plr] == p then profiles[plr] = nil end
+end
+Players.PlayerRemoving:Connect(finalSave)
+game:BindToClose(function()
+	for plr in pairs(profiles) do task.spawn(finalSave, plr) end
+	local t0 = os.clock()
+	while pending > 0 and os.clock() - t0 < 25 do task.wait(0.1) end
+end)
 task.spawn(function()
 	while true do
 		task.wait(SAVE_EVERY)
-		for plr, p in pairs(profiles) do if p.dirty then save(plr) end end
+		for plr, p in pairs(profiles) do if p.dirty and not p.closing then task.spawn(save, plr) end end
 	end
 end)

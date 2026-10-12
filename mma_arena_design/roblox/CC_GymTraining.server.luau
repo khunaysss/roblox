@@ -219,6 +219,12 @@ local function finish(p, s, reason)
 		if s.tread.model then s.tread.model:SetAttribute("CC_BeltSpeed", 0); s.tread.model:SetAttribute("CC_BeltKmh", 0) end
 		p:SetAttribute("CC_Tread", nil)
 	end
+	-- Tracks dieser Sitzung nach dem Ausblenden freigeben (sonst sammeln sie sich pro Sitzung im Animator an)
+	local all = {}
+	for _, g in ipairs({ { s.track or false, s.restTrack or false }, s.comboTracks or {}, s.repTracks or {}, s.tread and s.tread.tracks or {} }) do
+		for _, t in pairs(g) do if t then table.insert(all, t) end end
+	end
+	task.delay(0.5, function() for _, t in pairs(all) do t:Destroy() end end)
 	clearProps(s)
 	local root = s.root
 	if root and root.Parent then
