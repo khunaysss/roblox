@@ -161,12 +161,23 @@ UI.button({ Style = "secondary", Text = "GEWERTET", Sub = "Rangliste gibt es noc
 -- Training
 local training = page("training")
 header(training, "TRAINING")
-local bFight = UI.button({ Style = "nav", Text = "TRAININGSKAMPF", Sub = "Gegen den Trainingsgegner · ohne Bilanz", Icon = "glove", LayoutOrder = 1,
-	OnClick = function() menuEvent:FireServer("training") end, Parent = training })
-UI.button({ Style = "nav", Text = "GYM-TRAINING", Sub = "Minispiele an den Stationen", Icon = "dumbbell", LayoutOrder = 2,
+-- Stufe des Trainingsgegners (Server prueft den Wert): Passiv / Anfaenger / Fortgeschritten
+local dummyLevel = player:GetAttribute("CC_DummyLevel") or "anfaenger"
+local lvRow = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), LayoutOrder = 1, Parent = training })
+UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = lvRow })
+local lvButtons = {}
+for i, e in ipairs({ { "passiv", "PASSIV" }, { "anfaenger", "ANFÄNGER" }, { "fortgeschritten", "PROFI" } }) do
+	local b = UI.button({ Style = "ghost", Text = e[2], Size = UDim2.new(1 / 3, -6, 1, 0), LayoutOrder = i, Name = "Lv_" .. e[1], Parent = lvRow,
+		OnClick = function() dummyLevel = e[1]; for k, x in pairs(lvButtons) do x:SetAttribute("Selected", k == dummyLevel) end end })
+	lvButtons[e[1]] = b
+	b:SetAttribute("Selected", e[1] == dummyLevel)
+end
+local bFight = UI.button({ Style = "nav", Text = "TRAININGSKAMPF", Sub = "Gegen den Trainingsgegner · ohne Bilanz", Icon = "glove", LayoutOrder = 2,
+	OnClick = function() menuEvent:FireServer("training", dummyLevel) end, Parent = training })
+UI.button({ Style = "nav", Text = "GYM-TRAINING", Sub = "Minispiele an den Stationen", Icon = "dumbbell", LayoutOrder = 3,
 	OnClick = function() close() end, Parent = training })
-local tState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 28), Parent = training })
-local bTCancel = UI.button({ Style = "danger", Text = "ABBRECHEN", Icon = "close", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("cancel") end, Parent = training })
+local tState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 4, Size = UDim2.new(1, 0, 0, 28), Parent = training })
+local bTCancel = UI.button({ Style = "danger", Text = "ABBRECHEN", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = training })
 
 ---------------------------------------------------------------------------------------------------
 -- Buehne: Kopie des eigenen Kaempfers in Kampfhaltung, Kamera auf dem Einlaufsteg, Fight-Night-Licht
@@ -556,6 +567,8 @@ end
 local function showPage(name)
 	for n, p in pairs(pages) do p.Visible = n == name end
 	if name == "fighter" then editorOpened(); return end
+	-- Karriere zeigt Level/XP/Bilanz selbst und ist hoeher als der Platz ueber der Profilkarte -> Profilkarte dort ausblenden
+	profile.Visible = name ~= "career"
 	local p = pages[name]
 	local first
 	for _, d in ipairs(p:GetDescendants()) do

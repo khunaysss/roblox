@@ -277,7 +277,16 @@ end
 local function stopGame()
 	game_ = nil
 	gui.Enabled = false
-	PPS.Enabled = true
+	-- Interaktionen erst wieder an, wenn keine Sitzung laeuft, 0,6 s vergangen sind und E/X losgelassen ist
+	-- (sonst startet dieselbe Station durch den letzten Tastendruck gleich neu)
+	local endedAt = os.clock()
+	task.spawn(function()
+		while game_ or os.clock() - endedAt < 0.6 or UIS:IsKeyDown(Enum.KeyCode.E) or UIS:IsGamepadButtonDown(Enum.UserInputType.Gamepad1, Enum.KeyCode.ButtonX) do
+			task.wait(0.05)
+			if game_ then return end
+		end
+		if not player:GetAttribute("CC_UIBlock") then PPS.Enabled = true end
+	end)
 	bindInput(false)
 	if cam.CameraType == Enum.CameraType.Scriptable then cam.CameraType = Enum.CameraType.Custom end
 end
@@ -294,7 +303,8 @@ player:GetAttributeChangedSignal("CC_TrainResult"):Connect(function()
 	local ok, r = pcall(function() return HS:JSONDecode(player:GetAttribute("CC_TrainResult") or "") end)
 	if not ok or type(r) ~= "table" then return end
 	local rate = r.n > 0 and r.hits / r.n or 0
-	resTitle.Text = rate >= 0.9 and "SEHR STARK" or rate >= 0.6 and "STARK" or rate >= 0.3 and "GESCHAFFT" or "NOCHMAL VERSUCHEN"
+	if r.reason == "Abbruch" then rate = -1 end
+	resTitle.Text = rate < 0 and "ABGEBROCHEN" or rate >= 0.9 and "SEHR STARK" or rate >= 0.6 and "STARK" or rate >= 0.3 and "GESCHAFFT" or "NOCHMAL VERSUCHEN"
 	resTitle.TextColor3 = rate >= 0.6 and C.gold or (rate >= 0.3 and C.text or C.warn)
 	task.wait()                                      -- lastPerfect wird beim Ende des Minispiels gesetzt
 	resLine.Text = ("%s  ·  %d von %d getroffen%s"):format(r.label or "", r.hits, r.n, lastPerfect > 0 and ("  ·  %d perfekt"):format(lastPerfect) or "")

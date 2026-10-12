@@ -478,7 +478,7 @@ local function reversePair(top, bottom, pair, from)
 end
 -- hat der Gegner gekontert? Spieler: F seit Beginn des Versuchs; Trainingsgegner: Zufall
 local function countered(f, t0, chance)
-	if isDummy(f) then return not passive(f) and math.random() < chance end
+	if isDummy(f) then return not passive(f) and math.random() < chance * (DummyLevel and DummyLevel().ground or 1) end
 	return f.sprawlAt ~= nil and f.sprawlAt >= t0 - 0.15
 end
 
@@ -1037,6 +1037,22 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 end)
 
+-- ================= Trainingsgegner-Stufen (zentral) =================
+-- Attribut CC_Difficulty am Trainingsgegner (setzt CC_Match aus der Menue-Auswahl): "passiv" | "anfaenger" | "fortgeschritten".
+--   reaction = Denkpause im Stand (min, zusaetzlich zufaellig, s); aggr = Anteil Angriffe je Entscheidung; combo = max. Kombolaenge;
+--   block = Blockchance je Entscheidung; td = Takedownchance je Entscheidung; ground = Bodenkampfstaerke (1 = volles Verhalten:
+--   Tempo der Bodenentscheidungen, Submission-, Konter-, Befreiungs- und Sprawl-Chance werden damit skaliert); regen = Leben/s.
+-- "fortgeschritten" = das bisherige vollstaendige Verhalten (Reaktion >= 0,45 s).
+local DUMMY_LEVELS = {
+	passiv = { reaction = { 1.0, 0.5 }, aggr = 0, combo = 0, block = 0, td = 0, ground = 0, regen = 4 },
+	anfaenger = { reaction = { 1.1, 0.9 }, aggr = 0.32, combo = 2, block = 0.12, td = 0.015, ground = 0.35, regen = 0 },
+	fortgeschritten = { reaction = { 0.45, 0.6 }, aggr = 0.48, combo = 3, block = 0.20, td = 0.07, ground = 1.0, regen = 0 },
+}
+function DummyLevel()
+	local d = workspace:FindFirstChild("CC_TrainingDummy")
+	return DUMMY_LEVELS[d and d:GetAttribute("CC_Difficulty") or "fortgeschritten"] or DUMMY_LEVELS.fortgeschritten
+end
+
 -- Trainingsgegner am Boden: oben Schlaege, Position verbessern, Submission; unten befreien
 RunService.Heartbeat:Connect(function()
 	local d = workspace:FindFirstChild("CC_TrainingDummy")
@@ -1044,15 +1060,16 @@ RunService.Heartbeat:Connect(function()
 	if not (D_ and D_.wr) or D_.ko then return end
 	local w = D_.wr
 	if os.clock() < (D_.groundThink or 0) then return end
-	D_.groundThink = os.clock() + 1.4 + math.random() * 1.2
-	if d:GetAttribute("CC_Passive") or d:GetAttribute("CC_InMatch") == false then return end
+	local G = DummyLevel().ground
+	D_.groundThink = os.clock() + (1.4 + math.random() * 1.2) / math.max(G, 0.35)   -- schwaecher = langsamere Bodenentscheidungen
+	if d:GetAttribute("CC_Passive") or d:GetAttribute("CC_InMatch") == false or G <= 0 then return end
 	if w.role == "top" and w.state == "guard" then
 		local r = math.random()
-		if SUBS[w.pos] and r < 0.3 then task.spawn(groundSubmit, D_)
+		if SUBS[w.pos] and r < 0.3 * G then task.spawn(groundSubmit, D_)
 		elseif PUNCH[w.pos] and r < 0.75 then task.spawn(groundPunch, D_)
 		elseif ADVANCE[w.pos] and r < 0.95 then task.spawn(groundAdvance, D_)
 		elseif w.pos == "guard" then task.spawn(groundEscape, D_) end
-	elseif w.role == "bottom" and w.partner.wr and w.partner.wr.state == "guard" and math.random() < 0.35 then
+	elseif w.role == "bottom" and w.partner.wr and w.partner.wr.state == "guard" and math.random() < 0.35 * G then
 		task.spawn(groundEscape, D_)
 	end
 end)
@@ -1084,7 +1101,7 @@ function tryTakedown(a)
 	local isDummy = b.char == workspace:FindFirstChild("CC_TrainingDummy")
 	task.wait(SPRAWL_WINDOW)
 	local defended
-	if isDummy then defended = math.random() < math.max(0.1, 0.3 - 0.01 * stat(a, "Wrestling"))
+	if isDummy then defended = math.random() < math.max(0.1, 0.3 - 0.01 * stat(a, "Wrestling")) * math.max(DummyLevel().ground, 0.3)
 	else defended = b.sprawlAt ~= nil and math.abs(b.sprawlAt - shotAt) <= SPRAWL_WINDOW + 0.01 * stat(b, "Wrestling") - 0.005 * stat(a, "Wrestling") end
 	if a.ko or b.ko or not (a.wr and b.wr) then
 		for _, f in ipairs({ a, b }) do if f.wr then setWrestle(f, nil, nil) end; f.busyUntil = 0 end
@@ -1242,7 +1259,12 @@ RunService.Heartbeat:Connect(function(dt)
 		root.CFrame = root.CFrame:Lerp(goal, 1 - math.exp(-TURN * dt))
 	end
 	if dummy:GetAttribute("CC_ForceTD") then dummy:SetAttribute("CC_ForceTD", nil); task.spawn(tryTakedown, D) return end -- Test: Takedown sofort
-	if dummy:GetAttribute("CC_Passive") or frozen(D) then setBlock(D, false); D.hum:Move(Vector3.zero) return end
+	if dummy:GetAttribute("CC_Passive") or frozen(D) then
+		setBlock(D, false); D.hum:Move(Vector3.zero)
+		local rg = DummyLevel().regen                              -- Passiv: Leben langsam zurueck (zum Ueben von Angriffen)
+		if dummy:GetAttribute("CC_Passive") and rg > 0 and D.hum.Health > HP_FLOOR then D.hum.Health = math.min(D.hum.MaxHealth, D.hum.Health + rg * dt) end
+		return
+	end
 	if best.down then                                                -- Gegner liegt: an die Beine heran, Low Kicks oder in die Guard
 		local bp = downBodyPos(best)
 		local toB = (bp - root.Position) * Vector3.new(1, 0, 1)
@@ -1298,17 +1320,20 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 	-- ---- Entscheidung ----
 	if now < nextThink or busy then return end
-	nextThink = now + 0.45 + math.random() * 0.6
+	local LV = DummyLevel()
+	nextThink = now + LV.reaction[1] + math.random() * LV.reaction[2]
 	if dist <= 5.5 then
 		local r = math.random()
-		if r < 0.07 and best.hum.Health > HP_FLOOR and not best.wr and dist <= 5 and not dummy:GetAttribute("CC_NoTD") then   -- CC_NoTD: Test ohne Takedowns
+		local tdT, blkT = LV.td, LV.td + LV.block
+		if r < tdT and best.hum.Health > HP_FLOOR and not best.wr and dist <= 5 and not dummy:GetAttribute("CC_NoTD") then   -- CC_NoTD: Test ohne Takedowns
 			setBlock(D, false); task.spawn(tryTakedown, D)
-		elseif r < 0.27 and (best.char:GetAttribute("CC_Loco") ~= "idle" or math.random() < 0.5) then
+		elseif r < blkT and (best.char:GetAttribute("CC_Loco") ~= "idle" or math.random() < 0.5) then
 			setBlock(D, true)
 			task.delay(0.6 + math.random() * 0.6, function() setBlock(D, false) end)
-		elseif r < 0.75 and not hurt or r < 0.55 then
+		elseif (r < blkT + LV.aggr and not hurt or r < blkT + LV.aggr * 0.6) and LV.combo > 0 then
 			setBlock(D, false)
 			local c = table.clone(DUMMY_COMBOS[math.random(#DUMMY_COMBOS)])
+			while #c > LV.combo do table.remove(c) end               -- Kombolaenge je Stufe begrenzen
 			local first = c[1]
 			if dist > (DUMMY_RANGE[first] or 4) then
 				stepDir, stepUntil = 1, now + math.clamp((dist - (DUMMY_RANGE[first] or 4) + 0.3) / 8, 0.1, 0.35)   -- erst hineinsteppen

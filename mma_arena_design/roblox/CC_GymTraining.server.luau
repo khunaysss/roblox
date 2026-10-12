@@ -62,8 +62,16 @@ local LEAD = 1.6                 -- Sekunden Vorlauf (Countdown) bis zur ersten 
 local sessions = {}              -- [player] = Sitzung
 local nextId = 0
 
-local function canTrain(p)
+-- Abklingzeit nach Sitzungsende (Server): pro Spieler 1 s, pro Spieler und Station 1,5 s -> E (Prompt/Minispiel) startet nicht doppelt
+local lastEnd = {}               -- [player] = { any = Zeit, [marker] = Zeit }
+local function cooling(p, marker)
+	local l = lastEnd[p]; if not l then return false end
+	local now = os.clock()
+	return now - (l.any or 0) < 1.0 or (marker and now - (l[marker] or 0) < 1.5)
+end
+local function canTrain(p, marker)
 	local c = p.Character
+	if cooling(p, marker) then return false end
 	return c and c:FindFirstChild("HumanoidRootPart") and not sessions[p] and not c:GetAttribute("CC_Opponent") and not c:GetAttribute("CC_Wrestle")
 end
 
@@ -197,9 +205,12 @@ end
 
 -- ---------- Sitzung ----------
 local function finish(p, s, reason)
-	if sessions[p] ~= s then return end
+	if sessions[p] ~= s or s.ended then return end
+	s.ended = true                                                -- jede Sitzung wird hoechstens einmal beendet/belohnt
 	sessions[p] = nil
+	lastEnd[p] = lastEnd[p] or {}; lastEnd[p].any = os.clock(); lastEnd[p][s.marker] = os.clock()
 	p:SetAttribute("CC_Minigame", nil)
+	for _, t in pairs(s.comboTracks or {}) do t:Stop(0.1) end
 	if s.track then s.track:Stop(0.3) end
 	if s.restTrack then s.restTrack:Stop(0.3) end
 	for _, t in pairs(s.repTracks or {}) do if t.IsPlaying then t:Stop(0.25) end end
@@ -215,11 +226,13 @@ local function finish(p, s, reason)
 		root.Anchored = false
 	end
 	if not p.Parent then return end
+	-- Belohnung nur bei gueltigem Abschluss (Server: alle Aufgaben gewertet bzw. Zeit abgelaufen); Abbruch (manuell, Tod, Reset) = 0 XP/0 TP
+	local valid = reason == "fertig" or reason == "Zeit"
 	local rate = s.hits / s.n
-	local tp = rate >= 0.9 and 3 or rate >= 0.6 and 2 or rate >= 0.3 and 1 or 0
+	local tp = valid and (rate >= 0.9 and 3 or rate >= 0.6 and 2 or rate >= 0.3 and 1 or 0) or 0
 	if tp > 0 then profile(p, "train", s.kindDef.stat, tp) end
-	local xp = s.kind == "tread" and math.floor(s.hits / 2) or s.hits   -- Laufband: 30 s -> hoechstens 15 XP (vergleichbar mit den anderen Stationen)
-	profile(p, "xp", xp)
+	local xp = not valid and 0 or (s.kind == "tread" and math.floor(s.hits / 2) or s.hits)   -- Laufband: 30 s -> hoechstens 15 XP
+	if xp > 0 then profile(p, "xp", xp) end
 	-- Ergebnis fuer die Trainings-Anzeige (CC_Minigame): echte Belohnung wie oben vergeben
 	p:SetAttribute("CC_TrainResult", HS:JSONEncode({ id = s.id, kind = s.kind, label = s.kindDef.label, stat = s.kindDef.stat,
 		hits = s.hits, n = s.n, tp = tp, xp = xp, reason = reason }))
@@ -228,7 +241,7 @@ end
 
 local lastStation = {}         -- [player] = { marker, kind } fuer "Nochmal"
 local function start(p, marker, kind)
-	if not canTrain(p) then return end
+	if not canTrain(p, marker) then return end
 	lastStation[p] = { marker, kind }
 	local def = KINDS[kind]
 	local char = p.Character
@@ -310,7 +323,11 @@ trainEv.OnServerEvent:Connect(function(p, what, id, i)
 		local l, c = lastStation[p], p.Character
 		local root = c and c:FindFirstChild("HumanoidRootPart")
 		if l and root and l[1].Parent and (root.Position - l[1].Position).Magnitude < 14 then
-			task.spawn(function() local ok, err = pcall(start, p, l[1], l[2]); if not ok then warn("[CC] Nochmal: " .. tostring(err)) end end)
+			task.spawn(function()
+				local t0 = os.clock()
+				while cooling(p, l[1]) and os.clock() - t0 < 2 do task.wait(0.1) end   -- Abklingzeit abwarten (kein Doppelstart)
+				local ok, err = pcall(start, p, l[1], l[2]); if not ok then warn("[CC] Nochmal: " .. tostring(err)) end
+			end)
 		end
 		return
 	end
@@ -326,8 +343,12 @@ trainEv.OnServerEvent:Connect(function(p, what, id, i)
 		if s.kind == "bag" then
 			s.combo += 1
 			local animator = p.Character and p.Character:FindFirstChildOfClass("Humanoid") and p.Character.Humanoid:FindFirstChildOfClass("Animator")
-			if animator then
-				local tr = animator:LoadAnimation(COMBO[(s.combo - 1) % #COMBO + 1]); tr.Priority = Enum.AnimationPriority.Action; tr:Play(0.05)
+			if animator then                                        -- Schlag-Tracks einmal pro Sitzung laden und wiederverwenden
+				local k = (s.combo - 1) % #COMBO + 1
+				s.comboTracks = s.comboTracks or {}
+				local tr = s.comboTracks[k]
+				if not tr then tr = animator:LoadAnimation(COMBO[k]); tr.Priority = Enum.AnimationPriority.Action; s.comboTracks[k] = tr end
+				tr:Play(0.05)
 			end
 			task.delay(0.18, function() swing(s.marker, s.dir or Vector3.new(1, 0, 0), 5 + math.min(s.combo, 6)); hitSound(s.marker) end)
 		elseif s.reps then
@@ -350,7 +371,7 @@ trainEv.OnServerEvent:Connect(function(p, what, id, i)
 			task.delay(0.5, function() if s.track and s.lastMiss == mark and sessions[p] == s then s.track:AdjustSpeed(0) end end)
 		end
 	end
-	if s.hits + s.misses >= s.n then task.delay(0.5, function() finish(p, s, "fertig") end) end
+	if s.hits + s.misses >= s.n and not s.finishing then s.finishing = true; task.delay(0.5, function() finish(p, s, "fertig") end) end
 end)
 -- ---------- Laufband: Tempo (km/h), wechselndes Zieltempo, Ausdauer, Wertung ----------
 -- Zielbereich +-0,8 km/h. Im Bereich sammelt man Sekunden (= Treffer, n = 30). Zu schnell kostet Ausdauer (leer -> man wird
@@ -443,7 +464,7 @@ for _, marker in ipairs(folder:GetChildren()) do
 		n += 1
 	end
 end
-Players.PlayerRemoving:Connect(function(p) local s = sessions[p]; if s then clearProps(s); sessions[p] = nil end; lastStation[p] = nil end)
+Players.PlayerRemoving:Connect(function(p) local s = sessions[p]; if s then s.ended = true; clearProps(s); sessions[p] = nil end; lastStation[p] = nil; lastEnd[p] = nil end)
 -- Charakter weg (Reset/Tod) waehrend einer Uebung: Sitzung sauber beenden (Gewichte weg, kein Haengenbleiben)
 local function hookChar(p) p.CharacterRemoving:Connect(function() local s = sessions[p]; if s then finish(p, s, "Abbruch") end end) end
 Players.PlayerAdded:Connect(hookChar); for _, p in ipairs(Players:GetPlayers()) do hookChar(p) end

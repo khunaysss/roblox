@@ -72,8 +72,13 @@ local function isFighting(p) return current ~= nil and (current.red == p or curr
 -- Menue-Wahl: vom Client (CC_Menu) oder serverseitig (ServerStorage.CC_MenuServer, z. B. Trainer im Gym)
 local menuServer = game.ServerStorage:FindFirstChild("CC_MenuServer") or Instance.new("BindableEvent")
 menuServer.Name = "CC_MenuServer"; menuServer.Parent = game.ServerStorage
-local function onMenu(p, what)
+local LEVELS = { passiv = true, anfaenger = true, fortgeschritten = true }   -- Trainingsgegner-Stufen (CC_CharacterAnimations)
+local function onMenu(p, what, level)
 	if type(what) ~= "string" then return end
+	if what == "training" then                                     -- gewaehlte Stufe merken (Standard: Anfaenger); Trainer im Gym nutzt die letzte Wahl
+		if type(level) == "string" and LEVELS[level] then p:SetAttribute("CC_DummyLevel", level)
+		elseif not p:GetAttribute("CC_DummyLevel") then p:SetAttribute("CC_DummyLevel", "anfaenger") end
+	end
 	local i = inQueue(p)
 	if what == "cancel" then
 		if i then table.remove(queue, i) end
@@ -168,7 +173,11 @@ local function runMatch(m)
 	current = m
 	set("Mode", m.mode); set("RedName", m.red.Name); set("BlueName", m.blue and m.blue.Name or "Trainingsgegner"); set("WinnerName", "")
 	set("Winner", ""); set("ScoreRed", 0); set("ScoreBlue", 0)
-	if m.mode == "training" then dummy:SetAttribute("CC_InMatch", true) end
+	if m.mode == "training" then
+		local lv = m.red:GetAttribute("CC_DummyLevel") or "anfaenger"
+		dummy:SetAttribute("CC_Difficulty", lv); dummy:SetAttribute("CC_Passive", lv == "passiv" or nil)
+		dummy:SetAttribute("CC_InMatch", true)
+	end
 	print(("[CC] Kampf startet (%s): %s gegen %s"):format(m.mode, m.red.Name, m.blue and m.blue.Name or "Trainingsgegner"))
 	local totalRed, totalBlue, winner, method = 0, 0, nil, nil
 	for round = 1, ROUNDS do
