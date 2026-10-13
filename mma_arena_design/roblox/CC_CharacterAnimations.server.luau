@@ -143,6 +143,7 @@ RunService.Heartbeat:Connect(function()
 				for _, k in ipairs({ "cIdle", "cWalk", "cRun" }) do t[k]:Stop(0.25) end
 				ensure(t.idle)
 			end
+			if f.idleOff then f.idleOff = false; t.idle:AdjustWeight(1, 0.15) end
 			if f.wantBlock and not f.blocking and os.clock() >= f.busyUntil then setBlock(f, true) end
 			if not t.mF.IsPlaying then for _, k in ipairs(MOVE_KEYS) do t[k]:Play(0, 0.001, 1) end end -- nach K.o./Reset wieder anwerfen (synchron)
 			local v = root.AssemblyLinearVelocity; v = Vector3.new(v.X, 0, v.Z)
@@ -161,6 +162,10 @@ RunService.Heartbeat:Connect(function()
 			if dom ~= f.loco then f.loco = dom; f.char:SetAttribute("CC_Loco", dom) end
 		elseif t then
 			for _, k in ipairs(MOVE_KEYS) do if t[k] then t[k]:AdjustWeight(0.001, 0.1) end end
+			-- Bodenkampf/Liegen: Stand-Idle ausblenden, damit in keiner Luecke zwischen zwei Bodenanimationen die Standhaltung durchscheint
+			local grounded = f.down or (f.wr and f.wr.role ~= "shoot" and f.wr.role ~= "defend")   -- beim Takedown-Ansatz stehen beide noch
+			if not grounded and f.idleOff then f.idleOff = false; t.idle:AdjustWeight(1, 0.1) end
+			if grounded and t.idle and not f.idleOff then f.idleOff = true; t.idle:AdjustWeight(0.001, 0.1) end
 			if f.mode == "casual" then f.mode = nil; for _, k in ipairs({ "cIdle", "cWalk", "cRun" }) do t[k]:Stop(0.2) end end
 		end
 	end
@@ -418,10 +423,26 @@ end
 -- Wechsel mit kurzer Ueberblendung (WR_FADE): ohne sie steht der Root-Bone einen Frame lang auf der Ruheposition
 -- (sichtbarer Sprung des Koerpers und Kamera-Ruck beim Takedown/Positionswechsel)
 local WR_FADE = 0.06
+-- Alte Spuren erst ausblenden, wenn die neue geladen ist (hochgeladene Animationen laden beim ersten Abspielen nach;
+-- vorher entstand eine Luecke, in der nur die Standhaltung zu sehen war). Neuere Uebergaenge (Token) haben Vorrang.
+local function stopOthersWhenLoaded(f, keep, others, fade)
+	f.animToken = (f.animToken or 0) + 1
+	local token = f.animToken
+	local function stopNow() for _, tr in ipairs(others) do if tr ~= keep and tr.IsPlaying then tr:Stop(fade) end end end
+	if keep.Length > 0 then stopNow() return end
+	task.spawn(function()
+		local t0 = os.clock()
+		while keep.Length == 0 and os.clock() - t0 < 1.0 do task.wait() end
+		if f.animToken == token then stopNow() end
+	end)
+end
 local function playPair(a, b, pair, looped)
 	local ta, tb = wrTrack(a, pair .. "_A"), wrTrack(b, pair .. "_B")
 	for _, x in ipairs({ { a, ta }, { b, tb } }) do
-		for _, tr in pairs(x[1].wrTracks or {}) do if tr ~= x[2] and tr.IsPlaying then tr:Stop(WR_FADE) end end
+		local others = {}
+		for _, tr in pairs(x[1].wrTracks or {}) do if tr ~= x[2] and tr.IsPlaying then table.insert(others, tr) end end
+		for _, tr in pairs(x[1].dnTracks or {}) do if tr.IsPlaying then table.insert(others, tr) end end
+		stopOthersWhenLoaded(x[1], x[2], others, WR_FADE)
 	end
 	ta.Looped = looped or false; tb.Looped = looped or false
 	if ta.IsPlaying then ta:Stop(0) end; if tb.IsPlaying then tb:Stop(0) end
@@ -711,6 +732,14 @@ local LEGKICK = { win = { 5 / 24, 9 / 24 }, limb = "LeftFoot", dmg = 5, targets 
 local LEGKICK_DOWN = { win = { 11 / 24, 15 / 24 }, limbs = { { "RightLowerLeg", 0.9 }, { "RightFoot", 0.1 } }, dmg = 5,
 	targets = { "LeftLowerLeg", "RightLowerLeg", "LeftFoot", "RightFoot", "LeftUpperLeg", "RightUpperLeg" }, radius = 1.4 }
 
+-- Ring-/Bodenanimationen beim Start vorladen (hochgeladene Animationen sonst erst beim ersten Abspielen)
+task.spawn(function()
+	local list = {}
+	for _, e in pairs(WR) do if e.anim then table.insert(list, e.anim) end end
+	for _, e in pairs(DN) do if e.anim then table.insert(list, e.anim) end end
+	local ok, err = pcall(function() game:GetService("ContentProvider"):PreloadAsync(list) end)
+	if not ok then warn("[CC] Vorladen der Bodenanimationen: " .. tostring(err)) end
+end)
 local function dnTrack(f, n)
 	f.dnTracks = f.dnTracks or {}
 	if not f.dnTracks[n] then
@@ -724,8 +753,10 @@ local function dnStopAll(f, fade, except)
 end
 local function dnPlay(f, n, fade, speed, looped)
 	local tr = dnTrack(f, n); if not tr then return nil end
-	dnStopAll(f, fade, tr)
-	for _, t in pairs(f.wrTracks or {}) do if t.IsPlaying then t:Stop(fade) end end
+	local others = {}
+	for _, t in pairs(f.dnTracks or {}) do if t ~= tr and t.IsPlaying then table.insert(others, t) end end
+	for _, t in pairs(f.wrTracks or {}) do if t.IsPlaying then table.insert(others, t) end end
+	stopOthersWhenLoaded(f, tr, others, fade or 0.1)
 	tr.Looped = looped or false
 	if tr.IsPlaying then tr:Stop(0) end
 	tr:Play(fade or 0.1, 1, speed or 1)
