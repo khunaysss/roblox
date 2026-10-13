@@ -38,5 +38,13 @@
 - **UI-Überarbeitung Schritt 1 (2026-10-12, `UI_DESIGN_V01.md`):** Designsystem `CC_UI` mit eigenen Icons, Ladebildschirm, Hauptmenü (Karriere, Online, Training, Mein Kämpfer, Einstellungen gesperrt) mit Arena und Kämpfer, Menü-Knopf im Gym. Getestet PC. Offen: Schritte 2–5.
 - **UI-Überarbeitung Schritt 2 (2026-10-12, `UI_STEP2_V01.md`):** Hauptmenü mit Fight-Night-Licht, Charakter-Editor (Vorschau bis Speichern, sofortiges Speichern), Gym-Anzeigen, neue Trainings- und Ergebnisanzeige; Fehler „Gesicht fehlt ohne Bart“ behoben. Getestet PC. Offen: Controller/Touch, Schritte 3–5.
 - **Einstieg / Tutorial (2026-10-13, `GAME_DESIGN.md`):** Erster Start → Editor mit FERTIG → Begrüßung durch den Haupttrainer → 6 Lektionen im Käfig (`CC_Tutorial` Server/Client) → Abschluss → erstes Sparring (1 Runde) → Ergebnis. Fortschritt im Profil (`onb`), Wiederholen über Hauptmenü → Training. In Studio komplett getestet (Testschalter `CC_TestNewPlayer` am Workspace, speichert nichts). **Offen:** Import des Haupttrainers (`export/Main_Coach_v01_Roblox.fbx`, dann `setup_coach_v01.luau`); das Modell `CC_Gym` ist im Place verschoben (Spieler fallen im Gym durch) – Rücksetzen nach Freigabe.
+- **Spielbarkeit + Fight Night vorbereitet (2026-10-13):**
+  - Ursache für „Durchfallen / nur Himmel“: Das Modell `CC_Gym` war im Place als Ganzes um (−52,5; −11,1; +9,2) verschoben; die 33 Stationen und der Startpunkt nicht. Zurückgesetzt auf Bodenmitte (160, 0, 0); die alte Lage steht als Attribut `CC_PivotBefore_20261013` am Modell.
+  - Fallschutz in `CC_Match`: außerhalb eines Kampfs zurück ins Gym, im Kampf zurück in die eigene Ecke.
+  - 105 Animations-IDs geladen.
+  - Curls-Platz auf der Hallenseite.
+  - Fight-Night-Export `export/Fight_Night_v01_Roblox.fbx` (97 Meshes) mit `setup_fight_night_v01.luau`; Kampfort über `CC_PvpArena` vorbereitet (Standard unverändert).
+  - Echte Speicherung mit Testschlüssel (`CC_TestProfileKey`) geprüft.
+  - **Wartet auf Import:** Haupttrainer und Fight Night.
 - Arbeitsweise in Studio: Daten aus `export/*_keyframes.luau` über lokalen Server `node` auf 127.0.0.1:8766 (im Ordner `mma_arena_design`) und `ServerStorage.CC_Animations.CC_Loader`; Scripts aus `roblox/` per HttpService (HttpEnabled nur kurz an).
 - Test-Attribute am Gegner: `CC_Passive`, `CC_ForceTD`; am Spieler (Client): `CC_LockTarget`.

@@ -196,10 +196,13 @@ local function place(p, marker, kind)
 	elseif kind == "bag" then
 		return faceStation(p, marker, 3.6)
 	else
-		-- Curls: neben der Hantelbank, Blick von der Bank weg (Kamera von vorn ohne Bank im Bild)
-		local d = faceStation(p, marker, 2.8)
-		local r = p.Character.HumanoidRootPart
-		r.CFrame = CFrame.lookAt(r.Position, r.Position - d)
+		-- Curls: neben der Hantelbank auf der Hallenseite, Blick in die Halle (Kamera von vorn ohne Bank und ohne Wand im Bild;
+		-- vorher hing die Seite davon ab, von wo der Spieler kam -> von der Wandseite stand er mit Blick zur Wand)
+		local mp = Vector3.new(marker.Position.X, y, marker.Position.Z)
+		local toHall = (Vector3.new(160, y, 0) - mp) * Vector3.new(1, 0, 1)
+		toHall = toHall.Magnitude > 0.1 and toHall.Unit or Vector3.new(0, 0, 1)
+		local pos = mp + toHall * 2.8
+		root.CFrame = CFrame.lookAt(pos, pos + toHall)
 	end
 end
 

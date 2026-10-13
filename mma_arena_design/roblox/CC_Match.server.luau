@@ -38,9 +38,21 @@ local function canvasY()
 	local c = workspace.CC_Arena:FindFirstChild("Platform_Canvas_FightSurface", true)
 	return c.Position.Y + c.Size.Y / 2
 end
-local function corners()
-	local y = canvasY() + 3                   -- HumanoidRootPart-Mitte 3 Studs ueber den Fuessen
-	return CFrame.lookAt(Vector3.new(0, y, 7), Vector3.new(0, y, -7)), CFrame.lookAt(Vector3.new(0, y, -7), Vector3.new(0, y, 7))
+-- Kampfort: Standard CC_Arena (Kaefig bei 0,0). Vorbereitet: Spieler-gegen-Spieler-Kaempfe in der Fight-Night-Arena, wenn
+-- workspace-Attribut CC_PvpArena = "fightnight" und Workspace.CC_FightNight eingerichtet ist (setup_fight_night_v01).
+-- Welche Kaempfe dort stattfinden, ist noch nicht entschieden (GAME_DESIGN.md) – ohne Attribut aendert sich nichts.
+local function arenaCenter(m)
+	local fn = workspace:FindFirstChild("CC_FightNight")
+	if m and m.mode == "pvp" and fn and workspace:GetAttribute("CC_PvpArena") == "fightnight" then
+		local c = fn:GetAttribute("CC_CageCenter")
+		if c then return Vector3.new(c.X, 0, c.Z), c.Y end
+	end
+	return Vector3.zero, canvasY()
+end
+local function corners(m)
+	local c, fy = arenaCenter(m)
+	local y = fy + 3                          -- HumanoidRootPart-Mitte 3 Studs ueber den Fuessen
+	return CFrame.lookAt(c + Vector3.new(0, y, 7), c + Vector3.new(0, y, -7)), CFrame.lookAt(c + Vector3.new(0, y, -7), c + Vector3.new(0, y, 7))
 end
 -- Lobby: im Trainings-Gym (Workspace.CC_Gym, Boden y = 0, Mitte x = 160), sonst Hallenboden vor dem Kaefig; Spieler nebeneinander
 local LOBBY_Y = 3                              -- Hallenboden (0) + 3
@@ -150,7 +162,7 @@ local function damage(c) return c and (c:GetAttribute("CC_DamageDealt") or 0) or
 local function clearDamage(m) for _, c in ipairs({ chars(m) }) do if c then c:SetAttribute("CC_DamageDealt", 0) end end end
 local function placeBoth(m, heal)
 	local r, b = chars(m)
-	local cr, cb = corners()
+	local cr, cb = corners(m)
 	if r then reset:Invoke(r, cr, heal and math.min(100, r.Humanoid.Health + heal) or nil) end
 	if b then reset:Invoke(b, cb, heal and math.min(100, b.Humanoid.Health + heal) or nil) end
 	if r and b then r:SetAttribute("CC_Opponent", b.Name); b:SetAttribute("CC_Opponent", r.Name) end
@@ -319,7 +331,7 @@ RunService.Heartbeat:Connect(function()
 		if r and h and r.Position.Y < FALL_Y then
 			r.AssemblyLinearVelocity = Vector3.zero
 			if isFighting(p) then
-				local cr, cb = corners()
+				local cr, cb = corners(current)
 				local cf = (current.red == p) and cr or cb
 				reset:Invoke(c, cf, h.Health)
 				warn(("[CC] Fallschutz: %s im Kampf zurueck in die Ecke"):format(p.Name))
@@ -332,7 +344,7 @@ RunService.Heartbeat:Connect(function()
 	local dr = dummy:FindFirstChild("HumanoidRootPart")
 	if dr and dr.Position.Y < FALL_Y then
 		dr.AssemblyLinearVelocity = Vector3.zero
-		if current and not current.blue then local _, cb = corners(); reset:Invoke(dummy, cb, dummy.Humanoid.Health) else parkDummy() end
+		if current and not current.blue then local _, cb = corners(current); reset:Invoke(dummy, cb, dummy.Humanoid.Health) else parkDummy() end
 	end
 end)
 

@@ -1,0 +1,16 @@
+{
+ "source": "Fight_Night_Arena_v03.blend (nur gelesen)",
+ "source_objects": 2285,
+ "source_triangles": 215706,
+ "export_meshes": 97,
+ "export_triangles": 215706,
+ "collision_boxes": 157,
+ "spots": 7,
+ "ref": "Platform_Canvas_FightSurface",
+ "ref_m": [
+  0.0,
+  0.0,
+  0.6
+ ],
+ "fbx_bytes": 3630700
+}
