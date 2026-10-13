@@ -305,6 +305,37 @@ local function nextMatch()
 	end
 end
 
+-- Fallschutz: wer unter die Welt faellt (z. B. Boden noch nicht geladen), kommt sicher zurueck.
+--   Ausserhalb eines Kampfs: in die Lobby (Gym). Im Kampf: zurueck in die eigene Ecke, Leben unveraendert (keine Flucht aus dem Kampf).
+local FALL_Y = -25
+local lastFallCheck = 0
+RunService.Heartbeat:Connect(function()
+	if os.clock() - lastFallCheck < 0.25 then return end
+	lastFallCheck = os.clock()
+	for _, p in ipairs(Players:GetPlayers()) do
+		local c = p.Character
+		local r = c and c:FindFirstChild("HumanoidRootPart")
+		local h = c and c:FindFirstChildOfClass("Humanoid")
+		if r and h and r.Position.Y < FALL_Y then
+			r.AssemblyLinearVelocity = Vector3.zero
+			if isFighting(p) then
+				local cr, cb = corners()
+				local cf = (current.red == p) and cr or cb
+				reset:Invoke(c, cf, h.Health)
+				warn(("[CC] Fallschutz: %s im Kampf zurueck in die Ecke"):format(p.Name))
+			else
+				toLobby(p)
+				warn(("[CC] Fallschutz: %s zurueck ins Gym"):format(p.Name))
+			end
+		end
+	end
+	local dr = dummy:FindFirstChild("HumanoidRootPart")
+	if dr and dr.Position.Y < FALL_Y then
+		dr.AssemblyLinearVelocity = Vector3.zero
+		if current and not current.blue then local _, cb = corners(); reset:Invoke(dummy, cb, dummy.Humanoid.Health) else parkDummy() end
+	end
+end)
+
 set("State", "idle"); set("Mode", ""); set("Banner", ""); set("BannerSub", ""); set("QueuePvp", 0); set("RedName", ""); set("BlueName", "")
 parkDummy()
 while true do
