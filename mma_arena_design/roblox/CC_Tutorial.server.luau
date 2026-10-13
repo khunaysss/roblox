@@ -308,7 +308,11 @@ runFn.OnInvoke = function(p)
 		if li < #LESSONS then resetBoth(p); task.wait(0.6) end
 	end
 	dummy:SetAttribute("CC_Tutor", nil)
-	if outcome == "left" then sessions[p] = nil; return "gym" end
+	if outcome == "left" then                        -- Respawn/Tod/Verlassen: Fortschritt bleibt, Angebot zum Weitermachen im Gym
+		sessions[p] = nil
+		if p.Parent then phase(p, "welcome") end
+		return "gym"
+	end
 	resetBoth(p)
 	if outcome == "skipAll" then
 		sessions[p] = nil; phase(p, ""); tip(p, "Kein Problem. Das Tutorial kannst du bei mir im Gym jederzeit wiederholen.")

@@ -74,11 +74,17 @@ local function train(plr, statName, points)
 	p.dirty = true; publish(plr)
 end
 
+-- Schluessel: "u_<UserId>". Test (Studio): workspace-Attribut CC_TestProfileKey = "<name>" -> eigener Testschluessel
+-- "test_<name>_<UserId>" (echtes Speichern und Laden, echtes Profil bleibt unberuehrt)
+local function keyOf(plr)
+	local t = workspace:GetAttribute("CC_TestProfileKey")
+	return (type(t) == "string" and t ~= "") and ("test_" .. t .. "_" .. plr.UserId) or ("u_" .. plr.UserId)
+end
 local function load(plr)
 	local data
 	if store then
 		for i = 1, 3 do
-			local ok, res = pcall(function() return store:GetAsync("u_" .. plr.UserId) end)
+			local ok, res = pcall(function() return store:GetAsync(keyOf(plr)) end)
 			if ok then data = res; plr:SetAttribute("CC_ProfileSaved", true); break end
 			warn("[CC] Profil laden fehlgeschlagen (" .. i .. "): " .. tostring(res)); task.wait(2 * i)
 		end
@@ -122,7 +128,7 @@ local function save(plr)
 		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight } }
 	local ok, err
 	for i = 1, 3 do
-		ok, err = pcall(function() store:UpdateAsync("u_" .. plr.UserId, function() return copy end) end)
+		ok, err = pcall(function() store:UpdateAsync(keyOf(plr), function() return copy end) end)
 		if ok then break end
 		if i < 3 then task.wait(i) end
 	end
