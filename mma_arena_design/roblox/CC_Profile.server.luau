@@ -9,6 +9,9 @@
 --   Fire(player, "xp", menge) | Fire(player, "train", "Power"|"Cardio"|"Wrestling"|"Grappling", punkte)
 --   | Fire(player, "result", "win"|"loss"|"draw", methode) | Fire(player, "look", { hair=, beard=, face=, skin=, hairColor= })
 -- Aussehen (CC_Customize liest es): Attribut CC_Look am Spieler (JSON).
+-- Einstieg (CC_Tutorial): Tabelle onb = { editor, offered, lessons = {6 x bool}, done, firstFight } -> Attribut CC_Onb (JSON);
+--   Fire(player, "onb", schluessel, wert) bzw. Fire(player, "onb", "lesson", nummer). Alte Profile ohne onb gelten als bekannte Spieler
+--   (Editor und Angebot erledigt, Tutorial bleibt beim Trainer wiederholbar).
 -- Speicherstand fuer die UI: Attribut CC_SaveStatus = "ok|<zeit>" | "error|<zeit>" | "offline|<zeit>" (nach jedem Speicherversuch).
 -- Aussehen wird sofort gespeichert (hoechstens alle 7 s pro Spieler), alles andere alle 120 s und beim Verlassen.
 -- Ohne DataStore-Zugriff (z. B. Studio ohne API-Freigabe) laeuft alles nur fuer die Sitzung.
@@ -34,7 +37,8 @@ event.Name = "CC_ProfileEvent"; event.Parent = SS
 local profiles = {}            -- [player] = Tabelle
 local function default()
 	local p = { v = 1, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
-		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 } }
+		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 },
+		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false } }
 	for _, s in ipairs(STATS) do p.stats[s] = 0; p.tp[s] = 0 end
 	return p
 end
@@ -46,6 +50,7 @@ local function publish(plr)
 	plr:SetAttribute("CC_Wins", p.wins); plr:SetAttribute("CC_Losses", p.losses); plr:SetAttribute("CC_KOs", p.kos); plr:SetAttribute("CC_Subs", p.subs)
 	for _, s in ipairs(STATS) do plr:SetAttribute("CC_" .. s, p.stats[s]); plr:SetAttribute("CC_" .. s .. "TP", p.tp[s]) end
 	plr:SetAttribute("CC_Look", game:GetService("HttpService"):JSONEncode(p.look))
+	plr:SetAttribute("CC_Onb", game:GetService("HttpService"):JSONEncode(p.onb))
 end
 
 local function addXP(plr, n)
@@ -78,9 +83,22 @@ local function load(plr)
 			warn("[CC] Profil laden fehlgeschlagen (" .. i .. "): " .. tostring(res)); task.wait(2 * i)
 		end
 	end
+	-- Test (Studio): workspace-Attribut CC_TestNewPlayer = wie ein neuer Spieler, ohne Speichern (echtes Profil bleibt unberuehrt)
+	--   Als Text (JSON) = Einstiegsstand zum Testen, z. B. {"editor":true,"offered":true,"lessons":[true,true,false,false,false,false]}
+	local test = workspace:GetAttribute("CC_TestNewPlayer")
+	if test then
+		data = nil; plr:SetAttribute("CC_ProfileSaved", false)
+		if type(test) == "string" then local ok, t = pcall(function() return game:GetService("HttpService"):JSONDecode(test) end); if ok and type(t) == "table" then data = { onb = t } end end
+	end
 	local p = default()
 	if type(data) == "table" then
-		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and k ~= "look" and p[k] ~= nil then p[k] = v end end
+		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and k ~= "look" and k ~= "onb" and p[k] ~= nil then p[k] = v end end
+		if type(data.onb) == "table" then
+			for k, v in pairs(data.onb) do if k ~= "lessons" and type(p.onb[k]) == "boolean" and type(v) == "boolean" then p.onb[k] = v end end
+			if type(data.onb.lessons) == "table" then for i = 1, 6 do p.onb.lessons[i] = data.onb.lessons[i] == true end end
+		else
+			p.onb.editor = true; p.onb.offered = true; p.onb.firstFight = true   -- bekannter Spieler aus der Zeit vor dem Einstieg
+		end
 		if type(data.look) == "table" then for k, v in pairs(data.look) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end end
 		for _, s in ipairs(STATS) do
 			if type(data.stats) == "table" and tonumber(data.stats[s]) then p.stats[s] = math.clamp(math.floor(data.stats[s]), 0, STAT_MAX) end
@@ -100,7 +118,8 @@ local function save(plr)
 	if not p.dirty then return true end
 	p.saving = true; p.dirty = false
 	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs,
-		stats = table.clone(p.stats), tp = table.clone(p.tp), look = table.clone(p.look) }
+		stats = table.clone(p.stats), tp = table.clone(p.tp), look = table.clone(p.look),
+		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight } }
 	local ok, err
 	for i = 1, 3 do
 		ok, err = pcall(function() store:UpdateAsync("u_" .. plr.UserId, function() return copy end) end)
@@ -129,6 +148,13 @@ event.Event:Connect(function(plr, kind, a, b)
 	elseif kind == "look" and type(a) == "table" then
 		local p = profiles[plr]
 		for k, v in pairs(a) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end
+		p.dirty = true; publish(plr)
+		saveSoon(plr)
+	elseif kind == "onb" then
+		local p = profiles[plr]
+		if a == "lesson" and tonumber(b) and p.onb.lessons[tonumber(b)] ~= nil then p.onb.lessons[tonumber(b)] = true
+		elseif type(a) == "string" and type(p.onb[a]) == "boolean" and type(b) == "boolean" then p.onb[a] = b
+		else return end
 		p.dirty = true; publish(plr)
 		saveSoon(plr)
 	elseif kind == "result" then

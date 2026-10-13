@@ -176,6 +176,8 @@ local bFight = UI.button({ Style = "nav", Text = "TRAININGSKAMPF", Sub = "Gegen 
 	OnClick = function() menuEvent:FireServer("training", dummyLevel) end, Parent = training })
 UI.button({ Style = "nav", Text = "GYM-TRAINING", Sub = "Minispiele an den Stationen", Icon = "dumbbell", LayoutOrder = 3,
 	OnClick = function() close() end, Parent = training })
+UI.button({ Style = "ghost", Text = "GRUNDLAGEN WIEDERHOLEN (TUTORIAL)", Icon = "help", LayoutOrder = 6, Name = "Tutorial",
+	OnClick = function() close(); RS:WaitForChild("CC_Tutorial"):FireServer("openWelcome") end, Parent = training })
 local tState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 4, Size = UDim2.new(1, 0, 0, 28), Parent = training })
 local bTCancel = UI.button({ Style = "danger", Text = "ABBRECHEN", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = training })
 
@@ -471,7 +473,17 @@ local function doSave()
 	task.delay(10, function() if saving then saving = false; saveMsg, saveMsgColor = "Keine Antwort vom Server – bitte erneut speichern.", C.warn end end)
 end
 bSave:SetAttribute("Disabled", true)
-bSave.Activated:Connect(function() doSave() end)
+-- Einstieg (CC_Tutorial, Phase "editor"): Knopf heisst FERTIG, ist immer aktiv, speichert bei Aenderungen und schliesst das Menue
+local onboarding = false
+local function finishOnboarding()
+	if not onboarding then return end
+	onboarding = false
+	doSave()
+	RS:WaitForChild("CC_Tutorial"):FireServer("editorDone")
+	bSave:FindFirstChildWhichIsA("TextLabel").Text = "SPEICHERN"
+	close()
+end
+bSave.Activated:Connect(function() if onboarding then finishOnboarding() else doSave() end end)
 bReset.Activated:Connect(function()
 	draft = Look.copy(saved); previewDraft()
 	if currentCat then showCat(currentCat) end
@@ -583,6 +595,7 @@ function go(name)
 	showPage(name)
 end
 function back()
+	if onboarding then finishOnboarding() return end
 	if #stack <= 1 then return end
 	local function leave()
 		local leaving = table.remove(stack)
@@ -643,7 +656,7 @@ local menuKey = UI.key("M", { AnchorPoint = Vector2.new(0, 0.5), Position = UDim
 local function canOpen()
 	local char = player.Character
 	return not isOpen and char and not char:GetAttribute("CC_Opponent") and not player:GetAttribute("CC_Minigame")
-		and not char:GetAttribute("CC_Wrestle")
+		and not char:GetAttribute("CC_Wrestle") and (player:GetAttribute("CC_OnbPhase") or "") == ""   -- waehrend des Einstiegs (CC_Tutorial) nicht
 end
 CAS:BindActionAtPriority("CC_MenuOpen", function(_, st)
 	if st ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
@@ -687,7 +700,8 @@ RunService.Heartbeat:Connect(function(dt)
 		local d = dirty()
 		bSave:SetAttribute("Disabled", not d or saving)
 		bReset:SetAttribute("Disabled", not d)
-		if d and not saving then saveState.Text, saveState.TextColor3 = "Nicht gespeicherte Änderungen", C.warn
+		if onboarding then bSave:SetAttribute("Disabled", saving); saveState.Text, saveState.TextColor3 = "Wähle dein Aussehen – später jederzeit änderbar.", C.dim
+		elseif d and not saving then saveState.Text, saveState.TextColor3 = "Nicht gespeicherte Änderungen", C.warn
 		elseif saveMsg then saveState.Text, saveState.TextColor3 = saveMsg, saveMsgColor
 		else saveState.Text = "" end
 		return
@@ -750,6 +764,7 @@ task.spawn(function()
 		{ "Profil", function() local t0 = os.clock(); while player:GetAttribute("CC_Level") == nil and os.clock() - t0 < 8 do task.wait(0.1) end end },
 		{ "Aussehen", function() RS:WaitForChild("CC_CustomShared", 5) end },
 		{ "Arena", function() workspace:WaitForChild("CC_Arena", 15) end },
+		{ "Einstieg", function() local t0 = os.clock(); while player:GetAttribute("CC_OnbPhase") == nil and os.clock() - t0 < 10 do task.wait(0.1) end end },
 	}
 	for i, s in ipairs(steps) do
 		lText.Text = "LÄDT … " .. s[1]
@@ -759,7 +774,12 @@ task.spawn(function()
 	end
 	task.wait(0.4)                                    -- Server setzt das Aussehen kurz nach dem Spawn
 	local char = player.Character
-	if char and not char:GetAttribute("CC_Opponent") then open() end
+	local ph = player:GetAttribute("CC_OnbPhase") or ""
+	if ph == "editor" then                            -- erster Start: direkt in den Editor (Standardaussehen vorausgewaehlt)
+		onboarding = true
+		open("fighter")
+		bSave:FindFirstChildWhichIsA("TextLabel").Text = "FERTIG"
+	elseif ph == "" and char and not char:GetAttribute("CC_Opponent") then open() end   -- Begruessung zeigt CC_Tutorial selbst
 	TweenService:Create(loading, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
 	for _, d in ipairs(loading:GetDescendants()) do
 		if d:IsA("TextLabel") then TweenService:Create(d, TweenInfo.new(0.4), { TextTransparency = 1 }):Play()

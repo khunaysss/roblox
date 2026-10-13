@@ -188,6 +188,40 @@ local ICONS = {
 	warn = function()
 		return S.cut(S.poly({ 32, 8, 57, 53, 7, 53 }), S.union(S.box(32, 32, 2.6, 10, 1.2), S.circle(32, 46, 3)))
 	end,
+	-- Einstieg/Tutorial (gleiche Strichstaerke)
+	run = function()                              -- laufende Figur mit Tempo-Strichen
+		return S.union(S.circle(38, 12, 5.5), S.line({ 35, 21, 30, 36, 38, 44, 36, 56 }, W), S.line({ 30, 36, 22, 44, 14, 44 }, W),
+			S.line({ 34, 23, 44, 30, 50, 26 }, W), S.line({ 34, 23, 24, 26, 20, 33 }, W),
+			S.seg(6, 22, 16, 22, W * 0.7), S.seg(4, 30, 14, 30, W * 0.7))
+	end,
+	shield = function() return S.poly({ 32, 8, 51, 15, 49, 34, 32, 56, 15, 34, 13, 15 }) end,
+	kick = function()                             -- Figur mit gestrecktem Bein
+		return S.union(S.circle(18, 13, 5.5), S.line({ 20, 21, 26, 36 }, W), S.line({ 26, 36, 24, 54 }, W), S.line({ 26, 36, 54, 28 }, W),
+			S.line({ 21, 25, 12, 34 }, W), S.line({ 21, 25, 31, 22 }, W))
+	end,
+	wrestle = function()                          -- zwei Figuren im Griff
+		return S.union(S.circle(18, 14, 5.5), S.circle(46, 22, 5.5), S.line({ 20, 22, 28, 34, 22, 54 }, W), S.line({ 28, 34, 34, 54 }, W),
+			S.line({ 44, 30, 36, 36, 42, 54 }, W), S.line({ 36, 36, 50, 54 }, W), S.line({ 22, 26, 38, 32 }, W))
+	end,
+	octagon = function()
+		local pts = {}
+		for i = 0, 8 do local a = math.rad(22.5 + i * 45); table.insert(pts, 32 + math.cos(a) * 23); table.insert(pts, 32 + math.sin(a) * 23) end
+		local inner = {}
+		for i = 0, 8 do local a = math.rad(22.5 + i * 45); table.insert(inner, 32 + math.cos(a) * 14); table.insert(inner, 32 + math.sin(a) * 14) end
+		return S.union(S.line(pts, W), S.line(inner, W * 0.6))
+	end,
+	skip = function() return S.union(S.poly({ 14, 14, 40, 32, 14, 50 }), S.box(46, 32, 3.2, 18, 1)) end,
+	mouse = function()                            -- Maus, linke Taste betont
+		return S.union(S.outline(S.box(32, 34, 14, 21, 13), W * 0.8), S.seg(32, 13, 32, 27, W * 0.7), S.both(S.box(32, 34, 14, 21, 13), S.box(25, 20, 7, 7)))
+	end,
+	help = function()
+		return S.union(S.ring(32, 32, 22, W), S.arc(32, 25, 7.5, 180, 405, W * 0.9), S.seg(32, 32, 32, 37, W * 0.9), S.circle(32, 45, 3))
+	end,
+	info = function() return S.union(S.ring(32, 32, 22, W), S.box(32, 36, 2.6, 9, 1.2), S.circle(32, 21, 3.2)) end,
+	coach = function()                            -- Kopf mit Kappe
+		return S.union(S.both(S.circle(32, 26, 15), S.box(32, 19, 16, 8)), S.box(40, 26, 13, 2.6, 1.2),
+			S.ring(32, 32, 11, W * 0.8), S.both(S.circle(32, 66, 24), S.box(32, 55, 26, 8)))
+	end,
 }
 UI.IconNames = {}
 for k in pairs(ICONS) do table.insert(UI.IconNames, k) end

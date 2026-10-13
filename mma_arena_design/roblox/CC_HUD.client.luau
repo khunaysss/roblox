@@ -189,7 +189,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local oppName = char and char:GetAttribute("CC_Opponent")
 	local dummy = oppName and workspace:FindFirstChild(oppName)
 	local inMatch = dummy ~= nil
-	for _, b in ipairs({ myFill.Parent, foeFill.Parent, myStam.Parent, foeStam.Parent }) do b.Visible = inMatch end
+	local tut = match and match:GetAttribute("Mode") == "tutorial"         -- Tutorial: nur die eigene Ausdauer (kein Sieg/Niederlage), Platz fuer die Aufgabenkarte
+	for _, b in ipairs({ myFill.Parent, foeFill.Parent, foeStam.Parent }) do b.Visible = inMatch and not tut end
+	myStam.Parent.Visible = inMatch
 	foeFill.Parent:FindFirstChildOfClass("TextLabel").Text = dummy and (dummy == workspace:FindFirstChild("CC_TrainingDummy") and "GEGNER" or string.upper(dummy.Name)) or "GEGNER"
 	local dh = dummy and dummy:FindFirstChildOfClass("Humanoid")
 	if dh then foeFill.Size = UDim2.fromScale(math.clamp(dh.Health / dh.MaxHealth, 0, 1), 1) end
@@ -205,13 +207,14 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		myStam.BackgroundColor3 = ((tired and workspace:GetServerTimeNow() - tired < 0.4) or blink) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
 		myStamL.Text = "AUSDAUER " .. math.floor(stam + 0.5)
 		local blocking = char:GetAttribute("CC_Block")
-		stateL.Visible = inMatch
+		stateL.Visible = inMatch and not tut
 		stateL.Text = blocking and "BLOCK" or (low and "WENIG AUSDAUER" or "")
 		stateL.TextColor3 = blocking and Color3.fromRGB(120, 190, 255) or Color3.fromRGB(255, 90, 70)
 	end
 	if char then
 		local gh = groundHint(char)
-		hint.Text = gh or (inMatch and HINT_STAND or "")
+		local guided = match and (match:GetAttribute("Mode") == "tutorial" or match:GetAttribute("Mode") == "sparring")   -- Einstieg: keine volle Tastenleiste (CC_Tutorial)
+		hint.Text = gh or ((inMatch and not guided) and HINT_STAND or "")
 		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or DOWN_NAME[char:GetAttribute("CC_Down")] or "") or ""
 		local p = char:GetAttribute("CC_SubProgress")
 		duel.Visible = p ~= nil
@@ -224,7 +227,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	if dummy then foeStam.Size = UDim2.fromScale(math.clamp((dummy:GetAttribute("CC_Stamina") or 100) / (dummy:GetAttribute("CC_StaminaMax") or 100), 0, 1), 1) end
 	if match then
 		local st, t = match:GetAttribute("State"), match:GetAttribute("TimeLeft") or 0
-		roundL.Text = st == "over" and "ENDE" or ("RUNDE " .. tostring(match:GetAttribute("Round") or 1) .. " / 3")
+		roundL.Text = st == "over" and "ENDE" or ("RUNDE " .. tostring(match:GetAttribute("Round") or 1) .. " / " .. tostring(match:GetAttribute("Rounds") or 3))
 		timeL.Text = st == "fight" and string.format("%d:%02d", t // 60, t % 60) or (st == "break" and "PAUSE" or "--:--")
 		scoreL.Text = string.format("Punkte  %d : %d", match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0)
 		banner.Text = match:GetAttribute("Banner") or ""
@@ -234,7 +237,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		if st == "over" and fighter and match:GetAttribute("Winner") ~= "draw" then banner.Text = match:GetAttribute("WinnerName") == me and "SIEG" or "NIEDERLAGE" end
 		local w = match:GetAttribute("Winner")
 		banner.TextColor3 = (st == "over" and w == "red") and Color3.fromRGB(255, 215, 70) or (st == "over" and w == "blue") and Color3.fromRGB(120, 160, 255) or Color3.new(1, 1, 1)
-		clock.Visible = st ~= "idle"
+		clock.Visible = st ~= "idle" and st ~= "tutorial"
 		if fighter then
 			local mine, theirs = match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0
 			if me == match:GetAttribute("BlueName") then mine, theirs = theirs, mine end

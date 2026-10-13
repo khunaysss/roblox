@@ -9,6 +9,9 @@
 --   Banner, BannerSub, ScoreRed, ScoreBlue, Winner ("red" | "blue" | "draw" | ""), RedName, BlueName, WinnerName, QueuePvp (Anzahl)
 -- Am Spieler: Attribut CC_Queue ("training" | "pvp" | nil). Am Charakter: CC_Opponent (Modellname des Gegners) waehrend des Kampfs.
 -- Test: workspace-Attribut CC_RoundTime (Sekunden) ueberschreibt die Rundenzeit.
+-- Einstieg (CC_Tutorial, nur serverseitig ueber CC_MenuServer): "tutorial" = Grundlagen im Kaefig gegen den passiven Gegner, ohne Uhr
+--   (Ablauf steuert ServerStorage.CC_TutorialRun, Rueckgabe "sparring" -> direkt im Kaefig weiter); "sparring" = erster Kampf,
+--   1 Runde gegen den Anfaenger-Gegner, Belohnung wie Training. Nach jedem Kampf: Attribut CC_LastFight am Spieler (JSON: mode, result, method, xp).
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local RS = game.ReplicatedStorage
@@ -73,7 +76,7 @@ local function isFighting(p) return current ~= nil and (current.red == p or curr
 local menuServer = game.ServerStorage:FindFirstChild("CC_MenuServer") or Instance.new("BindableEvent")
 menuServer.Name = "CC_MenuServer"; menuServer.Parent = game.ServerStorage
 local LEVELS = { passiv = true, anfaenger = true, fortgeschritten = true }   -- Trainingsgegner-Stufen (CC_CharacterAnimations)
-local function onMenu(p, what, level)
+local function onMenu(p, what, level, fromServer)
 	if type(what) ~= "string" then return end
 	if what == "training" then                                     -- gewaehlte Stufe merken (Standard: Anfaenger); Trainer im Gym nutzt die letzte Wahl
 		if type(level) == "string" and LEVELS[level] then p:SetAttribute("CC_DummyLevel", level)
@@ -83,15 +86,15 @@ local function onMenu(p, what, level)
 	if what == "cancel" then
 		if i then table.remove(queue, i) end
 		p:SetAttribute("CC_Queue", nil)
-	elseif (what == "training" or what == "pvp") and not isFighting(p) then
+	elseif (what == "training" or what == "pvp" or ((what == "tutorial" or what == "sparring") and fromServer)) and not isFighting(p) then
 		if i then table.remove(queue, i) end
 		table.insert(queue, { p, what })
 		p:SetAttribute("CC_Queue", what)
 	end
 	updateQueueAttrs()
 end
-menu.OnServerEvent:Connect(onMenu)
-menuServer.Event:Connect(onMenu)
+menu.OnServerEvent:Connect(function(p, what, level) onMenu(p, what, level, false) end)
+menuServer.Event:Connect(function(p, what, level) onMenu(p, what, level, true) end)
 Players.PlayerRemoving:Connect(function(p)
 	local i = inQueue(p); if i then table.remove(queue, i) end
 	updateQueueAttrs()
@@ -169,18 +172,45 @@ local function koWinner(m)
 	return nil
 end
 
-local function runMatch(m)
+local runMatch
+-- Tutorial: Spieler und passiver Gegner im Kaefig, keine Uhr und kein Ergebnis; CC_Tutorial fuehrt durch die Lektionen
+local function runTutorial(m)
 	current = m
+	set("Mode", "tutorial"); set("RedName", m.red.Name); set("BlueName", "Trainingsgegner"); set("Winner", ""); set("WinnerName", "")
+	dummy:SetAttribute("CC_Difficulty", "passiv"); dummy:SetAttribute("CC_Passive", true); dummy:SetAttribute("CC_InMatch", true)
+	freeze(m, false)
+	placeBoth(m)
+	clearDamage(m)
+	set("State", "tutorial"); set("Banner", ""); set("BannerSub", "")
+	print("[CC] Tutorial startet: " .. m.red.Name)
+	local run = game.ServerStorage:FindFirstChild("CC_TutorialRun")
+	local ok, nextStep = pcall(function() return run and run:Invoke(m.red) end)
+	if not ok then warn("[CC] Tutorial-Fehler: " .. tostring(nextStep)) end
+	dummy:SetAttribute("CC_Tutor", nil); dummy:SetAttribute("CC_Passive", nil)
+	if ok and nextStep == "sparring" and m.red.Parent and m.red.Character then
+		return runMatch({ red = m.red, mode = "sparring" })   -- direkt im Kaefig weiter
+	end
+	current = nil
+	if m.red.Parent then toLobby(m.red) end
+	parkDummy()
+	set("State", "idle"); set("Mode", ""); set("RedName", ""); set("BlueName", "")
+end
+
+function runMatch(m)
+	if m.mode == "tutorial" then return runTutorial(m) end
+	current = m
+	local rounds = m.mode == "sparring" and 1 or ROUNDS
+	set("Rounds", rounds)
 	set("Mode", m.mode); set("RedName", m.red.Name); set("BlueName", m.blue and m.blue.Name or "Trainingsgegner"); set("WinnerName", "")
 	set("Winner", ""); set("ScoreRed", 0); set("ScoreBlue", 0)
-	if m.mode == "training" then
-		local lv = m.red:GetAttribute("CC_DummyLevel") or "anfaenger"
+	if m.mode == "training" or m.mode == "sparring" then
+		local lv = m.mode == "sparring" and "anfaenger" or (m.red:GetAttribute("CC_DummyLevel") or "anfaenger")
 		dummy:SetAttribute("CC_Difficulty", lv); dummy:SetAttribute("CC_Passive", lv == "passiv" or nil)
 		dummy:SetAttribute("CC_InMatch", true)
 	end
 	print(("[CC] Kampf startet (%s): %s gegen %s"):format(m.mode, m.red.Name, m.blue and m.blue.Name or "Trainingsgegner"))
 	local totalRed, totalBlue, winner, method = 0, 0, nil, nil
-	for round = 1, ROUNDS do
+	for round = 1, rounds do
 		freeze(m, true)
 		placeBoth(m, round > 1 and BREAK_HEAL or nil)
 		clearDamage(m)
@@ -238,8 +268,10 @@ local function runMatch(m)
 	for side, p in pairs({ red = m.red, blue = m.blue or false }) do
 		if p then
 			local res = winner == "draw" and "draw" or (winner == side and "win" or "loss")
+			local xp = m.mode == "pvp" and nil or (res == "win" and 30 or 15)
 			if m.mode == "pvp" then profile(p, "result", res, method)
-			else profile(p, "xp", res == "win" and 30 or 15) end
+			else profile(p, "xp", xp) end
+			p:SetAttribute("CC_LastFight", game:GetService("HttpService"):JSONEncode({ mode = m.mode, result = res, method = method, xp = xp }))
 		end
 	end
 	for t = OVER_TIME, 1, -1 do set("TimeLeft", t); task.wait(1) end
@@ -247,7 +279,7 @@ local function runMatch(m)
 	freeze(m, false)
 	current = nil
 	for _, p in ipairs({ m.red, m.blue }) do if p and p.Parent then toLobby(p) end end
-	if m.mode == "training" then parkDummy() end
+	if m.mode == "training" or m.mode == "sparring" then parkDummy() end
 	set("State", "idle"); set("Mode", ""); set("Banner", ""); set("BannerSub", ""); set("RedName", ""); set("BlueName", "")
 end
 
@@ -264,9 +296,9 @@ local function nextMatch()
 			return { red = a, blue = b, mode = "pvp" }
 		end
 		for i, e in ipairs(queue) do
-			if e[2] == "training" then
+			if e[2] == "training" or e[2] == "tutorial" or e[2] == "sparring" then
 				table.remove(queue, i); e[1]:SetAttribute("CC_Queue", nil); updateQueueAttrs()
-				return { red = e[1], mode = "training" }
+				return { red = e[1], mode = e[2] }
 			end
 		end
 		task.wait(0.5)

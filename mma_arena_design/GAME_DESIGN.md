@@ -57,7 +57,7 @@ Richtung vom Nutzer (Auftrag 2026-10-13):
   - Bei einer Niederlage im ersten Sparring gibt es trotzdem Fortschritt und einen schnellen neuen Versuch.
   - Belohnungen nur aus dem echten System. Die Erstabschluss-Belohnung gibt es nur einmal.
 
-### Umsetzungsliste Einstieg (wartet auf Freigabe)
+### Umsetzungsliste Einstieg (freigegeben 2026-10-13, Stand siehe „Bereits umgesetzt“)
 | # | Aufgabe | Nutzt | Fertig, wenn |
 |---|---|---|---|
 | V1 | Profil um Einstiegsfortschritt erweitern (Editor fertig, Lektionen 1–6, Erstbelohnung erhalten), alte Profile kompatibel | `CC_Profile` | Neues und altes Profil laden; Fortschritt übersteht Neubeitritt |
@@ -87,6 +87,18 @@ Richtung vom Nutzer (Auftrag 2026-10-13):
 - Schritte 2–6 sind noch nicht besprochen.
 
 ## Bereits umgesetzt (laut Projektstand, Studio-Tests mit 1 Spieler)
+### Einstieg (2026-10-13, in Studio getestet mit Testschalter CC_TestNewPlayer, 1 Spieler, Desktop)
+- **V1 Profil:** onb (editor, offered, lessons 1–6, done, firstFight) wird gespeichert; alte Profile ohne onb gelten als bekannte Spieler. Getestet: neuer Spieler und Fortsetzen nach Neubeitritt (mit vorgegebenem Stand). Echtes Speichern in den DataStore nicht getestet (Testmodus speichert nicht).
+- **V2 Haupttrainer:** Export fertig (`export/Main_Coach_v01_Roblox.fbx`, Standhaltung, Vorschau `renders/coach_roblox_v01_preview.png`), Einrichtungsskript `roblox/setup_coach_v01.luau`. **Offen:** Import in Studio durch den Nutzer (Import 3D, Centimeter, Faktor 1), danach Platzierung im Gym und am Käfigrand testen. Bis dahin spricht der Trainer nur im Dialogfeld (Symbol statt Porträt).
+- **V3 Gegner-Modi:** angekündigter Jab (Block), angekündigter Takedown (Sprawl), erzwungener Takedown (Lektion 6), Platz machen zum Aufstehen; im Tutorial kein K.o. (Leben min. 40) und kein Schaden durch den passiven Gegner. Getestet.
+- **V4 Sparring 1 Runde:** getestet (Sieg und Niederlage), Anzeige „RUNDE 1 / 1“.
+- **V5 Erster Start:** Editor mit FERTIG → Begrüßung; bekannte Spieler sehen das normale Hauptmenü. Getestet.
+- **V6 Lektionen:** alle 6 mit echten Aktionen getestet (Lauf-Strecke, Umkreisen, Abstand, gelandete Jabs/Crosses, geblockte Schläge, Ausdauer verbrauchen/erholen, Kick + Deckung, Takedown, Sprawl, Befreien + Aufstehen); freundliche Fehlerhinweise (z. B. „Zu weit weg“) getestet.
+- **V7 Anzeigen:** Begrüßung, Aufgabenkarte, Hilfe (H) mit „Lektion überspringen“, „Tutorial überspringen“ (setzt Kamera, Gegner, Sperren, Position zurück) getestet bei 1516×753 (UI skaliert mit der Höhe).
+- **V8 Abschluss/Sparring/Ergebnis:** getestet; Belohnung = echter Trainingskampf (Sieg 30 XP, Niederlage 15 XP, +2 TP Kondition je Runde); das Tutorial selbst gibt keine Belohnung (kein Mehrfach-Abholen möglich).
+- **V9 Gesamttest:** einmal komplett durchgespielt (Editor → Begrüßung → 6 Lektionen → Abschluss → Sparring → Ergebnis → frei), Wiederholen über Hauptmenü → Training → „Grundlagen wiederholen“. Ohne Konsolenfehler.
+- **Gefundenes Problem (nicht vom Einstieg verursacht):** Das Modell `CC_Gym` ist im Place um (−52,5; −11,1; +9,2) Studs verschoben (Boden, Laufband), die Stationen und der Startpunkt nicht. Spieler fallen im Gym durch den Boden. Zurücksetzen auf Bodenmitte (160, 0, 0) braucht die Freigabe des Nutzers.
+
 - Kampfsystem:
   - Stand-Kampf mit Schlägen, Tritten, Block, Kombos und Ausdauer
   - Takedown/Sprawl, Bodenpositionen, Submissions mit Duell

@@ -1,0 +1,19 @@
+{
+ "source": "main_coach_v03.blend (nur gelesen)",
+ "meshes": 17,
+ "triangles": 3824,
+ "height_m": 1.922,
+ "width_m": 1.021,
+ "depth_m": 0.412,
+ "hand_L": [
+  0.36,
+  -0.0,
+  0.9
+ ],
+ "hand_R": [
+  -0.36,
+  -0.0,
+  0.9
+ ],
+ "fbx_bytes": 124652
+}

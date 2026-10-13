@@ -10,6 +10,9 @@
 local KSP = game:GetService("KeyframeSequenceProvider")
 local RunService = game:GetService("RunService")
 local RS = game.ReplicatedStorage
+-- Kampf-Ereignisse fuer andere Server-Skripte (CC_Tutorial): Fire("hit", angreifer, ziel, schlag, geblockt) | Fire("td", angreifer, ziel, abgewehrt)
+local fightEvent = game.ServerStorage:FindFirstChild("CC_FightEvent") or Instance.new("BindableEvent")
+fightEvent.Name = "CC_FightEvent"; fightEvent.Parent = game.ServerStorage
 local A = game.ServerStorage.CC_Animations
 -- Hochgeladene Animationen (Gruppe ANIMEXGANG): ServerStorage.CC_Animations.CC_AnimIds = ModuleScript { [Name] = Asset-ID }.
 -- Fehlt eine ID, wird die temporaere Studio-ID benutzt (funktioniert nur in Studio).
@@ -278,6 +281,7 @@ local function land(attacker, target, move, m, track)
 	target.hum.Health = math.max(HP_FLOOR, target.hum.Health - dmg)
 	addDamage(attacker.char, dmg)
 	if blocked then spend(target, 4) end
+	fightEvent:Fire("hit", attacker.char, target.char, move, blocked)
 	print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
 	-- Treffer-Stopp: Glied bleibt an der Oberflaeche stehen (Hitstop) und springt dann in die Rueckzugsphase,
 	-- statt durch den Koerper des Gegners weiterzulaufen
@@ -1107,8 +1111,11 @@ function tryTakedown(a)
 	local isDummy = b.char == workspace:FindFirstChild("CC_TrainingDummy")
 	task.wait(SPRAWL_WINDOW)
 	local defended
-	if isDummy then defended = math.random() < math.max(0.1, 0.3 - 0.01 * stat(a, "Wrestling")) * math.max(DummyLevel().ground, 0.3)
+	local tutor = workspace:FindFirstChild("CC_TrainingDummy") and workspace.CC_TrainingDummy:GetAttribute("CC_Tutor")
+	if isDummy then defended = not tutor and math.random() < math.max(0.1, 0.3 - 0.01 * stat(a, "Wrestling")) * math.max(DummyLevel().ground, 0.3)   -- Tutorial: Takedown gelingt
+	elseif tutor == "ground" then defended = false                                                                     -- Tutorial Lektion 6: Spieler soll unten landen
 	else defended = b.sprawlAt ~= nil and math.abs(b.sprawlAt - shotAt) <= SPRAWL_WINDOW + 0.01 * stat(b, "Wrestling") - 0.005 * stat(a, "Wrestling") end
+	fightEvent:Fire("td", a.char, b.char, defended)
 	if a.ko or b.ko or not (a.wr and b.wr) then
 		for _, f in ipairs({ a, b }) do if f.wr then setWrestle(f, nil, nil) end; f.busyUntil = 0 end
 		return
@@ -1267,6 +1274,25 @@ RunService.Heartbeat:Connect(function(dt)
 	if dummy:GetAttribute("CC_ForceTD") then dummy:SetAttribute("CC_ForceTD", nil); task.spawn(tryTakedown, D) return end -- Test: Takedown sofort
 	if dummy:GetAttribute("CC_Passive") or frozen(D) then
 		setBlock(D, false); D.hum:Move(Vector3.zero)
+		-- Tutorial (CC_Tutor am Gegner, von CC_Tutorial gesetzt): langsam angekuendigte Einzelaktionen statt normaler KI.
+		--   "strike" = Jab, "td"/"ground" = Takedown. Ankuendigung 1,0 s vorher als Attribut CC_Telegraph ("strike|zeit" / "td|zeit"), dann 3 s Pause.
+		local tutor = not frozen(D) and dummy:GetAttribute("CC_Tutor")
+		if (tutor == "strike" or tutor == "td" or tutor == "ground") and (best.down or best.wr) then
+			-- Spieler liegt/ringt: keine neue Ankuendigung; Lektion 6: Platz machen, damit Aufstehen moeglich ist (Druck-Abstand 4,2)
+			D.tutorAt = nil
+			if tutor == "ground" and best.down and dist < 7 then D.hum:Move(-toT.Unit, false) end
+		elseif tutor == "strike" or tutor == "td" or tutor == "ground" then
+			local reach = tutor == "strike" and 4.0 or TD_RANGE - 0.6
+			if dist > reach and not D.tutorAt then D.hum:Move(toT.Unit, false) end
+			local now = os.clock()
+			if not D.tutorAt and dist <= reach + 0.5 and now >= (D.tutorNext or 0) and now >= D.busyUntil then
+				D.tutorAt = now + 1.0
+				dummy:SetAttribute("CC_Telegraph", (tutor == "strike" and "strike" or "td") .. "|" .. workspace:GetServerTimeNow())
+			elseif D.tutorAt and now >= D.tutorAt then
+				D.tutorAt = nil; D.tutorNext = now + 3.0
+				if tutor == "strike" then task.spawn(attack, D, "jab") else task.spawn(tryTakedown, D) end
+			end
+		else D.tutorAt = nil end
 		local rg = DummyLevel().regen                              -- Passiv: Leben langsam zurueck (zum Ueben von Angriffen)
 		if dummy:GetAttribute("CC_Passive") and rg > 0 and D.hum.Health > HP_FLOOR then D.hum.Health = math.min(D.hum.MaxHealth, D.hum.Health + rg * dt) end
 		return
