@@ -47,26 +47,33 @@ for _, p in ipairs(parts) do
 	if p.Name:find("Fence") then p.Transparency = math.max(p.Transparency, 0.35) end
 	if p.Name:find("Platform") or p.Name:find("Canvas") then p.CanQuery = true end
 end
--- Kollision: unsichtbare Boxen
-local col = Instance.new("Folder"); col.Name = "FN_Collision"; col.Parent = model
+-- Kollision: unsichtbare Boxen (Datenlage = Lage des Modells nach der Drehkorrektur, daher nicht noch einmal drehen)
+local col = Instance.new("Model"); col.Name = "FN_Collision"; col.Parent = model
+col.ModelStreamingMode = Enum.ModelStreamingMode.Persistent   -- immer beim Client geladen (sonst faellt man beim Teleport in die weit entfernte Map durch)
 local function m3(r) return r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9] end
 for _, c in ipairs(data.collision) do
+	-- gebogene Tribuenen und die Tunnelhuelle ergeben als Quader riesige Boxen (umschliessen Walkout und Gang): nicht als Kollision
+	if c.group == "Stands" or c.name:find("Tunnel_Shell") then continue end
 	local b = Instance.new("Part"); b.Name = "COL_" .. c.name
 	b.Size = Vector3.new(math.max(c.size[1], 0.2), math.max(c.size[2], 0.2), math.max(c.size[3], 0.2))
 	local pos = FN_REF + Vector3.new(c.pos[1], c.pos[2], c.pos[3])
 	local cfr = CFrame.new(pos.X, pos.Y, pos.Z, m3(c.rot))
-	if rotated then cfr = CFrame.new(FN_REF) * CFrame.Angles(0, math.pi, 0) * (CFrame.new(FN_REF):Inverse() * cfr) end
 	b.CFrame = cfr
-	b.Transparency = 1; b.Anchored = true; b.CanCollide = true; b.CanQuery = true; b.CanTouch = false
+	b.Transparency = 1; b.Anchored = true; b.CanCollide = true; b.CanQuery = true
+	b.CanTouch = true                                  -- ohne CanTouch erkennt die Spielfigur die Box nicht als Boden und sinkt ein
+	if b.Size.Y < 1 and math.abs(b.CFrame.UpVector.Y) > 0.99 then   -- duenne Bodenplatten nach unten verdicken (Oberkante bleibt)
+		local top = b.Position.Y + b.Size.Y / 2
+		b.Size = Vector3.new(b.Size.X, 1, b.Size.Z); b.CFrame = b.CFrame + Vector3.new(0, (top - 0.5) - b.Position.Y, 0)
+	end
 	b.Parent = col
 end
 -- Bezugspunkte
-local spots = Instance.new("Folder"); spots.Name = "FN_Spots"; spots.Parent = model
+local spots = Instance.new("Model"); spots.Name = "FN_Spots"; spots.Parent = model
+spots.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
 for _, s in ipairs(data.spots) do
 	local m = Instance.new("Part"); m.Name = s.name; m.Size = Vector3.new(1, 1, 1); m.Transparency = 1; m.Anchored = true
 	m.CanCollide = false; m.CanQuery = false; m.CanTouch = false
 	local pos = FN_REF + Vector3.new(s.pos[1], s.pos[2], s.pos[3])
-	if rotated then pos = FN_REF + (CFrame.Angles(0, math.pi, 0) * (pos - FN_REF)) end
 	m.Position = pos; m.Parent = spots
 end
 model:SetAttribute("CC_CageCenter", FN_REF)

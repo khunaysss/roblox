@@ -344,10 +344,13 @@ local function apply()
 	if ph == "welcome" then
 		local any, nextL = false, nil
 		for i = 1, 6 do if o and o.lessons and o.lessons[i] then any = true elseif not nextL then nextL = i end end
-		bStartParts.title.Text = (any and nextL and not o.done) and ("WEITER MIT LEKTION " .. nextL) or "TRAINING STARTEN"
+		local repeat_ = o and o.done
+		bStartParts.title.Text = repeat_ and "GRUNDLAGEN WIEDERHOLEN" or ((any and nextL) and ("WEITER MIT LEKTION " .. nextL) or "TRAINING STARTEN")
+		bSkipW:FindFirstChildWhichIsA("TextLabel").Text = repeat_ and "SCHLIESSEN" or "ÜBERSPRINGEN"
 		setDoneRows(wRows, o and o.lessons)
 		if lastPhase ~= "welcome" then
-			say(any and not o.done and "Schön, dass du wieder da bist. Machen wir weiter, wo wir aufgehört haben."
+			say(repeat_ and "Lust auf eine Auffrischung? Wir gehen die Grundlagen gern noch einmal durch."
+				or any and "Schön, dass du wieder da bist. Machen wir weiter, wo wir aufgehört haben."
 				or "Willkommen im Gym. Ich bin dein Trainer. Zeig mir, was du kannst.", "tip", true)
 			welcomeCamera(true)
 		end

@@ -42,6 +42,13 @@ local function ignoreList()
 			if p:IsA("BasePart") and (p.Transparency > 0.2 or p.Name:find("Fence") or p.Name:find("LightRig") or p.Name:find("Truss")) then table.insert(list, p) end
 		end
 	end
+	-- Fight-Night-Arena: Gitter, Traversen und unsichtbare Kollisionsboxen versperren die Kamera nicht
+	local fn = workspace:FindFirstChild("CC_FightNight")
+	if fn then
+		for _, p in ipairs(fn:GetDescendants()) do
+			if p:IsA("BasePart") and (p.Transparency > 0.2 or p.Name:find("Fence") or p.Name:find("Truss") or p.Name:find("Crowd")) then table.insert(list, p) end
+		end
+	end
 	return list
 end
 local params = RaycastParams.new(); params.FilterType = Enum.RaycastFilterType.Exclude
@@ -92,6 +99,10 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	local arena = workspace:FindFirstChild("CC_Arena")
 	local canvas = arena and arena:FindFirstChild("Platform_Canvas_FightSurface", true)
 	if canvas then center = Vector3.new(canvas.Position.X, 0, canvas.Position.Z) end
+	-- naechster Kaefig: Fight-Night-Arena (Online-Kaempfe), sonst die kleine Arena
+	local fnArena = workspace:FindFirstChild("CC_FightNight")
+	local fc = fnArena and fnArena:GetAttribute("CC_CageCenter")
+	if fc and (Vector3.new(me.X, 0, me.Z) - Vector3.new(fc.X, 0, fc.Z)).Magnitude < (Vector3.new(me.X, 0, me.Z) - center).Magnitude then center = Vector3.new(fc.X, 0, fc.Z) end
 	local function inside(p) return Vector3.new(p.X - center.X, 0, p.Z - center.Z).Magnitude <= CAGE_R end
 	local away = Vector3.new(me.X - foe.X, 0, me.Z - foe.Z)
 	away = away.Magnitude > 0.1 and away.Unit or -char.HumanoidRootPart.CFrame.LookVector

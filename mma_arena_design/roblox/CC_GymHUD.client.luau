@@ -217,7 +217,9 @@ end, false, 3100, Enum.KeyCode.Backspace, Enum.KeyCode.ButtonB)
 local acc = 0
 RunService.Heartbeat:Connect(function(dt)
 	local char = player.Character
-	local inMatch = char and char:GetAttribute("CC_Opponent") ~= nil
+	local ms = game.ReplicatedStorage:FindFirstChild("CC_MatchState")
+	local inMatch = (char and char:GetAttribute("CC_Opponent") ~= nil)
+		or (ms and (ms:GetAttribute("Mode") or "") ~= "" and (ms:GetAttribute("RedName") == player.Name or ms:GetAttribute("BlueName") == player.Name))   -- auch Walkout
 	local busy = inMatch or player:GetAttribute("CC_Minigame") ~= nil or player:GetAttribute("CC_TrainResultOpen")
 	prof.Visible = not busy
 	task_.Visible = not busy

@@ -45,6 +45,16 @@ end
 -- Haupttrainer im Gym und am Kaefigrand (Modell ServerStorage.CC_Coach aus setup_coach_v01; fehlt es, spricht er nur im Dialogfeld)
 ---------------------------------------------------------------------------------------------------
 local coachGym, coachCage
+-- Standpunkte (Studs, Welt): Gym = neben dem Trainertisch (Stuhl-Seite, Tisch an der Ostwand), Blick in die Halle;
+-- Arena = Hallenboden ausserhalb der Plattform auf der roten Seite, Blick zur Kaefigmitte. Ueberschreibbar per Attribut CC_CoachSpot.
+local GYM_SPOT, GYM_LOOK = Vector3.new(186.2, 0, -12.4), Vector3.new(160, 0, 0)
+local CAGE_SPOT, CAGE_LOOK = Vector3.new(-8, 0, 22.5), Vector3.new(0, 0, 0)
+local function groundAt(v)
+	local rp = RaycastParams.new(); rp.FilterType = Enum.RaycastFilterType.Exclude
+	rp.FilterDescendantsInstances = { workspace:FindFirstChild("CC_CoachGym"), workspace:FindFirstChild("CC_CoachCage") }
+	local hit = workspace:Raycast(Vector3.new(v.X, v.Y + 12, v.Z), Vector3.new(0, -40, 0), rp)
+	return hit and hit.Position.Y or v.Y
+end
 local function placeCoach()
 	local tpl = SS:FindFirstChild("CC_Coach")
 	if not tpl then return end
@@ -52,9 +62,9 @@ local function placeCoach()
 	local desk = gi and gi:FindFirstChild("Coach_Desk")
 	if desk and not coachGym then
 		coachGym = tpl:Clone(); coachGym.Name = "CC_CoachGym"
-		local look = desk:GetAttribute("CC_CoachLook") or Vector3.new(160, desk.Position.Y, 0)
-		local pos = desk.Position + (desk:GetAttribute("CC_CoachOffset") or Vector3.new(0, 0, 0))
-		coachGym:PivotTo(CFrame.lookAt(Vector3.new(pos.X, 0, pos.Z), Vector3.new(look.X, 0, look.Z)))
+		local pos = desk:GetAttribute("CC_CoachSpot") or GYM_SPOT
+		local y = groundAt(pos)
+		coachGym:PivotTo(CFrame.lookAt(Vector3.new(pos.X, y, pos.Z), Vector3.new(GYM_LOOK.X, y, GYM_LOOK.Z)))
 		coachGym.Parent = workspace
 		-- Ansprechen: Tutorial wiederholen
 		local pr = Instance.new("ProximityPrompt")
@@ -69,10 +79,9 @@ local function placeCoach()
 	local arena = workspace:FindFirstChild("CC_Arena")
 	if arena and not coachCage then
 		coachCage = tpl:Clone(); coachCage.Name = "CC_CoachCage"
-		local c = arena:FindFirstChild("Platform_Canvas_FightSurface", true)
-		local floorY = c and (c.Position.Y + c.Size.Y / 2) or 0
-		local spot = arena:GetAttribute("CC_CoachSpot") or Vector3.new(-19, 0, 4)   -- ausserhalb des Gitters, Ecke Rot
-		coachCage:PivotTo(CFrame.lookAt(Vector3.new(spot.X, floorY + (spot.Y or 0), spot.Z), Vector3.new(0, floorY, 0)))
+		local spot = arena:GetAttribute("CC_CoachSpot") or CAGE_SPOT
+		local y = groundAt(spot)
+		coachCage:PivotTo(CFrame.lookAt(Vector3.new(spot.X, y, spot.Z), Vector3.new(CAGE_LOOK.X, y, CAGE_LOOK.Z)))
 		coachCage.Parent = workspace
 	end
 end

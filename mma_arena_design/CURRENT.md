@@ -46,5 +46,13 @@
   - Fight-Night-Export `export/Fight_Night_v01_Roblox.fbx` (97 Meshes) mit `setup_fight_night_v01.luau`; Kampfort über `CC_PvpArena` vorbereitet (Standard unverändert).
   - Echte Speicherung mit Testschlüssel (`CC_TestProfileKey`) geprüft.
   - **Wartet auf Import:** Haupttrainer und Fight Night.
+- **Bodenkampf, Trainer, Fight Night (2026-10-13):**
+  - Bodenkampf: Die Figur sprang in die Standhaltung. Ursache: Hochgeladene Animationen laden beim ersten Abspielen nach; die alte Boden-Idle wurde vorher gestoppt, sodass 0,2–0,3 s nur die Stand-Idle lief. Jetzt stoppen alte Spuren erst nach dem Laden, und die Stand-Idle ist am Boden aus. Getestet in drei Durchläufen (oben, unten, schnelle Eingaben), 0 Lücken in 1.577 Bodenbildern.
+  - Haupttrainer eingerichtet (`ServerStorage.CC_Coach`, Drehpunkt an den Füßen): im Gym neben dem Trainertisch mit E → Begrüßung bzw. „Grundlagen wiederholen“, am Käfigrand der kleinen Arena; echtes Porträt im Dialog.
+  - Fight Night eingerichtet (`Workspace.CC_FightNight`, Käfig bei 0, 2,14, −700):
+    - Online-Kämpfe laufen dort mit Walkout ab der Mitte des Einlaufwegs.
+    - Kollision immer geladen, `CanTouch` an (sonst sinkt die Figur ein); Tribünen- und Tunnelboxen entfernt (nach `ServerStorage.CC_Old`).
+    - Die Kampfkamera nimmt den nächsten Käfig.
+    - Getestet mit dem Testschalter `CC_TestPvpDummy` (1 Spieler + Trainingsgegner).
 - Arbeitsweise in Studio: Daten aus `export/*_keyframes.luau` über lokalen Server `node` auf 127.0.0.1:8766 (im Ordner `mma_arena_design`) und `ServerStorage.CC_Animations.CC_Loader`; Scripts aus `roblox/` per HttpService (HttpEnabled nur kurz an).
 - Test-Attribute am Gegner: `CC_Passive`, `CC_ForceTD`; am Spieler (Client): `CC_LockTarget`.

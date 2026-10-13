@@ -19,6 +19,10 @@ for _, d in ipairs(src:GetDescendants()) do
 	if d:IsA("BasePart") then
 		table.insert(parts, d)
 		local c = data.colors[d.Name]
+		if not c then                                  -- Studio kuerzt lange Namen beim Import ("Anfang..._Ende"): ueber Anfang und Ende zuordnen
+			local head, tail = d.Name:match("^(.-)%.%.%.(.*)$")
+			if head then for k, v in pairs(data.colors) do if k:sub(1, #head) == head and k:sub(-#tail) == tail then c = v; break end end end
+		end
 		if c then d.Color = Color3.fromRGB(c.rgb[1], c.rgb[2], c.rgb[3]); colored += 1 end
 		d.Material = Enum.Material.SmoothPlastic
 		d.Anchored = true; d.CanCollide = false; d.CanQuery = false; d.CanTouch = false; d.CastShadow = true
@@ -34,6 +38,7 @@ local root = Instance.new("Part"); root.Name = "Root"; root.Size = Vector3.new(2
 root.CFrame = CFrame.new(foot + Vector3.new(0, size.Y / 2, 0))                 -- Modell schaut nach -Z (Blender -Y vorne)
 root.Transparency = 1; root.Anchored = true; root.CanCollide = true; root.CanQuery = true; root.CanTouch = false; root.Parent = model
 model.PrimaryPart = root
+root.PivotOffset = CFrame.new(0, -size.Y / 2, 0)            -- Drehpunkt an der Fusssohle (PivotTo setzt die Fuesse auf den Boden)
 -- Pivot an die Fussmitte, Blickrichtung -Z
 model.WorldPivot = CFrame.new(foot)
 local old = game.ServerStorage:FindFirstChild("CC_Coach"); if old then old.Parent = game.ServerStorage:FindFirstChild("CC_Old") or game.ServerStorage; old.Name = "CC_Coach_alt" end

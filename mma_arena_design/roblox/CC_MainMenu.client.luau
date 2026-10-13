@@ -657,6 +657,7 @@ local function canOpen()
 	local char = player.Character
 	return not isOpen and char and not char:GetAttribute("CC_Opponent") and not player:GetAttribute("CC_Minigame")
 		and not char:GetAttribute("CC_Wrestle") and (player:GetAttribute("CC_OnbPhase") or "") == ""   -- waehrend des Einstiegs (CC_Tutorial) nicht
+		and not ((state:GetAttribute("Mode") or "") ~= "" and (state:GetAttribute("RedName") == player.Name or state:GetAttribute("BlueName") == player.Name))   -- eigener Kampf inkl. Walkout
 end
 CAS:BindActionAtPriority("CC_MenuOpen", function(_, st)
 	if st ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
@@ -681,7 +682,8 @@ local function queueText()
 end
 RunService.Heartbeat:Connect(function(dt)
 	local char = player.Character
-	if isOpen and char and (char:GetAttribute("CC_Opponent") or player:GetAttribute("CC_Minigame")) then close() end
+	local inFight = (state:GetAttribute("Mode") or "") ~= "" and (state:GetAttribute("RedName") == player.Name or state:GetAttribute("BlueName") == player.Name)   -- auch beim Walkout (noch ohne Gegner)
+	if isOpen and char and (char:GetAttribute("CC_Opponent") or player:GetAttribute("CC_Minigame") or inFight) then close() end
 	if isOpen and char then
 		local hum = char:FindFirstChildOfClass("Humanoid")
 		if hum and hum.WalkSpeed ~= 0 then hum.WalkSpeed = 0 end

@@ -38,12 +38,16 @@ local function canvasY()
 	local c = workspace.CC_Arena:FindFirstChild("Platform_Canvas_FightSurface", true)
 	return c.Position.Y + c.Size.Y / 2
 end
--- Kampfort: Standard CC_Arena (Kaefig bei 0,0). Vorbereitet: Spieler-gegen-Spieler-Kaempfe in der Fight-Night-Arena, wenn
--- workspace-Attribut CC_PvpArena = "fightnight" und Workspace.CC_FightNight eingerichtet ist (setup_fight_night_v01).
--- Welche Kaempfe dort stattfinden, ist noch nicht entschieden (GAME_DESIGN.md) – ohne Attribut aendert sich nichts.
-local function arenaCenter(m)
+-- Kampfort: Online-Kaempfe (pvp) in der Fight-Night-Arena (Workspace.CC_FightNight, setup_fight_night_v01; Entscheidung 2026-10-13),
+-- Tutorial, Training und erstes Sparring in der kleinen Arena (CC_Arena, Kaefig bei 0,0).
+-- workspace-Attribut CC_PvpArena = "arena" schaltet Online-Kaempfe zurueck in die kleine Arena.
+local function fightNight(m)
 	local fn = workspace:FindFirstChild("CC_FightNight")
-	if m and m.mode == "pvp" and fn and workspace:GetAttribute("CC_PvpArena") == "fightnight" then
+	return m and m.mode == "pvp" and fn and workspace:GetAttribute("CC_PvpArena") ~= "arena" and fn:GetAttribute("CC_CageCenter") and fn or nil
+end
+local function arenaCenter(m)
+	local fn = fightNight(m)
+	if fn then
 		local c = fn:GetAttribute("CC_CageCenter")
 		if c then return Vector3.new(c.X, 0, c.Z), c.Y end
 	end
@@ -221,6 +225,54 @@ function runMatch(m)
 		dummy:SetAttribute("CC_InMatch", true)
 	end
 	print(("[CC] Kampf startet (%s): %s gegen %s"):format(m.mode, m.red.Name, m.blue and m.blue.Name or "Trainingsgegner"))
+	-- Fight Night: Walkout ueber den vorhandenen Einlaufweg bis zur Kaefigtuer, danach wie gewohnt in die Ecken
+	local fn = fightNight(m)
+	if fn then
+		local spots = fn:FindFirstChild("FN_Spots")
+		local startP, door = spots and spots:FindFirstChild("Fighter_Walkout_Main"), spots and spots:FindFirstChild("Cage_Door")
+		if startP and door then
+			set("Mode", m.mode); set("State", "walkout"); set("Banner", "FIGHT NIGHT"); set("BannerSub", "Walkout")
+			local r, b = chars(m)
+			-- Streaming: Boden am Ziel vorher laden lassen, sonst faellt der Spieler beim Teleport durch (Map liegt weit entfernt)
+			for _, pl in ipairs({ m.red, m.blue }) do
+				if pl and pl.Parent then
+					pcall(function() pl:RequestStreamAroundAsync(startP.Position, 10) end)
+					pcall(function() pl:RequestStreamAroundAsync(door.Position, 10) end)
+				end
+			end
+			local list = {}
+			for i, c in ipairs({ r, b }) do
+				local h, root = c and c:FindFirstChildOfClass("Humanoid"), c and c:FindFirstChild("HumanoidRootPart")
+				if h and root then
+					local side = (i == 1) and -2.5 or 2.5
+					local mid = door.Position + (startP.Position - door.Position) * 0.55   -- ab der Mitte des Einlaufwegs (Gehtempo: gut 6 s bis zur Tuer)
+					local from = Vector3.new(mid.X, startP.Position.Y, mid.Z) + Vector3.new(side, 0, (i - 1) * 4)        -- Rot vorn, Blau dahinter
+					-- auf die Oberkante der Bodenkollision stellen (duenne Laufsteg-Platte: sonst starten die Fuesse darin und fallen durch)
+					local rpar = RaycastParams.new(); rpar.FilterType = Enum.RaycastFilterType.Include; rpar.FilterDescendantsInstances = { fn:FindFirstChild("FN_Collision") }
+					local hit = workspace:Raycast(from + Vector3.new(0, 10, 0), Vector3.new(0, -30, 0), rpar)
+					from = Vector3.new(from.X, (hit and hit.Position.Y or from.Y) + 3.1, from.Z)
+					reset:Invoke(c, CFrame.lookAt(from, Vector3.new(door.Position.X + side, from.Y, door.Position.Z)), nil)
+					c:SetAttribute("CC_Opponent", nil); c:SetAttribute("CC_Frozen", false)
+					h.WalkSpeed = 16
+					table.insert(list, { c = c, h = h, root = root, goal = Vector3.new(door.Position.X + side * 0.6, from.Y, door.Position.Z + 6) })
+				end
+			end
+			paint(r, "red"); paint(b, "blue")
+			for _, e in ipairs(list) do
+				if e.c == dummy then e.root.CFrame = CFrame.lookAt(e.goal, e.goal - Vector3.new(0, 0, 1)) else e.h:MoveTo(e.goal) end   -- Trainingsgegner (nur Test) steht schon an der Tuer
+			end
+			local t0 = os.clock()
+			while os.clock() - t0 < 10 do
+				local done = true
+				for _, e in ipairs(list) do
+					if e.c.Parent and ((e.root.Position - e.goal) * Vector3.new(1, 0, 1)).Magnitude > 3 then done = false; e.h:MoveTo(e.goal) end
+				end
+				if done then break end
+				task.wait(0.25)
+			end
+			print(("[CC] Walkout fertig nach %.1f s"):format(os.clock() - t0))
+		end
+	end
 	local totalRed, totalBlue, winner, method = 0, 0, nil, nil
 	for round = 1, rounds do
 		freeze(m, true)
@@ -280,7 +332,8 @@ function runMatch(m)
 	for side, p in pairs({ red = m.red, blue = m.blue or false }) do
 		if p then
 			local res = winner == "draw" and "draw" or (winner == side and "win" or "loss")
-			local xp = m.mode == "pvp" and nil or (res == "win" and 30 or 15)
+			local xp = nil                                 -- Online: XP vergibt CC_Profile selbst (Ergebnis + Methode)
+			if m.mode ~= "pvp" then xp = res == "win" and 30 or 15 end
 			if m.mode == "pvp" then profile(p, "result", res, method)
 			else profile(p, "xp", xp) end
 			p:SetAttribute("CC_LastFight", game:GetService("HttpService"):JSONEncode({ mode = m.mode, result = res, method = method, xp = xp }))
@@ -291,7 +344,7 @@ function runMatch(m)
 	freeze(m, false)
 	current = nil
 	for _, p in ipairs({ m.red, m.blue }) do if p and p.Parent then toLobby(p) end end
-	if m.mode == "training" or m.mode == "sparring" then parkDummy() end
+	if not m.blue then parkDummy() end                -- Trainingsgegner war beteiligt (Training, Sparring, Test)
 	set("State", "idle"); set("Mode", ""); set("Banner", ""); set("BannerSub", ""); set("RedName", ""); set("BlueName", "")
 end
 
@@ -301,6 +354,11 @@ local function nextMatch()
 		for i = #queue, 1, -1 do if not queue[i][1].Parent or not queue[i][1].Character then table.remove(queue, i) end end
 		local pvp = {}
 		for i, e in ipairs(queue) do if e[2] == "pvp" then table.insert(pvp, i) end end
+		if #pvp == 1 and workspace:GetAttribute("CC_TestPvpDummy") then          -- Test (Studio, 1 Spieler): Online-Ablauf gegen den Trainingsgegner
+			local a = queue[pvp[1]][1]
+			table.remove(queue, pvp[1]); a:SetAttribute("CC_Queue", nil); updateQueueAttrs()
+			return { red = a, mode = "pvp" }
+		end
 		if #pvp >= 2 then
 			local a, b = queue[pvp[1]][1], queue[pvp[2]][1]
 			table.remove(queue, pvp[2]); table.remove(queue, pvp[1])
