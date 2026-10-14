@@ -1,0 +1,9 @@
+{
+ "source": "Fighter_Rigged_v19.blend (unveraendert)",
+ "Fighter_Sig_Ali": {
+  "jab1_min_m": 0.096,
+  "jab2_min_m": 0.096,
+  "cross_min_m": 0.132,
+  "start_end_pose_diff": 0.0
+ }
+}

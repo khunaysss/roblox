@@ -10,7 +10,7 @@ local SIG = require(RS:WaitForChild("CC_Signatures"))
 
 local INFO = {   -- Reihenfolge = Plaetze von West nach Ost; sig = Schluessel in CC_Signatures.list (nil = noch nicht gebaut)
 	{ id = "Mike_Tyson", name = "Mike Tyson", style = "Peek-a-boo Boxen", sig = "tyson", move = "Linker Koerperhaken + rechter Uppercut" },
-	{ id = "Muhammad_Ali", name = "Muhammad Ali", style = "Tänzelndes Boxen", move = "Jab-Jab-Cross" },
+	{ id = "Muhammad_Ali", name = "Muhammad Ali", style = "Tänzelndes Boxen", sig = "ali", move = "Jab-Jab-Cross" },
 	{ id = "Alex_Pereira", name = "Alex Pereira", style = "Kickboxen", move = "Linker Konterhaken" },
 	{ id = "Khabib_Nurmagomedov", name = "Khabib Nurmagomedov", style = "Ringen", move = "Double-Leg-Takedown" },
 	{ id = "Saenchai", name = "Saenchai", style = "Muay Thai", move = "Teep mit Finte" },

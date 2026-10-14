@@ -34,8 +34,20 @@ S.list = {
 		},
 		trails = { { t = { 0.24, 0.48 }, bone = "LeftHand" }, { t = { 0.55, 0.76 }, bone = "RightHand" } },
 	},
+	ali = {
+		name = "SCHMETTERLING-SERIE", short = "Jab - Jab - Cross", trainer = "Muhammad_Ali",
+		anim = "Fighter_Sig_Ali", length = 26 / 24, lock = 1.0,
+		stamina = 18, range = 4.1,                      -- gemessen: alle 3 Treffer bis 4,0; ab 4,3 verfehlt Jab 2 (Gegner weicht nach Jab 1 zurueck)
+		color = Color3.fromRGB(235, 240, 255),         -- weiss
+		hits = {
+			{ win = { 0.13, 0.29 }, limb = "LeftHand", zone = "head", move = "jab", scale = 1.0, react = "hitStraight", ko = "ko", impact = 0.6 },
+			{ win = { 0.33, 0.50 }, limb = "LeftHand", zone = "head", move = "jab", scale = 1.0, react = "hitStraight", ko = "ko", impact = 0.6 },
+			{ win = { 0.54, 0.71 }, limb = "RightHand", zone = "head", move = "cross", scale = 1.1, react = "hitStraight", ko = "ko", impact = 1.2 },
+		},
+		trails = { { t = { 0.09, 0.27 }, bone = "LeftHand" }, { t = { 0.30, 0.48 }, bone = "LeftHand" }, { t = { 0.50, 0.70 }, bone = "RightHand" } },
+	},
 }
-S.ORDER = { "tyson" }           -- Reihenfolge in Menues (weitere Trainer folgen, siehe GAME_DESIGN.md)
+S.ORDER = { "tyson", "ali" }           -- Reihenfolge in Menues (weitere Trainer folgen, siehe GAME_DESIGN.md)
 
 -- Finisher-Wiederholung (nur nach vom Server bestaetigtem K.o. durch eine Signatur)
 S.FINISHER = { before = 0.9, after = 0.6, slowFrom = -0.12, slowTo = 0.22, slowRate = 0.3, total = 2.6 }
