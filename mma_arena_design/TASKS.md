@@ -75,7 +75,7 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 
 ## Signatur-Ultimates (Stand 2026-10-14)
 - [x] Tyson-Prototyp: Animation (Fighter_Rigged_v19, Export v21), Server-Logik, Fokus, VFX, HUD, Finisher-Wiederholung – in Studio getestet
-- [ ] Interrupt-Test mit echtem Gegner, Whoosh-Sound im Projekt (CC_Sounds.Whoosh)
+- [x] Unterbrechung getestet (Gegner-Jab stoppt die Signatur, keine Rest-Treffer); Whoosh-Sound CC_Sounds.Whoosh (Roblox Pro Sound Effects 9120728815)
 - [ ] Upload der Animation Fighter_Sig_Tyson (Nutzer, upload_starten.ps1)
 - [ ] Trainer-Vorstellung, Übung, Freischaltung, Kämpfermenü-Auswahl
 - [ ] Ali, Pereira, Khabib, Saenchai; Oliveira wartet auf Clinch-System

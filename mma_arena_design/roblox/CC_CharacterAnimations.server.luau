@@ -1419,6 +1419,8 @@ RunService.Heartbeat:Connect(function(dt)
 		root.CFrame = root.CFrame:Lerp(goal, 1 - math.exp(-TURN * dt))
 	end
 	if dummy:GetAttribute("CC_ForceTD") then dummy:SetAttribute("CC_ForceTD", nil); task.spawn(tryTakedown, D) return end -- Test: Takedown sofort
+	local fa = dummy:GetAttribute("CC_ForceAttack")
+	if fa and MOVES[fa] then dummy:SetAttribute("CC_ForceAttack", nil); setBlock(D, false); task.spawn(attack, D, fa) return end -- Test: ein Schlag sofort
 	if dummy:GetAttribute("CC_Passive") or frozen(D) then
 		setBlock(D, dummy:GetAttribute("CC_ForceBlock") == true and not frozen(D)); D.hum:Move(Vector3.zero)   -- CC_ForceBlock: Test (Dauerblock)
 		-- Tutorial (CC_Tutor am Gegner, von CC_Tutorial gesetzt): langsam angekuendigte Einzelaktionen statt normaler KI.
