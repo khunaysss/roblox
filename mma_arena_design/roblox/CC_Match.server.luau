@@ -225,6 +225,8 @@ function runMatch(m)
 		dummy:SetAttribute("CC_InMatch", true)
 	end
 	print(("[CC] Kampf startet (%s): %s gegen %s"):format(m.mode, m.red.Name, m.blue and m.blue.Name or "Trainingsgegner"))
+	set("Finisher", nil)
+	do local r0, b0 = chars(m); for _, c in ipairs({ r0, b0 }) do if c then c:SetAttribute("CC_FocusReset", os.clock()) end end end   -- Signatur-Fokus: neues Match = 0
 	-- Fight Night: Walkout ueber den vorhandenen Einlaufweg bis zur Kaefigtuer, danach wie gewohnt in die Ecken
 	local fn = fightNight(m)
 	if fn then
@@ -321,6 +323,15 @@ function runMatch(m)
 		winner = totalRed > totalBlue and "red" or totalBlue > totalRed and "blue" or "draw"
 	end
 	if method == "K.O." or method == "Submission" then task.wait(1.5) end
+	-- Finisher-Wiederholung: nur wenn der Server den K.o. durch eine Signatur bestaetigt hat. Ergebnis steht bereits fest
+	-- (Winner wird vorher gesetzt); die Clients zeigen die letzte Aktion als lokale Kopie und koennen sie ueberspringen.
+	local fin = state:GetAttribute("Finisher")
+	if fin and method == "K.O." then
+		local wn = winner == "red" and m.red.Name or winner == "blue" and (m.blue and m.blue.Name or "Trainingsgegner") or ""
+		set("Winner", winner); set("WinnerName", wn)
+		set("State", "finisher"); set("Banner", ""); set("BannerSub", "")
+		task.wait(require(RS:WaitForChild("CC_Signatures")).FINISHER.total)
+	end
 	freeze(m, true)
 	local wname = winner == "red" and m.red.Name or winner == "blue" and (m.blue and m.blue.Name or "Trainingsgegner") or ""
 	set("State", "over"); set("Winner", winner); set("WinnerName", wname)

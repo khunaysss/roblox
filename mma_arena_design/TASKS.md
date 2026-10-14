@@ -72,3 +72,10 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 | Export Basiskämpfer (Modell + Idle als FBX, Roblox nicht getestet) | `export/Fighter_Base_v03_*.fbx` |
 | Jab-Action | `Fighter_Rigged_v04.blend`, `renders/fighter_rigged_v04_jab_preview.mp4` |
 | Wrestling-Prototyp (6 Action-Paare, korrigierte Guard) | `Wrestling_Prototype_v02.blend` |
+
+## Signatur-Ultimates (Stand 2026-10-14)
+- [x] Tyson-Prototyp: Animation (Fighter_Rigged_v19, Export v21), Server-Logik, Fokus, VFX, HUD, Finisher-Wiederholung – in Studio getestet
+- [ ] Interrupt-Test mit echtem Gegner, Whoosh-Sound im Projekt (CC_Sounds.Whoosh)
+- [ ] Upload der Animation Fighter_Sig_Tyson (Nutzer, upload_starten.ps1)
+- [ ] Trainer-Vorstellung, Übung, Freischaltung, Kämpfermenü-Auswahl
+- [ ] Ali, Pereira, Khabib, Saenchai; Oliveira wartet auf Clinch-System

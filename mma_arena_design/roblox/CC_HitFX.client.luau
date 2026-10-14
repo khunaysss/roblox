@@ -49,6 +49,11 @@ end)
 local function watch(char)
 	char:GetAttributeChangedSignal("CC_Tired"):Connect(function() show("ZU WENIG AUSDAUER", Color3.fromRGB(255, 90, 70), 3, 0.9) end)
 	char:GetAttributeChangedSignal("CC_OutOfRange"):Connect(function() show("ZU WEIT WEG", Color3.fromRGB(220, 220, 225), 0, 0.7) end)
+	char:GetAttributeChangedSignal("CC_SigDenied"):Connect(function()   -- Signatur abgelehnt (Server)
+		local why = tostring(char:GetAttribute("CC_SigDenied")):match("^(%a+)")
+		local txt = ({ focus = "FOKUS NOCH NICHT VOLL", position = "NICHT IN POSITION", anim = "SIGNATUR NICHT VERFÜGBAR" })[why]
+		if txt then show(txt, Color3.fromRGB(220, 220, 225), 1, 0.8) end
+	end)
 end
 if player.Character then watch(player.Character) end
 player.CharacterAdded:Connect(watch)

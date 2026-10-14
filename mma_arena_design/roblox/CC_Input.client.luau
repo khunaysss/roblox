@@ -47,6 +47,7 @@ bindMove("CC_BodyKick", "bodykick", true, Enum.KeyCode.X, Enum.KeyCode.DPadLeft)
 bindMove("CC_HighKick", "highkick", true, Enum.KeyCode.V, Enum.KeyCode.DPadRight)
 bindMove("CC_FrontKick", "frontkick", false, Enum.KeyCode.Z, Enum.KeyCode.DPadDown)
 bindMove("CC_Takedown", "takedown", true, Enum.KeyCode.E, Enum.KeyCode.ButtonL1)
+bindMove("CC_Signature", "signature", false, Enum.KeyCode.G, Enum.KeyCode.DPadUp)   -- Signaturtechnik (Server prueft Ausruestung, Fokus, Ausdauer, Reichweite)
 
 CAS:BindAction("CC_Block", function(_, state)
 	if state == Enum.UserInputState.Begin then block:FireServer(true)

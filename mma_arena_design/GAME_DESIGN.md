@@ -122,3 +122,12 @@ Richtung vom Nutzer (Auftrag 2026-10-13):
 
 ## Für spätere Updates
 - Mobile/Touch und Controller-Feinschliff (Desktop zuerst, bestätigt).
+
+## Signatur-Ultimates (Prototyp Tyson, 2026-10-14)
+- Konfiguration: `roblox/CC_Signatures.module.luau` (alle Werte vorläufig).
+- Fokus (0–100) nur durch gelandete Treffer und erfolgreiche Abwehr im echten Kampf; nicht im Tutorial, nicht durch Leerschläge oder Blockhalten. Bleibt zwischen Runden, neues Match = 0.
+- Taste G / Steuerkreuz hoch. Ein Versuch kostet den ganzen Fokus plus Ausdauer. Server prüft alles; Schaden kommt aus den normalen Techniken; jeder Schlag hat ein eigenes Trefferfenster (kann verfehlen, geblockt oder unterbrochen werden).
+- Tyson: linker Körperhaken → rechter Uppercut, dunkelrote Spuren, Reichweite 4,1 Studs.
+- Finisher-Wiederholung nur nach Server-K.o. durch Signatur: lokale Kopien, Seitenkamera, Zeitlupe, überspringbar (Leertaste/Klick/Controller).
+- Geplant mit gleicher Architektur: Ali (Jab-Jab-Cross, weiß), Pereira (linker Konterhaken, gold), Khabib (Double-Leg, Sprawl möglich, kein Finisher), Saenchai (Teep mit Finte). Oliveira braucht erst ein Clinch-System (offene Abhängigkeit).
+- Offen: Vorstellung/Übung/Freischaltung beim Trainer, Auswahl im Kämpfermenü, Ranked = gleiche Auswahl für alle.

@@ -1,0 +1,14 @@
+{
+ "source": "Fighter_Rigged_v18.blend (unveraendert)",
+ "Fighter_Sig_Tyson": {
+  "hook_glove_to_liver_min_m": 0.284,
+  "hook_best_frame": 12,
+  "upper_glove_to_target_min_m": 0.165,
+  "upper_best_frame": 18,
+  "stand_foot_slide_m": 0.0,
+  "lowest_z": -0.0,
+  "start_end_pose_diff": 0.0,
+  "glove_L_y_min": -0.777,
+  "glove_R_z_max": 1.508
+ }
+}

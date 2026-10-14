@@ -50,10 +50,18 @@ local myStam, myStamL = sbar(0)
 local foeStam = sbar(1)
 -- Zustand unter der eigenen Ausdauer: BLOCK / WENIG AUSDAUER
 local stateL = Instance.new("TextLabel")
-stateL.Position = UDim2.fromOffset(20, 68); stateL.Size = UDim2.fromOffset(320, 22); stateL.BackgroundTransparency = 1
+stateL.Position = UDim2.fromOffset(20, 84); stateL.Size = UDim2.fromOffset(320, 22); stateL.BackgroundTransparency = 1
 stateL.Font = Enum.Font.GothamBlack; stateL.TextSize = 18; stateL.TextXAlignment = Enum.TextXAlignment.Left
 stateL.TextStrokeTransparency = 0.3; stateL.Text = ""; stateL.Parent = gui
 local LOW_STAMINA = 25   -- wie im Kampfskript: darunter weniger Schaden und langsamere Schlaege
+-- Signatur-Fokus (CC_Signatures): schmaler Balken unter der Ausdauer, nur mit ausgeruesteter Signatur; voll = gold + Taste G
+local SIGCFG = require(game.ReplicatedStorage:WaitForChild("CC_Signatures"))
+local focusF = Instance.new("Frame"); focusF.Position = UDim2.fromOffset(20, 68); focusF.Size = UDim2.fromOffset(320, 10)
+focusF.BackgroundColor3 = Color3.fromRGB(25, 25, 28); focusF.BorderSizePixel = 0; focusF.Visible = false; focusF.Parent = gui
+local focusFill = Instance.new("Frame"); focusFill.Size = UDim2.fromScale(0, 1); focusFill.BorderSizePixel = 0; focusFill.BackgroundColor3 = Color3.fromRGB(150, 20, 28); focusFill.Parent = focusF
+local focusL = Instance.new("TextLabel"); focusL.BackgroundTransparency = 1; focusL.Size = UDim2.fromScale(1, 1); focusL.ZIndex = 2; focusL.Font = Enum.Font.GothamBold
+focusL.TextSize = 10; focusL.TextColor3 = Color3.new(1, 1, 1); focusL.TextStrokeTransparency = 0.4; focusL.Text = "FOKUS"; focusL.Parent = focusF
+local function sigEquipped() local id = workspace:GetAttribute(SIGCFG.TEST_ATTR) or player:GetAttribute("CC_Signature"); return id and SIGCFG.list[id] end
 
 local ko = Instance.new("TextLabel")
 ko.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -206,6 +214,13 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		local blink = low and (os.clock() * 3) % 1 < 0.5
 		myStam.BackgroundColor3 = ((tired and workspace:GetServerTimeNow() - tired < 0.4) or blink) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
 		myStamL.Text = "AUSDAUER " .. math.floor(stam + 0.5)
+		local sdef = sigEquipped()
+		local fo = char:GetAttribute("CC_Focus") or 0
+		focusF.Visible = inMatch and not tut and sdef ~= nil
+		focusFill.Size = UDim2.fromScale(math.clamp(fo / SIGCFG.FOCUS_MAX, 0, 1), 1)
+		local full = fo >= SIGCFG.FOCUS_MAX
+		focusFill.BackgroundColor3 = full and Color3.fromRGB(236, 190, 76) or Color3.fromRGB(150, 20, 28)
+		focusL.Text = full and ("G  " .. (sdef and sdef.name or "SIGNATUR")) or "FOKUS"
 		local blocking = char:GetAttribute("CC_Block")
 		stateL.Visible = inMatch and not tut
 		stateL.Text = blocking and "BLOCK" or (low and "WENIG AUSDAUER" or "")
@@ -214,7 +229,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	if char then
 		local gh = groundHint(char)
 		local guided = match and (match:GetAttribute("Mode") == "tutorial" or match:GetAttribute("Mode") == "sparring")   -- Einstieg: keine volle Tastenleiste (CC_Tutorial)
-		hint.Text = gh or ((inMatch and not guided) and HINT_STAND or "")
+		hint.Text = gh or ((inMatch and not guided) and (HINT_STAND .. (sigEquipped() and " · G Signatur" or "")) or "")
 		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or DOWN_NAME[char:GetAttribute("CC_Down")] or "") or ""
 		local p = char:GetAttribute("CC_SubProgress")
 		duel.Visible = p ~= nil

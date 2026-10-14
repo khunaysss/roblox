@@ -77,6 +77,19 @@ local function reward(f, kind, a, b)
 	if ev then ev:Fire(p, kind, a, b) end
 end
 local function staminaMax(f) return STAMINA_MAX + 2 * stat(f, "Cardio") end
+-- ---- Signaturtechniken (Konfiguration in ReplicatedStorage.CC_Signatures, alle Werte vorlaeufig) ----
+local SIG = require(RS:WaitForChild("CC_Signatures"))
+local sigFX = RS:FindFirstChild("CC_SigFX") or Instance.new("RemoteEvent"); sigFX.Name = "CC_SigFX"; sigFX.Parent = RS
+local function focusGain(f, kind)
+	-- nur im echten Kampf mit Gegner (nicht im Tutorial); Fokus als Attribut CC_Focus am Charakter fuer das HUD
+	if not f or f.ko or not f.char:GetAttribute("CC_Opponent") then return end
+	local ms = RS:FindFirstChild("CC_MatchState")
+	if not ms or ms:GetAttribute("Mode") == "tutorial" or ms:GetAttribute("State") ~= "fight" then return end
+	local n = SIG.FOCUS[kind] or 0
+	if n <= 0 then return end
+	f.focus = math.min(SIG.FOCUS_MAX, (f.focus or 0) + n)
+	f.char:SetAttribute("CC_Focus", f.focus)
+end
 local LOW_STAMINA = 25          -- darunter: weniger Schaden, langsamere Schlaege
 local BUFFER = 0.30             -- Eingabe so viele Sekunden vor Ende der Sperre wird gepuffert (Kombination)
 local WALK_REF = 6        -- Laufzyklen sind fuer WalkSpeed 6 gebaut
@@ -106,6 +119,11 @@ local function setup(char)
 		stamina = STAMINA_MAX, lastSpend = 0 }
 	char:SetAttribute("CC_Stamina", STAMINA_MAX)
 	fighters[char] = f
+	-- Fokus: neues Match (CC_Match setzt CC_FocusReset) = 0; Test-Modus (CC_TestSignature) = voll
+	char:GetAttributeChangedSignal("CC_FocusReset"):Connect(function()
+		local test = workspace:GetAttribute("CC_TestSignature") and game.Players:GetPlayerFromCharacter(char)
+		f.focus = test and 100 or 0; char:SetAttribute("CC_Focus", f.focus)
+	end)
 	char.AncestryChanged:Connect(function() if not char.Parent then fighters[char] = nil end end)
 	return f
 end
@@ -201,7 +219,7 @@ local function knockout(f, kind)
 	task.delay(KO_TIME, function()
 		if not f.char.Parent then return end
 		local ms = RS:FindFirstChild("CC_MatchState")
-		if ms and ms:GetAttribute("State") == "over" then return end -- liegen bleiben; das Runden-System setzt beim Neustart zurueck
+		if ms and (ms:GetAttribute("State") == "over" or ms:GetAttribute("State") == "finisher") then return end -- liegen bleiben; das Runden-System setzt beim Neustart zurueck
 		ko:Stop(0.4)
 		f.hum.Health = f.hum.MaxHealth
 		f.hum.WalkSpeed = f.speed
@@ -245,6 +263,11 @@ local function interrupt(f)
 	for move in pairs(MOVES) do
 		if f.tracks[move].IsPlaying then f.tracks[move]:Stop(0.08) end
 	end
+	if f.sigTrack and f.sigTrack.IsPlaying then            -- laufende Signatur: keine Rest-Treffer, keine spaeten Effekte
+		f.sigTrack:Stop(0.1)
+		if RS:FindFirstChild("CC_SigFX") then RS.CC_SigFX:FireAllClients("cancel", f.char) end
+	end
+	f.sigActive = false
 end
 
 local function react(target, kind, lock)
@@ -287,6 +310,10 @@ local function land(attacker, target, move, m, track)
 	addDamage(attacker.char, dmg)
 	if blocked then spend(target, 4) end
 	fightEvent:Fire("hit", attacker.char, target.char, move, blocked)
+	if not attacker.sigActive then                                     -- Signatur-Treffer laden keinen neuen Fokus
+		if blocked then focusGain(attacker, "blockedHit"); focusGain(target, "block")
+		else focusGain(attacker, m.heavy and "heavy" or "hit") end
+	end
 	print(("[CC] %s %s -> %s %.0f%s"):format(attacker.char.Name, move, target.char.Name, target.hum.Health, blocked and " (geblockt)" or ""))
 	-- Treffer-Stopp: Glied bleibt an der Oberflaeche stehen (Hitstop) und springt dann in die Rueckzugsphase,
 	-- statt durch den Koerper des Gegners weiterzulaufen
@@ -294,7 +321,7 @@ local function land(attacker, target, move, m, track)
 	task.delay(blocked and HITSTOP * 0.5 or HITSTOP, function()
 		if not track.IsPlaying then return end
 		local back = m.win[2] + 0.04
-		if track.TimePosition < back then track.TimePosition = back end
+		if not m.noRewind and track.TimePosition < back then track.TimePosition = back end   -- Signatur: kein Vorspringen (zweiter Schlag folgt)
 		track:AdjustSpeed(attacker.animSpeed or 1)
 	end)
 	if target.hum.Health <= HP_FLOOR then
@@ -552,6 +579,7 @@ function groundPunch(top)
 		bottom.hum.Health = math.max(HP_FLOOR, bottom.hum.Health - dmg)
 		addDamage(top.char, dmg)
 		print(("[CC] %s Bodenschlag (%s) -> %s %.0f"):format(top.char.Name, w.pos, bottom.char.Name, bottom.hum.Health))
+		focusGain(top, "groundHit")
 		hitFX(bottom.char, 0.5, "hit"); hitFX(top.char, 0.25, "land")
 		ta:AdjustSpeed(0.05); task.delay(HITSTOP, function() if ta.IsPlaying then ta:AdjustSpeed(1) end end)
 	end)
@@ -1153,7 +1181,7 @@ function tryTakedown(a)
 	end
 	local pair = defended and "TD_DoubleLeg_Defended" or "TD_DoubleLeg_Success"
 	print(("[CC] %s Takedown -> %s: %s"):format(a.char.Name, b.char.Name, defended and "Sprawl (abgewehrt)" or "erfolgreich"))
-	if defended then reward(b, "train", "Wrestling", 2) else reward(a, "train", "Wrestling", 2) end
+	if defended then reward(b, "train", "Wrestling", 2); focusGain(b, "sprawl") else reward(a, "train", "Wrestling", 2); focusGain(a, "takedown") end
 	local ta = playPair(a, b, pair, false)
 	hitFX(a.char, 0.25, "land"); hitFX(b.char, defended and 0.2 or 0.6, defended and "block" or "hit")
 	ta.Stopped:Wait()
@@ -1197,6 +1225,92 @@ resetEvent.OnInvoke = function(char, cf, health)
 	return true
 end
 
+-- Ausgeruestete Signatur: Attribut CC_Signature am Spieler (CC_Profile) oder Test-Attribut am Workspace (nur Studio-Tests)
+local function equippedSig(f)
+	local p = game.Players:GetPlayerFromCharacter(f.char)
+	if not p then return nil end
+	local id = workspace:GetAttribute(SIG.TEST_ATTR) or p:GetAttribute("CC_Signature")
+	return id and SIG.list[id] and id or nil
+end
+local function sigTrackFor(f, def)
+	f.sigTracks = f.sigTracks or {}
+	if f.sigTracks[def.anim] == nil then
+		local ok, tr = pcall(function()
+			local a = Instance.new("Animation")
+			a.AnimationId = ANIM_IDS[def.anim] and ("rbxassetid://" .. tostring(ANIM_IDS[def.anim])) or KSP:RegisterKeyframeSequence(A[def.anim])
+			return f.hum.Animator:LoadAnimation(a)
+		end)
+		f.sigTracks[def.anim] = ok and tr or false
+		if ok then tr.Priority = Enum.AnimationPriority.Action else warn("[CC] Signatur-Animation fehlt: " .. def.anim) end
+	end
+	return f.sigTracks[def.anim] or nil
+end
+-- Signatur: echte Attacke mit eigenen Trefferfenstern; Server prueft Ausruestung, Fokus, Ausdauer, Kampfzustand und Reichweite.
+local function signature(f)
+	local id = equippedSig(f); if not id then return end
+	local def = SIG.list[id]
+	local function fail(why) f.char:SetAttribute("CC_SigDenied", why .. "|" .. workspace:GetServerTimeNow()) end
+	if f.ko or f.blocking or f.wr or f.down or frozen(f) or f.sigActive then return end
+	local ms = RS:FindFirstChild("CC_MatchState")
+	if not f.char:GetAttribute("CC_Opponent") or not ms or ms:GetAttribute("Mode") == "tutorial" or ms:GetAttribute("State") ~= "fight" then return end
+	if os.clock() < f.busyUntil then return end
+	if (f.focus or 0) < SIG.FOCUS_MAX then fail("focus") return end
+	if f.stamina < def.stamina then f.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); fail("stamina") return end
+	local opp = opponentOf(f)
+	if not opp or opp.ko or opp.wr or opp.down then fail("position") return end
+	local d = (opp.char.HumanoidRootPart.Position - f.char.HumanoidRootPart.Position) * Vector3.new(1, 0, 1)
+	if d.Magnitude > def.range then f.char:SetAttribute("CC_OutOfRange", workspace:GetServerTimeNow()); fail("range") return end
+	if f.char.HumanoidRootPart.CFrame.LookVector:Dot(d.Unit) < 0.5 then fail("position") return end
+	local track = sigTrackFor(f, def); if not track then fail("anim") return end
+	-- Versuch: ganzer Fokus und Ausdauer werden verbraucht (auch wenn er verfehlt, geblockt oder unterbrochen wird)
+	f.focus = 0; f.char:SetAttribute("CC_Focus", 0)
+	if workspace:GetAttribute(SIG.TEST_ATTR) then task.delay(def.length + 0.3, function() f.focus = SIG.FOCUS_MAX; f.char:SetAttribute("CC_Focus", f.focus) end) end
+	spend(f, def.stamina)
+	for k in pairs(MOVES) do local tr = f.tracks[k]; if tr.IsPlaying then tr:Stop(0.06) end end
+	f.attackToken = (f.attackToken or 0) + 1
+	local token = f.attackToken
+	local speed = 1
+	f.animSpeed = speed; f.sigActive = true; f.sigTrack = track
+	f.busyUntil = os.clock() + def.lock
+	track:Play(0.05, 1, speed)
+	local start = workspace:GetServerTimeNow()
+	sigFX:FireAllClients("start", f.char, id, start)
+	print(("[CC] %s Signatur %s"):format(f.char.Name, id))
+	local t0 = os.clock()
+	for i, h in ipairs(def.hits) do
+		local base = MOVES[h.move]
+		local m = { win = h.win, limb = h.limb, zone = h.zone, damage = base.damage * h.scale, react = h.react, ko = h.ko,
+			heavy = true, bodyShot = h.bodyShot, noRewind = true }
+		local done = false
+		local conn
+		conn = RunService.Heartbeat:Connect(function()
+			local t = track.IsPlaying and track.TimePosition or math.huge     -- Trefferfenster in Animationszeit (Hitstop verschiebt nichts)
+			if done or f.ko or not f.char.Parent or f.attackToken ~= token or t > h.win[2] then
+				conn:Disconnect()
+				if not done and f.attackToken == token and not f.ko then sigFX:FireAllClients("miss", f.char, i) end
+				return
+			end
+			if t < h.win[1] then return end
+			local fist = bonePos(f.char, h.limb, LIMB_OFFSET[h.limb])
+			if not fist or opp.ko or opp.wr or opp.down then return end
+			local z = ZONES[h.zone]
+			local zp = bonePos(opp.char, z.bone, z.along)
+			if zp and (fist - zp).Magnitude <= z.radius then
+				done = true; conn:Disconnect()
+				local blocked = opp.blocking
+				land(f, opp, "sig_" .. id .. "_" .. i, m, track)
+				sigFX:FireAllClients(blocked and "block" or "hit", f.char, i, opp.char)
+				if opp.ko and not blocked and ms then
+					-- Finisher: Ergebnis steht (K.o. durch Signatur, vom Server bestaetigt); CC_Match zeigt danach die Wiederholung
+					ms:SetAttribute("Finisher", game:GetService("HttpService"):JSONEncode({ attacker = f.char.Name, target = opp.char.Name,
+						sig = id, start = start, impact = workspace:GetServerTimeNow() }))
+				end
+			end
+		end)
+	end
+	task.delay(def.length, function() if f.sigTrack == track and f.attackToken == token then f.sigActive = false end end)
+end
+
 RS.CC_Action.OnServerEvent:Connect(function(player, move)
 	local f = player.Character and fighters[player.Character]
 	if not (f and type(move) == "string") then return end
@@ -1220,10 +1334,12 @@ RS.CC_Action.OnServerEvent:Connect(function(player, move)
 			if move == "jab" then task.spawn(groundPunch, f) elseif move == "takedown" then task.spawn(groundAdvance, f) elseif move == "hook" then task.spawn(groundSubmit, f) end
 		end
 	elseif move == "takedown" then tryTakedown(f)
+	elseif move == "signature" then signature(f)
 	else attack(f, move) end
 end)
 RS.CC_Block.OnServerEvent:Connect(function(player, on)
 	local f = player.Character and fighters[player.Character]
+	if f and on and f.sigActive then return end                         -- Signatur laeuft als Ganzes (oder wird durch Treffer unterbrochen)
 	if f and on and not f.char:GetAttribute("CC_Opponent") then return end
 	if f and f.down then                                              -- Block am Boden: enge Deckung (Rueckenlage) und weniger Schaden
 		f.downBlock = on == true
@@ -1304,7 +1420,7 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 	if dummy:GetAttribute("CC_ForceTD") then dummy:SetAttribute("CC_ForceTD", nil); task.spawn(tryTakedown, D) return end -- Test: Takedown sofort
 	if dummy:GetAttribute("CC_Passive") or frozen(D) then
-		setBlock(D, false); D.hum:Move(Vector3.zero)
+		setBlock(D, dummy:GetAttribute("CC_ForceBlock") == true and not frozen(D)); D.hum:Move(Vector3.zero)   -- CC_ForceBlock: Test (Dauerblock)
 		-- Tutorial (CC_Tutor am Gegner, von CC_Tutorial gesetzt): langsam angekuendigte Einzelaktionen statt normaler KI.
 		--   "strike" = Jab, "td"/"ground" = Takedown. Ankuendigung 1,0 s vorher als Attribut CC_Telegraph ("strike|zeit" / "td|zeit"), dann 3 s Pause.
 		local tutor = not frozen(D) and dummy:GetAttribute("CC_Tutor")
