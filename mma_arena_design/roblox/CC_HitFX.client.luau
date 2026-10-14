@@ -55,6 +55,9 @@ local function watch(char)
 		if txt then show(txt, Color3.fromRGB(220, 220, 225), 1, 0.8) end
 	end)
 end
+player:GetAttributeChangedSignal("CC_SigLearned"):Connect(function()   -- Uebung beim Trainer bestanden
+	show("SIGNATUR FREIGESCHALTET!", Color3.fromRGB(255, 200, 80), 4, 2.0)
+end)
 if player.Character then watch(player.Character) end
 player.CharacterAdded:Connect(watch)
 

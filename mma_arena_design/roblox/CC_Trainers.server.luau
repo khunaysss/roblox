@@ -1,8 +1,10 @@
 -- ServerScriptService.CC_Trainers
 -- Stellt die sechs Stil-Trainer (ServerStorage.CC_StyleTrainers aus setup_trainers_v01) an die Ostseite des Gyms (neben dem Kaefig).
 -- Mit E ansprechen: Panel mit Kampfstil und Signatur (CC_TrainerPanel am Client). Ist die Signatur fertig (CC_Signatures.list),
--- kann sie ausgeruestet werden (Spieler-Attribut CC_Signature). VORLAEUFIG: Freischaltung mit Vorfuehrung/Uebung und Speichern im
--- Profil fehlen noch (siehe GAME_DESIGN.md, Signatur-Ultimates).
+-- wird sie so freigeschaltet: "Lernen" startet die Uebung (Attribut CC_SigTrial, nur im Trainingskampf nutzbar). Landet der Spieler die
+-- Kombination dort einmal sauber, schaltet CC_CharacterAnimations sie im Profil frei (CC_Profile "sig_unlock", wird gespeichert).
+-- Freigeschaltete Signaturen hier ausruesten/ablegen (CC_Profile "sig_equip"). VORLAEUFIG: Vorfuehrung durch den Trainer fehlt
+-- (Trainer-Modelle sind starr); Ranked-Regel folgt mit dem Ranked-Modus.
 local RS, SS = game:GetService("ReplicatedStorage"), game:GetService("ServerStorage")
 local SIG = require(RS:WaitForChild("CC_Signatures"))
 
@@ -47,17 +49,19 @@ local function place()
 				if not c or c:GetAttribute("CC_Opponent") or p:GetAttribute("CC_Minigame") then return end
 				local def = t.sig and SIG.list[t.sig]
 				panel:FireClient(p, "open", { id = t.id, name = t.name, style = t.style, move = t.move, sig = def and t.sig or nil,
-					sigName = def and def.name or nil, equipped = p:GetAttribute("CC_Signature") })
+					sigName = def and def.name or nil })
 			end)
 		end
 	end
 end
 panel.OnServerEvent:Connect(function(p, action, sig)
-	if action == "equip" and type(sig) == "string" and SIG.list[sig] then
-		p:SetAttribute("CC_Signature", sig)
-	elseif action == "unequip" then
-		p:SetAttribute("CC_Signature", nil)
-	end
+	local pe = SS:FindFirstChild("CC_ProfileEvent")
+	if type(sig) ~= "string" or not SIG.list[sig] or not pe then return end
+	local unlocked = table.find(string.split(p:GetAttribute("CC_SigUnlocked") or "", ","), sig) ~= nil
+	if action == "equip" and unlocked then pe:Fire(p, "sig_equip", sig)
+	elseif action == "unequip" then pe:Fire(p, "sig_equip", "")
+	elseif action == "learn" and not unlocked then p:SetAttribute("CC_SigTrial", sig)
+	elseif action == "stoplearn" then p:SetAttribute("CC_SigTrial", nil) end
 end)
 task.spawn(function() task.wait(2); place() end)
 SS.ChildAdded:Connect(function(c) if c.Name == "CC_StyleTrainers" then place() end end)

@@ -80,3 +80,5 @@ Stand: 2026-10-10 (Roblox-Importtest v01 bestanden, siehe `ROBLOX_IMPORT_TEST_V0
 - [ ] Trainer-Vorstellung, Übung, Freischaltung, Kämpfermenü-Auswahl
 - [ ] Ali, Pereira, Khabib, Saenchai; Oliveira wartet auf Clinch-System
 - [x] Sechs Stil-Trainer importiert (setup_trainers_v01 → ServerStorage.CC_StyleTrainers), im Gym an der Ostseite (CC_Trainers), mit E: Panel, Tyson-Signatur ausrüstbar (getestet). Noch nicht im Profil gespeichert; Vorführung/Übung fehlt
+- [x] Signatur-Freischaltung: Trainer → „Lernen“ → im Trainingskampf Kombination einmal landen → freigeschaltet und ausgerüstet, im Profil gespeichert (sig, sigs). Getestet mit Testprofil inkl. Neustart
+- [ ] Vorführung durch den Trainer (Modelle starr), Ranked-Regel, weitere Signaturen

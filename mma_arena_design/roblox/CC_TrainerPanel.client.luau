@@ -18,6 +18,7 @@ local title = label(16, 26, Enum.Font.GothamBlack, Color3.new(1, 1, 1))
 local style = label(50, 16, Enum.Font.GothamMedium, Color3.fromRGB(170, 175, 190))
 local sigL = label(84, 18, Enum.Font.GothamBold, Color3.fromRGB(255, 200, 80))
 local move = label(110, 16, Enum.Font.Gotham, Color3.fromRGB(220, 220, 225))
+move.Size = UDim2.new(1, -40, 0, 58); move.TextYAlignment = Enum.TextYAlignment.Top
 local function button(x, text, color)
 	local b = Instance.new("TextButton"); b.Position = UDim2.fromOffset(x, 172); b.Size = UDim2.fromOffset(180, 40)
 	b.BackgroundColor3 = color; b.BorderSizePixel = 0; b.Font = Enum.Font.GothamBold; b.TextSize = 16; b.TextColor3 = Color3.new(1, 1, 1)
@@ -31,9 +32,18 @@ local cur
 local function refresh()
 	if not cur then return end
 	local eq = player:GetAttribute("CC_Signature")
+	local unlocked = table.find(string.split(player:GetAttribute("CC_SigUnlocked") or "", ","), cur.sig or "") ~= nil
+	local trial = player:GetAttribute("CC_SigTrial") == cur.sig
 	if cur.sig then
 		act.Visible = true
-		act.Text = eq == cur.sig and "Ablegen" or "Ausrüsten (G)"
+		if unlocked then
+			act.Text = eq == cur.sig and "Ablegen" or "Ausrüsten (G)"
+			move.Text = cur.move
+		else
+			act.Text = trial and "Übung abbrechen" or "Lernen"
+			move.Text = cur.move .. (trial and "\nÜBUNG: Trainingskampf starten und die Kombination einmal landen (G bei vollem Fokus)."
+				or "\nNoch nicht freigeschaltet.")
+		end
 		sigL.Text = "Signatur: " .. cur.sigName .. (eq == cur.sig and "  ✓" or "")
 	else
 		act.Visible = false
@@ -48,7 +58,12 @@ ev.OnClientEvent:Connect(function(kind, data)
 end)
 act.Activated:Connect(function()
 	if not cur or not cur.sig then return end
-	ev:FireServer(player:GetAttribute("CC_Signature") == cur.sig and "unequip" or "equip", cur.sig)
+	local unlocked = table.find(string.split(player:GetAttribute("CC_SigUnlocked") or "", ","), cur.sig) ~= nil
+	if unlocked then ev:FireServer(player:GetAttribute("CC_Signature") == cur.sig and "unequip" or "equip", cur.sig)
+	else ev:FireServer(player:GetAttribute("CC_SigTrial") == cur.sig and "stoplearn" or "learn", cur.sig) end
 end)
 close.Activated:Connect(function() gui.Enabled = false; cur = nil end)
-player:GetAttributeChangedSignal("CC_Signature"):Connect(refresh)
+for _, a in ipairs({ "CC_Signature", "CC_SigUnlocked", "CC_SigTrial" }) do player:GetAttributeChangedSignal(a):Connect(refresh) end
+-- Kampfbeginn schliesst das Panel
+local ms = RS:WaitForChild("CC_MatchState")
+ms:GetAttributeChangedSignal("State"):Connect(function() if ms:GetAttribute("State") ~= "idle" then gui.Enabled = false; cur = nil end end)

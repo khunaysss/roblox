@@ -31,6 +31,7 @@ do
 	if not ok then warn("[CC] Profil: kein DataStore (" .. tostring(s) .. ") – Fortschritt nur fuer diese Sitzung") end
 end
 
+local SIG = require(game:GetService("ReplicatedStorage"):WaitForChild("CC_Signatures"))
 local event = SS:FindFirstChild("CC_ProfileEvent") or Instance.new("BindableEvent")
 event.Name = "CC_ProfileEvent"; event.Parent = SS
 
@@ -38,7 +39,8 @@ local profiles = {}            -- [player] = Tabelle
 local function default()
 	local p = { v = 1, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
 		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 },
-		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false } }
+		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false },
+		sig = "", sigs = {} }                     -- Signaturen: ausgeruestet (Schluessel aus CC_Signatures.list oder "") und freigeschaltet (Liste)
 	for _, s in ipairs(STATS) do p.stats[s] = 0; p.tp[s] = 0 end
 	return p
 end
@@ -51,6 +53,8 @@ local function publish(plr)
 	for _, s in ipairs(STATS) do plr:SetAttribute("CC_" .. s, p.stats[s]); plr:SetAttribute("CC_" .. s .. "TP", p.tp[s]) end
 	plr:SetAttribute("CC_Look", game:GetService("HttpService"):JSONEncode(p.look))
 	plr:SetAttribute("CC_Onb", game:GetService("HttpService"):JSONEncode(p.onb))
+	plr:SetAttribute("CC_Signature", p.sig ~= "" and p.sig or nil)
+	plr:SetAttribute("CC_SigUnlocked", table.concat(p.sigs, ","))
 end
 
 local function addXP(plr, n)
@@ -98,13 +102,15 @@ local function load(plr)
 	end
 	local p = default()
 	if type(data) == "table" then
-		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and k ~= "look" and k ~= "onb" and p[k] ~= nil then p[k] = v end end
+		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and k ~= "look" and k ~= "onb" and k ~= "sigs" and k ~= "sig" and p[k] ~= nil then p[k] = v end end
 		if type(data.onb) == "table" then
 			for k, v in pairs(data.onb) do if k ~= "lessons" and type(p.onb[k]) == "boolean" and type(v) == "boolean" then p.onb[k] = v end end
 			if type(data.onb.lessons) == "table" then for i = 1, 6 do p.onb.lessons[i] = data.onb.lessons[i] == true end end
 		else
 			p.onb.editor = true; p.onb.offered = true; p.onb.firstFight = true   -- bekannter Spieler aus der Zeit vor dem Einstieg
 		end
+		if type(data.sigs) == "table" then for _, id in ipairs(data.sigs) do if SIG.list[id] and not table.find(p.sigs, id) then table.insert(p.sigs, id) end end end
+		if type(data.sig) == "string" and table.find(p.sigs, data.sig) then p.sig = data.sig end
 		if type(data.look) == "table" then for k, v in pairs(data.look) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end end
 		for _, s in ipairs(STATS) do
 			if type(data.stats) == "table" and tonumber(data.stats[s]) then p.stats[s] = math.clamp(math.floor(data.stats[s]), 0, STAT_MAX) end
@@ -125,7 +131,8 @@ local function save(plr)
 	p.saving = true; p.dirty = false
 	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs,
 		stats = table.clone(p.stats), tp = table.clone(p.tp), look = table.clone(p.look),
-		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight } }
+		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight },
+		sig = p.sig, sigs = table.clone(p.sigs) }
 	local ok, err
 	for i = 1, 3 do
 		ok, err = pcall(function() store:UpdateAsync(keyOf(plr), function() return copy end) end)
@@ -163,6 +170,13 @@ event.Event:Connect(function(plr, kind, a, b)
 		else return end
 		p.dirty = true; publish(plr)
 		saveSoon(plr)
+	elseif kind == "sig_unlock" and SIG.list[a] then             -- Signatur freischalten (nach bestandener Uebung, CC_CharacterAnimations)
+		local p = profiles[plr]
+		if not table.find(p.sigs, a) then table.insert(p.sigs, a) end
+		p.sig = a; p.dirty = true; publish(plr); saveSoon(plr)
+	elseif kind == "sig_equip" then                                -- a = Schluessel oder "" (ablegen); nur Freigeschaltetes
+		local p = profiles[plr]
+		if a == "" or (SIG.list[a] and table.find(p.sigs, a)) then p.sig = a; p.dirty = true; publish(plr); saveSoon(plr) end
 	elseif kind == "result" then
 		local p = profiles[plr]
 		if a == "win" then

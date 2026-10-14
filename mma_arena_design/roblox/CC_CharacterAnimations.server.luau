@@ -1229,7 +1229,12 @@ end
 local function equippedSig(f)
 	local p = game.Players:GetPlayerFromCharacter(f.char)
 	if not p then return nil end
-	local id = workspace:GetAttribute(SIG.TEST_ATTR) or p:GetAttribute("CC_Signature")
+	local trial = p:GetAttribute("CC_SigTrial")
+	local id = workspace:GetAttribute(SIG.TEST_ATTR) or trial or p:GetAttribute("CC_Signature")
+	if trial and id == trial then                                   -- Uebung beim Trainer: nur im Trainingskampf
+		local ms = RS:FindFirstChild("CC_MatchState")
+		if not ms or ms:GetAttribute("Mode") ~= "training" then return nil end
+	end
 	return id and SIG.list[id] and id or nil
 end
 local function sigTrackFor(f, def)
@@ -1300,6 +1305,13 @@ local function signature(f)
 				local blocked = opp.blocking
 				land(f, opp, "sig_" .. id .. "_" .. i, m, track)
 				sigFX:FireAllClients(blocked and "block" or "hit", f.char, i, opp.char)
+				local pl = game.Players:GetPlayerFromCharacter(f.char)
+				if pl and not blocked and i == #def.hits and pl:GetAttribute("CC_SigTrial") == id then
+					-- Uebung bestanden: letzter Schlag der Kombination sauber gelandet -> freischalten (Profil) und Uebung beenden
+					pl:SetAttribute("CC_SigTrial", nil)
+					local pe = game.ServerStorage:FindFirstChild("CC_ProfileEvent"); if pe then pe:Fire(pl, "sig_unlock", id) end
+					pl:SetAttribute("CC_SigLearned", id .. "|" .. workspace:GetServerTimeNow())
+				end
 				if opp.ko and not blocked and ms then
 					-- Finisher: Ergebnis steht (K.o. durch Signatur, vom Server bestaetigt); CC_Match zeigt danach die Wiederholung
 					ms:SetAttribute("Finisher", game:GetService("HttpService"):JSONEncode({ attacker = f.char.Name, target = opp.char.Name,

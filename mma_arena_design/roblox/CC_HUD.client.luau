@@ -61,7 +61,7 @@ focusF.BackgroundColor3 = Color3.fromRGB(25, 25, 28); focusF.BorderSizePixel = 0
 local focusFill = Instance.new("Frame"); focusFill.Size = UDim2.fromScale(0, 1); focusFill.BorderSizePixel = 0; focusFill.BackgroundColor3 = Color3.fromRGB(150, 20, 28); focusFill.Parent = focusF
 local focusL = Instance.new("TextLabel"); focusL.BackgroundTransparency = 1; focusL.Size = UDim2.fromScale(1, 1); focusL.ZIndex = 2; focusL.Font = Enum.Font.GothamBold
 focusL.TextSize = 10; focusL.TextColor3 = Color3.new(1, 1, 1); focusL.TextStrokeTransparency = 0.4; focusL.Text = "FOKUS"; focusL.Parent = focusF
-local function sigEquipped() local id = workspace:GetAttribute(SIGCFG.TEST_ATTR) or player:GetAttribute("CC_Signature"); return id and SIGCFG.list[id] end
+local function sigEquipped() local id = workspace:GetAttribute(SIGCFG.TEST_ATTR) or player:GetAttribute("CC_SigTrial") or player:GetAttribute("CC_Signature"); return id and SIGCFG.list[id] end
 
 local ko = Instance.new("TextLabel")
 ko.AnchorPoint = Vector2.new(0.5, 0.5)
