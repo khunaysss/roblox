@@ -1,0 +1,39 @@
+{
+ "Fighter_Idle_Bounce": {
+  "frame": 1,
+  "glove_L_center_to_hand_m": 0.215
+ },
+ "Fighter_CasualRun_v3": {
+  "frame": 6,
+  "glove_L_center_to_hand_m": 0.071
+ },
+ "Fighter_MoveF": {
+  "frame": 6,
+  "glove_L_center_to_hand_m": 0.202
+ },
+ "Fighter_Jab_v3": {
+  "frame": 6,
+  "glove_L_center_to_hand_m": 0.125
+ },
+ "Fighter_Hook_v3": {
+  "frame": 8,
+  "glove_L_center_to_hand_m": 0.058
+ },
+ "Fighter_BodyKick_v3": {
+  "frame": 10,
+  "glove_L_center_to_hand_m": 0.071
+ },
+ "Fighter_LowKick_v5": {
+  "frame": 10,
+  "glove_L_center_to_hand_m": 0.071
+ },
+ "Fighter_Sig_Tyson": {
+  "frame": 17,
+  "glove_L_center_to_hand_m": 0.085
+ },
+ "tris": {
+  "CC_Shorts_Classic": 1928,
+  "CC_Gloves_A": 1336
+ },
+ "weights_same_as_original": true
+}
