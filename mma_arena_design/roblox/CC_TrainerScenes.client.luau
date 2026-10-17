@@ -59,9 +59,18 @@ local function play(kind, id, model, info)
 	local pg = player:WaitForChild("PlayerGui")
 	local restoreOn = {}                                   -- Oberflaechen, die nach der Szene wieder an sein sollen
 	local gui, title, sub = makeGui(def, info)
+	-- Wiederherstellen: was beim Start an war, dazu das Trainer-Panel (oeffnet beim Ansprechen gleichzeitig mit der Begruessung).
+	-- Andere Oberflaechen, die erst waehrend der Szene angehen (z. B. Reaktion auf das versteckte Menue), bleiben danach aus.
+	local LATE_OK = { CC_TrainerPanel = true }
+	local startOn = {}
+	for _, g in ipairs(pg:GetChildren()) do if g:IsA("ScreenGui") and g.Enabled then startOn[g] = true end end
+	local lateOn = {}
 	local function hideOthers()
 		for _, g in ipairs(pg:GetChildren()) do
-			if g:IsA("ScreenGui") and g ~= gui and g.Enabled then restoreOn[g] = true; g.Enabled = false end
+			if g:IsA("ScreenGui") and g ~= gui and g.Enabled then
+				if startOn[g] or LATE_OK[g.Name] then restoreOn[g] = true else lateOn[g] = true end
+				g.Enabled = false
+			end
 		end
 	end
 	hideOthers()
@@ -97,6 +106,7 @@ local function play(kind, id, model, info)
 		if saved.subject then cam.CameraSubject = saved.subject end
 		if saved.type == Enum.CameraType.Scriptable then cam.CFrame = saved.cf end
 		for g in pairs(restoreOn) do if g.Parent then g.Enabled = true end end
+		for g in pairs(lateOn) do if g.Parent and not restoreOn[g] then g.Enabled = false end end   -- nicht vom Start: aus lassen
 		player:SetAttribute("CC_UIBlock", nil)
 		if controls then pcall(function() controls:Enable() end) end
 		if running == state then running = nil end

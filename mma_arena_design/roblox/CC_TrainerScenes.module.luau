@@ -71,7 +71,7 @@ local function trainer(o)
 			shots = { c.challenge1, { t = 2.2, from = V(-1.5, h + 0.3, -4.4), to = V(-1.2, h + 0.25, -3.9), look = V(0, h, -0.3), fov = 36 } },
 			title = o.name, sub = "FORDERT DICH HERAUS", titleAt = 1.6 },
 		unlock = { length = 5.0, anims = { { at = 0.4, name = o.prefix .. "_Respect" } },
-			shots = { { t = 2.4, from = V(-5.0, 3.4, -5.0), to = V(-3.2, 3.8, -6.4), look = V(0, h - 0.8, -2.2), fov = 50 },
+			shots = { { t = 2.4, from = V(-6.8, 3.6, -7.4), to = V(-4.6, 4.0, -8.8), look = V(0, h - 0.8, -2.4), fov = 46 },
 				{ t = 2.6, from = V(-7.0, h - 0.4, -2.4), to = V(-6.2, h - 0.4, -2.3), look = V(0, h - 0.8, -2.3), fov = 50 } },
 			title = "SIGNATUR FREIGESCHALTET", sub = o.sigName .. " · Taste G", titleAt = 2.4 },
 	}
@@ -100,7 +100,7 @@ S.list.Khabib_Nurmagomedov = trainer({   -- Khabib: Ringer. Kamera tief am Boden
 S.list.Saenchai = trainer({   -- Saenchai: verspielt, leicht. Kamera seitlich, gleitend.
 	name = "SAENCHAI", style = "MUAY THAI", prefix = "Trainer_Saenchai", h = 5.9,
 	demo = "Fighter_FrontKick_v3", slow = { 0.15, 0.45, 0.35 }, sigName = "FINTEN-TEEP", sigSub = "Teep mit Finte",
-	cam = { greet1 = { t = 2.2, from = V(6.5, 3.6, -1.0), to = V(5.0, 3.8, -4.0), look = V(0, 4.6, -0.5), fov = 46 },
+	cam = { greet1 = { t = 2.2, from = V(8.5, 3.8, -2.0), to = V(6.5, 4.0, -6.0), look = V(0, 4.4, -0.5), fov = 46 },
 		demo1 = { t = 1.6, from = V(6.8, 3.4, -2.6), to = V(6.4, 3.4, -2.4), look = V(0, 3.8, -1.8), fov = 46 },
 		challenge1 = { t = 1.6, from = V(5.5, 4.0, -6.0), to = V(3.0, 4.4, -7.5), look = V(0, 5.0, 0), fov = 44 } },
 })

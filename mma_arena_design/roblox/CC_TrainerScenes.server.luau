@@ -138,14 +138,17 @@ local function hookPlayer(p)
 		known = now
 	end)
 end
--- Vorschau (nur Studio): workspace-Attribut CC_ScenePreview = "Mike_Tyson" -> nach dem Start alle vier Szenen nacheinander
+-- Vorschau (nur Studio): workspace-Attribut CC_ScenePreview = "Mike_Tyson" (ein Trainer) oder "ALLE" -> nach dem Start alle vier Szenen nacheinander
 -- (greet, demo, challenge ohne Kampf, unlock). Im echten Spiel wirkungslos.
 local function preview(p)
 	local id = workspace:GetAttribute("CC_ScenePreview")
 	if not game:GetService("RunService"):IsStudio() or type(id) ~= "string" then return end
 	if not p.Character then p.CharacterAdded:Wait() end
 	task.wait(8)                                       -- Trainer werden erst nach dem Start ins Gym gestellt
-	if not trainerModel(id) then warn("[CC] Szenen-Vorschau: Trainer " .. id .. " nicht im Gym") return end
+	local ids = id == "ALLE" and { "Mike_Tyson", "Muhammad_Ali", "Alex_Pereira", "Khabib_Nurmagomedov", "Saenchai", "Charles_Oliveira" } or { id }
+	for _, tid in ipairs(ids) do
+	id = tid
+	if not trainerModel(id) then warn("[CC] Szenen-Vorschau: Trainer " .. id .. " nicht im Gym") continue end
 	for _, kind in ipairs({ "greet", "demo", "challenge", "unlock" }) do
 		if not p.Parent then return end
 		local model = trainerModel(id); local r = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
@@ -155,6 +158,7 @@ local function preview(p)
 		end
 		local len = play(p, id, kind)
 		task.wait((len or 0) + 1.2)
+	end
 	end
 end
 Players.PlayerAdded:Connect(function(p) task.spawn(preview, p) end)

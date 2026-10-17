@@ -95,8 +95,8 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Gym: Bank/Matten ohne eigene Animation.
 - Event-Map: 168 358 Dreiecke, keine Kollision (M1). Maßstabsdatei verweist auf alten Fighter (M2).
 - Einstellungen-Menü fehlt; Schalter „Effekte reduzieren“ (`CC_ReduceFX`) ist nur vorbereitet.
-- Animierbar ist bisher nur Tyson; die anderen 5 Trainer brauchen Export + Import + eigene Animationen/Szenen.
-- Upload nötig für online: Trainer_Tyson_Idle/Greet/Respect, Fighter_Sig_Tyson, Fighter_Sig_Ali (ohne Upload nur in Studio sichtbar).
+- Saenchai wurde mit falscher Einheit importiert (182 Studs) und per ScaleTo auf 6,5 Studs gebracht; Haltung geprüft und korrekt. Roblox skaliert dadurch Hüft-Verschiebungen seiner Animationen mit (Faktor 0,036) – sauberer wäre ein Neuimport (Centimeter, Faktor 1).
+- Upload nötig für online: alle Trainer_*-Animationen (18), Fighter_Sig_Tyson, Fighter_Sig_Ali (ohne Upload nur in Studio sichtbar).
 - Im Test kamen Schläge über CC_Action im Kampf nicht beim Server an (keine Treffer, keine Meldung) – Codex hat den Angriffsweg evtl. geändert; mit echter Tastatur prüfen.
 - Tysons Platz (Boxbereich, 100/16) liegt eng an Säule und Sack: Kamerawinkel mussten angepasst werden.
 - Trainer-Endkampf: Champion-Tyson ist sehr stark (im Test 196:10 Schaden gegen mich); Balance noch nicht geprüft. Kein Walkout/Intro beim Trainer-Endkampf (startet direkt).
