@@ -14,7 +14,7 @@ local INFO = {   -- Reihenfolge = feste Zonen im Gym; sig = Schluessel in CC_Sig
 	{ id = "Alex_Pereira", name = "Alex Pereira", style = "Kickboxen", sig = "pereira", move = "Linker Konterhaken" },
 	{ id = "Khabib_Nurmagomedov", name = "Khabib Nurmagomedov", style = "Ringen", sig = "khabib", move = "Eagle Slam: hochheben, tragen, slammen" },
 	{ id = "Saenchai", name = "Saenchai", style = "Muay Thai", sig = "saenchai", move = "Rad-Kick: Cartwheel Kick zum Kopf" },
-	{ id = "Charles_Oliveira", name = "Charles Oliveira", style = "Muay Thai / BJJ", sig = "oliveira", move = "Harter Koerperkick" },
+	{ id = "Charles_Oliveira", name = "Charles Oliveira", style = "Muay Thai / BJJ", sig = "oliveira", move = "Bronx Choke: auf den Ruecken springen und wuergen" },
 }
 local POSITIONS = { -- Lobby V10: Trainer bleiben an freien Wegen und nahe ihren Trainingsbereichen
 	{ pos = Vector3.new(100, 0, 16), look = Vector3.new(91, 0, 12) },   -- Tyson: Boxsäcke

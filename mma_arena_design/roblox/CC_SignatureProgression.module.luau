@@ -69,7 +69,7 @@ M.list = {
 		},
 	},
 	oliveira = {
-		trainerId = "Charles_Oliveira", trainerName = "Charles Oliveira", signatureName = "CHUTE BOXE KICK",
+		trainerId = "Charles_Oliveira", trainerName = "Charles Oliveira", signatureName = "BRONX CHOKE",
 		requirements = {
 			{ key = "groundHits", target = 20, label = "20 Bodentreffer landen" },
 			{ key = "subs", target = 2, label = "2 Kaempfe per Submission gewinnen" },

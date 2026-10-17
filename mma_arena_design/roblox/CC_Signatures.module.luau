@@ -70,11 +70,12 @@ S.list = {
 		trails = { { t = { 0.36, 0.70 }, bone = "RightFoot" }, { t = { 0.30, 0.70 }, bone = "LeftFoot" } },
 	},
 	oliveira = {
-		name = "CHUTE BOXE KICK", short = "Harter Koerperkick mit Finish-Druck", trainer = "Charles_Oliveira",
-		anim = "Fighter_Sig_Oliveira", length = 1.28, lock = 1.28, stamina = 21, range = 5.5,
-		color = Color3.fromRGB(220, 190, 85),
-		hits = { { win = { 0.47, 0.65 }, limb = "RightLowerLeg", zone = "body", move = "bodykick", scale = 1.35, react = "hitBody", ko = "koFwd", impact = 1.3, bodyShot = true } },
-		trails = { { t = { 0.40, 0.65 }, bone = "RightLowerLeg" } },
+		-- Ruecken nehmen + Rear Naked Choke (Paar Sig_BackTake, Ground_Positions_v02): unblockbar (Block/Sprawl helfen nicht),
+		-- danach sofort das Wuerge-Duell mit Vorsprung (subStart) und staerkerem Zug (subPower). Befreien bleibt moeglich.
+		name = "BRONX CHOKE", short = "Auf den Ruecken springen und wuergen (unblockbar)", trainer = "Charles_Oliveira",
+		special = "backtake", stamina = 24, range = 4.8, length = 48 / 24, lock = 48 / 24,
+		subStart = 0.50, subPower = 1.25, subTime = 4.5,
+		color = Color3.fromRGB(220, 190, 85), hits = {}, trails = {},
 	},
 }
 S.ORDER = { "tyson", "ali", "pereira", "khabib", "saenchai", "oliveira" }

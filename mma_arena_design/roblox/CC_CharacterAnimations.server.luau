@@ -865,7 +865,7 @@ local WR_GAP = 1.5 / 0.28
 local WR = {}
 for _, pair in ipairs({ "TD_DoubleLeg_Success", "TD_DoubleLeg_Defended", "Ground_Guard_Idle", "Ground_Guard_Punch", "Ground_Guard_Escape", "Ground_GetUp",
 	"Ground_Pass_Half", "Ground_HalfGuard_Idle", "Ground_Pass_Side", "Ground_Side_Idle", "Ground_Side_To_Mount", "Ground_Mount_Idle",
-	"Ground_Mount_Punch", "Ground_Mount_To_Back", "Ground_Back_Idle", "Sub_RNC", "Sub_Armbar", "TD_LiftSlam" }) do  -- TD_LiftSlam: Khabib-Signatur (Wrestling_Prototype_v04)  -- zweite/dritte Zeile: Ground_Positions_v01 (E)
+	"Ground_Mount_Punch", "Ground_Mount_To_Back", "Ground_Back_Idle", "Sub_RNC", "Sub_Armbar", "TD_LiftSlam", "Sig_BackTake" }) do  -- Sig_BackTake: Oliveira-Signatur (Ground_Positions_v02)  -- TD_LiftSlam: Khabib-Signatur (Wrestling_Prototype_v04)  -- zweite/dritte Zeile: Ground_Positions_v01 (E)
 	for _, s in ipairs({ "A", "B" }) do
 		local name = "WR_" .. pair .. "_" .. s
 		local data = require(A[name .. "_Data"])
@@ -1180,13 +1180,14 @@ function groundPunch(top)
 	end
 end
 
-function groundSubmit(top)
+function groundSubmit(top, opts)   -- opts (Signatur, z. B. Oliveira): start = Startfortschritt, power = Zug oben, time = Duell-Dauer, free = ohne Ausdauer
 	local w = top.wr
+	opts = opts or {}
 	if not w or w.role ~= "top" or w.state ~= "guard" or top.ko then return end
 	local sub = SUBS[w.pos]; if not sub then return end
-	if top.stamina < SUB_COST then top.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
+	if not opts.free and top.stamina < SUB_COST then top.char:SetAttribute("CC_Tired", workspace:GetServerTimeNow()); return end
 	local bottom = w.partner
-	spend(top, SUB_COST)
+	if not opts.free then spend(top, SUB_COST) end
 	w.state = "sub"; top.mash, bottom.mash = 0, 0
 	print(("[CC] %s Submission-Versuch: %s"):format(top.char.Name, sub.name))
 	local ta, tb = playPair(top, bottom, sub.pair, false)
@@ -1195,14 +1196,15 @@ function groundSubmit(top)
 	if pairCancelled(top, bottom) then return end
 	ta:AdjustSpeed(0); tb:AdjustSpeed(0)
 	-- Duell: Start 0,35; weniger Leben unten -> Griff zieht von selbst zu
-	local p, t0, last = 0.35, os.clock(), os.clock()
+	local p, t0, last = opts.start or 0.35, os.clock(), os.clock()
 	local dummyNext = 0
-	while pairAlive(top, bottom) and not frozen(top) and not frozen(bottom) and p > 0 and p < 1 and os.clock() - t0 < SUB_TIME do
+	local power = opts.power or 1
+	while pairAlive(top, bottom) and not frozen(top) and not frozen(bottom) and p > 0 and p < 1 and os.clock() - t0 < (opts.time or SUB_TIME) do
 		local dt = task.wait(); local now = os.clock()
 		for _, x in ipairs({ top, bottom }) do                 -- Trainingsgegner haemmert ca. 4-5 mal pro Sekunde
 			if isDummy(x) and not passive(x) and now >= dummyNext then x.mash += 1; dummyNext = now + 0.18 + math.random() * 0.12 end
 		end
-		p += top.mash * SUB_TOP * (1 + 0.025 * stat(top, "Grappling")) - bottom.mash * SUB_BOTTOM * (1 + 0.025 * stat(bottom, "Grappling")) + dt * 0.10 * (1 - bottom.hum.Health / bottom.hum.MaxHealth)
+		p += top.mash * SUB_TOP * power * (1 + 0.025 * stat(top, "Grappling")) - bottom.mash * SUB_BOTTOM * (1 + 0.025 * stat(bottom, "Grappling")) + dt * 0.10 * (1 - bottom.hum.Health / bottom.hum.MaxHealth)
 		top.mash, bottom.mash = 0, 0
 		p = math.clamp(p, 0, 1)
 		top.char:SetAttribute("CC_SubProgress", p); bottom.char:SetAttribute("CC_SubProgress", p)
@@ -1915,6 +1917,38 @@ function tryTakedown(a, forceSuccess, slam)   -- slam = Signatur-Definition mit 
 	groundLoop(a, b)
 end
 
+-- Oliveira-Signatur: Ruecken nehmen aus dem Stand (Paar Sig_BackTake) und sofort Rear Naked Choke mit Vorsprung.
+-- Unblockbar: kein Sprawl-Fenster, Block wird ignoriert. Endet in der Ruecken-Kontrolle (Ground_Back_Idle).
+function sigBackTake(a, b, def)
+	if a.ko or a.wr or b.ko or b.wr or b.down then return end
+	interrupt(b); setBlock(b, false); b.wantBlock = false
+	stopStanding(a); stopStanding(b)
+	local ra, rb = a.char.HumanoidRootPart, b.char.HumanoidRootPart
+	local dir = ((rb.Position - ra.Position) * Vector3.new(1, 0, 1)).Unit
+	local Ca = CFrame.lookAt(ra.Position, ra.Position + dir)
+	local Cb = Ca * CFrame.new(0, 0, -WR_GAP) * CFrame.Angles(0, math.pi, 0)
+	Cb = Cb + Vector3.new(0, rb.Position.Y - Cb.Position.Y, 0)
+	setWrestle(a, b, "shoot"); setWrestle(b, a, "defend")
+	ra.CFrame = Ca; rb.CFrame = Cb
+	a.wrStart, b.wrStart = Ca, Cb
+	a.busyUntil, b.busyUntil = math.huge, math.huge
+	fightEvent:Fire("td", a.char, b.char, false)
+	print(("[CC] %s Signatur Ruecken nehmen -> %s"):format(a.char.Name, b.char.Name))
+	local ta = playPair(a, b, "Sig_BackTake", false)
+	task.delay(25 / 24, function() if a.wr and b.wr then sigFX:FireAllClients("backtake", a.char, b.char, workspace:GetServerTimeNow()) end end)
+	if not holdTrackEnd(ta, pairLen("Sig_BackTake"), nil, function() return pairCancelled(a, b) end) then return end
+	if pairCancelled(a, b) then
+		for _, f in ipairs({ a, b }) do if f.wr then wrStopAll(f, 0.1); setWrestle(f, nil, nil); f.busyUntil = 0 end end
+		return
+	end
+	a.wr.role, b.wr.role = "top", "bottom"
+	a.char:SetAttribute("CC_Wrestle", "top"); b.char:SetAttribute("CC_Wrestle", "bottom")
+	a.busyUntil, b.busyUntil = 0, 0
+	addDamage(a.char, 8)
+	groundLoop(a, b, "back")
+	groundSubmit(a, { start = def.subStart or 0.55, power = def.subPower or 1.5, time = def.subTime, free = true })
+end
+
 local function hook(p) p.CharacterAdded:Connect(setup); if p.Character then task.spawn(setup, p.Character) end end
 game.Players.PlayerAdded:Connect(hook); for _, p in ipairs(game.Players:GetPlayers()) do hook(p) end
 
@@ -2056,6 +2090,16 @@ local function signature(f)
 	local d = (opp.char.HumanoidRootPart.Position - f.char.HumanoidRootPart.Position) * Vector3.new(1, 0, 1)
 	if d.Magnitude > def.range then f.char:SetAttribute("CC_OutOfRange", workspace:GetServerTimeNow()); fail("range") return end
 	if f.char.HumanoidRootPart.CFrame.LookVector:Dot(d.Unit) < 0.5 then fail("position") return end
+	if def.special == "backtake" then
+		f.focus = 0; f.char:SetAttribute("CC_Focus", 0); spend(f, def.stamina)
+		f.sigActive = true; sigFX:FireAllClients("start", f.char, id, workspace:GetServerTimeNow())
+		task.spawn(function()
+			sigBackTake(f, opp, def)
+			f.sigActive = false
+			if workspace:GetAttribute(SIG.TEST_ATTR) then f.focus = SIG.FOCUS_MAX; f.char:SetAttribute("CC_Focus", f.focus) end
+		end)
+		return
+	end
 	if def.special == "takedown" then
 		f.focus = 0; f.char:SetAttribute("CC_Focus", 0); spend(f, def.stamina)
 		f.sigActive = true; sigFX:FireAllClients("start", f.char, id, workspace:GetServerTimeNow())

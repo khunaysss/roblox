@@ -106,7 +106,7 @@ S.list.Saenchai = trainer({   -- Saenchai: verspielt, leicht. Kamera seitlich, g
 })
 S.list.Charles_Oliveira = trainer({   -- Oliveira: Grappler mit Muay Thai. Kamera nah dran, ueber die Schulter.
 	name = "CHARLES OLIVEIRA", style = "MUAY THAI / BJJ", prefix = "Trainer_Oliveira", h = 6.0,
-	demo = "Fighter_BodyKick_v3", slow = { 0.15, 0.48, 0.35 }, sigName = "CHUTE BOXE KICK", sigSub = "Harter Körperkick",
+	demo = "WR_Sig_BackTake_A", slow = { 0.40, 0.70, 0.4 }, sigName = "BRONX CHOKE", sigSub = "Auf den Rücken, dann würgen",
 	cam = { greet1 = { t = 2.2, from = V(-2.6, 4.8, -5.4), to = V(-1.8, 5.0, -4.4), look = V(0, 5.4, 0), fov = 42 },
 		demo1 = { t = 1.6, from = V(6.5, 3.8, -2.4), to = V(6.0, 3.8, -2.2), look = V(0, 4.0, -1.4), fov = 46 },
 		challenge1 = { t = 1.6, from = V(-2.2, 4.6, -6.5), to = V(-1.6, 4.9, -5.2), look = V(0, 5.5, 0), fov = 40 } },

@@ -279,6 +279,26 @@ fx.OnClientEvent:Connect(function(kind, char, a, b, c)
 				if target == player.Character then redEdge(0.9); fovPunch(8) end
 				if char == player.Character then impactFrame(0.8); speedlines(0.3, Color3.fromRGB(200, 225, 255)) end
 			end
+		elseif kind == "backtake" then
+			-- char = Oliveira (springt auf den Ruecken), a = Opfer. Goldener Ring, Opfer: Bildrand wird dunkel (Wuergegriff)
+			local target = a
+			local at = bonePos(target, "UpperTorso") or bonePos(target, "LowerTorso"); if not at then return end
+			shockwave(at, Vector3.new(0, 1, 0), Color3.fromRGB(235, 200, 90), 9, 0.4)
+			burst(at, { Texture = SPARK, Color = ColorSequence.new(Color3.fromRGB(255, 225, 140)), LightEmission = 0.6,
+				Size = NumberSequence.new(0.22, 0.04), Lifetime = NumberRange.new(0.3, 0.5), Speed = NumberRange.new(8, 14),
+				SpreadAngle = Vector2.new(180, 180), Drag = 3 }, 24, 1)
+			sound("HitHeavy", 0.9, 0.8, at)
+			if not reduced() then
+				if target == player.Character then
+					local f = Instance.new("Frame"); f.BackgroundColor3 = Color3.fromRGB(20, 0, 0); f.BackgroundTransparency = 0.25; f.BorderSizePixel = 0
+					f.Size = UDim2.fromScale(1, 1); f.Parent = screen
+					local g = Instance.new("UIGradient"); g.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.3, 1), NumberSequenceKeypoint.new(0.7, 1), NumberSequenceKeypoint.new(1, 0) }); g.Parent = f
+					local f2 = f:Clone(); f2.UIGradient.Rotation = 90; f2.Parent = screen
+					for _, x in ipairs({ f, f2 }) do TweenService:Create(x, TweenInfo.new(5.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { BackgroundTransparency = 1 }):Play(); Debris:AddItem(x, 5.6) end
+					fovPunch(5)
+				end
+				if char == player.Character then impactFrame(0.6) end
+			end
 		elseif kind == "slam" then
 			-- char = Khabib, a = Opfer (mit dem Ruecken auf die Matte geslammt)
 			local target = a

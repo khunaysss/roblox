@@ -102,6 +102,10 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Karriere: 10 Gegner (neu Tomas Novak, Leon Brandt, Omar Haddad, Ivan Morozov), Ränge 10 → 1. Titel AMATEUR → AMATEUR-CHAMPION (2 Siege, +50 XP) → PROFI (4, +80) → TOP-HERAUSFORDERER (7, +120) → LEICHTGEWICHTS-CHAMPION (10, +250); Bonus nur beim ersten Erreichen, Hinweis „Neuer Titel“. Liste scrollbar, Titel in der Karriere-Übersicht (getestet). Backup: ServerStorage.CC_Opponents_PRE_CAREER10.
 - Trainer-Endkampf und Karriere: Walkout mit Banner „TRAINER-ENDKAMPF“ / „KARRIERE“ und „Spieler vs. Gegner“; der KI-Gegner läuft mit ein (getestet mit Tyson).
 
+### Oliveira Bronx Choke (2026-10-18, in Studio getestet)
+- Neue Paar-Animation Sig_BackTake_A/B (Ground_Positions_v02, build_ground_v02.py, Export export_ground_roblox_v02): Armzug, Gegner dreht sich, Sprung auf den Rücken (Haken, Arm um den Hals), Gegner bricht auf Knie und Hände ein, Ende = Ground_Back_Idle Frame 1 (Übergänge 0,0 cm). Handschuhe beim Umklammern bis 13–15 cm im Körper (wie bei den übrigen Griffen, W1).
+- Signatur „BRONX CHOKE“ (special backtake): unblockbar (kein Sprawl, Block wird gelöst), danach sofort Rear-Naked-Choke-Duell mit Vorsprung 0,50 und Zug ×1,25, ohne Ausdauerkosten; Befreien bleibt möglich. Effekt: goldener Ring/Funken, beim Opfer dunkler Bildrand. Getestet: Ablauf → Rücken-Kontrolle → Würge-Duell → Sieg per Submission bei schnellem Hämmern; ohne Hämmern befreit sich der Gegner. Trainer-Text/Vorführung angepasst. Kein Clinch-System nötig.
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -125,9 +129,9 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
 
 - Ali-Instinkt: Balance (3 Ausweicher, 2,5-fach Calf Kick, Knie 18) vorläufig.
-- Neue Signatur-Ideen offen: Oliveira Würgegriff von hinten (braucht Clinch-System).
 - Flash-K.o. (Codex) löst bei starken Kopf-Signaturen oft sofort aus – Balance prüfen.
-- Upload nötig: Fighter_Sig_Saenchai_Wheel, WR_TD_LiftSlam_A, WR_TD_LiftSlam_B.
+- Upload nötig: Fighter_Sig_Saenchai_Wheel, WR_TD_LiftSlam_A, WR_TD_LiftSlam_B, WR_Sig_BackTake_A, WR_Sig_BackTake_B.
+- Bronx-Choke-Balance (Vorsprung 0,50, Zug ×1,25) vorläufig; mit echtem Gegner-Spieler prüfen.
 
 ### Aufgaben (Reihenfolge laut Nutzer)
 1. Zwei-Spieler-Test Fight Night.
