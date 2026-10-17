@@ -138,6 +138,27 @@ local function hookPlayer(p)
 		known = now
 	end)
 end
+-- Vorschau (nur Studio): workspace-Attribut CC_ScenePreview = "Mike_Tyson" -> nach dem Start alle vier Szenen nacheinander
+-- (greet, demo, challenge ohne Kampf, unlock). Im echten Spiel wirkungslos.
+local function preview(p)
+	local id = workspace:GetAttribute("CC_ScenePreview")
+	if not game:GetService("RunService"):IsStudio() or type(id) ~= "string" then return end
+	if not p.Character then p.CharacterAdded:Wait() end
+	task.wait(8)                                       -- Trainer werden erst nach dem Start ins Gym gestellt
+	if not trainerModel(id) then warn("[CC] Szenen-Vorschau: Trainer " .. id .. " nicht im Gym") return end
+	for _, kind in ipairs({ "greet", "demo", "challenge", "unlock" }) do
+		if not p.Parent then return end
+		local model = trainerModel(id); local r = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+		if kind == "unlock" and model and r then
+			local piv = model:GetPivot(); local pos = (piv * CFrame.new(SC.UNLOCK_SPOT)).Position + Vector3.new(0, 3, 0)
+			r.CFrame = CFrame.lookAt(pos, Vector3.new(piv.Position.X, pos.Y, piv.Position.Z))
+		end
+		local len = play(p, id, kind)
+		task.wait((len or 0) + 1.2)
+	end
+end
+Players.PlayerAdded:Connect(function(p) task.spawn(preview, p) end)
+for _, p in ipairs(Players:GetPlayers()) do task.spawn(preview, p) end
 Players.PlayerAdded:Connect(hookPlayer)
 for _, p in ipairs(Players:GetPlayers()) do hookPlayer(p) end
 Players.PlayerRemoving:Connect(function(p) busy[p] = nil end)
