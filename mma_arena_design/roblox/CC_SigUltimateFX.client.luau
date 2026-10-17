@@ -261,6 +261,20 @@ fx.OnClientEvent:Connect(function(kind, char, a, b, c)
 			end
 			stopAura(char)
 			if char == player.Character then instinctTint(false) end
+		elseif kind == "knee" then
+			-- char = Ali (Knie), a = Angreifer des Takedowns (getroffen am Kopf)
+			local target = a
+			local head = bonePos(target, "Head"); if not head then return end
+			afterimage(char)
+			shockwave(head, Vector3.new(0, 1, 0), Color3.fromRGB(205, 225, 255), 8, 0.35)
+			burst(head, { Texture = SPARK, Color = ColorSequence.new(Color3.fromRGB(220, 240, 255)), LightEmission = 0.5,
+				Size = NumberSequence.new(0.22, 0.04), Lifetime = NumberRange.new(0.35, 0.6), Speed = NumberRange.new(12, 20),
+				SpreadAngle = Vector2.new(60, 60), Acceleration = Vector3.new(0, -40, 0), EmissionDirection = Enum.NormalId.Top }, 30, 1.2)
+			sound("HitHeavy", 1.3, 0.75, head)
+			if not reduced() then
+				if target == player.Character then redEdge(0.9); fovPunch(8) end
+				if char == player.Character then impactFrame(0.8); speedlines(0.3, Color3.fromRGB(200, 225, 255)) end
+			end
 		elseif kind == "instinct_end" then
 			stopAura(char)
 			if char == player.Character then instinctTint(false) end

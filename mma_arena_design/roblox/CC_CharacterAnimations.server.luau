@@ -1818,6 +1818,41 @@ function tryTakedown(a, forceSuccess)
 		end
 	end
 	if not b then return end
+	-- Ali-Instinkt: Takedown gegen den Instinkt-Kaempfer -> Knie-Konter zum Kopf. Angreifer faellt, steht wieder auf (kein Knockdown-Zaehler).
+	local bInst = b.instinct
+	if bInst and os.clock() < bInst.untilT and (bInst.dodges or 0) > 0 and not b.ko and not b.knocked then
+		bInst.dodges -= 1
+		b.char:SetAttribute("CC_InstinctDodges", bInst.dodges)
+		local def = SIG.list.ali
+		local dmg = def.kneeDamage or 18
+		interrupt(a); setBlock(a, false)
+		if b.tracks.frontkick then b.tracks.frontkick:Play(0.04, 1, 1.5) end
+		b.busyUntil = math.max(b.busyUntil, os.clock() + 0.45)
+		a.hum.Health = math.max(HP_FLOOR, a.hum.Health - dmg)
+		addDamage(b.char, dmg)
+		applyInjury(a, "Head", def.kneeInjury or 15, "knee")
+		a.char:SetAttribute("CC_HeadHits", (a.char:GetAttribute("CC_HeadHits") or 0) + 1)
+		b.char:SetAttribute("CC_StrikesLanded", (b.char:GetAttribute("CC_StrikesLanded") or 0) + 1)
+		fightEvent:Fire("hit", b.char, a.char, "knee", false)
+		sigFX:FireAllClients("knee", b.char, a.char, dmg)
+		print(("[CC] %s Knie-Konter (Instinkt) gegen den Takedown von %s (%.0f Schaden)"):format(b.char.Name, a.char.Name, dmg))
+		-- Angreifer faellt nach vorn und steht nach kurzer Zeit wieder auf
+		local fall = a.tracks.koFwd or a.tracks.ko
+		a.knockToken = (a.knockToken or 0) + 1
+		local token = a.knockToken
+		a.knocked = true; a.hum.WalkSpeed = 0; a.busyUntil = os.clock() + (def.kneeDownTime or 1.6) + 0.5
+		if fall then fall:Play(0.06) end
+		a.char:SetAttribute("CC_LastReact", "kneeCounter")
+		task.delay(def.kneeDownTime or 1.6, function()
+			if not a.char.Parent or a.knockToken ~= token or a.ko then return end
+			if fall then fall:Stop(0.3) end
+			if not a.tracks.idle.IsPlaying then a.tracks.idle:Play(0.2) end
+			a.knocked = false
+			a.hum.WalkSpeed = injuryWalkSpeed(a)
+			a.char:SetAttribute("CC_LastReact", "recovered")
+		end)
+		return
+	end
 	stopStanding(a); stopStanding(b)
 	-- Aufstellung wie in Blender
 	local ra, rb = a.char.HumanoidRootPart, b.char.HumanoidRootPart

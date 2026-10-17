@@ -84,7 +84,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 
 ### Signaturen Tyson + Ali überarbeitet (2026-10-17, in Studio getestet)
 - Tyson: dunkelrote Flammen-Aura mit leuchtendem Umriss während der Kombination; Uppercut-Treffer im Anime-Stil (Schweiß-Spritzer, Luft-Schockwellen, Impact-Frame schwarz-weiß, Speedlines, Kamera-Stoß). Schaden unverändert. Getestet: beide Treffer, Effekte sichtbar.
-- Ali: neu „INSTINKT-MODUS“ statt Jab-Jab-Cross: 5 s Modus, weicht bis zu 3 Treffern automatisch aus (Faust oder Tritt; Nachbild + Seitschritt), Low Kick wird zum Calf Kick mit 2,5-fachem Schaden und +35 Bein-Verletzung (beendet den Modus). Silbrig-blaue Aura, Anzeige mit Restzeit und Ausweich-Punkten, bläuliche Tönung. Getestet: 2 Schläge ausgewichen ohne Schaden; Calf Kick 22 Schaden, Bein 35.
+- Ali: neu „INSTINKT-MODUS“ statt Jab-Jab-Cross: 5 s Modus, weicht bis zu 3 Treffern automatisch aus (Faust oder Tritt; Nachbild + Seitschritt), Low Kick wird zum Calf Kick mit 2,5-fachem Schaden und +35 Bein-Verletzung (beendet den Modus). Silbrig-blaue Aura, Anzeige mit Restzeit und Ausweich-Punkten, bläuliche Tönung. Getestet: 2 Schläge ausgewichen ohne Schaden; Calf Kick 22 Schaden, Bein 35. Takedown gegen Ali im Modus: Knie-Konter zum Kopf (18 Schaden, Kopf-Verletzung), Angreifer fällt und steht nach 1,6 s wieder auf (kein Knockdown-Zähler), verbraucht ein Ausweichen – getestet.
 - Neues Script roblox/CC_SigUltimateFX.client.luau (nur Optik). Server-Änderungen in CC_CharacterAnimations (land: Ausweichen/Calf Kick; signature: Instinkt; Reset beendet Modus). Backup: ServerStorage.CC_UltimateBackup_20261017.
 
 ### Weitere Fertigstellungen
@@ -112,7 +112,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Gym-Lobby: Laufen im Play-Modus nicht getestet (Hauptmenü sperrt die Steuerung beim Test). Fight-Night-Licht über CC_ZoneLighting zurückgesetzt (nicht im Spiel geprüft). Empfang noch eher dunkel. Place muss in Studio gespeichert werden (Strg+S).
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
 
-- Ali-Instinkt: Takedowns werden noch nicht ausgewichen (nur Schläge/Tritte). Balance (3 Ausweicher, 2,5-fach) vorläufig.
+- Ali-Instinkt: Balance (3 Ausweicher, 2,5-fach Calf Kick, Knie 18) vorläufig.
 - Neue Signatur-Ideen offen: Khabib Tragen + Slam (roter Bildschirm), Saenchai Rad-Kick (Cartwheel), Oliveira Würgegriff von hinten (braucht Clinch-System).
 
 ### Aufgaben (Reihenfolge laut Nutzer)

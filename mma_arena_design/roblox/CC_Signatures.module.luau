@@ -37,8 +37,10 @@ S.list = {
 	ali = {
 		-- Instinkt-Modus (Ultra-Instinkt-Idee): kein fester Schlag, sondern 5 s Zustand. Ali weicht bis zu 3 Treffern automatisch aus
 		-- (Faust oder Tritt), sein Low Kick wird zum Calf Kick mit 2,5-fachem Schaden und schwerer Bein-Verletzung (beendet den Modus).
+		-- Takedown-Versuch gegen ihn im Modus: Knie zum Kopf, Angreifer faellt kurz um (kein Knockdown), verbraucht ein Ausweichen.
 		name = "INSTINKT-MODUS", short = "Weicht automatisch aus · Calf Kick mit voller Wucht", trainer = "Muhammad_Ali",
 		special = "instinct", duration = 5.0, dodges = 3, calfMult = 2.5, calfInjury = 35,
+		kneeDamage = 18, kneeInjury = 15, kneeDownTime = 1.6,   -- Takedown gegen Ali im Modus: Knie-Konter, Angreifer faellt und steht wieder auf
 		anim = "Fighter_Sig_Ali", length = 26 / 24, lock = 0.2,
 		stamina = 18, range = 99,
 		color = Color3.fromRGB(205, 225, 255),         -- silbrig-blau
