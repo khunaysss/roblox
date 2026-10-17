@@ -90,6 +90,18 @@ local function play(kind, id, model, info)
 	lamp(Vector3.new(-1.5, 7.0, 4.0), "SpotLight", 2.0, 14, Color3.new(1, 0.95, 0.9))
 	lights.Parent = workspace
 	player:SetAttribute("CC_UIBlock", true)
+	-- CC_CombatMotion stoppt die lockere Steh-Animation, solange CC_UIBlock gesetzt ist -> sonst T-Pose in der Szene.
+	-- Deshalb hier selbst eine Steh-Animation auf der eigenen Figur abspielen (nur lokal sichtbar, wird am Ende gestoppt).
+	local standTrack
+	pcall(function()
+		local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+		local animator = hum and hum:FindFirstChildOfClass("Animator")
+		local clip = RS:FindFirstChild("CC_AnimationManifest") and RS.CC_AnimationManifest:FindFirstChild("Fighter_CasualIdle_v01")
+		if animator and clip then
+			standTrack = animator:LoadAnimation(clip); standTrack.Looped = true; standTrack.Priority = Enum.AnimationPriority.Idle
+			standTrack:Play(0.15)
+		end
+	end)
 	if controls then pcall(function() controls:Disable() end) end
 	local t0 = os.clock()
 	local done = false
@@ -108,6 +120,7 @@ local function play(kind, id, model, info)
 		for g in pairs(restoreOn) do if g.Parent then g.Enabled = true end end
 		for g in pairs(lateOn) do if g.Parent and not restoreOn[g] then g.Enabled = false end end   -- nicht vom Start: aus lassen
 		player:SetAttribute("CC_UIBlock", nil)
+		if standTrack then standTrack:Stop(0.2) end
 		if controls then pcall(function() controls:Enable() end) end
 		if running == state then running = nil end
 	end

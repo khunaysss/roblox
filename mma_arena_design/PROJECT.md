@@ -79,6 +79,9 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Kinobalken, Titel, Filmlicht nur lokal, Kamera-Kollision, Überspringen (Leertaste/Enter/Klick/Controller), sauberes Zurücksetzen (Kamera, Oberflächen, CC_UIBlock) – geprüft.
 - Andere Trainer: Standard-Szenen (ruhige Kamera, ohne eigene Animation) bis ihre eigenen gebaut sind.
 
+### T-Pose behoben (2026-10-17)
+- Ursache: CC_CombatMotion stoppte die Steh-Animation des Spielers, solange CC_UIBlock gesetzt war (offenes Hauptmenü, Filmszenen) → T-Pose. Bedingung entfernt (UIBlock sperrt nur Eingaben); zusätzlich spielt die Szene selbst eine Steh-Animation. Getestet: Menü offen, Szene, danach → keine T-Pose. Original in ServerStorage.CC_TPoseFixBackup.
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
