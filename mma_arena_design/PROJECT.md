@@ -62,7 +62,9 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Materialien: Säulen/Träger matt schwarzes Metall, Wände dunkler Beton, Wandpaneele dunkles Holz, Geräte gebürstetes Metall, Säcke schwarzes Leder.
 - Zonenschilder (BOXEN, BODENKAMPF, KRAFT, KONDITION) jetzt fest an den Galerie-Stirnseiten statt schwebend.
 - 6 Pflanzen (3 Typen, alle unterschiedlich) in dunklen Töpfen: Empfang (2), Lounge (2), Treppe, Trainertisch. Keine Überschneidungen (geprüft).
-- Keine Scripts geändert; kein Script greift auf die geänderten Teile zu (geprüft).
+- Nachbesserung: Laufwege per Pfadsuche geprüft (Eingang → Empfang, Box, Bodenkampf, Kraft, Kondition, Treppe, Trainertisch, Spinde, Oktagon-Stufen: alle erreichbar). Käfigboden weniger grell. Warmes Licht auf die Empfangs-Holzwand. Poster (Fight Night, Disziplin, Respekt) und Gürtel-Vitrine an den Wänden unter den Galerien. Fugen im Gummiboden (6-Stud-Raster). Rote Säcke des Original-Gyms farblich angeglichen (Interaktionen unverändert). Wasserspender und Handtuchregal zwischen Kraft und Kondition.
+- Neues Script roblox/CC_ZoneLighting.client.luau (nur Optik): Gym neutral, Fight Night (Kamera z < -400) behält die alten, kühleren Werte.
+- Keine Kampf-/Trainings-/UI-Scripts geändert; kein Script greift auf die geänderten Teile zu (geprüft).
 
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
@@ -83,7 +85,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Trainer-Modelle sind starr, die Signatur wird nicht vorgeführt.
 - Trainer-Namen sind echte Personen (rechtlich riskant vor Veröffentlichung).
 - Die Animationen Fighter_Sig_Tyson / Fighter_Sig_Ali sind noch nicht hochgeladen; die Animationen Fighter_LegCheck_v01, Fighter_LimpLeft_v01, Fighter_LimpRight_v01 ebenfalls offen.
-- Gym-Lobby: Laufen im Play-Modus nicht getestet (Hauptmenü sperrt die Steuerung beim Test). Lighting-Änderungen sind global und wirken auch in der Fight Night (nicht geprüft). Empfang noch eher dunkel. Place muss in Studio gespeichert werden (Strg+S).
+- Gym-Lobby: Laufen im Play-Modus nicht getestet (Hauptmenü sperrt die Steuerung beim Test). Fight-Night-Licht über CC_ZoneLighting zurückgesetzt (nicht im Spiel geprüft). Empfang noch eher dunkel. Place muss in Studio gespeichert werden (Strg+S).
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
 
 ### Aufgaben (Reihenfolge laut Nutzer)
