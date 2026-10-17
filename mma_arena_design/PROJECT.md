@@ -95,6 +95,13 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Neue Paar-Animation TD_LiftSlam_A/B (Wrestling_Prototype_v04, build_wrestling_v04.py, Export export_wrestling_roblox_v12): Schuss wie Double-Leg, Anheben über die Schulter, zwei Schritte tragen, Slam auf den Rücken (Aufprall Frame 45), Ende = Guard-Position wie TD_DoubleLeg_Success. Griffe 7 cm in den Schlüsselposen, im Slam bis 29 cm (schnelle Bewegung).
 - Signatur „EAGLE SLAM“ (special takedown, slam=true): Zusatzschaden 14 + Rippen-Verletzung 10 beim Aufprall, danach Bodenkampf. Effekte: Staub, Schockwellen, Impact-Frame beim Angreifer, rötlicher Bildschirm + roter Rand + Kamera-Stoß beim Opfer. Getestet: Dummy 100 → 81 HP, Ereignis nach 2,4 s, Guard danach, roter Bildschirm sichtbar. Trainer-Text und Vorführung angepasst.
 
+### Einstellungen, KI, Karriere, Trainer-Walkout (2026-10-17, in Studio getestet)
+- Einstellungen: Lautstärke (Gesamt/Musik/Effekte) + Schalter „Starke Effekte“ und „Kamera-Wackeln“, im Profil gespeichert (CC_Profile settings, Remote CC_Progress "settings"). Getestet mit Testprofil: Klick → Server → gespeichert → nach Neustart geladen. Wackeln aus = kein Treffer-Ruckeln (CC_HitFX) und kein Kamera-Stoß (CC_SigUltimateFX); starke Effekte aus = nur schwacher Treffer-Blitz, keine Signatur-Bildschirmeffekte.
+- Ringkampf-Leiste: während Takedown/Eagle Slam (Rolle shoot/defend) ausgeblendet, erst am Boden sichtbar (getestet).
+- Gegner-KI reagiert auf Treffer: Kombination bricht ab; schwerer Schaden/angeschlagen/wenig Leben → Deckung + Rückzug (~1–1,8 s); leichter Treffer → oft Konter (Jab-Cross/Haken). Getestet: 16 Schaden → blockt und weicht 2 Studs zurück; leichte Treffer → 5/6 Konter.
+- Karriere: 10 Gegner (neu Tomas Novak, Leon Brandt, Omar Haddad, Ivan Morozov), Ränge 10 → 1. Titel AMATEUR → AMATEUR-CHAMPION (2 Siege, +50 XP) → PROFI (4, +80) → TOP-HERAUSFORDERER (7, +120) → LEICHTGEWICHTS-CHAMPION (10, +250); Bonus nur beim ersten Erreichen, Hinweis „Neuer Titel“. Liste scrollbar, Titel in der Karriere-Übersicht (getestet). Backup: ServerStorage.CC_Opponents_PRE_CAREER10.
+- Trainer-Endkampf und Karriere: Walkout mit Banner „TRAINER-ENDKAMPF“ / „KARRIERE“ und „Spieler vs. Gegner“; der KI-Gegner läuft mit ein (getestet mit Tyson).
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -106,16 +113,13 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 ### Bugs / Prüfungen
 - Zwei-Spieler-Test (Studio → Test → Clients 2) für Online, Fight Night, Walkout, Signatur, Finisher, Ergebnis, XP und Rückkehr ins Gym. **Noch nicht gemacht.**
 - Touch (Geräte-Emulator) und echter Controller ungetestet.
-- Gegner-KI: Verhalten nach Trefferschaden noch unfertig.
 - Wrestling: Handschuh-Überlappung am Knie bis 13 cm (W1), Armbewegungen (W2), Guard-Durchdringung (W3), Aufstehen (W4).
 - Gym: Bank/Matten ohne eigene Animation.
 - Event-Map: 168 358 Dreiecke, keine Kollision (M1). Maßstabsdatei verweist auf alten Fighter (M2).
-- Einstellungen-Menü fehlt; Schalter „Effekte reduzieren“ (`CC_ReduceFX`) ist nur vorbereitet.
 - Upload nötig für online: alle Trainer_*-Animationen (18), Fighter_Sig_Tyson, Fighter_Sig_Ali (ohne Upload nur in Studio sichtbar).
 - Im Test kamen Schläge über CC_Action im Kampf nicht beim Server an (keine Treffer, keine Meldung) – Codex hat den Angriffsweg evtl. geändert; mit echter Tastatur prüfen.
 - Tysons Platz (Boxbereich, 100/16) liegt eng an Säule und Sack: Kamerawinkel mussten angepasst werden.
-- Trainer-Endkampf: Champion-Tyson ist sehr stark (im Test 196:10 Schaden gegen mich); Balance noch nicht geprüft. Kein Walkout/Intro beim Trainer-Endkampf (startet direkt).
-- Trainer-Namen sind echte Personen (rechtlich riskant vor Veröffentlichung).
+- Trainer-Endkampf: Champion-Tyson ist sehr stark (im Test 196:10 Schaden gegen mich); Balance noch nicht geprüft.- Trainer-Namen sind echte Personen (rechtlich riskant vor Veröffentlichung).
 - Die Animationen Fighter_Sig_Tyson / Fighter_Sig_Ali sind noch nicht hochgeladen; die Animationen Fighter_LegCheck_v01, Fighter_LimpLeft_v01, Fighter_LimpRight_v01 ebenfalls offen.
 - Gym-Lobby: Laufen im Play-Modus nicht getestet (Hauptmenü sperrt die Steuerung beim Test). Fight-Night-Licht über CC_ZoneLighting zurückgesetzt (nicht im Spiel geprüft). Empfang noch eher dunkel. Place muss in Studio gespeichert werden (Strg+S).
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
@@ -124,15 +128,12 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Neue Signatur-Ideen offen: Oliveira Würgegriff von hinten (braucht Clinch-System).
 - Flash-K.o. (Codex) löst bei starken Kopf-Signaturen oft sofort aus – Balance prüfen.
 - Upload nötig: Fighter_Sig_Saenchai_Wheel, WR_TD_LiftSlam_A, WR_TD_LiftSlam_B.
-- Eagle Slam: Während des Anhebens zeigt die Ringkampf-Leiste schon „E Position / Space Aufstehen“ (Hinweis zu früh).
 
 ### Aufgaben (Reihenfolge laut Nutzer)
 1. Zwei-Spieler-Test Fight Night.
-2. Einstellungen-Menü (Effekte aus, Kamera-Wackeln, Lautstärke) mit Profil-Speicherung.
 3. Balancing der Signaturen (Fokus, Ausdauer, Schaden, Freischaltbedingung).
 4. Fiktive Namen und Aussehen für die sechs Trainer.
 5. Signaturen Pereira, Saenchai, Khabib (eigene Takedown-Logik, ohne Finisher). Oliveira braucht vorher ein Clinch-System.
-6. Karriere: Gegnerliste (ca. 10 KI-Gegner, steigend), Titel, Belohnungen.
 7. Ranked (später): gleiche Signatur-Auswahl für alle.
 8. Vorführung der Signatur durch den Trainer (Ersatz über Dummy-Kämpfer).
 9. Gym-Lobby: erledigt bis auf Laufen im Play-Modus (siehe Offene Punkte).

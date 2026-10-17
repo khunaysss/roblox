@@ -6,7 +6,7 @@
 -- Fuer HUD/Menue als Attribute am Spieler: CC_Level, CC_XP, CC_XPNext, CC_Wins, CC_Losses, CC_KOs, CC_Subs,
 --   CC_Power/CC_Cardio/CC_Wrestling/CC_Grappling (Wert) und CC_PowerTP ... (Trainingspunkte 0..9), CC_ProfileSaved (bool).
 -- Andere Skripte melden ueber ServerStorage.CC_ProfileEvent (BindableEvent):
---   Fire(player, "xp", menge) | Fire(player, "train", "Power"|"Cardio"|"Wrestling"|"Grappling", punkte)
+--   Fire(player, "xp", menge) | Fire(player, "train", "Power"|"Cardio"|"Wrestling"|"Grappling", punkte) | Fire(player, "goal", zaehler, menge)
 --   | Fire(player, "result", "win"|"loss"|"draw", methode) | Fire(player, "look", { hair=, beard=, face=, skin=, hairColor= })
 -- Aussehen (CC_Customize liest es): Attribut CC_Look am Spieler (JSON).
 -- Einstieg (CC_Tutorial): Tabelle onb = { editor, offered, lessons = {6 x bool}, done, firstFight } -> Attribut CC_Onb (JSON);
@@ -31,23 +31,46 @@ do
 	if not ok then warn("[CC] Profil: kein DataStore (" .. tostring(s) .. ") – Fortschritt nur fuer diese Sitzung") end
 end
 
-local SIG = require(game:GetService("ReplicatedStorage"):WaitForChild("CC_Signatures"))
+local RS = game:GetService("ReplicatedStorage")
+local SIG = require(RS:WaitForChild("CC_Signatures"))
+local OPP = require(RS:WaitForChild("CC_Opponents"))
+local PROG = require(RS:WaitForChild("CC_Progression"))
+local SIGPROG = require(RS:WaitForChild("CC_SignatureProgression"))
 local event = SS:FindFirstChild("CC_ProfileEvent") or Instance.new("BindableEvent")
 event.Name = "CC_ProfileEvent"; event.Parent = SS
+local progressRemote = RS:FindFirstChild("CC_Progress") or Instance.new("RemoteEvent")
+progressRemote.Name = "CC_Progress"; progressRemote.Parent = RS
 
 local profiles = {}            -- [player] = Tabelle
 local function default()
-	local p = { v = 1, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
+	local p = { v = 4, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
 		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 },
 		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false },
-		sig = "", sigs = {} }                     -- Signaturen: ausgeruestet (Schluessel aus CC_Signatures.list oder "") und freigeschaltet (Liste)
+		sig = "", sigs = {}, sigProgress = SIGPROG.newProgress(), career = { beaten = {}, losses = 0 },
+		goals = { day = PROG.dayKey(), week = PROG.weekKey(), counts = {}, claimed = {} }, -- Signaturen, Karriere und servergepruefte Ziele
+		settings = { master = 0.8, music = 0.4, effects = 0.7, reduceFx = false, noShake = false } } -- Einstellungen (Menue), Client sendet CC_Progress "settings"
 	for _, s in ipairs(STATS) do p.stats[s] = 0; p.tp[s] = 0 end
 	return p
 end
 local function xpNext(level) return 100 + 50 * (level - 1) end
 
+local function resetGoals(p)
+	local day, week = PROG.dayKey(), PROG.weekKey()
+	local changed = false
+	if p.goals.day ~= day then
+		p.goals.day = day; changed = true
+		for _, def in ipairs(PROG.goals) do if def.period == "day" then p.goals.counts[def.id] = nil; p.goals.claimed[def.id] = nil end end
+	end
+	if p.goals.week ~= week then
+		p.goals.week = week; changed = true
+		for _, def in ipairs(PROG.goals) do if def.period == "week" then p.goals.counts[def.id] = nil; p.goals.claimed[def.id] = nil end end
+	end
+	if changed then p.dirty = true end
+end
+
 local function publish(plr)
 	local p = profiles[plr]; if not p then return end
+	resetGoals(p)
 	plr:SetAttribute("CC_Level", p.level); plr:SetAttribute("CC_XP", p.xp); plr:SetAttribute("CC_XPNext", xpNext(p.level))
 	plr:SetAttribute("CC_Wins", p.wins); plr:SetAttribute("CC_Losses", p.losses); plr:SetAttribute("CC_KOs", p.kos); plr:SetAttribute("CC_Subs", p.subs)
 	for _, s in ipairs(STATS) do plr:SetAttribute("CC_" .. s, p.stats[s]); plr:SetAttribute("CC_" .. s .. "TP", p.tp[s]) end
@@ -55,6 +78,18 @@ local function publish(plr)
 	plr:SetAttribute("CC_Onb", game:GetService("HttpService"):JSONEncode(p.onb))
 	plr:SetAttribute("CC_Signature", p.sig ~= "" and p.sig or nil)
 	plr:SetAttribute("CC_SigUnlocked", table.concat(p.sigs, ","))
+	plr:SetAttribute("CC_SigProgress", game:GetService("HttpService"):JSONEncode(p.sigProgress))
+	plr:SetAttribute("CC_CareerBeaten", table.concat(p.career.beaten, ","))
+	plr:SetAttribute("CC_CareerWins", #p.career.beaten)
+	plr:SetAttribute("CC_CareerLosses", p.career.losses)
+	plr:SetAttribute("CC_CareerNext", OPP.nextId(p.career.beaten))
+	plr:SetAttribute("CC_CareerTitle", OPP.titleFor and OPP.titleFor(#p.career.beaten).name or nil)
+	plr:SetAttribute("CC_RankTitle", PROG.titleForLevel(p.level))
+	plr:SetAttribute("CC_MasterVolume", p.settings.master); plr:SetAttribute("CC_MusicVolume", p.settings.music); plr:SetAttribute("CC_EffectsVolume", p.settings.effects)
+	plr:SetAttribute("CC_ReduceFX", p.settings.reduceFx); plr:SetAttribute("CC_NoShake", p.settings.noShake); plr:SetAttribute("CC_SettingsLoaded", true)
+	plr:SetAttribute("CC_Goals", game:GetService("HttpService"):JSONEncode({
+		day = p.goals.day, week = p.goals.week, counts = p.goals.counts, claimed = p.goals.claimed,
+	}))
 end
 
 local function addXP(plr, n)
@@ -102,7 +137,8 @@ local function load(plr)
 	end
 	local p = default()
 	if type(data) == "table" then
-		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and k ~= "look" and k ~= "onb" and k ~= "sigs" and k ~= "sig" and p[k] ~= nil then p[k] = v end end
+		for k, v in pairs(data) do if k ~= "stats" and k ~= "tp" and k ~= "look" and k ~= "onb" and k ~= "sigs" and k ~= "sig" and k ~= "sigProgress" and k ~= "career" and k ~= "goals" and k ~= "settings" and p[k] ~= nil then p[k] = v end end
+		if type(data.settings) == "table" then for k, v in pairs(data.settings) do if p.settings[k] ~= nil and type(v) == type(p.settings[k]) then p.settings[k] = type(v) == "number" and math.clamp(v, 0, 1) or v end end end
 		if type(data.onb) == "table" then
 			for k, v in pairs(data.onb) do if k ~= "lessons" and type(p.onb[k]) == "boolean" and type(v) == "boolean" then p.onb[k] = v end end
 			if type(data.onb.lessons) == "table" then for i = 1, 6 do p.onb.lessons[i] = data.onb.lessons[i] == true end end
@@ -111,6 +147,23 @@ local function load(plr)
 		end
 		if type(data.sigs) == "table" then for _, id in ipairs(data.sigs) do if SIG.list[id] and not table.find(p.sigs, id) then table.insert(p.sigs, id) end end end
 		if type(data.sig) == "string" and table.find(p.sigs, data.sig) then p.sig = data.sig end
+		p.sigProgress = SIGPROG.normalize(data.sigProgress)
+		if type(data.career) == "table" then
+			p.career.losses = math.max(0, math.floor(tonumber(data.career.losses) or 0))
+			local saved = {}
+			if type(data.career.beaten) == "table" then for _, id in ipairs(data.career.beaten) do saved[id] = true end end
+			for _, def in ipairs(OPP.list) do if saved[def.id] then table.insert(p.career.beaten, def.id) end end
+		end
+		if type(data.goals) == "table" then
+			if type(data.goals.day) == "string" then p.goals.day = data.goals.day end
+			if type(data.goals.week) == "string" then p.goals.week = data.goals.week end
+			if type(data.goals.counts) == "table" then
+				for id, value in pairs(data.goals.counts) do if PROG.goalById[id] and tonumber(value) then p.goals.counts[id] = math.max(0, math.floor(value)) end end
+			end
+			if type(data.goals.claimed) == "table" then
+				for id, value in pairs(data.goals.claimed) do if PROG.goalById[id] and value == true then p.goals.claimed[id] = true end end
+			end
+		end
 		if type(data.look) == "table" then for k, v in pairs(data.look) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end end
 		for _, s in ipairs(STATS) do
 			if type(data.stats) == "table" and tonumber(data.stats[s]) then p.stats[s] = math.clamp(math.floor(data.stats[s]), 0, STAT_MAX) end
@@ -132,7 +185,9 @@ local function save(plr)
 	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs,
 		stats = table.clone(p.stats), tp = table.clone(p.tp), look = table.clone(p.look),
 		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight },
-		sig = p.sig, sigs = table.clone(p.sigs) }
+		sig = p.sig, sigs = table.clone(p.sigs), sigProgress = SIGPROG.normalize(p.sigProgress), career = { beaten = table.clone(p.career.beaten), losses = p.career.losses },
+		goals = { day = p.goals.day, week = p.goals.week, counts = table.clone(p.goals.counts), claimed = table.clone(p.goals.claimed) },
+		settings = table.clone(p.settings) }
 	local ok, err
 	for i = 1, 3 do
 		ok, err = pcall(function() store:UpdateAsync(keyOf(plr), function() return copy end) end)
@@ -154,7 +209,31 @@ local function saveSoon(plr)
 	end)
 end
 
-event.Event:Connect(function(plr, kind, a, b)
+progressRemote.OnServerEvent:Connect(function(plr, action, id)
+	if action == "settings" then                                 -- Einstellungen aus dem Menue: nur bekannte Schluessel, Zahlen 0..1
+		local p = profiles[plr]; if not p or type(id) ~= "table" then return end
+		local changed = false
+		for k, v in pairs(id) do
+			if p.settings[k] ~= nil and type(v) == type(p.settings[k]) then
+				if type(v) == "number" then v = math.clamp(math.floor(v * 20 + 0.5) / 20, 0, 1) end
+				if p.settings[k] ~= v then p.settings[k] = v; changed = true end
+			end
+		end
+		if changed then p.dirty = true; publish(plr); saveSoon(plr) end
+		return
+	end
+	local p, def = profiles[plr], type(id) == "string" and PROG.goalById[id] or nil
+	if action ~= "claim" or not p or not def then return end
+	resetGoals(p)
+	local count = p.goals.counts[id] or 0
+	if count < def.target or p.goals.claimed[id] then return end
+	p.goals.claimed[id] = true; p.dirty = true
+	addXP(plr, def.xp)
+	publish(plr); saveSoon(plr)
+	plr:SetAttribute("CC_GoalClaimed", id .. "|" .. tostring(workspace:GetServerTimeNow()))
+end)
+
+event.Event:Connect(function(plr, kind, a, b, c)
 	if typeof(plr) ~= "Instance" or not plr:IsA("Player") or not profiles[plr] then return end
 	if kind == "xp" then addXP(plr, tonumber(a) or 0)
 	elseif kind == "train" then train(plr, a, tonumber(b) or 1)
@@ -170,13 +249,73 @@ event.Event:Connect(function(plr, kind, a, b)
 		else return end
 		p.dirty = true; publish(plr)
 		saveSoon(plr)
-	elseif kind == "sig_unlock" and SIG.list[a] then             -- Signatur freischalten (nach bestandener Uebung, CC_CharacterAnimations)
+	elseif kind == "sig_start" and SIGPROG.list[a] then
 		local p = profiles[plr]
-		if not table.find(p.sigs, a) then table.insert(p.sigs, a) end
-		p.sig = a; p.dirty = true; publish(plr); saveSoon(plr)
+		p.sigProgress[a] = p.sigProgress[a] or SIGPROG.newProgress()[a]
+		p.sigProgress[a].started = true
+		p.dirty = true; publish(plr); saveSoon(plr)
+		plr:SetAttribute("CC_Notice", "Trainer-Quest gestartet.|" .. tostring(workspace:GetServerTimeNow()))
+	elseif kind == "sig_fight_result" and type(a) == "table" then
+		local p = profiles[plr]
+		for id, def in pairs(SIGPROG.list) do
+			local q = p.sigProgress[id]
+			if q and q.started and not table.find(p.sigs, id) then
+				q.body += math.max(0, math.floor(tonumber(a.body) or 0))
+				q.counters += math.max(0, math.floor(tonumber(a.counters) or 0))
+				q.jabs += math.max(0, math.floor(tonumber(a.jabs) or 0))
+				q.blocks += math.max(0, math.floor(tonumber(a.blocks) or 0))
+				q.kicks += math.max(0, math.floor(tonumber(a.kicks) or 0))
+				q.takedowns += math.max(0, math.floor(tonumber(a.takedowns) or 0))
+				q.groundHits += math.max(0, math.floor(tonumber(a.groundHits) or 0))
+				q.subs += math.max(0, math.floor(tonumber(a.subs) or 0))
+				if a.career == true and a.result == "win" then q.careerWins += 1 end
+			end
+		end
+		p.dirty = true; publish(plr); saveSoon(plr)
+	elseif kind == "sig_boss_result" and SIGPROG.list[a] and (b == "win" or b == "loss" or b == "draw") then
+		local p, q = profiles[plr], profiles[plr].sigProgress[a]
+		if b == "win" and SIGPROG.ready(a, p.sigProgress) then
+			q.bossWins = (q.bossWins or 0) + 1
+			if not table.find(p.sigs, a) then table.insert(p.sigs, a) end
+			p.sig = a
+			plr:SetAttribute("CC_Notice", SIGPROG.list[a].signatureName .. " freigeschaltet!|" .. tostring(workspace:GetServerTimeNow()))
+		end
+		p.dirty = true; publish(plr); saveSoon(plr)
+	elseif kind == "sig_unlock" and SIG.list[a] then
+		-- Alte direkte Trainings-Freischaltung bleibt gesperrt; Signaturen kommen nur noch aus dem Trainer-Endkampf.
+		return
 	elseif kind == "sig_equip" then                                -- a = Schluessel oder "" (ablegen); nur Freigeschaltetes
 		local p = profiles[plr]
 		if a == "" or (SIG.list[a] and table.find(p.sigs, a)) then p.sig = a; p.dirty = true; publish(plr); saveSoon(plr) end
+	elseif kind == "goal" and type(a) == "string" then
+		local p, amount, changed = profiles[plr], math.clamp(math.floor(tonumber(b) or 1), 1, 100), false
+		resetGoals(p)
+		for _, def in ipairs(PROG.goals) do
+			if def.counter == a then
+				p.goals.counts[def.id] = math.min(def.target, (p.goals.counts[def.id] or 0) + amount)
+				changed = true
+			end
+		end
+		if changed then p.dirty = true; publish(plr); saveSoon(plr) end
+	elseif kind == "career_result" and OPP.byId[a] and (b == "win" or b == "loss" or b == "draw") then
+		local p, def = profiles[plr], OPP.byId[a]
+		if b == "win" then
+			p.wins += 1
+			if c == "K.O." then p.kos += 1 elseif c == "Submission" then p.subs += 1 end
+			if not table.find(p.career.beaten, a) then
+				local before = OPP.titleFor(#p.career.beaten)
+				table.insert(p.career.beaten, a)
+				local after = OPP.titleFor(#p.career.beaten)
+				if after ~= before then                                  -- neuer Karriere-Titel: einmalige Belohnung
+					addXP(plr, after.bonusXP or 0)
+					plr:SetAttribute("CC_Notice", ("Neuer Titel: %s  (+%d XP)|%s"):format(after.name, after.bonusXP or 0, tostring(workspace:GetServerTimeNow())))
+				end
+			end
+		elseif b == "loss" then p.losses += 1; p.career.losses += 1 end
+		local xp = b == "win" and (def.rewardXP + ((c == "K.O." or c == "Submission") and XP_FINISH or 0)) or (b == "draw" and XP_DRAW or 20)
+		addXP(plr, xp)
+		p.dirty = true; publish(plr); saveSoon(plr)
+		plr:SetAttribute("CC_CareerAdvance", a .. "|" .. b .. "|" .. tostring(workspace:GetServerTimeNow()))
 	elseif kind == "result" then
 		local p = profiles[plr]
 		if a == "win" then

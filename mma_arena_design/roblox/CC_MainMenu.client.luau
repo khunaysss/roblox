@@ -6,12 +6,12 @@
 -- Waehrend das Menue offen ist (Attribut CC_UIBlock am Spieler, nur lokal): keine Kampf-Eingaben, kein Laufen,
 -- kein HUD, keine Gym-Interaktionen. Ein Kampf (CC_Opponent) oder ein Minispiel (CC_Minigame) schliesst das Menue.
 -- Menuepunkte:
---   KARRIERE      = Fortschritt (Level, Werte, Bilanz) + ins Gym. Eine echte Karriere (Gegnerliste, Titel) gibt es noch nicht.
+--   KARRIERE      = sechs freischaltbare Gegner, Rivalenkampf, Ranglistenweg und Titelkampf; echte Vorschau aus vorhandenen Modellen.
 --   ONLINE        = Warteschlange gegen Spieler (ReplicatedStorage.CC_Menu "pvp" / "cancel")
 --   TRAINING      = Trainingskampf (CC_Menu "training") oder Gym-Training (Menue schliessen)
 --   MEIN KAEMPFER = Charakter-Editor: Vorschau nur lokal (ReplicatedStorage.CC_LookShared + CC_CustomShared),
 --                   erst SPEICHERN schickt das Aussehen an den Server (CC_Look) -> Profil speichert sofort (CC_SaveStatus).
---   EINSTELLUNGEN = noch nicht vorhanden (als "BALD" markiert)
+--   EINSTELLUNGEN = Audio, Anzeige, Steuerungshilfe und Tutorial-Zugriff
 -- Spiegel/Spind im Gym (Attribut CC_OpenCustomize vom Server) oeffnen direkt den Editor.
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
@@ -22,14 +22,18 @@ local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 local PPS = game:GetService("ProximityPromptService")
 local Lighting = game:GetService("Lighting")
+local SoundService = game:GetService("SoundService")
 local HS = game:GetService("HttpService")
 
 local player = Players.LocalPlayer
 local UI = require(RS:WaitForChild("CC_UI"))
 local Look = require(RS:WaitForChild("CC_LookShared"))
+local Opponents = require(RS:WaitForChild("CC_Opponents"))
+local Progression = require(RS:WaitForChild("CC_Progression"))
 local C, F = UI.C, UI.F
 local menuEvent = RS:WaitForChild("CC_Menu")
 local lookEvent = RS:WaitForChild("CC_Look")
+local progressEvent = RS:WaitForChild("CC_Progress")
 local state = RS:WaitForChild("CC_MatchState")
 local gui = script.Parent
 gui.ResetOnSpawn = false
@@ -70,14 +74,16 @@ end
 local menuLogo = logo(menu, UDim2.fromOffset(56, 34), 46)
 
 -- Bereich links: Navigation bzw. Unterseite
-local area = UI.new("Frame", { Name = "Area", BackgroundTransparency = 1, Position = UDim2.fromOffset(56, 132), Size = UDim2.fromOffset(470, 440), Parent = menu })
+local area = UI.new("Frame", { Name = "Area", BackgroundTransparency = 1, Position = UDim2.fromOffset(56, 132), Size = UDim2.fromOffset(620, 470), Parent = menu })
 
 -- Profil-Karte unten links
 local profile = UI.panel({ Name = "Profile", AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 56, 1, -32), Size = UDim2.fromOffset(470, 96), Parent = menu })
 UI.label({ Text = player.DisplayName, FontFace = F.head, TextSize = 22, Position = UDim2.fromOffset(20, 10), Size = UDim2.new(1, -40, 0, 28), Parent = profile })
 local pLevel = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextColor3 = C.gold, TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.fromOffset(20, 12), Size = UDim2.new(1, -40, 0, 24), Parent = profile })
 local _, pXP = UI.bar({ Position = UDim2.fromOffset(20, 44), Size = UDim2.new(1, -40, 0, 6), Parent = profile }, C.gold)
-local pInfo = UI.label({ Text = "", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(20, 58), Size = UDim2.new(1, -40, 0, 26), Parent = profile })
+local pInfo = UI.label({ Text = "", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(20, 58), Size = UDim2.new(1, -190, 0, 26), Parent = profile })
+local profileMore = UI.label({ Text = "FORTSCHRITT  ›", FontFace = F.bold, TextSize = 14, TextColor3 = C.dim,
+	TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.new(1, -174, 0, 58), Size = UDim2.fromOffset(145, 26), ZIndex = 8, Parent = profile })
 
 local menuHints = UI.hints({ AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -40, 1, -32), Entries = {
 	{ pc = "KLICK", pad = "A", text = "Auswählen" }, { pc = "RÜCKTASTE", pad = "B", text = "Zurück" } }, Parent = menu })
@@ -90,6 +96,23 @@ local statusL = UI.label({ Text = "", FontFace = F.bold, TextSize = 18, TextXAli
 ---------------------------------------------------------------------------------------------------
 local pages, stack = {}, {}
 local open, close, go, back
+local profileOpen = UI.new("TextButton", { Name = "OpenProgress", Text = "", AutoButtonColor = false, BackgroundTransparency = 1,
+	Size = UDim2.fromScale(1, 1), ZIndex = 7, Selectable = true, Parent = profile })
+profileOpen.SelectionImageObject = UI.noSelectionImage()
+profileOpen.Activated:Connect(function() if go then go("progress") end end)
+local profileOutline = profile:FindFirstChild("PanelOutline")
+profileOpen.MouseEnter:Connect(function()
+	profileMore.TextColor3 = C.red
+	if profileOutline then profileOutline.Color = C.red; profileOutline.Transparency = 0 end
+end)
+profileOpen.MouseLeave:Connect(function()
+	profileMore.TextColor3 = C.dim
+	if profileOutline then profileOutline.Color = C.line; profileOutline.Transparency = 0.28 end
+end)
+UI.icon("next", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -14, 0.72, 0), Size = UDim2.fromOffset(20, 20), ImageColor3 = C.dim, ZIndex = 8, Parent = profile })
+local stage, stageTrack
+local draft = Look.copy(Look.DEFAULT)
+local saved = Look.copy(Look.DEFAULT)
 
 local function page(name, parent)
 	local f = UI.new("Frame", { Name = name, BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Visible = false, Parent = parent or area })
@@ -111,6 +134,7 @@ end
 
 -- Start
 local home = page("home")
+home.Size = UDim2.fromOffset(470, 440)
 local navButtons = {}
 local function nav(order, text, sub, icon, fn, disabled, badge)
 	local b = UI.button({ Style = "nav", Text = text, Sub = sub, Icon = icon, LayoutOrder = order, OnClick = fn, Disabled = disabled, Badge = badge, Parent = home })
@@ -121,29 +145,159 @@ nav(1, "KARRIERE", "Fortschritt · Werte · Bilanz", "trophy", function() go("ca
 nav(2, "ONLINE", "Gegen echte Spieler kämpfen", "globe", function() go("online") end)
 nav(3, "TRAINING", "Trainingskampf oder Gym", "dumbbell", function() go("training") end)
 nav(4, "MEIN KÄMPFER", "Aussehen anpassen", "fighter", function() go("fighter") end)
-nav(5, "EINSTELLUNGEN", "Noch nicht verfügbar", "gear", nil, true, "BALD")
+nav(5, "EINSTELLUNGEN", "Ton · Anzeige · Tutorial", "gear", function() go("settings") end)
 
--- Karriere (= ehrlicher Fortschritt; eine echte Karriere gibt es noch nicht)
+-- Karriere: Ranglistenweg mit zehn Gegnern (Liste scrollbar), Rivalen- und Titelkampf, Karriere-Titel (CC_CareerTitle)
 local career = page("career")
 header(career, "KARRIERE")
-local cStats = card(career, 1, 262)
-UI.new("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder, Parent = cStats })
-local cLevel = UI.label({ Text = "", FontFace = F.head, TextSize = 20, TextColor3 = C.gold, LayoutOrder = 1, Parent = cStats })
-local _, cXP = UI.bar({ LayoutOrder = 2, Parent = cStats }, C.gold)
-local STATS = { { "Power", "Schlagkraft" }, { "Cardio", "Kondition" }, { "Wrestling", "Ringen" }, { "Grappling", "Bodenkampf" } }
-local statRows = {}
-for i, s in ipairs(STATS) do
-	local r = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 36), LayoutOrder = 2 + i, Parent = cStats })
-	UI.label({ Text = s[2], FontFace = F.bold, TextSize = 17, Size = UDim2.new(0.5, 0, 0, 24), Parent = r })
-	local v = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextXAlignment = Enum.TextXAlignment.Right, Size = UDim2.new(1, 0, 0, 24), Parent = r })
-	local _, fill = UI.bar({ Position = UDim2.fromOffset(0, 27), Size = UDim2.new(1, 0, 0, 5), Parent = r }, C.blue)
-	statRows[s[1]] = { v, fill }
+local cSummary = card(career, 1, 62)
+local cLevel = UI.label({ Text = "", FontFace = F.head, TextSize = 19, TextColor3 = C.gold, Size = UDim2.new(1, 0, 0, 24), Parent = cSummary })
+local cRecord = UI.label({ Text = "", TextSize = 15, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 26), Size = UDim2.new(1, 0, 0, 20), Parent = cSummary })
+local _, cXP = UI.bar({ Position = UDim2.fromOffset(0, 48), Size = UDim2.new(1, 0, 0, 5), Parent = cSummary }, C.gold)
+local cRosterCard = card(career, 2, 294)
+local cRoster = UI.new("ScrollingFrame", { BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.fromScale(1, 1), CanvasSize = UDim2.new(),
+	AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarThickness = 4, ScrollBarImageColor3 = C.red, ScrollingDirection = Enum.ScrollingDirection.Y, Parent = cRosterCard })
+UI.new("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder, Parent = cRoster })
+UI.new("UIPadding", { PaddingRight = UDim.new(0, 8), Parent = cRoster })
+local cRows = {}
+local selectedCareerId = Opponents.list[1].id
+local cTip = UI.label({ Text = "", TextSize = 15, TextColor3 = C.dim, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 34), TextWrapped = true, Parent = career })
+local cFight, cFightParts
+local function selectCareer(id)
+	local def = Opponents.byId[id]; if not def then return end
+	selectedCareerId = id
+	for rid, row in pairs(cRows) do row.button:SetAttribute("Selected", rid == id) end
+	cTip.Text = "TRAINER-TIPP  ·  " .. def.tip
+	if cFightParts then cFightParts.title.Text = "KAMPF GEGEN " .. def.name:upper() end
+	if stage then
+		Look.apply(stage, def.look, RS:FindFirstChild("CC_CustomShared"))
+		local shorts = stage:FindFirstChild("Fighter_Shorts", true); if shorts and shorts:IsA("BasePart") then shorts.Color = C.blue end
+	end
 end
-local cRecord = UI.label({ Text = "", TextSize = 16, TextColor3 = C.dim, LayoutOrder = 9, Parent = cStats })
-local cNote = card(career, 2, 74)
-UI.label({ Text = "Werte steigen durch Gym-Training und Kämpfe. Eine Karriere mit Gegnerliste und Titeln gibt es noch nicht.",
-	TextSize = 16, TextColor3 = C.dim, Size = UDim2.fromScale(1, 1), Parent = cNote })
-UI.button({ Style = "primary", Text = "INS GYM", Icon = "dumbbell", LayoutOrder = 3, OnClick = function() close() end, Parent = career })
+for i, def in ipairs(Opponents.list) do
+	local d = def
+	local b, parts = UI.button({ Style = "ghost", Text = d.name, Sub = ("RANG #%d  ·  %s  ·  %s"):format(d.rank or i, d.stage, d.style),
+		Size = UDim2.new(1, 0, 0, 41), LayoutOrder = i, Name = d.id, OnClick = function() selectCareer(d.id) end, Parent = cRoster })
+	cRows[d.id] = { button = b, parts = parts, def = d, index = i }
+end
+local cActions = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 54), LayoutOrder = 4, Parent = career })
+UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Right,
+	Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = cActions })
+UI.button({ Style = "secondary", Text = "INS GYM", Icon = "dumbbell", Size = UDim2.new(0.34, -5, 1, 0), LayoutOrder = 1, OnClick = function() close() end, Parent = cActions })
+cFight, cFightParts = UI.button({ Style = "primary", Text = "KAMPF STARTEN", Icon = "glove", Size = UDim2.new(0.66, -5, 1, 0), LayoutOrder = 2,
+	OnClick = function()
+		if player:GetAttribute("CC_Queue") == "career" then menuEvent:FireServer("cancel")
+		elseif player:GetAttribute("CC_Queue") == nil then menuEvent:FireServer("career", selectedCareerId) end
+	end, Parent = cActions })
+local function refreshCareer()
+	local lv, xp, nx = player:GetAttribute("CC_Level") or 1, player:GetAttribute("CC_XP") or 0, player:GetAttribute("CC_XPNext") or 100
+	local beaten = Opponents.beatenSet(player:GetAttribute("CC_CareerBeaten"))
+	local cw, cl = player:GetAttribute("CC_CareerWins") or 0, player:GetAttribute("CC_CareerLosses") or 0
+	cLevel.Text = ("LEVEL %d   ·   %d / %d XP"):format(lv, xp, nx)
+	cXP.Size = UDim2.fromScale(math.clamp(xp / nx, 0, 1), 1)
+	local title = player:GetAttribute("CC_CareerTitle") or (Opponents.titleFor and Opponents.titleFor(cw).name) or "AMATEUR"
+	cRecord.Text = ("%s   ·   %s   ·   Karriere %d/%d   ·   Bilanz %d-%d"):format(title, Opponents.division or "DIVISION", cw, #Opponents.list, cw, cl)
+	for id, row in pairs(cRows) do
+		local unlocked = Opponents.isUnlocked(id, beaten)
+		row.button:SetAttribute("Disabled", not unlocked)
+		local stateText = beaten[id] and "SIEG" or (unlocked and "BEREIT" or "GESPERRT")
+		row.parts.sub.Text = ("RANG #%d  ·  %s%s  ·  %s"):format(row.def.rank or row.index, row.def.rival and "RIVALE  ·  " or "", row.def.style, stateText)
+	end
+	local unlocked = Opponents.isUnlocked(selectedCareerId, beaten)
+	if not unlocked then
+		local nextId = player:GetAttribute("CC_CareerNext")
+		if nextId and Opponents.byId[nextId] then
+			selectCareer(nextId)
+			unlocked = Opponents.isUnlocked(selectedCareerId, beaten)
+		end
+	end
+	local q = player:GetAttribute("CC_Queue")
+	cFight:SetAttribute("Disabled", not unlocked or (q ~= nil and q ~= "career"))
+	cFightParts.title.Text = q == "career" and "WARTEN ABBRECHEN" or ("KAMPF GEGEN " .. Opponents.byId[selectedCareerId].name:upper())
+end
+selectCareer(selectedCareerId)
+
+-- Fortschritt: echte Tages-/Wochenziele und abgeleitete Level-Titel.
+local progress = page("progress")
+header(progress, "FORTSCHRITT")
+local pgSummary = card(progress, 1, 62)
+local pgRank = UI.label({ Text = "", FontFace = F.head, TextSize = 20, TextColor3 = C.gold, Size = UDim2.new(1, 0, 0, 24), Parent = pgSummary })
+local pgXPText = UI.label({ Text = "", TextSize = 15, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Right, Size = UDim2.new(1, 0, 0, 24), Parent = pgSummary })
+local _, pgXP = UI.bar({ Position = UDim2.fromOffset(0, 42), Size = UDim2.new(1, 0, 0, 6), Parent = pgSummary }, C.gold)
+
+local pgTabs = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), LayoutOrder = 2, Parent = progress })
+UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = pgTabs })
+local pgGoalsTab = UI.button({ Style = "ghost", Text = "ZIELE & BELOHNUNGEN", Icon = "trophy", Size = UDim2.new(0.5, -4, 1, 0), LayoutOrder = 1, Parent = pgTabs })
+local pgLevelsTab = UI.button({ Style = "ghost", Text = "LEVEL & TITEL", Icon = "star", Size = UDim2.new(0.5, -4, 1, 0), LayoutOrder = 2, Parent = pgTabs })
+
+local pgBody = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 276), LayoutOrder = 3, Parent = progress })
+local pgGoals = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = pgBody })
+local pgLevels = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Visible = false, Parent = pgBody })
+UI.new("UIListLayout", { Padding = UDim.new(0, 5), SortOrder = Enum.SortOrder.LayoutOrder, Parent = pgGoals })
+UI.new("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder, Parent = pgLevels })
+
+local goalRows = {}
+for i, def in ipairs(Progression.goals) do
+	local d = def
+	local row = UI.panel({ Size = UDim2.new(1, 0, 0, 62), LayoutOrder = i, ImageColor3 = C.bg1, Parent = pgGoals })
+	UI.label({ Text = d.title, FontFace = F.bold, TextSize = 16, Position = UDim2.fromOffset(14, 5), Size = UDim2.new(1, -160, 0, 23), Parent = row })
+	local statusText = UI.label({ Text = "", TextSize = 14, TextColor3 = C.dim, Position = UDim2.fromOffset(14, 27), Size = UDim2.new(1, -165, 0, 19), Parent = row })
+	local _, fill = UI.bar({ Position = UDim2.fromOffset(14, 50), Size = UDim2.new(1, -170, 0, 5), Parent = row }, C.red)
+	local claim, claimParts = UI.button({ Style = "primary", Text = "+" .. d.xp .. " XP", Size = UDim2.fromOffset(136, 40), Parent = row,
+		OnClick = function() progressEvent:FireServer("claim", d.id) end })
+	claim.AnchorPoint = Vector2.new(1, 0.5); claim.Position = UDim2.new(1, -10, 0.5, 0)
+	goalRows[d.id] = { def = d, status = statusText, fill = fill, button = claim, parts = claimParts }
+end
+
+local levelRows = {}
+for i, def in ipairs(Progression.titles) do
+	local row = UI.panel({ Size = UDim2.new(1, 0, 0, 42), LayoutOrder = i, ImageColor3 = C.bg1, Parent = pgLevels })
+	local title = UI.label({ Text = ("LEVEL %d  ·  %s"):format(def.level, def.title), FontFace = F.bold, TextSize = 16,
+		Position = UDim2.fromOffset(14, 0), Size = UDim2.new(0.48, 0, 1, 0), Parent = row })
+	UI.label({ Text = def.reward, TextSize = 14, TextColor3 = C.dim, Position = UDim2.new(0.48, 0, 0, 0), Size = UDim2.new(0.34, 0, 1, 0), Parent = row })
+	local stateText = UI.label({ Text = "", FontFace = F.bold, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Right,
+		Position = UDim2.new(0.82, 0, 0, 0), Size = UDim2.new(0.15, 0, 1, 0), Parent = row })
+	levelRows[i] = { def = def, title = title, state = stateText }
+end
+
+local function setProgressTab(which)
+	pgGoals.Visible = which == "goals"; pgLevels.Visible = which == "levels"
+	pgGoalsTab:SetAttribute("Selected", which == "goals"); pgLevelsTab:SetAttribute("Selected", which == "levels")
+end
+pgGoalsTab.Activated:Connect(function() setProgressTab("goals") end)
+pgLevelsTab.Activated:Connect(function() setProgressTab("levels") end)
+setProgressTab("goals")
+
+local function progressData()
+	local ok, data = pcall(function() return HS:JSONDecode(player:GetAttribute("CC_Goals") or "") end)
+	return ok and type(data) == "table" and data or { counts = {}, claimed = {} }
+end
+local function refreshProgress()
+	local lv, xp, nx = player:GetAttribute("CC_Level") or 1, player:GetAttribute("CC_XP") or 0, player:GetAttribute("CC_XPNext") or 100
+	pgRank.Text = ("%s  ·  LEVEL %d"):format(player:GetAttribute("CC_RankTitle") or "ROOKIE", lv)
+	pgXPText.Text = ("%d / %d XP"):format(xp, nx)
+	pgXP.Size = UDim2.fromScale(math.clamp(xp / nx, 0, 1), 1)
+	local data = progressData(); data.counts = data.counts or {}; data.claimed = data.claimed or {}
+	for id, row in pairs(goalRows) do
+		local count = math.min(tonumber(data.counts[id]) or 0, row.def.target)
+		local claimed = data.claimed[id] == true
+		row.status.Text = ("%s  ·  %d / %d"):format(row.def.period == "day" and "TÄGLICH" or "WÖCHENTLICH", count, row.def.target)
+		row.fill.Size = UDim2.fromScale(count / row.def.target, 1)
+		row.button:SetAttribute("Disabled", claimed or count < row.def.target)
+		row.parts.title.Text = claimed and "GEHOLT" or (count >= row.def.target and "ABHOLEN" or ("+" .. row.def.xp .. " XP"))
+	end
+	local currentTitle = player:GetAttribute("CC_RankTitle")
+	for _, row in ipairs(levelRows) do
+		local unlocked = lv >= row.def.level
+		row.title.TextColor3 = unlocked and (currentTitle == row.def.title and C.gold or C.text) or C.mute
+		row.state.Text = unlocked and (currentTitle == row.def.title and "AKTIV" or "ERREICHT") or "GESPERRT"
+		row.state.TextColor3 = unlocked and (currentTitle == row.def.title and C.gold or C.green) or C.mute
+	end
+end
+for _, attr in ipairs({ "CC_Goals", "CC_Level", "CC_XP", "CC_XPNext", "CC_RankTitle" }) do
+	player:GetAttributeChangedSignal(attr):Connect(refreshProgress)
+end
+refreshProgress()
 
 -- Online
 local online = page("online")
@@ -181,14 +335,137 @@ UI.button({ Style = "ghost", Text = "GRUNDLAGEN WIEDERHOLEN (TUTORIAL)", Icon = 
 local tState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 4, Size = UDim2.new(1, 0, 0, 28), Parent = training })
 local bTCancel = UI.button({ Style = "danger", Text = "ABBRECHEN", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = training })
 
+-- Einstellungen: lokal und sofort wirksam. Musik wird anhand des Sound-Namens erkannt;
+-- nicht erkannte Sounds gelten als Effekte. Gespeichert im Profil (CC_Progress "settings"; CC_Profile setzt die Attribute beim Laden).
+local settings = page("settings")
+header(settings, "EINSTELLUNGEN")
+local settingsCard = card(settings, 1, 272)
+UI.label({ Text = "TON", FontFace = F.head, TextSize = 21, TextColor3 = C.text, Size = UDim2.new(1, 0, 0, 28), Parent = settingsCard })
+
+local volume = {
+	master = player:GetAttribute("CC_MasterVolume") or 0.8,
+	music = player:GetAttribute("CC_MusicVolume") or 0.4,
+	effects = player:GetAttribute("CC_EffectsVolume") or 0.7,
+}
+local baseVolumes = setmetatable({}, { __mode = "k" })
+local function isMusic(sound)
+	local n = sound.Name:lower()
+	return n:find("music", 1, true) or n:find("theme", 1, true) or n:find("ambience", 1, true)
+end
+local function applySound(sound)
+	if not sound:IsA("Sound") then return end
+	if baseVolumes[sound] == nil then baseVolumes[sound] = sound.Volume end
+	local channel = isMusic(sound) and volume.music or volume.effects
+	sound.Volume = baseVolumes[sound] * volume.master * channel
+end
+local display = { reduceFx = player:GetAttribute("CC_ReduceFX") == true, noShake = player:GetAttribute("CC_NoShake") == true }
+local sendQueued = false
+local function sendSettings()   -- hoechstens alle 0,6 s an den Server (Profil speichert selbst gedrosselt)
+	if sendQueued then return end
+	sendQueued = true
+	task.delay(0.6, function()
+		sendQueued = false
+		progressEvent:FireServer("settings", { master = volume.master, music = volume.music, effects = volume.effects,
+			reduceFx = display.reduceFx, noShake = display.noShake })
+	end)
+end
+local function applyVolumes()
+	player:SetAttribute("CC_MasterVolume", volume.master)
+	player:SetAttribute("CC_MusicVolume", volume.music)
+	player:SetAttribute("CC_EffectsVolume", volume.effects)
+	for _, root in ipairs({ SoundService, workspace }) do
+		for _, d in ipairs(root:GetDescendants()) do applySound(d) end
+	end
+end
+SoundService.DescendantAdded:Connect(applySound)
+workspace.DescendantAdded:Connect(applySound)
+
+local sliderSet = {}
+local function slider(parent, y, title, key)
+	local row = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, y), Size = UDim2.new(1, 0, 0, 64), Parent = parent })
+	UI.label({ Text = title, FontFace = F.bold, TextSize = 17, Size = UDim2.new(0.6, 0, 0, 24), Parent = row })
+	local percent = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Right,
+		Size = UDim2.new(1, 0, 0, 24), Parent = row })
+	local track = UI.new("TextButton", { Text = "", AutoButtonColor = false, BackgroundColor3 = C.bg3, BorderSizePixel = 0,
+		Position = UDim2.fromOffset(0, 34), Size = UDim2.new(1, 0, 0, 10), Parent = row })
+	UI.new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = track })
+	local fill = UI.new("Frame", { BackgroundColor3 = C.red, BorderSizePixel = 0, Size = UDim2.fromScale(volume[key], 1), Parent = track })
+	UI.new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = fill })
+	local knob = UI.new("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(volume[key], 0, 0.5, 0), Size = UDim2.fromOffset(22, 22),
+		BackgroundColor3 = C.red, BorderSizePixel = 0, ZIndex = 3, Parent = track })
+	UI.new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = knob })
+	UI.new("UIStroke", { Color = C.text, Transparency = 0.12, Thickness = 2, Parent = knob })
+	local dragging = false
+	local function setAt(x)
+		local v = math.clamp((x - track.AbsolutePosition.X) / math.max(track.AbsoluteSize.X, 1), 0, 1)
+		v = math.floor(v * 20 + 0.5) / 20
+		volume[key] = v
+		fill.Size = UDim2.fromScale(v, 1)
+		knob.Position = UDim2.new(v, 0, 0.5, 0)
+		percent.Text = ("%d %%"):format(math.floor(v * 100 + 0.5))
+		applyVolumes(); sendSettings()
+	end
+	sliderSet[key] = function(v)
+		fill.Size = UDim2.fromScale(v, 1); knob.Position = UDim2.new(v, 0, 0.5, 0); percent.Text = ("%d %%"):format(math.floor(v * 100 + 0.5))
+	end
+	percent.Text = ("%d %%"):format(math.floor(volume[key] * 100 + 0.5))
+	track.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true; setAt(input.Position.X) end
+	end)
+	UIS.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then setAt(input.Position.X) end
+	end)
+	UIS.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
+	end)
+	return track
+end
+slider(settingsCard, 42, "Gesamt", "master")
+slider(settingsCard, 108, "Musik", "music")
+slider(settingsCard, 174, "Effekte", "effects")
+local settingsNote = card(settings, 2, 146)
+UI.label({ Text = "ANZEIGE", FontFace = F.head, TextSize = 21, TextColor3 = C.text, Size = UDim2.new(1, 0, 0, 28), Parent = settingsNote })
+local toggleSet = {}
+local function toggle(y, title, key, invert)   -- invert: Schalter zeigt "AN", wenn der gespeicherte Wert false ist (Kamera-Wackeln an = noShake false)
+	local row = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, y), Size = UDim2.new(1, 0, 0, 40), Parent = settingsNote })
+	UI.label({ Text = title, FontFace = F.bold, TextSize = 17, Size = UDim2.new(0.62, 0, 1, 0), Parent = row })
+	local b, parts
+	local function show() local on = display[key] ~= (invert == true); parts.title.Text = on and "AN" or "AUS"; b:SetAttribute("Selected", on) end
+	b, parts = UI.button({ Style = "secondary", Text = "", Size = UDim2.new(0.3, 0, 1, 0), Name = key, OnClick = function()
+		display[key] = not display[key]; player:SetAttribute(key == "reduceFx" and "CC_ReduceFX" or "CC_NoShake", display[key]); show(); sendSettings()
+	end, Parent = row })
+	b.AnchorPoint = Vector2.new(1, 0); b.Position = UDim2.new(1, 0, 0, 0)
+	toggleSet[key] = show; show()
+end
+toggle(34, "Starke Effekte (Blitze, Tönung)", "reduceFx", true)
+toggle(80, "Kamera-Wackeln", "noShake", true)
+-- Gespeicherte Werte uebernehmen, sobald das Profil geladen ist (und bei spaeteren Server-Aenderungen)
+local function loadSettings()
+	if not player:GetAttribute("CC_SettingsLoaded") then return end
+	volume.master = player:GetAttribute("CC_MasterVolume") or volume.master
+	volume.music = player:GetAttribute("CC_MusicVolume") or volume.music
+	volume.effects = player:GetAttribute("CC_EffectsVolume") or volume.effects
+	display.reduceFx = player:GetAttribute("CC_ReduceFX") == true; display.noShake = player:GetAttribute("CC_NoShake") == true
+	for k, f in pairs(sliderSet) do f(volume[k]) end
+	for _, f in pairs(toggleSet) do f() end
+	applyVolumes()
+end
+player:GetAttributeChangedSignal("CC_SettingsLoaded"):Connect(loadSettings)
+task.defer(loadSettings)
+local settingsActions = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 56), LayoutOrder = 3, Parent = settings })
+UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Right,
+	Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = settingsActions })
+UI.button({ Style = "secondary", Text = "TUTORIAL WIEDERHOLEN", Icon = "help", Size = UDim2.new(0.58, -5, 1, 0), LayoutOrder = 1,
+	OnClick = function() close(); RS:WaitForChild("CC_Tutorial"):FireServer("openWelcome") end, Parent = settingsActions })
+UI.button({ Style = "primary", Text = "FERTIG", Icon = "check", Size = UDim2.new(0.42, -5, 1, 0), LayoutOrder = 2,
+	OnClick = function() back() end, Parent = settingsActions })
+applyVolumes()
+
 ---------------------------------------------------------------------------------------------------
 -- Buehne: Kopie des eigenen Kaempfers in Kampfhaltung, Kamera auf dem Einlaufsteg, Fight-Night-Licht
 ---------------------------------------------------------------------------------------------------
-local stage, stageTrack
 local stageYaw = 0
 local stageBones = {}
-local draft = Look.copy(Look.DEFAULT)      -- Editor-Entwurf (Vorschau)
-local saved = Look.copy(Look.DEFAULT)      -- zuletzt gespeichertes Aussehen
 local rayParams = RaycastParams.new(); rayParams.FilterType = Enum.RaycastFilterType.Exclude
 local function floorY(pos, ignore)
 	rayParams.FilterDescendantsInstances = ignore
@@ -579,8 +856,19 @@ end
 local function showPage(name)
 	for n, p in pairs(pages) do p.Visible = n == name end
 	if name == "fighter" then editorOpened(); return end
+	if name == "career" then
+		local beaten = Opponents.beatenSet(player:GetAttribute("CC_CareerBeaten"))
+		local nextId = player:GetAttribute("CC_CareerNext")
+		if beaten[selectedCareerId] and nextId and not beaten[nextId] then selectedCareerId = nextId end
+		selectCareer(selectedCareerId); refreshCareer()
+	elseif name == "progress" then
+		refreshProgress()
+	elseif stage then
+		Look.apply(stage, draft, templates())
+		local shorts = stage:FindFirstChild("Fighter_Shorts", true); if shorts and shorts:IsA("BasePart") then shorts.Color = Color3.fromRGB(144, 21, 30) end
+	end
 	-- Karriere zeigt Level/XP/Bilanz selbst und ist hoeher als der Platz ueber der Profilkarte -> Profilkarte dort ausblenden
-	profile.Visible = name ~= "career"
+	profile.Visible = name ~= "career" and name ~= "settings" and name ~= "progress"
 	local p = pages[name]
 	local first
 	for _, d in ipairs(p:GetDescendants()) do
@@ -632,7 +920,13 @@ function close()
 	cam.CameraType = Enum.CameraType.Custom
 	cam.FieldOfView = 70
 	local char = player.Character
-	if char and char:FindFirstChildOfClass("Humanoid") then cam.CameraSubject = char:FindFirstChildOfClass("Humanoid") end
+	if char and char:FindFirstChildOfClass("Humanoid") then
+		cam.CameraSubject = char:FindFirstChildOfClass("Humanoid")
+		local root = char:FindFirstChild("HumanoidRootPart")
+		if root then
+			cam.CFrame = CFrame.lookAt(root.Position - root.CFrame.LookVector * 9 + Vector3.new(0, 4, 0), root.Position + Vector3.new(0, 2, 0))
+		end
+	end
 	blockGameplay(false)
 	otherGuis(true)
 	GuiService.SelectedObject = nil
@@ -655,7 +949,7 @@ menuBtn.Parent = canvas
 local menuKey = UI.key("M", { AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(1, 8, 0.5, 0), Parent = menuBtn })
 local function canOpen()
 	local char = player.Character
-	return not isOpen and char and not char:GetAttribute("CC_Opponent") and not player:GetAttribute("CC_Minigame")
+	return not isOpen and char and not char:GetAttribute("CC_Opponent") and not char:GetAttribute("CC_BagPractice") and not player:GetAttribute("CC_Minigame")
 		and not char:GetAttribute("CC_Wrestle") and (player:GetAttribute("CC_OnbPhase") or "") == ""   -- waehrend des Einstiegs (CC_Tutorial) nicht
 		and not ((state:GetAttribute("Mode") or "") ~= "" and (state:GetAttribute("RedName") == player.Name or state:GetAttribute("BlueName") == player.Name))   -- eigener Kampf inkl. Walkout
 end
@@ -677,13 +971,15 @@ local function queueText()
 		return "Suche läuft … (" .. n .. " von 2 Spielern)"
 	elseif q == "training" then
 		return busy and "Arena belegt – Training startet nach dem laufenden Kampf." or "Training startet …"
+	elseif q == "career" then
+		return busy and "Fight Night belegt – dein Karriere-Kampf wartet." or "Karriere-Kampf startet …"
 	end
 	return nil
 end
 RunService.Heartbeat:Connect(function(dt)
 	local char = player.Character
 	local inFight = (state:GetAttribute("Mode") or "") ~= "" and (state:GetAttribute("RedName") == player.Name or state:GetAttribute("BlueName") == player.Name)   -- auch beim Walkout (noch ohne Gegner)
-	if isOpen and char and (char:GetAttribute("CC_Opponent") or player:GetAttribute("CC_Minigame") or inFight) then close() end
+	if isOpen and char and (char:GetAttribute("CC_Opponent") or char:GetAttribute("CC_BagPractice") or player:GetAttribute("CC_Minigame") or inFight) then close() end
 	if isOpen and char then
 		local hum = char:FindFirstChildOfClass("Humanoid")
 		if hum and hum.WalkSpeed ~= 0 then hum.WalkSpeed = 0 end
@@ -716,16 +1012,7 @@ RunService.Heartbeat:Connect(function(dt)
 	local loaded = player:GetAttribute("CC_ProfileSaved")
 	pInfo.Text = ("%d / %d XP   ·   Bilanz %d-%d%s"):format(xp, nx, w, l, not loaded and "   ·   Profil nicht geladen" or "")
 	pInfo.TextColor3 = not loaded and C.warn or C.dim
-	if pages.career.Visible then
-		cLevel.Text = ("LEVEL %d   ·   %d / %d XP"):format(lv, xp, nx)
-		cXP.Size = UDim2.fromScale(math.clamp(xp / nx, 0, 1), 1)
-		for key, row in pairs(statRows) do
-			local v, tp = player:GetAttribute("CC_" .. key) or 0, player:GetAttribute("CC_" .. key .. "TP") or 0
-			row[1].Text = ("%d / 20   ·   %d/10 TP"):format(v, tp)
-			row[2].Size = UDim2.fromScale(math.clamp((v + tp / 10) / 20, 0, 1), 1)
-		end
-		cRecord.Text = ("Bilanz %d-%d   ·   K.o. %d   ·   Submission %d"):format(w, l, player:GetAttribute("CC_KOs") or 0, player:GetAttribute("CC_Subs") or 0)
-	end
+	if pages.career.Visible then refreshCareer() end
 	-- Warteschlange
 	local q = player:GetAttribute("CC_Queue")
 	local txt = queueText()

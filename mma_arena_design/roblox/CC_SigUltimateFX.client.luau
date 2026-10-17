@@ -160,6 +160,7 @@ local function impactFrame(strength)
 	end)
 end
 local function fovPunch(amount)
+	if player:GetAttribute("CC_NoShake") then return end
 	local cam = workspace.CurrentCamera; local base = cam.FieldOfView
 	cam.FieldOfView = base - amount
 	TweenService:Create(cam, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { FieldOfView = base }):Play()

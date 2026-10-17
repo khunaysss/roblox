@@ -33,9 +33,10 @@ local function grounded()
 end
 
 fx.OnClientEvent:Connect(function(strength, kind)
-	if kind == "hit" or kind == "stagger" or kind == "ko" then
-		flashA = math.max(flashA, 0.25 + 0.35 * strength)
-		if strength >= 0.4 then shake = math.max(shake, strength) end   -- nur schwere Treffer ruckeln
+	if kind == "hit" or kind == "stagger" or kind == "ko" or kind == "knockdown" then
+		flashA = math.max(flashA, (player:GetAttribute("CC_ReduceFX") and 0.08 or 0.25 + 0.35 * strength))   -- Einstellung: starke Effekte aus = nur schwacher Blitz
+		if strength >= 0.4 and not player:GetAttribute("CC_NoShake") then shake = math.max(shake, strength) end   -- nur schwere Treffer ruckeln
+		if kind == "knockdown" then show("KNOCKDOWN!", Color3.fromRGB(255, 196, 46), 5, 1.1) end
 	elseif kind == "land" then
 		local heavy = strength >= 0.3
 		show(heavy and "SCHWERER TREFFER" or "TREFFER", heavy and Color3.fromRGB(255, 170, 60) or Color3.new(1, 1, 1), heavy and 2 or 1)

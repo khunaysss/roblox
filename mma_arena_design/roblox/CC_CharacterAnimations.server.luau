@@ -2195,6 +2195,27 @@ local function arenaCenter()
 end
 local CENTER = arenaCenter()
 local lastAnchored = false
+-- Reaktion auf eingesteckte Treffer: Schaden der letzten Sekunden (klingt ab). Ein Treffer bricht die eigene Kombination ab;
+-- danach je nach Schaden/Angeschlagen: Deckung + Rueckzug ("cover") oder sofortiger Konter ("counter").
+local hitDmg, lastHitAt, lastHP, reactUntil, reactKind = 0, -99, D.hum.Health, 0, nil
+D.hum.HealthChanged:Connect(function(hp)
+	local d = lastHP - hp; lastHP = hp
+	if d <= 0.5 or D.wr or D.down or D.ko then return end
+	local now = os.clock()
+	hitDmg = hitDmg * math.exp(-(now - lastHitAt) / 2.0) + d
+	lastHitAt = now
+	combo = nil                                                       -- getroffen: eigene Serie bricht ab
+	if dummy:GetAttribute("CC_Passive") or dummy:GetAttribute("CC_Tutor") then return end
+	local LV = DummyLevel()
+	local rocked = dummy:GetAttribute("CC_Rocked") == true
+	if rocked or hitDmg >= 14 or D.hum.Health < 30 then
+		reactKind, reactUntil = "cover", now + 0.9 + math.min(hitDmg, 30) / 30   -- schwer getroffen: Deckung hoch, Abstand holen
+	elseif math.random() < math.clamp(0.25 + LV.aggr * 0.35, 0.2, 0.6) then
+		reactKind, reactUntil = "counter", now + 0.6                      -- leichter Treffer: zurueckschlagen
+	else
+		reactKind, reactUntil = "cover", now + 0.5
+	end
+end)
 RunService.Heartbeat:Connect(function(dt)
 	local root = dummy.HumanoidRootPart
 	if root.Anchored ~= lastAnchored then        -- nach dem Ringkampf wieder vom Server steuern
@@ -2291,6 +2312,27 @@ RunService.Heartbeat:Connect(function(dt)
 	local right = Vector3.new(-fwd.Z, 0, fwd.X)
 	local hurt = D.hum.Health < 35 or D.stamina < 30
 	local want = style.want + (hurt and 1.2 or 0)
+	-- ---- Reaktion auf Treffer (siehe HealthChanged oben) ----
+	if reactKind and now < reactUntil and not D.down and not (D.busyUntil and now < D.busyUntil) then
+		if reactKind == "cover" then
+			setBlock(D, true)
+			local away = -fwd + right * circleDir * 0.6
+			D.hum:Move(dist < want + 2 and away.Unit or Vector3.zero, false)
+			if now + 0.05 >= reactUntil then setBlock(D, false); reactKind = nil; nextThink = math.max(nextThink, now + 0.3) end
+			return
+		elseif reactKind == "counter" then
+			reactKind = nil
+			if dist <= (DUMMY_RANGE.jab or 4.4) + 0.4 and D.stamina >= 10 then
+				setBlock(D, false)
+				combo = (math.random() < 0.5) and { "jab", "cross" } or { "hook" }
+				if dist > (DUMMY_RANGE[combo[1]] or 4) then combo = { "jab", "cross" } end
+				comboAt = now
+			end
+		end
+	elseif reactKind and now >= reactUntil then
+		if reactKind == "cover" then setBlock(D, false) end
+		reactKind = nil
+	end
 	-- ---- Bewegung ----
 	if now > nextSwitch then circleDir = -circleDir; nextSwitch = now + 1.2 + math.random() * 2.0 end
 	local off = Vector3.new(root.Position.X, 0, root.Position.Z) - CENTER
