@@ -1,0 +1,42 @@
+{
+ "rest_angle_before_deg_max": 10.01,
+ "rest_angle_after_deg_max": 0.0,
+ "parts": 14,
+ "bones": 16,
+ "height_m": 1.877,
+ "frames": {
+  "1": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "10": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "17": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "30": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  }
+ },
+ "fbx_bytes": 368972,
+ "part_names": [
+  "Muhammad_Ali__Brows",
+  "Muhammad_Ali__Eye_Dark",
+  "Muhammad_Ali__Eye_White",
+  "Muhammad_Ali__Glove",
+  "Muhammad_Ali__Glove.001",
+  "Muhammad_Ali__Glove_Cuff",
+  "Muhammad_Ali__Glove_Cuff.001",
+  "Muhammad_Ali__Hair",
+  "Muhammad_Ali__Mouth",
+  "Muhammad_Ali__Shorts",
+  "Muhammad_Ali__Shorts_Stripe_Left",
+  "Muhammad_Ali__Shorts_Stripe_Right",
+  "Muhammad_Ali__Shorts_Waistband",
+  "Muhammad_Ali__Skin"
+ ]
+}

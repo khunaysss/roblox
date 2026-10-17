@@ -1,0 +1,43 @@
+{
+ "rest_angle_before_deg_max": 10.01,
+ "rest_angle_after_deg_max": 0.0,
+ "parts": 15,
+ "bones": 16,
+ "height_m": 1.806,
+ "frames": {
+  "1": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  },
+  "10": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  },
+  "17": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  },
+  "30": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  }
+ },
+ "fbx_bytes": 408396,
+ "part_names": [
+  "Khabib_Nurmagomedov__Beard",
+  "Khabib_Nurmagomedov__Brows",
+  "Khabib_Nurmagomedov__Chest_Decal",
+  "Khabib_Nurmagomedov__Eye_Dark",
+  "Khabib_Nurmagomedov__Eye_White",
+  "Khabib_Nurmagomedov__Glove",
+  "Khabib_Nurmagomedov__Glove.001",
+  "Khabib_Nurmagomedov__Glove_Wrap",
+  "Khabib_Nurmagomedov__Glove_Wrap.001",
+  "Khabib_Nurmagomedov__Hair",
+  "Khabib_Nurmagomedov__Mouth",
+  "Khabib_Nurmagomedov__Shorts",
+  "Khabib_Nurmagomedov__Shorts_Decal",
+  "Khabib_Nurmagomedov__Shorts_Waistband",
+  "Khabib_Nurmagomedov__Skin"
+ ]
+}

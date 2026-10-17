@@ -1,0 +1,44 @@
+{
+ "rest_angle_before_deg_max": 10.01,
+ "rest_angle_after_deg_max": 0.0,
+ "parts": 16,
+ "bones": 16,
+ "height_m": 1.854,
+ "frames": {
+  "1": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "10": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "17": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "30": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  }
+ },
+ "fbx_bytes": 425852,
+ "part_names": [
+  "Charles_Oliveira__Brows",
+  "Charles_Oliveira__Chest_Decal",
+  "Charles_Oliveira__Eye_Dark",
+  "Charles_Oliveira__Eye_White",
+  "Charles_Oliveira__Glove",
+  "Charles_Oliveira__Glove.001",
+  "Charles_Oliveira__Glove_Wrap",
+  "Charles_Oliveira__Glove_Wrap.001",
+  "Charles_Oliveira__Hair",
+  "Charles_Oliveira__Hair_Sides",
+  "Charles_Oliveira__Mouth",
+  "Charles_Oliveira__Shorts",
+  "Charles_Oliveira__Shorts_Decal",
+  "Charles_Oliveira__Shorts_Waistband",
+  "Charles_Oliveira__Skin",
+  "Charles_Oliveira__Sleeve_Tattoo"
+ ]
+}

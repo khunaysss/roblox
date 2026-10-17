@@ -1,0 +1,108 @@
+{
+ "source": "Fighter_Rigged_v21.blend (unveraendert)",
+ "Trainer_Ali_Idle": {
+  "frames": 33,
+  "loop": true,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.37,
+  "lowest_z_m": 0.017
+ },
+ "Trainer_Ali_Greet": {
+  "frames": 34,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.301,
+  "lowest_z_m": 0.017
+ },
+ "Trainer_Ali_Respect": {
+  "frames": 44,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.382,
+  "lowest_z_m": 0.017
+ },
+ "Trainer_Pereira_Idle": {
+  "frames": 41,
+  "loop": true,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.342,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Pereira_Greet": {
+  "frames": 28,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.342,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Pereira_Respect": {
+  "frames": 44,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.169,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Khabib_Idle": {
+  "frames": 41,
+  "loop": true,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.414,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Khabib_Greet": {
+  "frames": 30,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.414,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Khabib_Respect": {
+  "frames": 48,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.283,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Saenchai_Idle": {
+  "frames": 21,
+  "loop": true,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.378,
+  "lowest_z_m": 0.02
+ },
+ "Trainer_Saenchai_Greet": {
+  "frames": 30,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.378,
+  "lowest_z_m": 0.02
+ },
+ "Trainer_Saenchai_Respect": {
+  "frames": 44,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.308,
+  "lowest_z_m": 0.02
+ },
+ "Trainer_Oliveira_Idle": {
+  "frames": 41,
+  "loop": true,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.376,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Oliveira_Greet": {
+  "frames": 30,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.376,
+  "lowest_z_m": -0.001
+ },
+ "Trainer_Oliveira_Respect": {
+  "frames": 44,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "glove_head_min_m": 0.373,
+  "lowest_z_m": -0.001
+ }
+}

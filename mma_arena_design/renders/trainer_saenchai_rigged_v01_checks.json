@@ -1,0 +1,45 @@
+{
+ "rest_angle_before_deg_max": 10.01,
+ "rest_angle_after_deg_max": 0.0,
+ "parts": 17,
+ "bones": 16,
+ "height_m": 1.746,
+ "frames": {
+  "1": {
+   "hand_L_to_head_m": 0.765,
+   "hand_R_to_head_m": 0.765
+  },
+  "10": {
+   "hand_L_to_head_m": 0.765,
+   "hand_R_to_head_m": 0.765
+  },
+  "17": {
+   "hand_L_to_head_m": 0.765,
+   "hand_R_to_head_m": 0.765
+  },
+  "30": {
+   "hand_L_to_head_m": 0.765,
+   "hand_R_to_head_m": 0.765
+  }
+ },
+ "fbx_bytes": 453036,
+ "part_names": [
+  "Saenchai__Armband_Red",
+  "Saenchai__Armband_Red.001",
+  "Saenchai__Armband_White",
+  "Saenchai__Armband_White.001",
+  "Saenchai__Brows",
+  "Saenchai__Eye_Dark",
+  "Saenchai__Eye_White",
+  "Saenchai__Glove",
+  "Saenchai__Glove.001",
+  "Saenchai__Glove_Cuff",
+  "Saenchai__Glove_Cuff.001",
+  "Saenchai__Hair",
+  "Saenchai__Mouth",
+  "Saenchai__Shorts",
+  "Saenchai__Shorts_Decal",
+  "Saenchai__Shorts_Waistband",
+  "Saenchai__Skin"
+ ]
+}

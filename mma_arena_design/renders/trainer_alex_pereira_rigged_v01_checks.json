@@ -1,0 +1,44 @@
+{
+ "rest_angle_before_deg_max": 10.01,
+ "rest_angle_after_deg_max": 0.0,
+ "parts": 16,
+ "bones": 16,
+ "height_m": 1.829,
+ "frames": {
+  "1": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "10": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "17": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  },
+  "30": {
+   "hand_L_to_head_m": 0.805,
+   "hand_R_to_head_m": 0.805
+  }
+ },
+ "fbx_bytes": 426364,
+ "part_names": [
+  "Alex_Pereira__Brows",
+  "Alex_Pereira__Chest_Tattoo_L",
+  "Alex_Pereira__Chest_Tattoo_R",
+  "Alex_Pereira__Eye_Dark",
+  "Alex_Pereira__Eye_White",
+  "Alex_Pereira__Glove",
+  "Alex_Pereira__Glove.001",
+  "Alex_Pereira__Glove_Wrap",
+  "Alex_Pereira__Glove_Wrap.001",
+  "Alex_Pereira__Hair",
+  "Alex_Pereira__Mouth",
+  "Alex_Pereira__Shorts",
+  "Alex_Pereira__Shorts_Decal",
+  "Alex_Pereira__Shorts_Waistband",
+  "Alex_Pereira__Skin",
+  "Alex_Pereira__Sleeve_Tattoo"
+ ]
+}

@@ -106,6 +106,21 @@ local function play(kind, id, model, info)
 	-- Kamera
 	local rayParams = RaycastParams.new(); rayParams.FilterType = Enum.RaycastFilterType.Exclude
 	rayParams.FilterDescendantsInstances = { model, player.Character, lights, workspace:FindFirstChild("CC_StyleTrainersGym") }
+	-- Seitenwahl: ist eine Einstellung durch Wand/Saeule verdeckt und die gespiegelte Seite frei, die gespiegelte nehmen
+	local function blocked(s)
+		local look = (piv * CFrame.new(s.look)).Position
+		for _, p in ipairs({ s.from, s.to }) do
+			local cpos = (piv * CFrame.new(p)).Position
+			if workspace:Raycast(look, cpos - look, rayParams) then return true end
+		end
+		return false
+	end
+	local shots = {}
+	for i, s in ipairs(def.shots) do
+		local m = { t = s.t, fov = s.fov, from = s.from * Vector3.new(-1, 1, 1), to = s.to * Vector3.new(-1, 1, 1), look = s.look * Vector3.new(-1, 1, 1) }
+		shots[i] = (blocked(s) and not blocked(m)) and m or s
+	end
+	def = setmetatable({ shots = shots }, { __index = def })
 	local total = 0; for _, s in ipairs(def.shots) do total += s.t end
 	RunService:BindToRenderStep("CC_TrainerSceneCam", Enum.RenderPriority.Last.Value + 5, function()
 		local t = os.clock() - t0
