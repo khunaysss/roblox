@@ -1,0 +1,91 @@
+# Cage Champions – PROJECT.md (zentraler Stand)
+
+Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md`, `CHATGPT_HANDOFF.md`.
+Ältere Dokumente bleiben gültig für Details. Bei Widersprüchen gilt dieser Stand, bis der Nutzer ihn bestätigt.
+
+## Festgelegte Entscheidungen (nicht ohne Zustimmung des Nutzers ändern)
+- Projektleitung: Nutzer. Umsetzung: Claude (Blender, Roblox Studio über MCP). Planung, Balancing, Texte: ChatGPT (kein Repo-Zugriff).
+- Desktop zuerst, Mobile später.
+- Kein Veröffentlichen des Place, nichts Kostenpflichtiges.
+- Keine Roblox-Arbeit ohne ausdrücklichen Auftrag.
+- Bestehende Dateien nicht überschreiben; neue Version (v03 → v04 …).
+- Nicht mit dem echten Profil testen: Testschlüssel `CC_TestProfileKey` benutzen; Testschalter danach entfernen.
+- Animations-Upload nur durch den Nutzer (`upload_starten.ps1`), API-Schlüssel nie an Claude.
+- Gruppe ANIMEXGANG (ID 7160158) für alle Uploads.
+- Das Meme-Roll-Spiel im Repo (`characters/`, `world/`) nicht verändern.
+- Spielkonzept: MMA-Spiel mit eigenem Kämpfer, Training, Kampfstilen, Karriere, Online. Gym und Lobby sind der Mittelpunkt, die Fight Night ist für besondere Kämpfe und Online-Events.
+- Kampfstile haben Stärken und Schwächen; keiner ist grundsätzlich besser.
+- Rangkämpfe nutzen gleiche Grundwerte.
+- Freischaltungen dürfen Anfänger nicht chancenlos machen. Keine täglichen Energiegrenzen, keine bezahlten Stärkevorteile.
+- Vorhandene Maps, Modelle, Animationen und UIs weiterverwenden.
+- Signatur-Regeln: Fokus nur durch gelandete Treffer und erfolgreiche Abwehr im echten Kampf (nicht im Tutorial). Ein Versuch verbraucht den ganzen Fokus plus Ausdauer. Server prüft alles, Schaden kommt aus den normalen Techniken. Blut gibt es nicht.
+
+## Fertig
+### Spielablauf
+- Einstieg: Editor mit „Fertig“ → Haupttrainer begrüßt → 6 Lektionen im Käfig → erster Trainingskampf (Tutorial, Studio getestet).
+- Hauptmenü: Karriere (Fortschritt), Online, Training, Mein Kämpfer, Einstellungen = „bald“.
+- Training: Trainingskampf gegen Dummy; Gym mit 20 Minispielen (Sandsack, Bank, Curls, Hampelmann).
+- Kampfablauf: 3 Runden à 2:00, K.o./Punktsieg, HUD, Sounds.
+- Spieler gegen Spieler: Warteschlange, Fight Night mit Walkout (Studio mit Testschaltern geprüft, nicht mit zwei echten Spielern).
+- Profil im DataStore: Level, XP, Siege, Werte, Aussehen, Tutorial-Fortschritt.
+- Fallschutz im Gym und Kampf.
+
+### Kampfsystem
+- Bewegung, Anvisierung, Kamera (Abschnitt A, PC geprüft).
+- Schlagreichweite, Trefferprüfung, Kombos, Ausdauer (B, PC geprüft).
+- Kicks und Basis-Moveset (C, PC geprüft).
+- Takedowns, Kamera (D, PC geprüft).
+- Bodenpositionen und Submissions (E, PC geprüft).
+- Ringen, Trefferreaktionen, K.o. am Boden (Playtest geprüft).
+- Bodenkampf-Übergang ohne Stand-Idle-Aufblitzen (2026-10-13, getestet).
+
+### Signaturen
+- Tyson „PEEK-A-BOO KOMBINATION“ (Körperhaken + Uppercut): Animation v19, Treffer, Fokus, VFX, HUD, Finisher, Unterbrechung getestet.
+- Ali „SCHMETTERLING-SERIE“ (Jab-Jab-Cross): Animation v20, in Studio getestet (Reichweite 4,1 Studs).
+- Whoosh-Sound: Roblox Pro Sound Effects 9120728815, in `SoundService.CC_Sounds`.
+- Freischaltung beim Trainer: „Lernen“ → im Trainingskampf Kombination einmal landen → im Profil gespeichert (getestet mit Testprofil inkl. Neustart).
+
+### Trainer
+- Haupttrainer im Gym (E) und am Käfigrand.
+- Sechs Stil-Trainer im Gym an der Ostseite (`CC_Trainers`), mit E: Panel mit Name, Stil, Signatur; lernen und ausrüsten (getestet).
+- Trainer-Modelle importiert aus `export/Trainers_v01_Roblox.fbx` (`setup_trainers_v01.luau`).
+
+### Animationen
+- Hochgeladen in ANIMEXGANG: 64 IDs (Stand 2026-10-11) plus 34 weitere (105 insgesamt, geladen und geprüft).
+- Ali und Tyson: als Keyframes in Studio, Upload noch offen.
+
+### Weitere Fertigstellungen
+- Gym-Startort, Fallschutz, Curls auf der Hallenseite.
+- Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
+- Kämpfer-Anpassung (Frisur, Bart, Gesicht, Haut, Haarfarbe).
+- UI-Schritte 1 und 2 (Designsystem `CC_UI`, Hauptmenü, Editor, Gym-Anzeigen, Ergebnisanzeige) – PC getestet.
+- Blender-Modelle: Arena, Event-Map mit Backstage, Trainings-Gym v02, Haupttrainer v03, Ringrichter v02, Trainer v02, Fighter Design v03/Customization v05, Fighter Rigged bis v20.
+
+## Offene Punkte
+### Bugs / Prüfungen
+- Zwei-Spieler-Test (Studio → Test → Clients 2) für Online, Fight Night, Walkout, Signatur, Finisher, Ergebnis, XP und Rückkehr ins Gym. **Noch nicht gemacht.**
+- Touch (Geräte-Emulator) und echter Controller ungetestet.
+- Gegner-KI: Verhalten nach Trefferschaden noch unfertig.
+- Wrestling: Handschuh-Überlappung am Knie bis 13 cm (W1), Armbewegungen (W2), Guard-Durchdringung (W3), Aufstehen (W4).
+- Gym: Bank/Matten ohne eigene Animation.
+- Event-Map: 168 358 Dreiecke, keine Kollision (M1). Maßstabsdatei verweist auf alten Fighter (M2).
+- Einstellungen-Menü fehlt; Schalter „Effekte reduzieren“ (`CC_ReduceFX`) ist nur vorbereitet.
+- Trainer-Modelle sind starr, die Signatur wird nicht vorgeführt.
+- Trainer-Namen sind echte Personen (rechtlich riskant vor Veröffentlichung).
+- Die Animationen Fighter_Sig_Tyson / Fighter_Sig_Ali sind noch nicht hochgeladen; die Animationen Fighter_LegCheck_v01, Fighter_LimpLeft_v01, Fighter_LimpRight_v01 ebenfalls offen.
+- `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
+
+### Aufgaben (Reihenfolge laut Nutzer)
+1. Zwei-Spieler-Test Fight Night.
+2. Einstellungen-Menü (Effekte aus, Kamera-Wackeln, Lautstärke) mit Profil-Speicherung.
+3. Balancing der Signaturen (Fokus, Ausdauer, Schaden, Freischaltbedingung).
+4. Fiktive Namen und Aussehen für die sechs Trainer.
+5. Signaturen Pereira, Saenchai, Khabib (eigene Takedown-Logik, ohne Finisher). Oliveira braucht vorher ein Clinch-System.
+6. Karriere: Gegnerliste (ca. 10 KI-Gegner, steigend), Titel, Belohnungen.
+7. Ranked (später): gleiche Signatur-Auswahl für alle.
+8. Vorführung der Signatur durch den Trainer (Ersatz über Dummy-Kämpfer).
+9. Gym-Lobby: Design und Lighting überarbeiten (Auftrag liegt vor, noch nicht begonnen).
+10. Grünpflanzen in dunklen Töpfen in ruhigen Bereichen (Auftrag liegt vor, noch nicht begonnen).
+
+## Commits
+- Letzter Commit mit Signatur-Arbeit: `1da508a` (Ali), `d1838a8` (CHATGPT_HANDOFF).
