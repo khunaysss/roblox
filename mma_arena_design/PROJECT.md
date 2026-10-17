@@ -91,6 +91,10 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Neue Animation Fighter_Sig_Saenchai_Wheel (Fighter_Rigged_v23, Export v25): Anlauf, Rad um die aufgesetzte linke Hand (Root-Drehung bis 126 Grad um die Hüfte), rechter Fuß trifft das Kopfziel genau (Frame 14), Landung in der Haltung. Boden: max. 2 cm Handschuh in einem Bild.
 - Signatur „RAD-KICK“ (Kopftreffer, highkick x1,35, Reichweite 4,4): getestet Treffer bei 4,3 und 2,6 Studs (24 Schaden; teils Flash-K.o. mit Finisher-Wiederholung). Effekte: Wind-Ring beim Abdrücken, Anime-Treffer (wie Tyson, helle Farben), Spuren an beiden Füßen. Trainer-Text und Vorführung angepasst.
 
+### Khabib Eagle Slam (2026-10-17, in Studio getestet)
+- Neue Paar-Animation TD_LiftSlam_A/B (Wrestling_Prototype_v04, build_wrestling_v04.py, Export export_wrestling_roblox_v12): Schuss wie Double-Leg, Anheben über die Schulter, zwei Schritte tragen, Slam auf den Rücken (Aufprall Frame 45), Ende = Guard-Position wie TD_DoubleLeg_Success. Griffe 7 cm in den Schlüsselposen, im Slam bis 29 cm (schnelle Bewegung).
+- Signatur „EAGLE SLAM“ (special takedown, slam=true): Zusatzschaden 14 + Rippen-Verletzung 10 beim Aufprall, danach Bodenkampf. Effekte: Staub, Schockwellen, Impact-Frame beim Angreifer, rötlicher Bildschirm + roter Rand + Kamera-Stoß beim Opfer. Getestet: Dummy 100 → 81 HP, Ereignis nach 2,4 s, Guard danach, roter Bildschirm sichtbar. Trainer-Text und Vorführung angepasst.
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -117,9 +121,10 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
 
 - Ali-Instinkt: Balance (3 Ausweicher, 2,5-fach Calf Kick, Knie 18) vorläufig.
-- Neue Signatur-Ideen offen: Khabib Tragen + Slam (roter Bildschirm, in Arbeit), Oliveira Würgegriff von hinten (braucht Clinch-System).
+- Neue Signatur-Ideen offen: Oliveira Würgegriff von hinten (braucht Clinch-System).
 - Flash-K.o. (Codex) löst bei starken Kopf-Signaturen oft sofort aus – Balance prüfen.
-- Upload nötig: Fighter_Sig_Saenchai_Wheel.
+- Upload nötig: Fighter_Sig_Saenchai_Wheel, WR_TD_LiftSlam_A, WR_TD_LiftSlam_B.
+- Eagle Slam: Während des Anhebens zeigt die Ringkampf-Leiste schon „E Position / Space Aufstehen“ (Hinweis zu früh).
 
 ### Aufgaben (Reihenfolge laut Nutzer)
 1. Zwei-Spieler-Test Fight Night.
