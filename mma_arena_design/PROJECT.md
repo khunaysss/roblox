@@ -82,6 +82,11 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 ### T-Pose behoben (2026-10-17)
 - Ursache: CC_CombatMotion stoppte die Steh-Animation des Spielers, solange CC_UIBlock gesetzt war (offenes Hauptmenü, Filmszenen) → T-Pose. Bedingung entfernt (UIBlock sperrt nur Eingaben); zusätzlich spielt die Szene selbst eine Steh-Animation. Getestet: Menü offen, Szene, danach → keine T-Pose. Original in ServerStorage.CC_TPoseFixBackup.
 
+### Signaturen Tyson + Ali überarbeitet (2026-10-17, in Studio getestet)
+- Tyson: dunkelrote Flammen-Aura mit leuchtendem Umriss während der Kombination; Uppercut-Treffer im Anime-Stil (Schweiß-Spritzer, Luft-Schockwellen, Impact-Frame schwarz-weiß, Speedlines, Kamera-Stoß). Schaden unverändert. Getestet: beide Treffer, Effekte sichtbar.
+- Ali: neu „INSTINKT-MODUS“ statt Jab-Jab-Cross: 5 s Modus, weicht bis zu 3 Treffern automatisch aus (Faust oder Tritt; Nachbild + Seitschritt), Low Kick wird zum Calf Kick mit 2,5-fachem Schaden und +35 Bein-Verletzung (beendet den Modus). Silbrig-blaue Aura, Anzeige mit Restzeit und Ausweich-Punkten, bläuliche Tönung. Getestet: 2 Schläge ausgewichen ohne Schaden; Calf Kick 22 Schaden, Bein 35.
+- Neues Script roblox/CC_SigUltimateFX.client.luau (nur Optik). Server-Änderungen in CC_CharacterAnimations (land: Ausweichen/Calf Kick; signature: Instinkt; Reset beendet Modus). Backup: ServerStorage.CC_UltimateBackup_20261017.
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -106,6 +111,9 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Die Animationen Fighter_Sig_Tyson / Fighter_Sig_Ali sind noch nicht hochgeladen; die Animationen Fighter_LegCheck_v01, Fighter_LimpLeft_v01, Fighter_LimpRight_v01 ebenfalls offen.
 - Gym-Lobby: Laufen im Play-Modus nicht getestet (Hauptmenü sperrt die Steuerung beim Test). Fight-Night-Licht über CC_ZoneLighting zurückgesetzt (nicht im Spiel geprüft). Empfang noch eher dunkel. Place muss in Studio gespeichert werden (Strg+S).
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
+
+- Ali-Instinkt: Takedowns werden noch nicht ausgewichen (nur Schläge/Tritte). Balance (3 Ausweicher, 2,5-fach) vorläufig.
+- Neue Signatur-Ideen offen: Khabib Tragen + Slam (roter Bildschirm), Saenchai Rad-Kick (Cartwheel), Oliveira Würgegriff von hinten (braucht Clinch-System).
 
 ### Aufgaben (Reihenfolge laut Nutzer)
 1. Zwei-Spieler-Test Fight Night.

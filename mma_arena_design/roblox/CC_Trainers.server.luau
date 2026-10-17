@@ -10,7 +10,7 @@ local SIGPROG = require(RS:WaitForChild("CC_SignatureProgression"))
 
 local INFO = {   -- Reihenfolge = feste Zonen im Gym; sig = Schluessel in CC_Signatures.list
 	{ id = "Mike_Tyson", name = "Mike Tyson", style = "Peek-a-boo Boxen", sig = "tyson", move = "Linker Koerperhaken + rechter Uppercut" },
-	{ id = "Muhammad_Ali", name = "Muhammad Ali", style = "Tänzelndes Boxen", sig = "ali", move = "Jab-Jab-Cross" },
+	{ id = "Muhammad_Ali", name = "Muhammad Ali", style = "Tänzelndes Boxen", sig = "ali", move = "Instinkt-Modus: automatisch ausweichen, Calf Kick" },
 	{ id = "Alex_Pereira", name = "Alex Pereira", style = "Kickboxen", sig = "pereira", move = "Linker Konterhaken" },
 	{ id = "Khabib_Nurmagomedov", name = "Khabib Nurmagomedov", style = "Ringen", sig = "khabib", move = "Double-Leg-Takedown" },
 	{ id = "Saenchai", name = "Saenchai", style = "Muay Thai", sig = "saenchai", move = "Teep mit Finte" },

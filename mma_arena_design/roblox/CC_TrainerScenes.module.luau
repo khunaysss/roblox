@@ -78,7 +78,7 @@ local function trainer(o)
 end
 S.list.Muhammad_Ali = trainer({   -- Ali: tanzend, selbstbewusst. Kamera schwenkt seitlich vor ihm vorbei.
 	name = "MUHAMMAD ALI", style = "TÄNZELNDES BOXEN", prefix = "Trainer_Ali", h = 6.0,
-	demo = "Fighter_Sig_Ali", slow = { 0.12, 0.72, 0.45 }, sigName = "SCHMETTERLING-SERIE", sigSub = "Jab - Jab - Cross",
+	demo = "Fighter_LowKick_v5", slow = { 0.12, 0.40, 0.35 }, sigName = "INSTINKT-MODUS", sigSub = "Automatisch ausweichen · Calf Kick",
 	cam = { greet1 = { t = 2.2, from = V(-5.0, 4.6, -8.5), to = V(4.0, 4.8, -8.5), look = V(0, 5.0, 0), fov = 48 },
 		demo1 = { t = 1.6, from = V(6.5, 4.2, -2.5), to = V(6.0, 4.2, -2.2), look = V(0, 4.6, -1.6), fov = 45 },
 		challenge1 = { t = 1.6, from = V(3.5, 4.5, -9.5), to = V(-3.0, 4.6, -8.5), look = V(0, 5.2, 0), fov = 45 } },

@@ -35,19 +35,44 @@ S.list = {
 		trails = { { t = { 0.24, 0.48 }, bone = "LeftHand" }, { t = { 0.55, 0.76 }, bone = "RightHand" } },
 	},
 	ali = {
-		name = "SCHMETTERLING-SERIE", short = "Jab - Jab - Cross", trainer = "Muhammad_Ali",
-		anim = "Fighter_Sig_Ali", length = 26 / 24, lock = 1.0,
-		stamina = 18, range = 4.1,                      -- gemessen: alle 3 Treffer bis 4,0; ab 4,3 verfehlt Jab 2 (Gegner weicht nach Jab 1 zurueck)
-		color = Color3.fromRGB(235, 240, 255),         -- weiss
-		hits = {
-			{ win = { 0.13, 0.29 }, limb = "LeftHand", zone = "head", move = "jab", scale = 1.0, react = "hitStraight", ko = "ko", impact = 0.6 },
-			{ win = { 0.33, 0.50 }, limb = "LeftHand", zone = "head", move = "jab", scale = 1.0, react = "hitStraight", ko = "ko", impact = 0.6 },
-			{ win = { 0.54, 0.71 }, limb = "RightHand", zone = "head", move = "cross", scale = 1.1, react = "hitStraight", ko = "ko", impact = 1.2 },
-		},
-		trails = { { t = { 0.09, 0.27 }, bone = "LeftHand" }, { t = { 0.30, 0.48 }, bone = "LeftHand" }, { t = { 0.50, 0.70 }, bone = "RightHand" } },
+		-- Instinkt-Modus (Ultra-Instinkt-Idee): kein fester Schlag, sondern 5 s Zustand. Ali weicht bis zu 3 Treffern automatisch aus
+		-- (Faust oder Tritt), sein Low Kick wird zum Calf Kick mit 2,5-fachem Schaden und schwerer Bein-Verletzung (beendet den Modus).
+		name = "INSTINKT-MODUS", short = "Weicht automatisch aus · Calf Kick mit voller Wucht", trainer = "Muhammad_Ali",
+		special = "instinct", duration = 5.0, dodges = 3, calfMult = 2.5, calfInjury = 35,
+		anim = "Fighter_Sig_Ali", length = 26 / 24, lock = 0.2,
+		stamina = 18, range = 99,
+		color = Color3.fromRGB(205, 225, 255),         -- silbrig-blau
+		hits = {},
+		trails = {},
+	},
+	pereira = {
+		name = "STEINHAND-KONTER", short = "Explosiver linker Konterhaken", trainer = "Alex_Pereira",
+		anim = "Fighter_Sig_Pereira", length = 0.98, lock = 0.98, stamina = 22, range = 4.5,
+		color = Color3.fromRGB(190, 44, 34),
+		hits = { { win = { 0.33, 0.49 }, limb = "LeftHand", zone = "head", move = "hook", scale = 1.35, react = "hitHook", ko = "koFwd", impact = 1.4 } },
+		trails = { { t = { 0.28, 0.49 }, bone = "LeftHand" } },
+	},
+	khabib = {
+		name = "EAGLE DOUBLE-LEG", short = "Explosiver Double-Leg in die Guard", trainer = "Khabib_Nurmagomedov",
+		special = "takedown", stamina = 24, range = 5.0, length = 1.65, lock = 1.65,
+		color = Color3.fromRGB(120, 95, 55), hits = {}, trails = {},
+	},
+	saenchai = {
+		name = "FINTEN-TEEP", short = "Schneller Teep nach einer Koerperfinte", trainer = "Saenchai",
+		anim = "Fighter_Sig_Saenchai", length = 1.24, lock = 1.24, stamina = 18, range = 5.7,
+		color = Color3.fromRGB(210, 165, 55),
+		hits = { { win = { 0.57, 0.70 }, limb = "LeftFoot", zone = "body", move = "frontkick", scale = 1.45, react = "hitBody", ko = "koFwd", impact = 1.15, bodyShot = true } },
+		trails = { { t = { 0.50, 0.70 }, bone = "LeftFoot" } },
+	},
+	oliveira = {
+		name = "CHUTE BOXE KICK", short = "Harter Koerperkick mit Finish-Druck", trainer = "Charles_Oliveira",
+		anim = "Fighter_Sig_Oliveira", length = 1.28, lock = 1.28, stamina = 21, range = 5.5,
+		color = Color3.fromRGB(220, 190, 85),
+		hits = { { win = { 0.47, 0.65 }, limb = "RightLowerLeg", zone = "body", move = "bodykick", scale = 1.35, react = "hitBody", ko = "koFwd", impact = 1.3, bodyShot = true } },
+		trails = { { t = { 0.40, 0.65 }, bone = "RightLowerLeg" } },
 	},
 }
-S.ORDER = { "tyson", "ali" }           -- Reihenfolge in Menues (weitere Trainer folgen, siehe GAME_DESIGN.md)
+S.ORDER = { "tyson", "ali", "pereira", "khabib", "saenchai", "oliveira" }
 
 -- Finisher-Wiederholung (nur nach vom Server bestaetigtem K.o. durch eine Signatur)
 S.FINISHER = { before = 0.9, after = 0.6, slowFrom = -0.12, slowTo = 0.22, slowRate = 0.3, total = 2.6 }
