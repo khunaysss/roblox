@@ -56,7 +56,7 @@ M.list = {
 		},
 	},
 	saenchai = {
-		trainerId = "Saenchai", trainerName = "Saenchai", signatureName = "FINTEN-TEEP",
+		trainerId = "Saenchai", trainerName = "Saenchai", signatureName = "RAD-KICK",
 		requirements = {
 			{ key = "kicks", target = 30, label = "30 Kicks sauber landen" },
 			{ key = "counters", target = 6, label = "6 Kontertreffer landen" },

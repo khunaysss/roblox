@@ -218,7 +218,10 @@ fx.OnClientEvent:Connect(function(kind, char, a, b, c)
 					if not reduced() then instinctTint(true); speedlines(0.35, Color3.fromRGB(200, 225, 255)) end
 				end
 			end
-		elseif kind == "hit" and char and char:GetAttribute("CC_LastSig") == "tyson" and a == #SIG.list.tyson.hits then
+		elseif kind == "hit" and char and (char:GetAttribute("CC_LastSig") == "tyson" or char:GetAttribute("CC_LastSig") == "saenchai")
+			and SIG.list[char:GetAttribute("CC_LastSig")] and a == #SIG.list[char:GetAttribute("CC_LastSig")].hits then
+			-- letzter Treffer einer Anime-Signatur (Tyson-Uppercut, Saenchai-Rad-Kick)
+			local sae = char:GetAttribute("CC_LastSig") == "saenchai"
 			-- Tyson-Uppercut gelandet: Anime-Treffer
 			local target = b
 			local head = bonePos(target, "Head"); if not head then return end
@@ -235,7 +238,7 @@ fx.OnClientEvent:Connect(function(kind, char, a, b, c)
 				Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.35), NumberSequenceKeypoint.new(1, 1) }),
 				Lifetime = NumberRange.new(0.35, 0.5), Speed = NumberRange.new(8, 14), SpreadAngle = Vector2.new(70, 70) }, 16, 1.2)
 			shockwave(head, (dir + up).Unit, Color3.fromRGB(255, 255, 255), 9, 0.35)
-			task.delay(0.06, function() shockwave(head, up, Color3.fromRGB(255, 120, 110), 6, 0.3) end)
+			task.delay(0.06, function() shockwave(head, up, sae and Color3.fromRGB(255, 230, 170) or Color3.fromRGB(255, 120, 110), 6, 0.3) end)
 			sound("HitHeavy", 1.2, 0.8, head)
 			if involved(char, target) and not reduced() then
 				impactFrame(1); speedlines(0.4); fovPunch(9)

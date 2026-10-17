@@ -99,7 +99,7 @@ S.list.Khabib_Nurmagomedov = trainer({   -- Khabib: Ringer. Kamera tief am Boden
 })
 S.list.Saenchai = trainer({   -- Saenchai: verspielt, leicht. Kamera seitlich, gleitend.
 	name = "SAENCHAI", style = "MUAY THAI", prefix = "Trainer_Saenchai", h = 5.9,
-	demo = "Fighter_FrontKick_v3", slow = { 0.15, 0.45, 0.35 }, sigName = "FINTEN-TEEP", sigSub = "Teep mit Finte",
+	demo = "Fighter_Sig_Saenchai_Wheel", slow = { 0.42, 0.70, 0.3 }, sigName = "RAD-KICK", sigSub = "Cartwheel Kick zum Kopf",
 	cam = { greet1 = { t = 2.2, from = V(8.5, 3.8, -2.0), to = V(6.5, 4.0, -6.0), look = V(0, 4.4, -0.5), fov = 46 },
 		demo1 = { t = 1.6, from = V(6.8, 3.4, -2.6), to = V(6.4, 3.4, -2.4), look = V(0, 3.8, -1.8), fov = 46 },
 		challenge1 = { t = 1.6, from = V(5.5, 4.0, -6.0), to = V(3.0, 4.4, -7.5), look = V(0, 5.0, 0), fov = 44 } },

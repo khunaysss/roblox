@@ -60,11 +60,13 @@ S.list = {
 		color = Color3.fromRGB(120, 95, 55), hits = {}, trails = {},
 	},
 	saenchai = {
-		name = "FINTEN-TEEP", short = "Schneller Teep nach einer Koerperfinte", trainer = "Saenchai",
-		anim = "Fighter_Sig_Saenchai", length = 1.24, lock = 1.24, stamina = 18, range = 5.7,
-		color = Color3.fromRGB(210, 165, 55),
-		hits = { { win = { 0.57, 0.70 }, limb = "LeftFoot", zone = "body", move = "frontkick", scale = 1.45, react = "hitBody", ko = "koFwd", impact = 1.15, bodyShot = true } },
-		trails = { { t = { 0.50, 0.70 }, bone = "LeftFoot" } },
+		-- Rad-Kick (Cartwheel Kick): Saenchai dreht sich auf der linken Hand ins Rad, der rechte Fuss trifft von oben den Kopf.
+		-- Animation Fighter_Sig_Saenchai_Wheel (Fighter_Rigged_v23): Treffer bei Frame 13-16 (0,50-0,66 s), Fuss erreicht das Kopfziel genau.
+		name = "RAD-KICK", short = "Cartwheel Kick zum Kopf", trainer = "Saenchai",
+		anim = "Fighter_Sig_Saenchai_Wheel", length = 30 / 24, lock = 1.25, stamina = 22, range = 4.4,
+		color = Color3.fromRGB(240, 235, 215),
+		hits = { { win = { 0.48, 0.68 }, limb = "RightFoot", zone = "head", move = "highkick", scale = 1.35, react = "hitHook", ko = "ko", impact = 1.5 } },
+		trails = { { t = { 0.36, 0.70 }, bone = "RightFoot" }, { t = { 0.30, 0.70 }, bone = "LeftFoot" } },
 	},
 	oliveira = {
 		name = "CHUTE BOXE KICK", short = "Harter Koerperkick mit Finish-Druck", trainer = "Charles_Oliveira",

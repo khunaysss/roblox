@@ -87,6 +87,10 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Ali: neu „INSTINKT-MODUS“ statt Jab-Jab-Cross: 5 s Modus, weicht bis zu 3 Treffern automatisch aus (Faust oder Tritt; Nachbild + Seitschritt), Low Kick wird zum Calf Kick mit 2,5-fachem Schaden und +35 Bein-Verletzung (beendet den Modus). Silbrig-blaue Aura, Anzeige mit Restzeit und Ausweich-Punkten, bläuliche Tönung. Getestet: 2 Schläge ausgewichen ohne Schaden; Calf Kick 22 Schaden, Bein 35. Takedown gegen Ali im Modus: Knie-Konter zum Kopf (18 Schaden, Kopf-Verletzung), Angreifer fällt und steht nach 1,6 s wieder auf (kein Knockdown-Zähler), verbraucht ein Ausweichen – getestet.
 - Neues Script roblox/CC_SigUltimateFX.client.luau (nur Optik). Server-Änderungen in CC_CharacterAnimations (land: Ausweichen/Calf Kick; signature: Instinkt; Reset beendet Modus). Backup: ServerStorage.CC_UltimateBackup_20261017.
 
+### Saenchai Rad-Kick (2026-10-17, in Studio getestet)
+- Neue Animation Fighter_Sig_Saenchai_Wheel (Fighter_Rigged_v23, Export v25): Anlauf, Rad um die aufgesetzte linke Hand (Root-Drehung bis 126 Grad um die Hüfte), rechter Fuß trifft das Kopfziel genau (Frame 14), Landung in der Haltung. Boden: max. 2 cm Handschuh in einem Bild.
+- Signatur „RAD-KICK“ (Kopftreffer, highkick x1,35, Reichweite 4,4): getestet Treffer bei 4,3 und 2,6 Studs (24 Schaden; teils Flash-K.o. mit Finisher-Wiederholung). Effekte: Wind-Ring beim Abdrücken, Anime-Treffer (wie Tyson, helle Farben), Spuren an beiden Füßen. Trainer-Text und Vorführung angepasst.
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -113,7 +117,9 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
 
 - Ali-Instinkt: Balance (3 Ausweicher, 2,5-fach Calf Kick, Knie 18) vorläufig.
-- Neue Signatur-Ideen offen: Khabib Tragen + Slam (roter Bildschirm), Saenchai Rad-Kick (Cartwheel), Oliveira Würgegriff von hinten (braucht Clinch-System).
+- Neue Signatur-Ideen offen: Khabib Tragen + Slam (roter Bildschirm, in Arbeit), Oliveira Würgegriff von hinten (braucht Clinch-System).
+- Flash-K.o. (Codex) löst bei starken Kopf-Signaturen oft sofort aus – Balance prüfen.
+- Upload nötig: Fighter_Sig_Saenchai_Wheel.
 
 ### Aufgaben (Reihenfolge laut Nutzer)
 1. Zwei-Spieler-Test Fight Night.

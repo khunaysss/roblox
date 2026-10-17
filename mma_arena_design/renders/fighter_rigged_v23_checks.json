@@ -1,0 +1,11 @@
+{
+ "source": "Fighter_Rigged_v22.blend (unveraendert)",
+ "Fighter_Sig_Saenchai_Wheel": {
+  "foot_to_head_min_m": 0.0,
+  "foot_best_frame": 14,
+  "hand_floor_max_m_during_plant": 0.35,
+  "lowest_z_m": -0.008,
+  "start_end_pose_diff": 0.0,
+  "max_theta_deg": 112
+ }
+}
