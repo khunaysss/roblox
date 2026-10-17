@@ -66,6 +66,12 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Neues Script roblox/CC_ZoneLighting.client.luau (nur Optik): Gym neutral, Fight Night (Kamera z < -400) behält die alten, kühleren Werte.
 - Keine Kampf-/Trainings-/UI-Scripts geändert; kein Script greift auf die geänderten Teile zu (geprüft).
 
+### Trainer-Quests und Endkampf (2026-10-17)
+- System von Codex (CC_SignatureProgression, CC_Trainers, CC_Match Modus trainer, CC_Profile sig_start/sig_fight_result/sig_boss_result) in Studio durchgetestet: Quest starten → Fortschritt zählt → Herausforderung → Endkampf in der Fight Night → Niederlage gibt 25 XP ohne Freischaltung, Sieg schaltet frei und rüstet aus; bleibt nach Neustart erhalten (Testprofil).
+- Behoben: Trainingsgegner (CC_TrainingDummy) war im Place komplett verankert (Körper, Handschuhe, Shorts) → stand in allen KI-Kämpfen fest (beim Trainer-Endkampf außerhalb des Käfigs). Körperteile gelöst (wie StarterCharacter).
+- Behoben: Testschalter CC_TestNewPlayer stand noch am Workspace → es wurde kein Profil gespeichert. Entfernt.
+- Trainer animierbar (Weg A): export_trainer_rigged_v01.py richtet das Trainer-Skelett auf die Kämpfer-Ruhehaltung aus (vorher bis 10° Abweichung, danach 0). check_trainer_rig_v01.py: Kämpfer-Animation auf die exportierte FBX übertragen, max. 3,6° Abweichung, Hände in Deckung. Tyson exportiert: export/Trainer_Mike_Tyson_Rigged_v01.fbx (wartet auf Import).
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -82,7 +88,8 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Gym: Bank/Matten ohne eigene Animation.
 - Event-Map: 168 358 Dreiecke, keine Kollision (M1). Maßstabsdatei verweist auf alten Fighter (M2).
 - Einstellungen-Menü fehlt; Schalter „Effekte reduzieren“ (`CC_ReduceFX`) ist nur vorbereitet.
-- Trainer-Modelle sind starr, die Signatur wird nicht vorgeführt.
+- Trainer-Modelle sind starr, die Signatur wird nicht vorgeführt (animierbare Version in Arbeit, Tyson zuerst).
+- Trainer-Endkampf: Champion-Tyson ist sehr stark (im Test 196:10 Schaden gegen mich); Balance noch nicht geprüft. Kein Walkout/Intro beim Trainer-Endkampf (startet direkt).
 - Trainer-Namen sind echte Personen (rechtlich riskant vor Veröffentlichung).
 - Die Animationen Fighter_Sig_Tyson / Fighter_Sig_Ali sind noch nicht hochgeladen; die Animationen Fighter_LegCheck_v01, Fighter_LimpLeft_v01, Fighter_LimpRight_v01 ebenfalls offen.
 - Gym-Lobby: Laufen im Play-Modus nicht getestet (Hauptmenü sperrt die Steuerung beim Test). Fight-Night-Licht über CC_ZoneLighting zurückgesetzt (nicht im Spiel geprüft). Empfang noch eher dunkel. Place muss in Studio gespeichert werden (Strg+S).

@@ -1,0 +1,41 @@
+{
+ "rest_angle_before_deg_max": 10.01,
+ "rest_angle_after_deg_max": 0.0,
+ "parts": 13,
+ "bones": 16,
+ "height_m": 1.806,
+ "frames": {
+  "1": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  },
+  "10": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  },
+  "17": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  },
+  "30": {
+   "hand_L_to_head_m": 0.789,
+   "hand_R_to_head_m": 0.789
+  }
+ },
+ "fbx_bytes": 351612,
+ "part_names": [
+  "Mike_Tyson__Brows",
+  "Mike_Tyson__Eye_Dark",
+  "Mike_Tyson__Eye_White",
+  "Mike_Tyson__Face_Tattoo",
+  "Mike_Tyson__Glove",
+  "Mike_Tyson__Glove.001",
+  "Mike_Tyson__Glove_Cuff",
+  "Mike_Tyson__Glove_Cuff.001",
+  "Mike_Tyson__Hair",
+  "Mike_Tyson__Mouth",
+  "Mike_Tyson__Shorts",
+  "Mike_Tyson__Shorts_Waistband",
+  "Mike_Tyson__Skin"
+ ]
+}
