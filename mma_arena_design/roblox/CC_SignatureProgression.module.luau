@@ -43,7 +43,7 @@ M.list = {
 		},
 	},
 	khabib = {
-		trainerId = "Khabib_Nurmagomedov", trainerName = "Khabib Nurmagomedov", signatureName = "EAGLE DOUBLE-LEG",
+		trainerId = "Khabib_Nurmagomedov", trainerName = "Khabib Nurmagomedov", signatureName = "EAGLE SLAM",
 		requirements = {
 			{ key = "takedowns", target = 10, label = "10 Takedowns landen" },
 			{ key = "groundHits", target = 20, label = "20 Bodentreffer landen" },

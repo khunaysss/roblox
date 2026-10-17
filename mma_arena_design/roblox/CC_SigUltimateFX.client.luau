@@ -278,6 +278,33 @@ fx.OnClientEvent:Connect(function(kind, char, a, b, c)
 				if target == player.Character then redEdge(0.9); fovPunch(8) end
 				if char == player.Character then impactFrame(0.8); speedlines(0.3, Color3.fromRGB(200, 225, 255)) end
 			end
+		elseif kind == "slam" then
+			-- char = Khabib, a = Opfer (mit dem Ruecken auf die Matte geslammt)
+			local target = a
+			local torso = bonePos(target, "UpperTorso") or bonePos(target, "LowerTorso"); if not torso then return end
+			local rp = RaycastParams.new(); rp.FilterType = Enum.RaycastFilterType.Exclude; rp.FilterDescendantsInstances = { char, target }
+			local hit = workspace:Raycast(torso + Vector3.new(0, 2, 0), Vector3.new(0, -8, 0), rp)
+			local ground = hit and hit.Position or (torso - Vector3.new(0, 0.6, 0))
+			shockwave(ground + Vector3.new(0, 0.1, 0), Vector3.new(0, 1, 0), Color3.fromRGB(255, 120, 90), 16, 0.45)
+			shockwave(ground + Vector3.new(0, 0.15, 0), Vector3.new(0, 1, 0), Color3.fromRGB(255, 235, 220), 9, 0.3)
+			burst(ground, { Texture = SMOKE, Color = ColorSequence.new(Color3.fromRGB(200, 185, 165)), LightEmission = 0,
+				Transparency = NumberSequence.new(0.35, 1), Size = NumberSequence.new(1.2, 3.2), Lifetime = NumberRange.new(0.6, 1.1),
+				Speed = NumberRange.new(10, 18), SpreadAngle = Vector2.new(180, 8), Drag = 4, EmissionDirection = Enum.NormalId.Top }, 40, 1.6)
+			burst(torso, { Texture = SPARK, Color = ColorSequence.new(Color3.fromRGB(255, 220, 200)), LightEmission = 0.5,
+				Size = NumberSequence.new(0.25, 0.04), Lifetime = NumberRange.new(0.3, 0.5), Speed = NumberRange.new(14, 22),
+				SpreadAngle = Vector2.new(70, 70), Acceleration = Vector3.new(0, -40, 0), EmissionDirection = Enum.NormalId.Top }, 26, 1)
+			sound("HitHeavy", 1.5, 0.55, ground)
+			if not reduced() then
+				if target == player.Character then
+					-- Opfer: Bildschirm wird roetlich (Toenung + roter Rand), klingt langsam ab
+					local cc = Instance.new("ColorCorrectionEffect"); cc.Name = "CC_SlamRed"; cc.TintColor = Color3.fromRGB(255, 120, 110)
+					cc.Saturation = -0.25; cc.Contrast = 0.15; cc.Parent = Lighting
+					TweenService:Create(cc, TweenInfo.new(1.8, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { TintColor = Color3.new(1, 1, 1), Saturation = 0, Contrast = 0 }):Play()
+					Debris:AddItem(cc, 1.9)
+					redEdge(1.6); fovPunch(10)
+				end
+				if char == player.Character then impactFrame(0.8); fovPunch(6) end
+			end
 		elseif kind == "instinct_end" then
 			stopAura(char)
 			if char == player.Character then instinctTint(false) end

@@ -55,8 +55,9 @@ S.list = {
 		trails = { { t = { 0.28, 0.49 }, bone = "LeftHand" } },
 	},
 	khabib = {
-		name = "EAGLE DOUBLE-LEG", short = "Explosiver Double-Leg in die Guard", trainer = "Khabib_Nurmagomedov",
-		special = "takedown", stamina = 24, range = 5.0, length = 1.65, lock = 1.65,
+		-- Hochheben, Tragen, Slam (Paar TD_LiftSlam, Wrestling_Prototype_v04): Aufprall Frame 45 -> Zusatzschaden, roter Bildschirm beim Opfer.
+		name = "EAGLE SLAM", short = "Hochheben, tragen und auf die Matte slammen", trainer = "Khabib_Nurmagomedov",
+		special = "takedown", slam = true, impactFrame = 45, slamDamage = 14, slamInjury = 10, stamina = 24, range = 5.0, length = 56 / 24, lock = 56 / 24,
 		color = Color3.fromRGB(120, 95, 55), hits = {}, trails = {},
 	},
 	saenchai = {

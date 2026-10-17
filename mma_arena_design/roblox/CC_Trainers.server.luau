@@ -12,7 +12,7 @@ local INFO = {   -- Reihenfolge = feste Zonen im Gym; sig = Schluessel in CC_Sig
 	{ id = "Mike_Tyson", name = "Mike Tyson", style = "Peek-a-boo Boxen", sig = "tyson", move = "Linker Koerperhaken + rechter Uppercut" },
 	{ id = "Muhammad_Ali", name = "Muhammad Ali", style = "Tänzelndes Boxen", sig = "ali", move = "Instinkt-Modus: automatisch ausweichen, Calf Kick" },
 	{ id = "Alex_Pereira", name = "Alex Pereira", style = "Kickboxen", sig = "pereira", move = "Linker Konterhaken" },
-	{ id = "Khabib_Nurmagomedov", name = "Khabib Nurmagomedov", style = "Ringen", sig = "khabib", move = "Double-Leg-Takedown" },
+	{ id = "Khabib_Nurmagomedov", name = "Khabib Nurmagomedov", style = "Ringen", sig = "khabib", move = "Eagle Slam: hochheben, tragen, slammen" },
 	{ id = "Saenchai", name = "Saenchai", style = "Muay Thai", sig = "saenchai", move = "Rad-Kick: Cartwheel Kick zum Kopf" },
 	{ id = "Charles_Oliveira", name = "Charles Oliveira", style = "Muay Thai / BJJ", sig = "oliveira", move = "Harter Koerperkick" },
 }

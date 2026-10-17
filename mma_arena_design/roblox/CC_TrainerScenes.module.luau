@@ -92,7 +92,7 @@ S.list.Alex_Pereira = trainer({   -- Pereira: ruhig, kalt. Lange, fast statische
 })
 S.list.Khabib_Nurmagomedov = trainer({   -- Khabib: Ringer. Kamera tief am Boden, Druck nach vorn.
 	name = "KHABIB NURMAGOMEDOV", style = "RINGEN", prefix = "Trainer_Khabib", h = 5.1,
-	demo = "WR_TD_DoubleLeg_Success_A", slow = { 0.25, 0.75, 0.4 }, sigName = "EAGLE DOUBLE-LEG", sigSub = "Double-Leg-Takedown",
+	demo = "WR_TD_LiftSlam_A", slow = { 0.70, 0.84, 0.35 }, sigName = "EAGLE SLAM", sigSub = "Hochheben, tragen, slammen",
 	cam = { greet1 = { t = 2.2, from = V(2.6, 0.8, -8.5), to = V(1.8, 1.0, -6.6), look = V(0, 4.2, 0), fov = 52 },
 		demo1 = { t = 1.6, from = V(7.0, 1.4, -3.0), to = V(6.5, 1.5, -3.0), look = V(0, 3.0, -2.0), fov = 48 },
 		challenge1 = { t = 1.6, from = V(0, 0.9, -9.5), to = V(0, 1.2, -7.5), look = V(0, 4.4, 0), fov = 48 } },

@@ -865,7 +865,7 @@ local WR_GAP = 1.5 / 0.28
 local WR = {}
 for _, pair in ipairs({ "TD_DoubleLeg_Success", "TD_DoubleLeg_Defended", "Ground_Guard_Idle", "Ground_Guard_Punch", "Ground_Guard_Escape", "Ground_GetUp",
 	"Ground_Pass_Half", "Ground_HalfGuard_Idle", "Ground_Pass_Side", "Ground_Side_Idle", "Ground_Side_To_Mount", "Ground_Mount_Idle",
-	"Ground_Mount_Punch", "Ground_Mount_To_Back", "Ground_Back_Idle", "Sub_RNC", "Sub_Armbar" }) do  -- zweite/dritte Zeile: Ground_Positions_v01 (E)
+	"Ground_Mount_Punch", "Ground_Mount_To_Back", "Ground_Back_Idle", "Sub_RNC", "Sub_Armbar", "TD_LiftSlam" }) do  -- TD_LiftSlam: Khabib-Signatur (Wrestling_Prototype_v04)  -- zweite/dritte Zeile: Ground_Positions_v01 (E)
 	for _, s in ipairs({ "A", "B" }) do
 		local name = "WR_" .. pair .. "_" .. s
 		local data = require(A[name .. "_Data"])
@@ -1801,7 +1801,7 @@ RunService.Heartbeat:Connect(function()
 	end
 end)
 
-function tryTakedown(a, forceSuccess)
+function tryTakedown(a, forceSuccess, slam)   -- slam = Signatur-Definition mit slam=true (Khabib): Hochheben, Tragen, Slam
 	if a.ko or a.knocked or a.wr or a.down or frozen(a) or os.clock() < a.busyUntil then return end
 	local legDamage = worstLeg(a)
 	if legDamage >= 85 then
@@ -1881,11 +1881,22 @@ function tryTakedown(a, forceSuccess)
 		for _, f in ipairs({ a, b }) do if f.wr then setWrestle(f, nil, nil) end; f.busyUntil = 0 end
 		return
 	end
-	local pair = defended and "TD_DoubleLeg_Defended" or "TD_DoubleLeg_Success"
+	local pair = defended and "TD_DoubleLeg_Defended" or (slam and "TD_LiftSlam" or "TD_DoubleLeg_Success")
 	print(("[CC] %s Takedown -> %s: %s"):format(a.char.Name, b.char.Name, defended and "Sprawl (abgewehrt)" or "erfolgreich"))
 	if defended then reward(b, "train", "Wrestling", 2); focusGain(b, "sprawl") else reward(a, "train", "Wrestling", 2); focusGain(a, "takedown") end
 	local ta = playPair(a, b, pair, false)
 	hitFX(a.char, 0.25, "land"); hitFX(b.char, defended and 0.2 or 0.6, defended and "block" or "hit")
+	if pair == "TD_LiftSlam" then   -- Aufprall in Frame 45 (24 fps): Zusatzschaden, Effekt (roter Bildschirm beim Opfer)
+		local tok = a.wr
+		task.delay((slam.impactFrame or 45) / 24, function()
+			if pairCancelled(a, b) or a.wr ~= tok then return end
+			b.hum.Health = math.max(1, b.hum.Health - (slam.slamDamage or 14))
+			addDamage(a.char, slam.slamDamage or 14)
+			applyInjury(b, "Ribs", slam.slamInjury or 10, "slam")
+			hitFX(b.char, 1, "hit")
+			sigFX:FireAllClients("slam", a.char, b.char, workspace:GetServerTimeNow())
+		end)
+	end
 	if not holdTrackEnd(ta, pairLen(pair), nil, function() return pairCancelled(a, b) end) then return end
 	if pairCancelled(a, b) then      -- waehrenddessen zurueckgesetzt, Kampfende oder Spieler weg
 		for _, f in ipairs({ a, b }) do if f.wr then wrStopAll(f, 0.1); setWrestle(f, nil, nil); f.busyUntil = 0 end end
@@ -2049,7 +2060,7 @@ local function signature(f)
 		f.focus = 0; f.char:SetAttribute("CC_Focus", 0); spend(f, def.stamina)
 		f.sigActive = true; sigFX:FireAllClients("start", f.char, id, workspace:GetServerTimeNow())
 		task.spawn(function()
-			tryTakedown(f, true)
+			tryTakedown(f, true, def.slam and def or nil)
 			f.sigActive = false
 			if workspace:GetAttribute(SIG.TEST_ATTR) then f.focus = SIG.FOCUS_MAX; f.char:SetAttribute("CC_Focus", f.focus) end
 		end)
