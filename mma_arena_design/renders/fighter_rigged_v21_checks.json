@@ -1,0 +1,24 @@
+{
+ "source": "Fighter_Rigged_v20.blend (unveraendert)",
+ "Trainer_Tyson_Idle": {
+  "frames": 41,
+  "loop": true,
+  "start_end_diff": 0.0,
+  "foot_slide_m": 0.0,
+  "glove_head_min_m": 0.275
+ },
+ "Trainer_Tyson_Greet": {
+  "frames": 37,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "foot_slide_m": 0.0,
+  "glove_head_min_m": 0.279
+ },
+ "Trainer_Tyson_Respect": {
+  "frames": 49,
+  "loop": false,
+  "start_end_diff": 0.0,
+  "foot_slide_m": 0.0001,
+  "glove_head_min_m": 0.243
+ }
+}

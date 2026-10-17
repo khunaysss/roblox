@@ -72,6 +72,13 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Behoben: Testschalter CC_TestNewPlayer stand noch am Workspace → es wurde kein Profil gespeichert. Entfernt.
 - Trainer animierbar (Weg A): export_trainer_rigged_v01.py richtet das Trainer-Skelett auf die Kämpfer-Ruhehaltung aus (vorher bis 10° Abweichung, danach 0). check_trainer_rig_v01.py: Kämpfer-Animation auf die exportierte FBX übertragen, max. 3,6° Abweichung, Hände in Deckung. Tyson exportiert: export/Trainer_Mike_Tyson_Rigged_v01.fbx (wartet auf Import).
 
+### Tyson animiert + Filmszenen (2026-10-17, in Studio getestet)
+- Tyson als animierbares Modell im Gym (setup_trainer_rigged_v01.luau, ersetzt das starre Modell; altes nach ServerStorage.CC_Old). CC_TrainerAnim spielt die Idle.
+- Eigene Tyson-Animationen (Fighter_Rigged_v21.blend, Export v23): Trainer_Tyson_Idle (Peek-a-boo, Bob & Weave), Trainer_Tyson_Greet, Trainer_Tyson_Respect. Füße fest, Start = Ende.
+- Szenen-System: ReplicatedStorage.CC_TrainerScenes (Kamerafahrten/Animationen/Texte je Trainer), CC_TrainerScenes Server + Client. Szenen: greet (erstes Ansprechen je Sitzung), demo (nach Quest starten, Signatur in Zeitlupe), challenge (vor dem Endkampf; CC_Trainers startet den Kampf erst danach), unlock (automatisch zurück im Gym nach dem Sieg, Spieler vor dem Trainer).
+- Kinobalken, Titel, Filmlicht nur lokal, Kamera-Kollision, Überspringen (Leertaste/Enter/Klick/Controller), sauberes Zurücksetzen (Kamera, Oberflächen, CC_UIBlock) – geprüft.
+- Andere Trainer: Standard-Szenen (ruhige Kamera, ohne eigene Animation) bis ihre eigenen gebaut sind.
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -88,7 +95,10 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Gym: Bank/Matten ohne eigene Animation.
 - Event-Map: 168 358 Dreiecke, keine Kollision (M1). Maßstabsdatei verweist auf alten Fighter (M2).
 - Einstellungen-Menü fehlt; Schalter „Effekte reduzieren“ (`CC_ReduceFX`) ist nur vorbereitet.
-- Trainer-Modelle sind starr, die Signatur wird nicht vorgeführt (animierbare Version in Arbeit, Tyson zuerst).
+- Animierbar ist bisher nur Tyson; die anderen 5 Trainer brauchen Export + Import + eigene Animationen/Szenen.
+- Upload nötig für online: Trainer_Tyson_Idle/Greet/Respect, Fighter_Sig_Tyson, Fighter_Sig_Ali (ohne Upload nur in Studio sichtbar).
+- Im Test kamen Schläge über CC_Action im Kampf nicht beim Server an (keine Treffer, keine Meldung) – Codex hat den Angriffsweg evtl. geändert; mit echter Tastatur prüfen.
+- Tysons Platz (Boxbereich, 100/16) liegt eng an Säule und Sack: Kamerawinkel mussten angepasst werden.
 - Trainer-Endkampf: Champion-Tyson ist sehr stark (im Test 196:10 Schaden gegen mich); Balance noch nicht geprüft. Kein Walkout/Intro beim Trainer-Endkampf (startet direkt).
 - Trainer-Namen sind echte Personen (rechtlich riskant vor Veröffentlichung).
 - Die Animationen Fighter_Sig_Tyson / Fighter_Sig_Ali sind noch nicht hochgeladen; die Animationen Fighter_LegCheck_v01, Fighter_LimpLeft_v01, Fighter_LimpRight_v01 ebenfalls offen.

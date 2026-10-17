@@ -5,7 +5,7 @@
 local SS = game:GetService("ServerStorage")
 local KSP = game:GetService("KeyframeSequenceProvider")
 
-local TRAINER_IDLE = {}                               -- spaeter: [trainerId] = "Trainer_Tyson_Idle" usw.
+local TRAINER_IDLE = { Mike_Tyson = "Trainer_Tyson_Idle" }   -- eigene Idle je Trainer (Rest: Kampf-Idle)
 local DEFAULT_IDLE = "Fighter_Idle_v08"
 
 local animFolder = SS:WaitForChild("CC_Animations", 10)
