@@ -54,6 +54,16 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Hochgeladen in ANIMEXGANG: 64 IDs (Stand 2026-10-11) plus 34 weitere (105 insgesamt, geladen und geprüft).
 - Ali und Tyson: als Keyframes in Studio, Upload noch offen.
 
+### Gym-Lobby Design (2026-10-17, nur in Studio)
+- Backup vorher: ServerStorage.CC_GymDesignBackup_Claude_20261017 (ganzes CC_Gym + Lighting-Effekte und -Werte).
+- Boden: matte Anthrazit-Betonplatten, Trainingsflächen dunkler Gummi, Grappling dunkler Stoff; rote Neon-Bodenlinien → eingelassene matte Metallfugen.
+- Licht: neutral-weiße Deckenspots, leicht kühle Fülllichter, Ambient weniger blau (Lighting.Ambient/OutdoorAmbient, CC_GymColor-Tönung neutral). Schatten nur noch 8 Spots (4 über dem Oktagon, je 1 pro Zone) statt 26. Neue Downlights über Empfang und Lounge.
+- Rot nur noch als dunkle, kurze Akzente (Säulenbänder, Türen, Theke, Podest). Weiße Neon-Galeriekante und Treppen-Neon → Metall.
+- Materialien: Säulen/Träger matt schwarzes Metall, Wände dunkler Beton, Wandpaneele dunkles Holz, Geräte gebürstetes Metall, Säcke schwarzes Leder.
+- Zonenschilder (BOXEN, BODENKAMPF, KRAFT, KONDITION) jetzt fest an den Galerie-Stirnseiten statt schwebend.
+- 6 Pflanzen (3 Typen, alle unterschiedlich) in dunklen Töpfen: Empfang (2), Lounge (2), Treppe, Trainertisch. Keine Überschneidungen (geprüft).
+- Keine Scripts geändert; kein Script greift auf die geänderten Teile zu (geprüft).
+
 ### Weitere Fertigstellungen
 - Gym-Startort, Fallschutz, Curls auf der Hallenseite.
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
@@ -73,6 +83,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Trainer-Modelle sind starr, die Signatur wird nicht vorgeführt.
 - Trainer-Namen sind echte Personen (rechtlich riskant vor Veröffentlichung).
 - Die Animationen Fighter_Sig_Tyson / Fighter_Sig_Ali sind noch nicht hochgeladen; die Animationen Fighter_LegCheck_v01, Fighter_LimpLeft_v01, Fighter_LimpRight_v01 ebenfalls offen.
+- Gym-Lobby: Laufen im Play-Modus nicht getestet (Hauptmenü sperrt die Steuerung beim Test). Lighting-Änderungen sind global und wirken auch in der Fight Night (nicht geprüft). Empfang noch eher dunkel. Place muss in Studio gespeichert werden (Strg+S).
 - `CHATGPT_HANDOFF.md`, `TASKS.md`, `GAME_DESIGN.md` sind nicht immer synchron mit diesem Stand.
 
 ### Aufgaben (Reihenfolge laut Nutzer)
@@ -84,8 +95,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 6. Karriere: Gegnerliste (ca. 10 KI-Gegner, steigend), Titel, Belohnungen.
 7. Ranked (später): gleiche Signatur-Auswahl für alle.
 8. Vorführung der Signatur durch den Trainer (Ersatz über Dummy-Kämpfer).
-9. Gym-Lobby: Design und Lighting überarbeiten (Auftrag liegt vor, noch nicht begonnen).
-10. Grünpflanzen in dunklen Töpfen in ruhigen Bereichen (Auftrag liegt vor, noch nicht begonnen).
+9. Gym-Lobby: erledigt bis auf Laufen im Play-Modus (siehe Offene Punkte).
 
 ## Commits
 - Letzter Commit mit Signatur-Arbeit: `1da508a` (Ali), `d1838a8` (CHATGPT_HANDOFF).
