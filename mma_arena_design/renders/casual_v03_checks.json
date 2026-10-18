@@ -1,0 +1,22 @@
+{
+ "rest@1": {
+  "Casual_Hands": "25/228 nicht bedeckt",
+  "Coach_Jacket": "48/320 nicht bedeckt",
+  "Coach_Pants": "0/102 nicht bedeckt"
+ },
+ "Fighter_CasualWalk_v2@5": {
+  "Casual_Hands": "24/228 nicht bedeckt",
+  "Coach_Jacket": "55/320 nicht bedeckt",
+  "Coach_Pants": "6/102 nicht bedeckt"
+ },
+ "Fighter_CasualWalk_v2@14": {
+  "Casual_Hands": "24/228 nicht bedeckt",
+  "Coach_Jacket": "55/320 nicht bedeckt",
+  "Coach_Pants": "6/102 nicht bedeckt"
+ },
+ "Fighter_CasualIdle@20": {
+  "Casual_Hands": "24/228 nicht bedeckt",
+  "Coach_Jacket": "45/320 nicht bedeckt",
+  "Coach_Pants": "0/102 nicht bedeckt"
+ }
+}

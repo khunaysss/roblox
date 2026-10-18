@@ -1,0 +1,26 @@
+{
+ "help_hands_m": {
+  "40": 0.176,
+  "50": 0.167,
+  "60": 0.084,
+  "70": 0.035,
+  "80": 0.035
+ },
+ "card_hands_m": {
+  "20": 0.153,
+  "23": 0.052,
+  "26": 0.052
+ },
+ "shove_hand_to_chest_m": {
+  "13": 0.126,
+  "15": 0.126
+ },
+ "lowest_body_z": {
+  "Story_P_Shoved": -0.067,
+  "Story_P_SitIdle": -0.049,
+  "Story_T_KneelHelp": -0.014,
+  "Story_P_HelpUp": -0.049,
+  "Story_P_Door": -0.036
+ },
+ "hand_floor_z_sit": 0.15
+}
