@@ -1,0 +1,41 @@
+{
+ "hall_m": [
+  50.68,
+  42.28,
+  8.68
+ ],
+ "hall_studs": [
+  181,
+  151,
+  31
+ ],
+ "octagon_width_studs": 24,
+ "mesh_objects": 105,
+ "tris_total": 48046,
+ "largest": [
+  [
+   "Wall_Left_Text",
+   5920
+  ],
+  [
+   "Logo_Name",
+   5568
+  ],
+  [
+   "WallLogo_Name",
+   5568
+  ],
+  [
+   "Logo_Sub",
+   3600
+  ],
+  [
+   "WallLogo_Sub",
+   3600
+  ],
+  [
+   "Banner_CC",
+   1544
+  ]
+ ]
+}
