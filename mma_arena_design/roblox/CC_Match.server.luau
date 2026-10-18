@@ -83,7 +83,16 @@ end
 local SHORTS = { red = Color3.new(0.564706, 0.0823529, 0.117647), blue = Color3.new(0.117647, 0.235294, 0.627451) }
 local function paint(c, side)
 	local s = c and c:FindFirstChild("Fighter_Shorts", true)
-	if s and s:IsA("BasePart") then s.Color = SHORTS[side] end
+	if not (s and s:IsA("BasePart")) then return end
+	-- Spieler tragen ihre freigeschalteten Shorts (Belohnung); nur KI-Gegner bekommen die Eckfarbe
+	local plr = Players:GetPlayerFromCharacter(c)
+	if plr then
+		local ok, look = pcall(function() return HttpService:JSONDecode(plr:GetAttribute("CC_Look") or "{}") end)
+		local LookS = require(RS:WaitForChild("CC_LookShared"))
+		local it = ok and look.shorts and LookS.SHORTS[look.shorts]
+		if it then s.Color = it.color; return end
+	end
+	s.Color = SHORTS[side]
 end
 
 -- ---------------- Warteschlange ----------------

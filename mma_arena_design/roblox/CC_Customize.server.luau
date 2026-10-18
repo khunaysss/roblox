@@ -53,6 +53,10 @@ remote.OnServerEvent:Connect(function(plr, t)
 		return
 	end
 	local look = Look.sanitize(t)
+	-- Belohnungen: nur freigeschaltete Farben uebernehmen (Server prueft, Client kann nichts erzwingen)
+	local prog = Look.progressOf(plr)
+	if look.shorts and not Look.unlocked(Look.SHORTS[look.shorts], prog) then look.shorts = nil end
+	if look.gloves and not Look.unlocked(Look.GLOVES[look.gloves], prog) then look.gloves = nil end
 	local ev = SS:FindFirstChild("CC_ProfileEvent")
 	if not ev then remote:FireClient(plr, "error", "Profil-System fehlt."); return end
 	ev:Fire(plr, "look", look)

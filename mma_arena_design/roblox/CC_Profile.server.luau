@@ -44,7 +44,7 @@ progressRemote.Name = "CC_Progress"; progressRemote.Parent = RS
 local profiles = {}            -- [player] = Tabelle
 local function default()
 	local p = { v = 4, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
-		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 },
+		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1, shorts = 1, gloves = 1 },
 		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false, story = false, outro = false, careerTip = false,
 			gymTour = false, sigTour = false, onlineHint = false, editorHint = false, focusTip = false },  -- Erklaerungen beim ersten Mal (alle Spieler einmal)
 		sig = "", sigs = {}, sigProgress = SIGPROG.newProgress(), career = { beaten = {}, losses = 0 },
@@ -69,6 +69,27 @@ local function resetGoals(p)
 	if changed then p.dirty = true end
 end
 
+-- Belohnungen: neu freigeschaltete Shorts/Handschuhe melden (Vergleich mit dem letzten Stand, nur waehrend der Sitzung)
+local LookS = require(RS:WaitForChild("CC_LookShared"))
+local lastUnlocked = {}
+local function rewardCheck(plr)
+	local prog = LookS.progressOf(plr)
+	local now, names = {}, {}
+	for _, kind in ipairs({ { "SHORTS", "Shorts" }, { "GLOVES", "Handschuhe" } }) do
+		for i, it in ipairs(LookS[kind[1]]) do
+			if LookS.unlocked(it, prog) then
+				local key = kind[1] .. i; now[key] = true
+				if lastUnlocked[plr] and not lastUnlocked[plr][key] then table.insert(names, kind[2] .. " " .. it.name) end
+			end
+		end
+	end
+	lastUnlocked[plr] = now
+	if #names > 0 then
+		plr:SetAttribute("CC_Notice", "Neu freigeschaltet: " .. table.concat(names, ", ") .. " (Mein Kämpfer)|" .. tostring(workspace:GetServerTimeNow()))
+	end
+end
+Players.PlayerRemoving:Connect(function(plr) lastUnlocked[plr] = nil end)
+
 local function publish(plr)
 	local p = profiles[plr]; if not p then return end
 	resetGoals(p)
@@ -91,6 +112,7 @@ local function publish(plr)
 	plr:SetAttribute("CC_Goals", game:GetService("HttpService"):JSONEncode({
 		day = p.goals.day, week = p.goals.week, counts = p.goals.counts, claimed = p.goals.claimed,
 	}))
+	rewardCheck(plr)
 end
 
 local function addXP(plr, n)
