@@ -144,3 +144,10 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 
 ## Commits
 - Letzter Commit mit Signatur-Arbeit: `1da508a` (Ali), `d1838a8` (CHATGPT_HANDOFF).
+
+### Story-Einstieg – Qualitätsprobe (2026-10-18, wartet auf Freigabe)
+- Alltagskleidung (Hoodie mit Kapuze/Kordeln/Tasche, Hose, Schuhe, Rucksack) als Hülle aus dem echten Körper-Mesh, gleiche Skin-Gewichte (build_casual_outfit_v01.py → Fighter_Casual_v01.blend, export/Fighter_Casual_v01.fbx, vom Nutzer importiert; Vorlage ServerStorage.CC_Story.Outfit_Casual, Farbe je Darsteller).
+- Animationen Story_P_Confront / Story_S_Confront (Fighter_Casual_v02, Export v26): Griff an den Rucksackträger 3,5 cm, Füße 0 cm Rutschen. Gehen mit Fighter_CasualWalk_v2 im Animationstempo 6,43 Studs/s.
+- Schulausschnitt Workspace.CC_StorySchool bei (-600, 0, 600), ca. 2.270 Teile (roblox/build_story_school_v01.luau): Straße, Gehwege, Ziegelzaun mit offenem Tor, Hof, 3-geschossige Schule mit Eingangsportal, Häuserzeile, Wohnblöcke, Bäume.
+- Probe ServerStorage.CC_Story.CC_StoryProbe (roblox/CC_StoryProbe.module.luau): Gehen → Anhalten → Konfrontation mit 4 Kameraeinstellungen und Untertiteln. Aufnahmen: renders/story_probe_20261018/.
+- Offen/bekannt: Kapuze wirkt in Nahaufnahmen wulstig; nackte Hände klein; Hausdächer im Hintergrund bilden ein V (falsch herum); Zaun ~920 Teile (zu viele); Menü-Kamera greift in Szenen ein (Szenen-Kamera braucht eigene Sperre); kein Video, nur Standbilder; neue Animationen/Kleidung brauchen Upload.

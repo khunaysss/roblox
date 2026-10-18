@@ -1,0 +1,68 @@
+{
+ "rest@1": {
+  "Casual_Hoodie": "52/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "0/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.0,
+  "body_min_z": -0.0
+ },
+ "Fighter_CasualWalk_v2@1": {
+  "Casual_Hoodie": "46/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "2/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.014,
+  "body_min_z": -0.01
+ },
+ "Fighter_CasualWalk_v2@5": {
+  "Casual_Hoodie": "57/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "8/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.0,
+  "body_min_z": -0.0
+ },
+ "Fighter_CasualWalk_v2@10": {
+  "Casual_Hoodie": "46/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "3/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.014,
+  "body_min_z": -0.01
+ },
+ "Fighter_CasualWalk_v2@15": {
+  "Casual_Hoodie": "57/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "4/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.0,
+  "body_min_z": -0.0
+ },
+ "Fighter_CasualWalk_v2@19": {
+  "Casual_Hoodie": "46/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "2/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.014,
+  "body_min_z": -0.01
+ },
+ "Fighter_CasualIdle@1": {
+  "Casual_Hoodie": "42/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "0/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.053,
+  "body_min_z": -0.049
+ },
+ "Fighter_CasualIdle@12": {
+  "Casual_Hoodie": "42/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "0/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.053,
+  "body_min_z": -0.049
+ },
+ "Fighter_CasualIdle@25": {
+  "Casual_Hoodie": "42/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "0/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.053,
+  "body_min_z": -0.049
+ },
+ "Fighter_CasualIdle@37": {
+  "Casual_Hoodie": "42/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "0/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.053,
+  "body_min_z": -0.049
+ },
+ "Fighter_CasualIdle@49": {
+  "Casual_Hoodie": "42/384 Koerperpunkte nicht bedeckt",
+  "Casual_Pants": "0/142 Koerperpunkte nicht bedeckt",
+  "shoe_min_z": -0.053,
+  "body_min_z": -0.049
+ }
+}
