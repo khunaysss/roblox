@@ -37,6 +37,19 @@ local function onb(p)
 	return ok and type(t) == "table" and t or nil
 end
 local function phase(p, ph) p:SetAttribute("CC_OnbPhase", ph or "") end
+-- Story-Einstieg (CC_Story.client): Phase "story" spielt den Film lokal; Schule und Gym-Front vorher streamen lassen.
+local storyRemote = RS:FindFirstChild("CC_Story") or Instance.new("RemoteEvent"); storyRemote.Name = "CC_Story"; storyRemote.Parent = RS
+local function streamStory(p)
+	local s = workspace:FindFirstChild("CC_StorySchool")
+	local o = s and s:GetAttribute("CC_Origin")
+	if o then
+		pcall(function() p:RequestStreamAroundAsync(o + Vector3.new(0, 0, 20), 8) end)
+		pcall(function() p:RequestStreamAroundAsync(o + Vector3.new(120, 0, -118), 8) end)
+	end
+end
+local function startStory(p)
+	task.spawn(function() streamStory(p); if p.Parent then phase(p, "story") end end)
+end
 local function tip(p, text, kind)
 	p:SetAttribute("CC_CoachTip", HS:JSONEncode({ text = text, kind = kind or "tip", t = workspace:GetServerTimeNow() }))
 end
@@ -47,7 +60,7 @@ end
 local coachGym, coachCage
 -- Standpunkte (Studs, Welt): Gym = neben dem Trainertisch (Stuhl-Seite, Tisch an der Ostwand), Blick in die Halle;
 -- Arena = Hallenboden ausserhalb der Plattform auf der roten Seite, Blick zur Kaefigmitte. Ueberschreibbar per Attribut CC_CoachSpot.
-local GYM_SPOT, GYM_LOOK = Vector3.new(186.2, 0, -12.4), Vector3.new(160, 0, 0)
+local GYM_SPOT, GYM_LOOK = Vector3.new(208, 0, -46), Vector3.new(160, 0, 4)
 local CAGE_SPOT, CAGE_LOOK = Vector3.new(-8, 0, 22.5), Vector3.new(0, 0, 0)
 local function groundAt(v)
 	local rp = RaycastParams.new(); rp.FilterType = Enum.RaycastFilterType.Exclude
@@ -403,6 +416,7 @@ local function hookPlayer(p)
 		local anyLesson = false
 		for i = 1, 6 do if o.lessons[i] then anyLesson = true end end
 		if not o.editor then phase(p, "editor")
+		elseif o.story == false then startStory(p)                  -- Film noch nicht gesehen (z. B. waehrenddessen verlassen)
 		elseif not o.offered or (anyLesson and not o.done) then phase(p, "welcome")
 		else phase(p, "") end
 	end)
@@ -411,12 +425,27 @@ Players.PlayerAdded:Connect(hookPlayer)
 for _, p in ipairs(Players:GetPlayers()) do hookPlayer(p) end
 Players.PlayerRemoving:Connect(function(p) local s = sessions[p]; if s then s.cmd = "skipAll" end; sparWatch[p] = nil end)
 
+-- Story: Ende/Ueberspringen -> gespeichert, danach direkt die erste Lektion im Kaefig (Film endet mit "Wir beginnen langsam").
+-- Wiederholung aus den Einstellungen: nur Film, kein Fortschritt, keine Belohnung.
+storyRemote.OnServerEvent:Connect(function(p, what)
+	local ph = p:GetAttribute("CC_OnbPhase") or ""
+	if what == "done" and ph == "story" then
+		profile(p, "onb", "story", true)
+		profile(p, "onb", "offered", true)
+		phase(p, "lesson")
+		menuServer:Fire(p, "tutorial")
+	elseif what == "replay" and ph == "" and p.Character and not p.Character:GetAttribute("CC_Opponent") and not p:GetAttribute("CC_Queue") then
+		task.spawn(function() streamStory(p); if p.Parent then storyRemote:FireClient(p, "play") end end)
+	end
+end)
+
 remote.OnServerEvent:Connect(function(p, what, arg)
 	local ph = p:GetAttribute("CC_OnbPhase") or ""
 	local s = sessions[p]
 	if what == "editorDone" and ph == "editor" then
 		profile(p, "onb", "editor", true)
-		phase(p, "welcome")
+		local o = onb(p)
+		if o and o.story == false then startStory(p) else phase(p, "welcome") end
 	elseif what == "start" and ph == "welcome" then
 		phase(p, "lesson")
 		menuServer:Fire(p, "tutorial")

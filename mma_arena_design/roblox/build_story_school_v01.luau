@@ -78,11 +78,10 @@ function S.fence()
 		P("WallCap", sz(len, 0.4, 2.0), at(mid, 3.0), CAP, M.Concrete)
 		P("RailLow", sz(len, 0.35, 0.35), at(mid, 3.8), IRON, M.Metal)
 		P("RailTop", sz(len, 0.35, 0.35), at(mid, 9.6), IRON, M.Metal)
-		local n = math.floor(len / 1.6)
+		local n = math.floor(len / 2.4)   -- Staebe alle 2,4 Studs (weniger Teile)
 		for i = 1, n - 1 do
 			local t = math.min(x0, x1) + i * len / n
 			P("Bar", sz(0.28, 6.4, 0.28), at(t, 6.7), IRON, M.Metal, { noShadow = true })
-			P("BarTip", sz(0.42, 0.5, 0.42), at(t, 10.05), IRON, M.Metal, { noShadow = true })
 		end
 	end
 	local function pillar(x, z, big)
@@ -256,9 +255,9 @@ function S.background()
 		-- face: Richtung der Vorderseite (+1 = Blick +Z zur Schule, -1 = Blick -Z)
 		P("House", V(w, h, d), CF(x, h / 2, z), wallc, M.Brick)
 		local r1 = P("Roof", V(w + 1, 7, d / 2 + 0.6), CF(), roofc, M.Slate, { wedge = true })
-		r1.CFrame = ORIGIN * CF(x, h + 3.5, z - d / 4) * CFrame.Angles(0, math.rad(180), 0)
+		r1.CFrame = ORIGIN * CF(x, h + 3.5, z + d / 4) * CFrame.Angles(0, math.rad(180), 0)
 		local r2 = P("Roof", V(w + 1, 7, d / 2 + 0.6), CF(), roofc, M.Slate, { wedge = true })
-		r2.CFrame = ORIGIN * CF(x, h + 3.5, z + d / 4)
+		r2.CFrame = ORIGIN * CF(x, h + 3.5, z - d / 4)
 		local fz = z + face * (d / 2 + 0.1)
 		for fl = 0, math.floor(h / 11) - 1 do
 			for wx = x - w / 2 + 5, x + w / 2 - 5, 8 do
@@ -315,6 +314,56 @@ function S.trees()
 	for _, t in ipairs({ { -44, 10 }, { -80, 32 }, { 48, 32 }, { 86, 10 } }) do
 		P("LeafPatch", V(14, 0.05, 12), CF(t[1] + 2, 0.82, t[2] - 1), C(176, 120, 56), M.Grass, { noShadow = true, noCollide = true })
 	end
+	return cur
+end
+
+-- ---------- Gym-Front "um die Ecke" (Szene 7): ersetzt das Haus bei x = 120 in der Haeuserzeile; echtes Logo aus dem Gym ----------
+function S.gymfront()
+	cur = folder("GymFront")
+	for _, d in ipairs(root.Background:GetChildren()) do                      -- Haus an dieser Stelle entfernen
+		if d:IsA("BasePart") then
+			local lp = ORIGIN:PointToObjectSpace(d.Position)
+			if math.abs(lp.X - 120) < 16 and lp.Z < -112 and lp.Z > -150 then d:Destroy() end
+		end
+	end
+	local X, Z, W, Dp, H = 120, -132, 40, 26, 28
+	local FZ = Z + Dp / 2                                                   -- Vorderseite (Blick +Z zur Strasse)
+	local DARK, TRIM, GLASS = C(58, 60, 66), C(36, 38, 42), C(110, 130, 140)
+	P("GymBody", V(W, H, Dp), CF(X, H / 2, Z), DARK, M.Concrete)
+	P("GymParapet", V(W + 1, 1.2, Dp + 1), CF(X, H + 0.6, Z), TRIM, M.Metal)
+	P("GymPlinth", V(W + 0.4, 1.2, Dp + 0.4), CF(X, 0.6, Z), C(70, 70, 72), M.Concrete)
+	-- Schaufenster links/rechts der Tuer mit Blick ins helle Innere
+	for _, sx in ipairs({ -1, 1 }) do
+		local cx = X + sx * 11
+		P("ShopInner", V(14, 10, 0.2), CF(cx, 6.6, FZ + 0.05), C(226, 220, 208), M.SmoothPlastic, { noShadow = true }); local sl = Instance.new("SurfaceLight"); sl.Face = Enum.NormalId.Front; sl.Range = 10; sl.Brightness = 1.2; sl.Color = C(255, 238, 214); sl.Parent = cur:GetChildren()[#cur:GetChildren()]
+		P("ShopGlass", V(14, 10, 0.2), CF(cx, 6.6, FZ + 1.0), GLASS, M.Glass, { refl = 0.12, trans = 0.55, noShadow = true })
+		P("ShopFrameT", V(14.6, 0.5, 0.6), CF(cx, 11.8, FZ + 1.1), TRIM, M.Metal); P("ShopFrameB", V(14.6, 0.5, 0.6), CF(cx, 1.4, FZ + 1.1), TRIM, M.Metal)
+		for _, k in ipairs({ -1, 1 }) do P("ShopFrameV", V(0.5, 10.4, 0.6), CF(cx + k * 7.05, 6.6, FZ + 1.1), TRIM, M.Metal) end
+		-- roter Sandsack im Fenster
+		P("ShopBag", V(5.2, 2.2, 2.2), CF(cx + sx * -2, 6.2, FZ - 3), C(150, 28, 34), M.Leather, { shape = Enum.PartType.Cylinder }).CFrame = ORIGIN * CF(cx + sx * -2, 6.4, FZ + 0.55) * CFrame.Angles(0, 0, math.rad(90))
+	end
+	-- Eingang: Rahmen, Tuer (Scharnier links, wird in Szene 7 geoeffnet), Griff
+	P("DoorInner", V(6.4, 11, 0.2), CF(X, 6.9, FZ + 0.05), C(226, 220, 208), M.SmoothPlastic, { noShadow = true })
+	P("DoorFrameL", V(0.6, 11.6, 1.0), CF(X - 3.5, 6.9, FZ + 1.1), TRIM, M.Metal); P("DoorFrameR", V(0.6, 11.6, 1.0), CF(X + 3.5, 6.9, FZ + 1.1), TRIM, M.Metal)
+	P("DoorFrameT", V(7.6, 0.6, 1.0), CF(X, 12.9, FZ + 1.1), TRIM, M.Metal)
+	local door = P("GymDoor", V(6.2, 11, 0.3), CF(X, 6.9, FZ + 1.0), GLASS, M.Glass, { refl = 0.12, trans = 0.45 })
+	door:SetAttribute("CC_Hinge", (ORIGIN * CF(X - 3.1, 6.9, FZ + 1.0)).Position)
+	local hdl = P("GymDoorHandle", V(0.3, 2.4, 0.3), CF(X + 2.4, 6.6, FZ + 1.3), C(190, 192, 196), M.Metal)
+	local w = Instance.new("WeldConstraint"); w.Part0 = door; w.Part1 = hdl; w.Parent = door
+	-- Logo-Schild: Kopie des echten Logo-Panels aus dem Gym (gleiche Grafik, kein neues Logo)
+	local src = workspace:FindFirstChild("CC_Gym") and workspace.CC_Gym:FindFirstChild("LogoPanel", true)
+	local sign = P("GymSign", V(30, 9.75, 0.3), CF(X, 19.2, FZ + 0.25), C(20, 22, 26), M.SmoothPlastic)
+	if src then
+		for _, d in ipairs(src:GetChildren()) do
+			if d:IsA("Decal") or d:IsA("SurfaceGui") then
+				local c = d:Clone(); c.Face = Enum.NormalId.Front; c.Parent = sign
+			end
+		end
+	end
+	local spot = Instance.new("SpotLight"); spot.Face = Enum.NormalId.Front; spot.Range = 24; spot.Brightness = 1.6; spot.Angle = 80; spot.Color = C(255, 236, 214); spot.Parent = sign
+	-- Fussmatte und Stufe
+	P("GymStep", V(12, 0.6, 3), CF(X, 0.3, FZ + 2.6), C(110, 108, 104), M.Concrete)
+	P("GymMat", V(6, 0.08, 2.4), CF(X, 0.64, FZ + 2.6), C(34, 34, 36), M.Fabric, { noShadow = true })
 	return cur
 end
 

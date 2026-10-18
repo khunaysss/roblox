@@ -37,7 +37,7 @@ local progressEvent = RS:WaitForChild("CC_Progress")
 local state = RS:WaitForChild("CC_MatchState")
 local gui = script.Parent
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = true
+gui.IgnoreGuiInset = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.DisplayOrder = 20
 
@@ -45,12 +45,12 @@ gui.DisplayOrder = 20
 local CAM_POS = Vector3.new(1.8, 4.0, -48)
 local CAM_AIM = Vector3.new(0.2, 5.0, 0)
 local FIGHTER_POS = Vector3.new(-2.6, 0, -35)
-local CAM_FOV = 45
+local CAM_FOV = 39
 local FIGHTER_YAW = 28            -- Grad zur Kamera gedreht
 local GUARD_LOWER = -22           -- Oberarme etwas senken, damit die Handschuhe das Gesicht nicht verdecken (nur Menue-Kopie)
 
 local canvas = UI.new("Frame", { Name = "Canvas", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = gui })
-UI.autoscale(canvas, 720)
+UI.autoscale(canvas, 780)
 
 ---------------------------------------------------------------------------------------------------
 -- Hauptmenue-Ebene
@@ -58,26 +58,23 @@ UI.autoscale(canvas, 720)
 local menu = UI.new("Frame", { Name = "Menu", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Visible = false, Parent = canvas })
 local shadeL = UI.new("Frame", { BackgroundColor3 = C.bg0, BorderSizePixel = 0, Size = UDim2.fromScale(0.6, 1), Parent = menu })
 UI.new("UIGradient", { Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.05), NumberSequenceKeypoint.new(0.6, 0.35), NumberSequenceKeypoint.new(1, 1) }), Parent = shadeL })
-local shadeB = UI.new("Frame", { BackgroundColor3 = C.bg0, BorderSizePixel = 0, AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromScale(0, 1), Size = UDim2.new(1, 0, 0, 150), Parent = menu })
-UI.new("UIGradient", { Rotation = -90, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.15), NumberSequenceKeypoint.new(1, 1) }), Parent = shadeB })
-
-local function logo(parent, pos, size, anchor)
-	local f = UI.new("Frame", { BackgroundTransparency = 1, Position = pos, AnchorPoint = anchor or Vector2.zero, Size = UDim2.fromOffset(600, size + 30), Parent = parent })
-	local words = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, size + 6), Parent = f })
-	UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 12), SortOrder = Enum.SortOrder.LayoutOrder,
-		HorizontalAlignment = anchor and anchor.X == 0.5 and Enum.HorizontalAlignment.Center or Enum.HorizontalAlignment.Left, Parent = words })
-	UI.label({ Text = "CAGE", FontFace = F.title, TextSize = size, TextColor3 = C.red, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, size + 6), TextWrapped = false, LayoutOrder = 1, Parent = words })
-	UI.label({ Text = "CHAMPIONS", FontFace = F.title, TextSize = size, TextColor3 = C.text, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, size + 6), TextWrapped = false, LayoutOrder = 2, Parent = words })
-	UI.new("Frame", { BackgroundColor3 = C.red, BorderSizePixel = 0, Position = UDim2.fromOffset(anchor and 150 or 2, size + 12), Size = UDim2.fromOffset(anchor and 300 or 120, 4), Parent = f })
-	return f
+local shadeB = UI.new("Frame", { BackgroundColor3 = C.bg0, BorderSizePixel = 0, AnchorPoint = Vector2.new(0, 1), Position = UDim2.fromScale(0, 1), Size = UDim2.new(1, 0, 0, 170), Parent = menu })
+UI.new("UIGradient", { Rotation = -90, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.08), NumberSequenceKeypoint.new(1, 1) }), Parent = shadeB })
+local function logo(parent,pos,size,anchor)
+ local height=size*1.35
+ local width=height*(48/15.6)
+ return UI.sprite("logo",{Name="CC_Logo",Position=pos,AnchorPoint=anchor or Vector2.zero,Size=UDim2.fromOffset(width,height),Parent=parent})
 end
-local menuLogo = logo(menu, UDim2.fromOffset(56, 34), 46)
+
+local menuLogo = logo(menu, UDim2.fromOffset(30, 8), 73)
+local menuTagline = UI.label({ Text = "", FontFace = F.bold, TextSize = 11, TextColor3 = C.mute,
+	Position = UDim2.fromOffset(46, 116), Size = UDim2.fromOffset(600, 20), TextWrapped = false, Parent = menu })
 
 -- Bereich links: Navigation bzw. Unterseite
-local area = UI.new("Frame", { Name = "Area", BackgroundTransparency = 1, Position = UDim2.fromOffset(56, 132), Size = UDim2.fromOffset(620, 470), Parent = menu })
+local area = UI.new("Frame", { Name = "Area", BackgroundTransparency = 1, Position = UDim2.fromOffset(36, 154), Size = UDim2.fromOffset(660, 470), Parent = menu })
 
 -- Profil-Karte unten links
-local profile = UI.panel({ Name = "Profile", AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 56, 1, -32), Size = UDim2.fromOffset(470, 96), Parent = menu })
+local profile = UI.panel({ Name = "Profile", AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -42, 0, 28), Size = UDim2.fromOffset(450, 88), ImageColor3 = C.bg0, Parent = menu })
 UI.label({ Text = player.DisplayName, FontFace = F.head, TextSize = 22, Position = UDim2.fromOffset(20, 10), Size = UDim2.new(1, -40, 0, 28), Parent = profile })
 local pLevel = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextColor3 = C.gold, TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.fromOffset(20, 12), Size = UDim2.new(1, -40, 0, 24), Parent = profile })
 local _, pXP = UI.bar({ Position = UDim2.fromOffset(20, 44), Size = UDim2.new(1, -40, 0, 6), Parent = profile }, C.gold)
@@ -134,7 +131,7 @@ end
 
 -- Start
 local home = page("home")
-home.Size = UDim2.fromOffset(470, 440)
+home.Size = UDim2.fromOffset(650, 460)
 local navButtons = {}
 local function nav(order, text, sub, icon, fn, disabled, badge)
 	local b = UI.button({ Style = "nav", Text = text, Sub = sub, Icon = icon, LayoutOrder = order, OnClick = fn, Disabled = disabled, Badge = badge, Parent = home })
@@ -146,6 +143,15 @@ nav(2, "ONLINE", "Gegen echte Spieler kämpfen", "globe", function() go("online"
 nav(3, "TRAINING", "Trainingskampf oder Gym", "dumbbell", function() go("training") end)
 nav(4, "MEIN KÄMPFER", "Aussehen anpassen", "fighter", function() go("fighter") end)
 nav(5, "EINSTELLUNGEN", "Ton · Anzeige · Tutorial", "gear", function() go("settings") end)
+navButtons[1]:SetAttribute("Selected", true)
+for _, button in ipairs(navButtons) do
+	button.MouseEnter:Connect(function()
+		for _, other in ipairs(navButtons) do other:SetAttribute("Selected", other == button) end
+	end)
+	button.SelectionGained:Connect(function()
+		for _, other in ipairs(navButtons) do other:SetAttribute("Selected", other == button) end
+	end)
+end
 
 -- Karriere: Ranglistenweg mit zehn Gegnern (Liste scrollbar), Rivalen- und Titelkampf, Karriere-Titel (CC_CareerTitle)
 local career = page("career")
@@ -154,19 +160,39 @@ local cSummary = card(career, 1, 62)
 local cLevel = UI.label({ Text = "", FontFace = F.head, TextSize = 19, TextColor3 = C.gold, Size = UDim2.new(1, 0, 0, 24), Parent = cSummary })
 local cRecord = UI.label({ Text = "", TextSize = 15, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 26), Size = UDim2.new(1, 0, 0, 20), Parent = cSummary })
 local _, cXP = UI.bar({ Position = UDim2.fromOffset(0, 48), Size = UDim2.new(1, 0, 0, 5), Parent = cSummary }, C.gold)
-local cRosterCard = card(career, 2, 294)
+local cRosterCard = card(career, 2, 404)
 local cRoster = UI.new("ScrollingFrame", { BackgroundTransparency = 1, BorderSizePixel = 0, Size = UDim2.fromScale(1, 1), CanvasSize = UDim2.new(),
 	AutomaticCanvasSize = Enum.AutomaticSize.Y, ScrollBarThickness = 4, ScrollBarImageColor3 = C.red, ScrollingDirection = Enum.ScrollingDirection.Y, Parent = cRosterCard })
-UI.new("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder, Parent = cRoster })
+UI.new("UIListLayout", { Padding = UDim.new(0, 3), SortOrder = Enum.SortOrder.LayoutOrder, Parent = cRoster })
 UI.new("UIPadding", { PaddingRight = UDim.new(0, 8), Parent = cRoster })
 local cRows = {}
 local selectedCareerId = Opponents.list[1].id
+
+local careerDetail=UI.panel({Name="OpponentDetails",AnchorPoint=Vector2.new(1,1),Position=UDim2.new(1,-42,1,-75),Size=UDim2.fromOffset(570,230),Visible=false,Parent=menu})
+local careerOpponentName=UI.label({Text="",FontFace=F.title,TextSize=27,Position=UDim2.fromOffset(30,15),Size=UDim2.new(1,-60,0,40),TextWrapped=false,Parent=careerDetail})
+local careerStyle=UI.label({Text="",TextSize=16,TextColor3=C.dim,Position=UDim2.fromOffset(30,53),Size=UDim2.new(1,-60,0,25),Parent=careerDetail})
+local careerStats={}
+for i,entry in ipairs({{"Power","Schlagkraft"},{"Cardio","Kondition"},{"Wrestling","Ringen"},{"Grappling","Bodenkampf"}}) do
+ local y=85+(i-1)*31
+ UI.label({Text=entry[2],TextSize=15,Position=UDim2.fromOffset(30,y),Size=UDim2.fromOffset(150,24),Parent=careerDetail})
+ local _,fill=UI.bar({Position=UDim2.fromOffset(190,y+7),Size=UDim2.fromOffset(220,10),Parent=careerDetail},i<=2 and C.red or C.gold)
+ local val=UI.label({Text="",FontFace=F.bold,TextSize=15,TextXAlignment=Enum.TextXAlignment.Right,Position=UDim2.fromOffset(420,y),Size=UDim2.fromOffset(100,24),Parent=careerDetail})
+ careerStats[entry[1]]={fill=fill,value=val}
+end
+
 local cTip = UI.label({ Text = "", TextSize = 15, TextColor3 = C.dim, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 34), TextWrapped = true, Parent = career })
 local cFight, cFightParts
 local function selectCareer(id)
 	local def = Opponents.byId[id]; if not def then return end
 	selectedCareerId = id
-	for rid, row in pairs(cRows) do row.button:SetAttribute("Selected", rid == id) end
+ careerOpponentName.Text=("#%d  %s"):format(def.rank or 0,def.name):upper()
+ careerStyle.Text=(def.style.."  /  "..def.stage):upper()
+ for key,row in pairs(careerStats) do
+  local v=def.stats and def.stats[key]
+  row.value.Text=v and (tostring(v).." / 20") or "—"
+  row.fill.Size=UDim2.fromScale(math.clamp((v or 0)/20,0,1),1)
+ end
+ for rid, row in pairs(cRows) do row.button:SetAttribute("Selected", rid == id) end
 	cTip.Text = "TRAINER-TIPP  ·  " .. def.tip
 	if cFightParts then cFightParts.title.Text = "KAMPF GEGEN " .. def.name:upper() end
 	if stage then
@@ -176,9 +202,12 @@ local function selectCareer(id)
 end
 for i, def in ipairs(Opponents.list) do
 	local d = def
-	local b, parts = UI.button({ Style = "ghost", Text = d.name, Sub = ("RANG #%d  ·  %s  ·  %s"):format(d.rank or i, d.stage, d.style),
-		Size = UDim2.new(1, 0, 0, 41), LayoutOrder = i, Name = d.id, OnClick = function() selectCareer(d.id) end, Parent = cRoster })
-	cRows[d.id] = { button = b, parts = parts, def = d, index = i }
+	local b, parts = UI.button({ Style = "ghost", Text = ("#%d  %s"):format(d.rank or i,d.name):upper(), Sub = ("RANG #%d  ·  %s  ·  %s"):format(d.rank or i, d.stage, d.style),
+		Size = UDim2.new(1, 0, 0, 34), LayoutOrder = 11-i, Name = d.id, OnClick = function() selectCareer(d.id) end, Parent = cRoster })
+	parts.title.TextSize=15
+ parts.title.Position=UDim2.fromOffset(28,0);parts.title.Size=UDim2.new(0.64,-28,1,0);parts.title.TextYAlignment=Enum.TextYAlignment.Center
+ parts.sub.Position=UDim2.new(0.64,0,0,0);parts.sub.Size=UDim2.new(0.36,-25,1,0);parts.sub.TextSize=11;parts.sub.TextYAlignment=Enum.TextYAlignment.Center
+ cRows[d.id] = { button = b, parts = parts, def = d, index = i }
 end
 local cActions = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 54), LayoutOrder = 4, Parent = career })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Right,
@@ -201,7 +230,8 @@ local function refreshCareer()
 		local unlocked = Opponents.isUnlocked(id, beaten)
 		row.button:SetAttribute("Disabled", not unlocked)
 		local stateText = beaten[id] and "SIEG" or (unlocked and "BEREIT" or "GESPERRT")
-		row.parts.sub.Text = ("RANG #%d  ·  %s%s  ·  %s"):format(row.def.rank or row.index, row.def.rival and "RIVALE  ·  " or "", row.def.style, stateText)
+		row.parts.sub.Text = (beaten[id] and "SIEG" or (unlocked and "BEREIT" or "GESPERRT"))
+ row.parts.sub.TextColor3=beaten[id] and C.green or (unlocked and C.gold or C.dim)
 	end
 	local unlocked = Opponents.isUnlocked(selectedCareerId, beaten)
 	if not unlocked then
@@ -388,8 +418,10 @@ local function slider(parent, y, title, key)
 		Size = UDim2.new(1, 0, 0, 24), Parent = row })
 	local track = UI.new("TextButton", { Text = "", AutoButtonColor = false, BackgroundColor3 = C.bg3, BorderSizePixel = 0,
 		Position = UDim2.fromOffset(0, 34), Size = UDim2.new(1, 0, 0, 10), Parent = row })
-	UI.new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = track })
-	local fill = UI.new("Frame", { BackgroundColor3 = C.red, BorderSizePixel = 0, Size = UDim2.fromScale(volume[key], 1), Parent = track })
+	UI.new("UICorner", { CornerRadius = UDim.new(0, 2), Parent = track })
+ UI.new("UIStroke",{Color=C.line,Thickness=1,Transparency=0.4,Parent=track})
+ track.ZIndex=2
+	local fill = UI.new("Frame", { BackgroundColor3 = C.red, BorderSizePixel = 0, Size = UDim2.fromScale(volume[key], 1), ZIndex=2, Parent = track })
 	UI.new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = fill })
 	local knob = UI.new("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(volume[key], 0, 0.5, 0), Size = UDim2.fromOffset(22, 22),
 		BackgroundColor3 = C.red, BorderSizePixel = 0, ZIndex = 3, Parent = track })
@@ -430,7 +462,7 @@ local function toggle(y, title, key, invert)   -- invert: Schalter zeigt "AN", w
 	local row = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, y), Size = UDim2.new(1, 0, 0, 40), Parent = settingsNote })
 	UI.label({ Text = title, FontFace = F.bold, TextSize = 17, Size = UDim2.new(0.62, 0, 1, 0), Parent = row })
 	local b, parts
-	local function show() local on = display[key] ~= (invert == true); parts.title.Text = on and "AN" or "AUS"; b:SetAttribute("Selected", on) end
+	local function show() local on = display[key] ~= (invert == true); b:SetAttribute("KitSprite",on and "toggle_on" or "toggle_off"); b:SetAttribute("Selected", on); parts.title.Text = on and "AN" or "AUS" end
 	b, parts = UI.button({ Style = "secondary", Text = "", Size = UDim2.new(0.3, 0, 1, 0), Name = key, OnClick = function()
 		display[key] = not display[key]; player:SetAttribute(key == "reduceFx" and "CC_ReduceFX" or "CC_NoShake", display[key]); show(); sendSettings()
 	end, Parent = row })
@@ -455,9 +487,11 @@ task.defer(loadSettings)
 local settingsActions = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 56), LayoutOrder = 3, Parent = settings })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Right,
 	Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = settingsActions })
-UI.button({ Style = "secondary", Text = "TUTORIAL WIEDERHOLEN", Icon = "help", Size = UDim2.new(0.58, -5, 1, 0), LayoutOrder = 1,
+UI.button({ Style = "secondary", Text = "TUTORIAL", Icon = "help", Size = UDim2.new(0.34, -7, 1, 0), LayoutOrder = 1,
 	OnClick = function() close(); RS:WaitForChild("CC_Tutorial"):FireServer("openWelcome") end, Parent = settingsActions })
-UI.button({ Style = "primary", Text = "FERTIG", Icon = "check", Size = UDim2.new(0.42, -5, 1, 0), LayoutOrder = 2,
+UI.button({ Style = "secondary", Text = "INTRO ANSEHEN", Size = UDim2.new(0.36, -7, 1, 0), LayoutOrder = 2,       -- Story-Film erneut (ohne Fortschritt)
+	OnClick = function() close(); local r = RS:FindFirstChild("CC_Story"); if r then r:FireServer("replay") end end, Parent = settingsActions })
+UI.button({ Style = "primary", Text = "FERTIG", Icon = "check", Size = UDim2.new(0.30, -6, 1, 0), LayoutOrder = 3,
 	OnClick = function() back() end, Parent = settingsActions })
 applyVolumes()
 
@@ -786,18 +820,19 @@ end)
 
 -- Editor oeffnen/schliessen (beim Verlassen mit ungespeicherten Aenderungen nachfragen)
 local function editorOpened()
+ careerDetail.Visible=false
 	saved = serverLook(); draft = Look.copy(saved); saveMsg = nil
 	setStageYaw(0)
 	previewDraft()
 	camMode = "editor"
-	menuLogo.Visible = false; profile.Visible = false; area.Visible = false; menuHints.Visible = false
+	menuLogo.Visible = false; menuTagline.Visible = false; profile.Visible = false; area.Visible = false; menuHints.Visible = false
 	showCat(CATS[1])
 	UI.focus(catButtons.hair)
 end
 local function editorClosed()
 	camMode = "menu"
 	draft = Look.copy(saved); previewDraft(); setStageYaw(0)
-	menuLogo.Visible = true; profile.Visible = true; area.Visible = true; menuHints.Visible = true
+	menuLogo.Visible = true; menuTagline.Visible = true; profile.Visible = true; area.Visible = true; menuHints.Visible = true
 end
 local function confirmLeave(onLeave)
 	if not dirty() then onLeave(); return end
@@ -854,7 +889,11 @@ local function blockGameplay(on)
 	end
 end
 local function showPage(name)
-	for n, p in pairs(pages) do p.Visible = n == name end
+ careerDetail.Visible=name=="career"
+ menuLogo.Visible=name~="career" and name~="fighter"
+ menuTagline.Visible=false
+ area.Position=UDim2.fromOffset(36,name=="career" and 16 or 154)
+ for n, p in pairs(pages) do p.Visible = n == name end
 	if name == "fighter" then editorOpened(); return end
 	if name == "career" then
 		local beaten = Opponents.beatenSet(player:GetAttribute("CC_CareerBeaten"))
@@ -944,7 +983,7 @@ end, false, 3000, Enum.KeyCode.Backspace, Enum.KeyCode.ButtonB)
 ---------------------------------------------------------------------------------------------------
 local menuBtn = UI.button({ Style = "secondary", Text = "MENÜ", Icon = "menu", Size = UDim2.fromOffset(150, 48), Name = "MenuButton",
 	OnClick = function() open() end })
-menuBtn.Position = UDim2.fromOffset(20, 70)
+menuBtn.Position = UDim2.fromOffset(20, 12)
 menuBtn.Parent = canvas
 local menuKey = UI.key("M", { AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(1, 8, 0.5, 0), Parent = menuBtn })
 local function canOpen()
@@ -1039,15 +1078,16 @@ player:GetAttributeChangedSignal("CC_OpenMainMenu"):Connect(function() if canOpe
 -- Ladebildschirm, dann Hauptmenue
 ---------------------------------------------------------------------------------------------------
 local loading = UI.new("Frame", { Name = "Loading", BackgroundColor3 = C.bg0, BorderSizePixel = 0, Size = UDim2.fromScale(1, 1), ZIndex = 50, Parent = canvas })
-local lLogo = logo(loading, UDim2.fromScale(0.5, 0.42), 64, Vector2.new(0.5, 0.5))
+local lLogo = logo(loading, UDim2.fromScale(0.5, 0.4), 120, Vector2.new(0.5, 0.5))
 for _, d in ipairs(lLogo:GetDescendants()) do if d:IsA("GuiObject") then d.ZIndex = 51 end end
-local _, lFill = UI.bar({ AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.56, 0), Size = UDim2.fromOffset(360, 4), ZIndex = 51, Parent = loading }, C.red)
+local _, lFill = UI.bar({ AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.61, 0), Size = UDim2.fromOffset(520, 7), ZIndex = 51, Parent = loading }, C.red)
 lFill.ZIndex = 52
 local lText = UI.label({ Text = "LÄDT …", FontFace = F.bold, TextSize = 16, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Center,
-	AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.56, 14), Size = UDim2.fromOffset(360, 24), ZIndex = 51, Parent = loading })
+	AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.61, 25), Size = UDim2.fromOffset(520, 30), ZIndex = 51, Parent = loading })
 
 task.spawn(function()
 	local steps = {
+        { "Oberfläche", function() local t0=os.clock(); while not UI.Ready and os.clock()-t0<6 do task.wait(0.1) end end },
 		{ "Spielwelt", function() if not game:IsLoaded() then game.Loaded:Wait() end end },
 		{ "Kämpfer", function() local c = player.Character or player.CharacterAdded:Wait(); c:WaitForChild("HumanoidRootPart", 15) end },
 		{ "Profil", function() local t0 = os.clock(); while player:GetAttribute("CC_Level") == nil and os.clock() - t0 < 8 do task.wait(0.1) end end },
