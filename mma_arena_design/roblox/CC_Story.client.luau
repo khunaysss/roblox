@@ -164,7 +164,7 @@ local function schoolLight(on)
 		if savedLight then return end
 		savedLight = { props = { ClockTime = Lighting.ClockTime, Brightness = Lighting.Brightness, Ambient = Lighting.Ambient, OutdoorAmbient = Lighting.OutdoorAmbient,
 			ShadowSoftness = Lighting.ShadowSoftness, EnvironmentDiffuseScale = Lighting.EnvironmentDiffuseScale, EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale }, fx = {}, moved = {} }
-		Lighting.ClockTime = 16.7; Lighting.Brightness = 2.0; Lighting.Ambient = Color3.fromRGB(104, 100, 96); Lighting.OutdoorAmbient = Color3.fromRGB(120, 114, 106)
+		Lighting.ClockTime = 16.7; Lighting.Brightness = 2.0; Lighting.Ambient = Color3.fromRGB(104, 100, 96); Lighting.OutdoorAmbient = Color3.fromRGB(138, 130, 120)
 		Lighting.ShadowSoftness = 0.3; Lighting.EnvironmentDiffuseScale = 0.6; Lighting.EnvironmentSpecularScale = 0.3
 		for _, e in ipairs(Lighting:GetChildren()) do
 			if e:IsA("PostEffect") then savedLight.fx[e] = e.Enabled; e.Enabled = false
@@ -193,6 +193,13 @@ local function makeCard()
 	local logo = SH:FindFirstChild("CardLogo")
 	if logo then local d = logo:Clone(); d.Face = Enum.NormalId.Front; d.Parent = c; local d2 = logo:Clone(); d2.Face = Enum.NormalId.Back; d2.Parent = c end
 	return c
+end
+local function filmLight(pos, target, brightness, range, angle)
+	local p = propPart("Story_FilmLight", Vector3.new(0.2, 0.2, 0.2), Color3.new(1, 1, 1)); p.Transparency = 1
+	p.CFrame = CFrame.lookAt(pos, target)
+	local l = Instance.new("SpotLight"); l.Face = Enum.NormalId.Front; l.Brightness = brightness or 2; l.Range = range or 30; l.Angle = angle or 60
+	l.Color = Color3.fromRGB(255, 240, 222); l.Shadows = false; l.Parent = p
+	return p
 end
 local cardFollow = nil                                  -- { a = actor, bone = "LeftHand", off = CFrame }
 local function holdCard(c, a, boneName, off) cardFollow = c and { card = c, a = a, bone = boneName, off = off } or nil end
@@ -288,7 +295,7 @@ local function runFilm()
 	T.play("Story_T_Stop", 0.25)
 	setShot(function(t) local m = (head(T) + head(S)) / 2; return CFrame.lookAt(m + Vector3.new(14 - t * 0.3, -0.4, 5), m + Vector3.new(0, -1.2, 0)), 40 end)
 	if not say("TRAINER", "Hey. Schluss jetzt.", 1.6) then return end
-	setShot(function(t) local p = P.hrp.Position; return CFrame.lookAt(p + Vector3.new(3.5, 0.2, 6.5), head(S) + Vector3.new(0, -1.0, 0)), 44 end)
+	setShot(function(t) local p = P.hrp.Position; return CFrame.lookAt(p + Vector3.new(7, 3.6, 9), head(S) + Vector3.new(0, -1.2, 0)), 44 end)
 	task.spawn(walkTo, S, W(-38, -6)); task.delay(0.4, function() if running then walkTo(S2, W(-36, -10)) end end)
 	if not wait_(2.0) then return end
 	------------------------------------------------ Szene 5: Auf Augenhoehe
@@ -317,7 +324,7 @@ local function runFilm()
 	fade(1, 0.25)
 	if not say("TRAINER", "Ich trainiere im Gym um die Ecke. Komm morgen vorbei, wenn du willst.", 3.2) then return end
 	T.play("Story_T_GiveCard", 0.25); P.play("Story_P_TakeCard", 0.25)
-	setShot(function(t) local m = (head(P) + head(T)) / 2; return CFrame.lookAt(m + P.hrp.CFrame.RightVector * 7 + Vector3.new(0, -0.8, 0), m + Vector3.new(0, -1.6, 0)), 34 end)
+	setShot(function(t) local m = (head(P) + head(T)) / 2; return CFrame.lookAt(m + P.hrp.CFrame.RightVector * 12 + Vector3.new(0, -0.4, 0), m + Vector3.new(0, -1.4, 0)), 38 end)
 	if not wait_(1.0) then return end
 	holdCard(c, P, "LeftHand", CFrame.new(0, 0, -0.12) * CFrame.Angles(math.rad(90), 0, 0))
 	if not wait_(1.0) then return end
@@ -338,6 +345,7 @@ local function runFilm()
 	local doorPos = door and door.Position or WP(120, 7, -118)
 	local standAt = Vector3.new(doorPos.X + 0.35, GROUND + HRP_Y + 0.0, doorPos.Z + 0.80 * M2S + 0.6)
 	P.hrp.CFrame = CFrame.lookAt(standAt, Vector3.new(doorPos.X + 0.35, standAt.Y, doorPos.Z))
+	filmLight(standAt + Vector3.new(5, 7, 12), standAt + Vector3.new(0, 1, -2), 3, 36, 70)            -- Fuelllicht von der Strassenseite (Fassade liegt im Schatten)
 	P.stop("Story_P_TakeCard", 0); local dr = P.play("Story_P_Door", 0)
 	if dr then dr:AdjustSpeed(0) end
 	setShot(function(t) local p = head(P); return CFrame.lookAt(p + Vector3.new(6.5 - t * 0.3, 1.2, 13 - t * 0.6), p + Vector3.new(-0.4, 2.2, -8)), 46 end)
@@ -363,6 +371,8 @@ local function runFilm()
 	P.stop("Story_P_Door", 0)
 	T.model.Parent = workspace
 	T.hrp.CFrame = CFrame.lookAt(Vector3.new(162, HRP_Y, 30), GYM_IN)
+	filmLight(Vector3.new(157, 13, 40), Vector3.new(157, 4, 30), 2.4, 34, 80)                          -- Filmlicht im Gym (nur lokal)
+	filmLight(Vector3.new(146, 9, 24), Vector3.new(158, 5, 30), 1.2, 30, 70)
 	setShot(function(t) local p = head(P); return CFrame.lookAt(p + Vector3.new(-5.5, 0.6, 3.2 - t * 0.3), head(T) + Vector3.new(0, -0.6, 0)), 44 end)
 	if not fade(1, 0.6) then return end
 	T.play("Trainer_Pereira_Greet", 0.25)
