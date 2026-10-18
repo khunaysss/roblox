@@ -23,6 +23,14 @@ local gui = UI.new("ScreenGui", { Name = "CC_TutorialGui", ResetOnSpawn = false,
 	ZIndexBehavior = Enum.ZIndexBehavior.Sibling, Parent = player:WaitForChild("PlayerGui") })
 local canvas = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = gui })
 UI.autoscale(canvas, 720)
+-- Nie gleichzeitig mit dem Hauptmenue: solange das Menue offen ist, sind die Tutorial-Panels ausgeblendet (keine Ueberlagerung)
+task.spawn(function()
+	local mg = player:WaitForChild("PlayerGui"):WaitForChild("CC_MainMenuGui", 30)
+	local menu = mg and mg:WaitForChild("Canvas", 10) and mg.Canvas:WaitForChild("Menu", 10)
+	if not menu then return end
+	local function sync() canvas.Visible = not (mg.Enabled and menu.Visible) end
+	menu:GetPropertyChangedSignal("Visible"):Connect(sync); mg:GetPropertyChangedSignal("Enabled"):Connect(sync); sync()
+end)
 local function fade(obj, on, t)
 	obj.Visible = true
 	local g = obj:FindFirstChildOfClass("CanvasGroup") or obj

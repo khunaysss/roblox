@@ -402,7 +402,9 @@ local function hookPlayer(p)
 		tip(p, r.result == "win" and "Starker erster Kampf! Das Gym und Online stehen dir offen."
 			or "Kopf hoch – jeder fängt so an. Noch ein Versuch?", r.result == "win" and "good" or "tip")
 		task.wait(7.5)                               -- Ergebnis im Kaefig (CC_Match OVER_TIME), dann im Gym
-		if p.Parent then phase(p, "after") end
+		local o = onb(p)
+		if p.Parent and o and o.story and o.outro == false then phase(p, "outro")   -- Story-Abschluss ("War das schlecht?") einmalig
+		elseif p.Parent then phase(p, "after") end
 	end)
 	p:GetAttributeChangedSignal("CC_OnbPhase"):Connect(function()
 		if p:GetAttribute("CC_OnbPhase") == "spar" then watchSparring(p) end
@@ -434,6 +436,19 @@ storyRemote.OnServerEvent:Connect(function(p, what)
 		profile(p, "onb", "offered", true)
 		phase(p, "lesson")
 		menuServer:Fire(p, "tutorial")
+	elseif what == "outroDone" and ph == "outro" then
+		profile(p, "onb", "outro", true)
+		phase(p, "after")
+		-- Karriere kurz erklaeren (bestehende Karriereansicht im Menue), einzeln nacheinander
+		task.spawn(function()
+			for _, t in ipairs({
+				"Karriere: Menü (M) → KARRIERE. Dort siehst du deinen nächsten Gegner.",
+				"Bei jedem Gegner stehen seine Stärken und mein Tipp. KAMPF STARTEN, wenn du bereit bist.",
+				"Du kannst auch erst im Gym weitertrainieren – jede Station macht dich stärker." }) do
+				task.wait(5.5); if not p.Parent then return end
+				tip(p, t)
+			end
+		end)
 	elseif what == "replay" and ph == "" and p.Character and not p.Character:GetAttribute("CC_Opponent") and not p:GetAttribute("CC_Queue") then
 		task.spawn(function() streamStory(p); if p.Parent then storyRemote:FireClient(p, "play") end end)
 	end

@@ -45,7 +45,7 @@ local profiles = {}            -- [player] = Tabelle
 local function default()
 	local p = { v = 4, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
 		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 },
-		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false, story = false },
+		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false, story = false, outro = false, careerTip = false },
 		sig = "", sigs = {}, sigProgress = SIGPROG.newProgress(), career = { beaten = {}, losses = 0 },
 		goals = { day = PROG.dayKey(), week = PROG.weekKey(), counts = {}, claimed = {} }, -- Signaturen, Karriere und servergepruefte Ziele
 		settings = { master = 0.8, music = 0.4, effects = 0.7, reduceFx = false, noShake = false } } -- Einstellungen (Menue), Client sendet CC_Progress "settings"
@@ -143,8 +143,10 @@ local function load(plr)
 			for k, v in pairs(data.onb) do if k ~= "lessons" and type(p.onb[k]) == "boolean" and type(v) == "boolean" then p.onb[k] = v end end
 			if type(data.onb.lessons) == "table" then for i = 1, 6 do p.onb.lessons[i] = data.onb.lessons[i] == true end end
 			if data.onb.story == nil then p.onb.story = data.onb.editor == true end      -- Spieler vor dem Story-Einstieg: Film nicht nachholen
+			if data.onb.outro == nil then p.onb.outro = data.onb.firstFight == true end
+			if data.onb.careerTip == nil then p.onb.careerTip = data.onb.firstFight == true end
 		else
-			p.onb.editor = true; p.onb.offered = true; p.onb.firstFight = true; p.onb.story = true   -- bekannter Spieler aus der Zeit vor dem Einstieg
+			p.onb.editor = true; p.onb.offered = true; p.onb.firstFight = true; p.onb.story = true; p.onb.outro = true; p.onb.careerTip = true   -- bekannter Spieler aus der Zeit vor dem Einstieg
 		end
 		if type(data.sigs) == "table" then for _, id in ipairs(data.sigs) do if SIG.list[id] and not table.find(p.sigs, id) then table.insert(p.sigs, id) end end end
 		if type(data.sig) == "string" and table.find(p.sigs, data.sig) then p.sig = data.sig end
@@ -185,7 +187,7 @@ local function save(plr)
 	p.saving = true; p.dirty = false
 	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs,
 		stats = table.clone(p.stats), tp = table.clone(p.tp), look = table.clone(p.look),
-		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight, story = p.onb.story },
+		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight, story = p.onb.story, outro = p.onb.outro, careerTip = p.onb.careerTip },
 		sig = p.sig, sigs = table.clone(p.sigs), sigProgress = SIGPROG.normalize(p.sigProgress), career = { beaten = table.clone(p.career.beaten), losses = p.career.losses },
 		goals = { day = p.goals.day, week = p.goals.week, counts = table.clone(p.goals.counts), claimed = table.clone(p.goals.claimed) },
 		settings = table.clone(p.settings) }
@@ -317,6 +319,12 @@ event.Event:Connect(function(plr, kind, a, b, c)
 		addXP(plr, xp)
 		p.dirty = true; publish(plr); saveSoon(plr)
 		plr:SetAttribute("CC_CareerAdvance", a .. "|" .. b .. "|" .. tostring(workspace:GetServerTimeNow()))
+		if not p.onb.careerTip then                                   -- erster offizieller Kampf: Belohnungen kurz erklaeren (auch nach Niederlage)
+			p.onb.careerTip = true
+			local text = b == "win" and ("Erster Karrieresieg! +%d XP. Mehr XP = höheres Level, neue Gegner werden frei."):format(xp)
+				or ("+%d XP auch ohne Sieg. Trainier im Gym und versuch es nochmal – die Karriere läuft weiter."):format(xp)
+			plr:SetAttribute("CC_CoachTip", game:GetService("HttpService"):JSONEncode({ text = text, kind = b == "win" and "good" or "tip", t = workspace:GetServerTimeNow() }))
+		end
 	elseif kind == "result" then
 		local p = profiles[plr]
 		if a == "win" then

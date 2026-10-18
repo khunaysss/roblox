@@ -35,9 +35,9 @@ local function animOf(name)
 	else warn("[Story] Animation fehlt: " .. name); return nil end
 	return a
 end
-local function makeActor(name, look, outfit, cf)
+local function makeActor(name, look, outfit, cf, keepFight)
 	local c = SH.ActorBase:Clone(); c.Name = "Story_" .. name
-	for _, n in ipairs({ "Fighter_Gloves", "Fighter_Shorts" }) do local x = c:FindFirstChild(n); if x then x.Transparency = 1 end end
+	if not keepFight then for _, n in ipairs({ "Fighter_Gloves", "Fighter_Shorts" }) do local x = c:FindFirstChild(n); if x then x.Transparency = 1 end end end
 	local hum = c:FindFirstChildOfClass("Humanoid"); hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	local hrp = c.HumanoidRootPart; hrp.Anchored = true
 	for _, p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false; p.CanQuery = false; p.CanTouch = false end end
@@ -403,6 +403,31 @@ local function runFilm()
 	wait_(1.3)
 end
 
+---------------------------------------------------------------------------------------------------- Abschluss nach dem ersten Sparring (Phase "outro")
+local function runOutro()
+	local plook = Look.sanitize(look()); for k, v in pairs(Look.DEFAULT) do if plook[k] == nil then plook[k] = v end end
+	local PP, TP = Vector3.new(153, HRP_Y, 30), Vector3.new(160, HRP_Y, 30)
+	local P = makeActor("PlayerFight", plook, {}, CFrame.lookAt(PP, TP), true)
+	local T = makeActor("Coach", LOOK_COACH, OUT_COACH, CFrame.lookAt(TP, PP))
+	local me = player.Character
+	if me then for _, d in ipairs(me:GetDescendants()) do if d:IsA("BasePart") or d:IsA("Decal") then d.LocalTransparencyModifier = 1 end end end
+	filmLight(Vector3.new(156, 13, 40), Vector3.new(156, 4, 30), 2.4, 34, 80)
+	if not wait_(0.6) then return end
+	setShot(function(t) local m = (head(P) + head(T)) / 2; return CFrame.lookAt(m + Vector3.new(0.8, -0.2, 11 - t * 0.25), m + Vector3.new(0, -0.7, 0)), 40 end)
+	fade(1, 0.6)
+	if not say("DU", "War das schlecht?", 1.8) then return end
+	setShot(function(t) return CFrame.lookAt(head(P) + Vector3.new(-3.2, 0.1, 3.6), head(T) + Vector3.new(0, -0.3, 0)), 36 end)
+	if not say("TRAINER", "Das war dein erster Tag.", 2.0) then return end
+	if not wait_(1.0) then return end
+	if not say("TRAINER", "Morgen wieder?", 1.4) then return end
+	setShot(function(t) return CFrame.lookAt(head(T) + Vector3.new(3.2, 0.1, 3.6), head(P) + Vector3.new(0, -0.3, 0)), 36 end)
+	P.play("Story_P_Nod", 0.15)
+	if not wait_(1.4) then return end
+	setShot(function(t) local m = (head(P) + head(T)) / 2; return CFrame.lookAt(m + Vector3.new(0.8, 0.4, 12), m + Vector3.new(0, -0.7, 0)), 42 end)
+	if not say("TRAINER", "Dann zeig ich dir jetzt, wie die Karriere läuft.", 2.4) then return end
+	fade(0, 0.5)
+end
+
 ---------------------------------------------------------------------------------------------------- Start / Ende
 local saved = nil
 local function begin()
@@ -442,22 +467,28 @@ local function finish(skipped)
 	cam.CameraType = Enum.CameraType.Custom; cam.FieldOfView = saved and saved.fov or 70
 	local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid"); if hum then cam.CameraSubject = hum end
 	if saved then for g in pairs(saved.guis) do if g.Parent then g.Enabled = true end end end
+	local me = player.Character
+	if me then for _, d in ipairs(me:GetDescendants()) do if d:IsA("BasePart") or d:IsA("Decal") then d.LocalTransparencyModifier = 0 end end end
 	player:SetAttribute("CC_UIBlock", nil)
 	saved = nil
 end
 local function play(mode)
 	if running then return end
 	begin()
-	local ok, err = pcall(runFilm)
+	if mode == "outro" then schoolLight(false) end
+	local ok, err = pcall(mode == "outro" and runOutro or runFilm)
 	if not ok then warn("[Story] Fehler: " .. tostring(err)) end
 	local skipped = skipFlag
 	finish(skipped)
 	if mode == "onboarding" then remote:FireServer("done", skipped and "skip" or "ok") end
+	if mode == "outro" then remote:FireServer("outroDone") end
 end
 
 remote.OnClientEvent:Connect(function(what) if what == "play" then task.spawn(play, "replay") end end)
 local function check()
-	if player:GetAttribute("CC_OnbPhase") == "story" and not running then task.spawn(play, "onboarding") end
+	local ph = player:GetAttribute("CC_OnbPhase")
+	if ph == "story" and not running then task.spawn(play, "onboarding") end
+	if ph == "outro" and not running then task.spawn(play, "outro") end
 end
 player:GetAttributeChangedSignal("CC_OnbPhase"):Connect(check)
 task.defer(check)
