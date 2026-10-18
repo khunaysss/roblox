@@ -429,13 +429,15 @@ Players.PlayerRemoving:Connect(function(p) local s = sessions[p]; if s then s.cm
 
 -- Story: Ende/Ueberspringen -> gespeichert, danach direkt die erste Lektion im Kaefig (Film endet mit "Wir beginnen langsam").
 -- Wiederholung aus den Einstellungen: nur Film, kein Fortschritt, keine Belohnung.
-storyRemote.OnServerEvent:Connect(function(p, what)
+storyRemote.OnServerEvent:Connect(function(p, what, arg)
 	local ph = p:GetAttribute("CC_OnbPhase") or ""
 	if what == "done" and ph == "story" then
 		profile(p, "onb", "story", true)
 		profile(p, "onb", "offered", true)
 		phase(p, "lesson")
 		menuServer:Fire(p, "tutorial")
+	elseif what == "explained" and (arg == "gymTour" or arg == "sigTour" or arg == "onlineHint" or arg == "editorHint" or arg == "focusTip") then
+		profile(p, "onb", arg, true)                                    -- Erklaerung beim ersten Mal gesehen (CC_Story.client)
 	elseif what == "outroDone" and ph == "outro" then
 		profile(p, "onb", "outro", true)
 		phase(p, "after")

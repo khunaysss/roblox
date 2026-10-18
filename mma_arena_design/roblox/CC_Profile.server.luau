@@ -45,7 +45,8 @@ local profiles = {}            -- [player] = Tabelle
 local function default()
 	local p = { v = 4, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
 		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 },
-		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false, story = false, outro = false, careerTip = false },
+		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false, story = false, outro = false, careerTip = false,
+			gymTour = false, sigTour = false, onlineHint = false, editorHint = false, focusTip = false },  -- Erklaerungen beim ersten Mal (alle Spieler einmal)
 		sig = "", sigs = {}, sigProgress = SIGPROG.newProgress(), career = { beaten = {}, losses = 0 },
 		goals = { day = PROG.dayKey(), week = PROG.weekKey(), counts = {}, claimed = {} }, -- Signaturen, Karriere und servergepruefte Ziele
 		settings = { master = 0.8, music = 0.4, effects = 0.7, reduceFx = false, noShake = false } } -- Einstellungen (Menue), Client sendet CC_Progress "settings"
@@ -187,7 +188,8 @@ local function save(plr)
 	p.saving = true; p.dirty = false
 	local copy = { v = p.v, level = p.level, xp = p.xp, wins = p.wins, losses = p.losses, kos = p.kos, subs = p.subs,
 		stats = table.clone(p.stats), tp = table.clone(p.tp), look = table.clone(p.look),
-		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight, story = p.onb.story, outro = p.onb.outro, careerTip = p.onb.careerTip },
+		onb = { editor = p.onb.editor, offered = p.onb.offered, lessons = table.clone(p.onb.lessons), done = p.onb.done, firstFight = p.onb.firstFight, story = p.onb.story, outro = p.onb.outro, careerTip = p.onb.careerTip,
+			gymTour = p.onb.gymTour, sigTour = p.onb.sigTour, onlineHint = p.onb.onlineHint, editorHint = p.onb.editorHint, focusTip = p.onb.focusTip },
 		sig = p.sig, sigs = table.clone(p.sigs), sigProgress = SIGPROG.normalize(p.sigProgress), career = { beaten = table.clone(p.career.beaten), losses = p.career.losses },
 		goals = { day = p.goals.day, week = p.goals.week, counts = table.clone(p.goals.counts), claimed = table.clone(p.goals.claimed) },
 		settings = table.clone(p.settings) }

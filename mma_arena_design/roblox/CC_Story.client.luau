@@ -428,6 +428,65 @@ local function runOutro()
 	fade(0, 0.5)
 end
 
+---------------------------------------------------------------------------------------------------- Erklaerungen beim ersten Mal (Kamera-Rundflug, Hinweise)
+-- Flags im Profil (onb): gymTour, sigTour, onlineHint, editorHint, focusTip. Gespeichert ueber CC_Story "explained".
+local function flyShot(fromCF, toCF, dur)
+	setShot(function(t) local u = math.min(t / dur, 1); u = u * u * (3 - 2 * u); return fromCF:Lerp(toCF, u), 50 end)
+end
+local GYM_TOUR = {
+	{ cam = Vector3.new(103, 11, 6), at = Vector3.new(103, 5, -16), text = "Hier an den Sandsäcken trainierst du Schlagkraft. Einfach hingehen und E drücken." },
+	{ cam = Vector3.new(210, 10, 22), at = Vector3.new(225, 3, 8), text = "Hantelbank und Kurzhanteln machen deine Schläge noch härter." },
+	{ cam = Vector3.new(205, 10, 26), at = Vector3.new(210, 2, 43), text = "Laufbänder und Matten bringen Kondition – damit geht dir im Kampf nicht so schnell die Luft aus." },
+	{ cam = Vector3.new(118, 10, -48), at = Vector3.new(100, 2, -66), text = "Ringen und Bodenkampf lernst du im Kampf: Takedowns, Positionen, Submissions." },
+	{ cam = Vector3.new(112, 9, 26), at = Vector3.new(100, 5, 16), text = "Das sind die Stil-Trainer. Jeder bringt dir eine eigene Signatur bei." },
+	{ cam = Vector3.new(196, 9, -34), at = Vector3.new(208, 3, -46), text = "Am Trainer-Tisch startest du Trainingskämpfe. Die Karriere findest du im Menü (M)." },
+	{ cam = Vector3.new(160, 14, 26), at = Vector3.new(160, 4, -10), text = "Und hier im Oktagon wird gekämpft – Training, Karriere und Online." },
+}
+local function runTour(stops)
+	local cam = workspace.CurrentCamera
+	local last = cam.CFrame
+	if not fade(1, 0.01) then return end
+	for _, s in ipairs(stops) do
+		local goal = CFrame.lookAt(s.cam, s.at)
+		flyShot(last, goal, 1.3)
+		if not wait_(1.3) then return end
+		setShot(function(t) return goal * CFrame.new(0, 0, -t * 0.25), 50 end)
+		if not say("TRAINER", s.text, 1.2 + #s.text * 0.05) then return end
+		last = goal
+	end
+end
+local function nearestTrainer()
+	local hold = workspace:FindFirstChild("CC_StyleTrainersGym")
+	local me = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	local best, bd
+	if hold and me then for _, m in ipairs(hold:GetChildren()) do
+		local d = (m:GetPivot().Position - me.Position).Magnitude
+		if not bd or d < bd then best, bd = m, d end
+	end end
+	return best
+end
+local function runSigTour()
+	local t = nearestTrainer(); if not t then return end
+	local p = t:GetPivot()
+	local headP = p.Position + Vector3.new(0, 5, 0)
+	local goal = CFrame.lookAt(headP + p.LookVector * 9 + p.RightVector * 3 + Vector3.new(0, 0.8, 0), headP - Vector3.new(0, 0.6, 0))
+	flyShot(workspace.CurrentCamera.CFrame, goal, 1.0)
+	fade(1, 0.01)
+	if not wait_(1.0) then return end
+	setShot(function(tt) return goal * CFrame.new(0, 0, -tt * 0.2), 46 end)
+	for _, line in ipairs({
+		"Jeder Stil-Trainer hat eine Signatur – einen besonderen Angriff.",
+		"Erst erledigst du seine Quests. Dann forderst du ihn zum Endkampf heraus.",
+		"Gewinnst du, gehört die Signatur dir. Du rüstest sie hier aus.",
+		"Im Kampf füllst du die Fokus-Leiste mit Treffern und Abwehr. Ist sie voll: G drücken." }) do
+		if not say("TRAINER", line, 1.2 + #line * 0.05) then return end
+	end
+end
+local function onbFlags() local ok, t = pcall(function() return HS:JSONDecode(player:GetAttribute("CC_Onb") or "{}") end); return ok and type(t) == "table" and t or {} end
+local function localTip(text, kind) player:SetAttribute("CC_CoachTip", HS:JSONEncode({ text = text, kind = kind or "tip", t = workspace:GetServerTimeNow() })) end
+local explained = {}
+local function markExplained(key) explained[key] = true; remote:FireServer("explained", key) end
+
 ---------------------------------------------------------------------------------------------------- Start / Ende
 local saved = nil
 local function begin()
@@ -476,7 +535,13 @@ local function play(mode)
 	if running then return end
 	begin()
 	if mode == "outro" then schoolLight(false) end
-	local ok, err = pcall(mode == "outro" and runOutro or runFilm)
+	if mode == "tour" or mode == "sig" then
+		schoolLight(false)
+		local me = player.Character                                      -- eigener Kaempfer stoert die Kamerafahrt nicht
+		if me then for _, d in ipairs(me:GetDescendants()) do if d:IsA("BasePart") or d:IsA("Decal") then d.LocalTransparencyModifier = 1 end end end
+	end
+	local fn = (mode == "outro" and runOutro) or (mode == "tour" and function() runTour(GYM_TOUR) end) or (mode == "sig" and runSigTour) or runFilm
+	local ok, err = pcall(fn)
 	if not ok then warn("[Story] Fehler: " .. tostring(err)) end
 	local skipped = skipFlag
 	finish(skipped)
@@ -492,3 +557,72 @@ local function check()
 end
 player:GetAttributeChangedSignal("CC_OnbPhase"):Connect(check)
 task.defer(check)
+
+---------------------------------------------------------------------------------------------------- Beobachter fuer die Erklaerungen beim ersten Mal
+local function inGym()
+	local r = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	return r and r.Position.X > 70 and r.Position.X < 250 and r.Position.Z > -86 and r.Position.Z < 64
+end
+local function menuOpen()
+	local mg = player.PlayerGui:FindFirstChild("CC_MainMenuGui")
+	local m = mg and mg:FindFirstChild("Canvas") and mg.Canvas:FindFirstChild("Menu")
+	return mg and mg.Enabled and m and m.Visible
+end
+local function idle()
+	local c = player.Character
+	return not running and (player:GetAttribute("CC_OnbPhase") or "") == "" and not player:GetAttribute("CC_UIBlock") and not player:GetAttribute("CC_Queue")
+		and not player:GetAttribute("CC_Minigame") and c and not c:GetAttribute("CC_Opponent") and not c:GetAttribute("CC_BagPractice")
+end
+-- 1) Gym-Rundflug: erstes Mal frei im Gym (Menue zu, nichts anderes aktiv)
+task.spawn(function()
+	while true do
+		task.wait(1.5)
+		local f = onbFlags()
+		if player:GetAttribute("CC_Onb") and f.gymTour == false and not explained.gymTour and idle() and inGym() and not menuOpen() then
+			task.wait(1.0)
+			if idle() and not menuOpen() then play("tour"); markExplained("gymTour") end
+		end
+		if explained.gymTour or f.gymTour == true then break end
+	end
+end)
+-- 2) Signaturen: erstes Trainer-Panel -> erst Erklaerung mit Kamera auf den Trainer, dann das Panel
+task.spawn(function()
+	local tp = player:WaitForChild("PlayerGui"):WaitForChild("CC_TrainerPanel", 60)
+	if not tp then return end
+	tp:GetPropertyChangedSignal("Enabled"):Connect(function()
+		if not tp.Enabled or explained.sigTour or onbFlags().sigTour ~= false or running then return end
+		explained.sigTour = true
+		tp.Enabled = false
+		task.spawn(function()
+			local t0 = os.clock()
+			while player:GetAttribute("CC_UIBlock") and os.clock() - t0 < 20 do task.wait(0.2) end   -- Begruessungsszene abwarten
+			play("sig"); markExplained("sigTour")
+			tp.Enabled = true
+		end)
+	end)
+end)
+-- 3) Online / Mein Kaempfer: kurzer Trainer-Hinweis beim ersten Oeffnen
+task.spawn(function()
+	local mg = player:WaitForChild("PlayerGui"):WaitForChild("CC_MainMenuGui", 60)
+	local area = mg and mg:WaitForChild("Canvas", 10) and mg.Canvas:WaitForChild("Menu", 10) and mg.Canvas.Menu:WaitForChild("Area", 10)
+	if not area then return end
+	local HINTS = {
+		online = { "onlineHint", "Online: SUCHE STARTEN – du kämpfst gegen den nächsten freien Spieler. Gleiche Grundwerte für alle." },
+		fighter = { "editorHint", "Mein Kämpfer: Frisur, Bart, Gesicht und Hautfarbe kannst du jederzeit ändern. Mehr wird später freigeschaltet." },
+	}
+	for page, h in pairs(HINTS) do
+		local fr = area:FindFirstChild(page) or area.Parent:FindFirstChild(page) or area:WaitForChild(page, 10)
+		if fr then fr:GetPropertyChangedSignal("Visible"):Connect(function()
+			if fr.Visible and not explained[h[1]] and onbFlags()[h[1]] == false then localTip(h[2]); markExplained(h[1]) end
+		end) end
+	end
+end)
+-- 4) Fokus voll im Kampf: einmal erklaeren, wie die Signatur ausgeloest wird
+local function hookFocus(c)
+	c:GetAttributeChangedSignal("CC_Focus"):Connect(function()
+		if (c:GetAttribute("CC_Focus") or 0) >= 100 and not explained.focusTip and onbFlags().focusTip == false then
+			localTip("Fokus voll! Drück G für deine Signatur.", "good"); markExplained("focusTip")
+		end
+	end)
+end
+player.CharacterAdded:Connect(hookFocus); if player.Character then hookFocus(player.Character) end
