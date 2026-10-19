@@ -180,3 +180,4 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Getestet (1 Spieler): Training in der Arena; Online-Ablauf gegen KI (Testschalter CC_TestPvpDummy) in Fight Night mit Walkout und in Käfig 3 (CC_TestArena = "pvp3"); Ergebnis, XP, Rückkehr ins Gym, Zustand wird aufgeräumt.
 - Sicherung: ServerStorage.CC_MultiMatchBackup_20261019.
 - OFFEN: echter Test mit 2–4 Spielern (Studio → Test → Clients 2/4), gleichzeitige Kämpfe prüfen; Publikumsgeräusch ist noch global (alle hören jeden Kampf).
+- Online-Arena-Wahl (2026-10-19, getestet allein): Online-Seite hat FIGHT NIGHT / KÄFIG / EGAL. Server paart nur passende Wahl („Egal“ passt zu allem); Fight Night → nur Fight Night, Käfig → CC_PvpArena_2..4 bzw. Arena. Getestet: „Käfig“ → pvp2, „Fight Night“ → fightnight.

@@ -336,10 +336,22 @@ local oCard = card(online, 1, 100)
 UI.label({ Text = "SCHNELLER KAMPF", FontFace = F.head, TextSize = 19, Size = UDim2.new(1, 0, 0, 26), Parent = oCard })
 UI.label({ Text = "Gegen den nächsten Spieler in der Warteschlange. 3 Runden, je 2 Minuten.",
 	TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 30), Size = UDim2.new(1, 0, 0, 40), Parent = oCard })
-local oState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 2, Size = UDim2.new(1, 0, 0, 28), Parent = online })
-local bSearch = UI.button({ Style = "primary", Text = "SUCHE STARTEN", Icon = "search", LayoutOrder = 3, OnClick = function() menuEvent:FireServer("pvp") end, Parent = online })
-local bCancel = UI.button({ Style = "danger", Text = "SUCHE ABBRECHEN", Icon = "close", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("cancel") end, Parent = online })
-UI.button({ Style = "secondary", Text = "GEWERTET", Sub = "Rangliste gibt es noch nicht", Icon = "star", LayoutOrder = 5, Disabled = true, Badge = "NICHT VERFÜGBAR",
+-- Arena-Wahl (Server paart nur Spieler mit passender Wahl; "egal" passt zu allen)
+local pvpArena = player:GetAttribute("CC_PvpArenaPick") or "any"
+local arRow = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), LayoutOrder = 1, Parent = online })
+UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = arRow })
+local arButtons = {}
+for i, e in ipairs({ { "fightnight", "FIGHT NIGHT" }, { "cage", "KÄFIG" }, { "any", "EGAL" } }) do
+	local b = UI.button({ Style = "ghost", Text = e[2], Size = UDim2.new(1 / 3, -6, 1, 0), LayoutOrder = i, Name = "Ar_" .. e[1], Parent = arRow,
+		OnClick = function() pvpArena = e[1]; player:SetAttribute("CC_PvpArenaPick", e[1]); for k, x in pairs(arButtons) do x:SetAttribute("Selected", k == pvpArena) end end })
+	arButtons[e[1]] = b
+	b:SetAttribute("Selected", e[1] == pvpArena)
+end
+arRow.LayoutOrder = 2
+local oState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 28), Parent = online })
+local bSearch = UI.button({ Style = "primary", Text = "SUCHE STARTEN", Icon = "search", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("pvp", pvpArena) end, Parent = online })
+local bCancel = UI.button({ Style = "danger", Text = "SUCHE ABBRECHEN", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = online })
+UI.button({ Style = "secondary", Text = "GEWERTET", Sub = "Rangliste gibt es noch nicht", Icon = "star", LayoutOrder = 6, Disabled = true, Badge = "NICHT VERFÜGBAR",
 	Size = UDim2.new(1, 0, 0, 66), Parent = online })
 
 -- Training

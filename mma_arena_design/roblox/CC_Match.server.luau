@@ -77,10 +77,12 @@ local PREFER = {
 	training = { "arena" }, tutorial = { "arena" }, sparring = { "arena" },
 }
 local function arenaById(id) for _, a in ipairs(ARENAS) do if a.id == id then return a end end end
-local function freeArena(kind)
+-- Online-Arena-Wahl: "fightnight" = nur Fight Night, "cage" = Kaefige (ohne Fight Night), "any" = egal
+local PICK = { fightnight = { "fightnight" }, cage = { "pvp2", "pvp3", "pvp4", "pvp5", "pvp6", "pvp7", "pvp8", "pvp9", "arena" } }
+local function freeArena(kind, pick)
 	local force = workspace:GetAttribute("CC_TestArena")                -- Test (Studio): bestimmten Kaefig erzwingen, z. B. "pvp2"
 	if force then local a = arenaById(force); if a and not a.busy then return a end end
-	for _, id in ipairs(PREFER[kind] or {}) do
+	for _, id in ipairs((kind == "pvp" and PICK[pick]) or PREFER[kind] or {}) do
 		local a = arenaById(id)
 		if a and not a.busy and a.kinds[kind] then return a end
 	end
@@ -173,7 +175,9 @@ local function onMenu(p, what, level, fromServer)
 		p:SetAttribute("CC_Queue", nil)
 	elseif (what == "training" or what == "pvp" or what == "career" or (what == "trainer" and fromServer) or ((what == "tutorial" or what == "sparring") and fromServer)) and not isFighting(p) then
 		if i then table.remove(queue, i) end
-		table.insert(queue, { p, what, (what == "career" or what == "trainer") and level or nil })
+		local arg = (what == "career" or what == "trainer") and level or nil
+		if what == "pvp" then arg = (level == "fightnight" or level == "cage") and level or "any" end   -- Arena-Wahl online
+		table.insert(queue, { p, what, arg })
 		p:SetAttribute("CC_Queue", what)
 	end
 	updateQueueAttrs()
@@ -597,17 +601,33 @@ local function schedule()
 	-- Online: Paare bilden
 	local pvp = {}
 	for i, e in ipairs(queue) do if e[2] == "pvp" then table.insert(pvp, i) end end
-	while #pvp >= 2 do
-		local arena = freeArena("pvp"); if not arena then break end
-		local ia, ib = pvp[1], pvp[2]
-		local a, b = queue[ia][1], queue[ib][1]
-		table.remove(queue, ib); table.remove(queue, ia)
-		a:SetAttribute("CC_Queue", nil); b:SetAttribute("CC_Queue", nil)
-		launch(newMatch({ red = a, blue = b, mode = "pvp" }, arena))
+	-- Paare nur mit passender Arena-Wahl ("any" passt zu allem); gemeinsame Wahl bestimmt den Kaefig
+	local paired = true
+	while paired do
+		paired = false
+		for x = 1, #pvp do
+			for y = x + 1, #pvp do
+				local ea, eb = queue[pvp[x]], queue[pvp[y]]
+				local pa, pb = ea[3] or "any", eb[3] or "any"
+				if pa == pb or pa == "any" or pb == "any" then
+					local pick = (pa ~= "any") and pa or pb
+					local arena = freeArena("pvp", pick)
+					if arena then
+						local a, b = ea[1], eb[1]
+						table.remove(queue, pvp[y]); table.remove(queue, pvp[x])
+						a:SetAttribute("CC_Queue", nil); b:SetAttribute("CC_Queue", nil)
+						launch(newMatch({ red = a, blue = b, mode = "pvp" }, arena))
+						paired = true
+						break
+					end
+				end
+			end
+			if paired then break end
+		end
 		pvp = {}; for i, e in ipairs(queue) do if e[2] == "pvp" then table.insert(pvp, i) end end
 	end
 	if #pvp == 1 and workspace:GetAttribute("CC_TestPvpDummy") and not kiBusy then          -- Test (Studio, 1 Spieler)
-		local arena = freeArena("pvp")
+		local arena = freeArena("pvp", queue[pvp[1]][3])
 		if arena then
 			local a = queue[pvp[1]][1]
 			table.remove(queue, pvp[1]); a:SetAttribute("CC_Queue", nil)
