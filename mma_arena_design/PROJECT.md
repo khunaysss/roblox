@@ -111,6 +111,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Fight Night eingerichtet (`CC_FightNight` bei 0, 2,14, −700), Kollision, Kamera nimmt nächsten Käfig.
 - Kämpfer-Anpassung (Frisur, Bart, Gesicht, Haut, Haarfarbe).
 - UI-Schritte 1 und 2 (Designsystem `CC_UI`, Hauptmenü, Editor, Gym-Anzeigen, Ergebnisanzeige) – PC getestet.
+- Story-Film überarbeitet (2026-10-19, in Studio getestet): englische Texte (Film, Rundflug, Hinweise, Tutorial), Schule „NORTHPARK HIGH SCHOOL“; Schubser mit Zeitlupe, Wackeln und Sound; Trainer rennt durchs Schultor und schreit (rot, Kamera-Stoß); Mobber rennen weg; größere Karte + lesbare Karten-Nahaufnahme; Zwischentitel „DAY 1 – FIRST LESSON“ (Film → Tutorial), „FIRST SPARRING“, „YOUR CAREER“ (nach dem Abschluss). Hände waren im Film sichtbar (geprüft).
 - Blender-Modelle: Arena, Event-Map mit Backstage, Trainings-Gym v02, Haupttrainer v03, Ringrichter v02, Trainer v02, Fighter Design v03/Customization v05, Fighter Rigged bis v20.
 
 ## Offene Punkte
@@ -132,6 +133,8 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Flash-K.o. (Codex) löst bei starken Kopf-Signaturen oft sofort aus – Balance prüfen.
 - Upload nötig: Fighter_Sig_Saenchai_Wheel, WR_TD_LiftSlam_A, WR_TD_LiftSlam_B, WR_Sig_BackTake_A, WR_Sig_BackTake_B.
 - Bronx-Choke-Balance (Vorsprung 0,50, Zug ×1,25) vorläufig; mit echtem Gegner-Spieler prüfen.
+- Sprache: Story und Tutorial sind englisch, Rest (Menü, HUD z. B. „AUSDAUER“, Profil-Meldungen, Trainer-Panel) noch deutsch. Tutorial-Kasten überdeckt oben links teilweise Name/Ausdauerleiste.
+- „FIRST SPARRING“-Titel und „YOUR CAREER“-Titel noch nicht im echten Ablauf gesehen (nur „DAY 1“ geprüft).
 
 ### Aufgaben (Reihenfolge laut Nutzer)
 1. Zwei-Spieler-Test Fight Night.

@@ -62,7 +62,7 @@ accent(coachBox, 20)
 local portrait = UI.new("ViewportFrame", { BackgroundColor3 = C.bg2, BorderSizePixel = 0, Position = UDim2.fromOffset(14, 10), Size = UDim2.fromOffset(64, 64),
 	Ambient = Color3.fromRGB(190, 190, 200), LightDirection = Vector3.new(-0.3, -0.5, -1), ZIndex = 3, Parent = coachBox })
 local portraitIcon = UI.icon("coach", { Size = UDim2.fromOffset(44, 44), Position = UDim2.fromOffset(24, 20), ImageColor3 = C.dim, ZIndex = 4, Parent = coachBox })
-local coachName = UI.label({ Text = "TRAINER", FontFace = F.bold, TextSize = 14, TextColor3 = C.red, Position = UDim2.fromOffset(94, 12), Size = UDim2.new(1, -110, 0, 18), ZIndex = 3, Parent = coachBox })
+local coachName = UI.label({ Text = "COACH", FontFace = F.bold, TextSize = 14, TextColor3 = C.red, Position = UDim2.fromOffset(94, 12), Size = UDim2.new(1, -110, 0, 18), ZIndex = 3, Parent = coachBox })
 local coachText = UI.label({ Text = "", TextSize = 18, TextYAlignment = Enum.TextYAlignment.Top, Position = UDim2.fromOffset(94, 34), Size = UDim2.new(1, -110, 0, 44), ZIndex = 3, Parent = coachBox })
 local portraitDone = false
 local function buildPortrait()
@@ -100,15 +100,15 @@ local wPad = 30
 UI.label({ Text = "C A G E   C H A M P I O N S", FontFace = F.bold, TextSize = 13, TextColor3 = C.dim, Position = UDim2.fromOffset(wPad, 24), Size = UDim2.fromOffset(300, 18), ZIndex = 3, Parent = welcome })
 UI.new("Frame", { BackgroundColor3 = C.red, BorderSizePixel = 0, Position = UDim2.fromOffset(wPad, 46), Size = UDim2.fromOffset(36, 3), ZIndex = 3, Parent = welcome })
 local wTag = UI.chamfer({ Position = UDim2.fromOffset(wPad, 62), Size = UDim2.fromOffset(250, 30), ImageColor3 = C.red, ImageTransparency = 0, ZIndex = 3, Parent = welcome }, "fill", 8)
-local wTagL = UI.label({ Text = "DEIN ERSTER SCHRITT", FontFace = F.bold, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Center, Size = UDim2.fromScale(1, 1), ZIndex = 4, Parent = wTag })
-local wTitle = UI.label({ Text = "BEREIT FÜR\nDEN KÄFIG?", FontFace = F.title, TextSize = 50, TextWrapped = false, TextYAlignment = Enum.TextYAlignment.Top,
+local wTagL = UI.label({ Text = "YOUR FIRST STEP", FontFace = F.bold, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Center, Size = UDim2.fromScale(1, 1), ZIndex = 4, Parent = wTag })
+local wTitle = UI.label({ Text = "READY FOR\nTHE CAGE?", FontFace = F.title, TextSize = 50, TextWrapped = false, TextYAlignment = Enum.TextYAlignment.Top,
 	Position = UDim2.fromOffset(wPad - 2, 104), Size = UDim2.new(1, -2 * wPad, 0, 116), ZIndex = 3, Parent = welcome })
-UI.label({ Text = "Lerne die Grundlagen. Danach wartet dein erster Kampf.", TextSize = 17, TextYAlignment = Enum.TextYAlignment.Top,
+UI.label({ Text = "Learn the basics. Then your first fight awaits.", TextSize = 17, TextYAlignment = Enum.TextYAlignment.Top,
 	Position = UDim2.fromOffset(wPad, 222), Size = UDim2.new(1, -2 * wPad, 0, 44), ZIndex = 3, Parent = welcome })
 local GROUPS = {
-	{ icon = "run", title = "Bewegen & Deckung", sub = "Laufe, halte Abstand und blocke Angriffe.", lessons = { 1, 3 } },
-	{ icon = "glove", title = "Schläge & Kicks", sub = "Lerne die wichtigsten Angriffe.", lessons = { 2, 4 } },
-	{ icon = "wrestle", title = "Takedown & Aufstehen", sub = "Bring den Gegner zu Boden und steh wieder auf.", lessons = { 5, 6 } },
+	{ icon = "run", title = "Movement & Guard", sub = "Move, keep your distance and block attacks.", lessons = { 1, 3 } },
+	{ icon = "glove", title = "Punches & Kicks", sub = "Learn the key attacks.", lessons = { 2, 4 } },
+	{ icon = "wrestle", title = "Takedown & Get Up", sub = "Take your opponent down and get back up.", lessons = { 5, 6 } },
 }
 local function groupRow(parent, y, g, h)
 	local row = UI.chamfer({ Position = UDim2.fromOffset(wPad - 8, y), Size = UDim2.new(1, -2 * wPad + 16, 0, h or 70), ImageColor3 = C.bg2, ImageTransparency = 0.1, ZIndex = 3, Parent = parent }, "fill", 10)
@@ -124,17 +124,17 @@ local function groupRow(parent, y, g, h)
 end
 local wRows = {}
 for i, g in ipairs(GROUPS) do wRows[i] = groupRow(welcome, 268 + (i - 1) * 72, g, 64) end
-local bStart, bStartParts = UI.button({ Style = "primary", Text = "TRAINING STARTEN", Size = UDim2.new(1, -2 * wPad + 16, 0, 56), Parent = welcome,
+local bStart, bStartParts = UI.button({ Style = "primary", Text = "START TRAINING", Size = UDim2.new(1, -2 * wPad + 16, 0, 56), Parent = welcome,
 	OnClick = function() remote:FireServer("start") end })
 bStart.Position = UDim2.fromOffset(wPad - 8, 490)
 UI.icon("next", { Size = UDim2.fromOffset(20, 20), AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -18, 0.5, 0), ZIndex = 4, Parent = bStart })
-local bSkipW = UI.button({ Style = "secondary", Text = "ÜBERSPRINGEN", Size = UDim2.new(1, -2 * wPad + 16, 0, 46), Parent = welcome,
+local bSkipW = UI.button({ Style = "secondary", Text = "SKIP", Size = UDim2.new(1, -2 * wPad + 16, 0, 46), Parent = welcome,
 	OnClick = function() remote:FireServer("closeWelcome") end })
 bSkipW.Position = UDim2.fromOffset(wPad - 8, 554)
 local wInfo = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(wPad - 6, 614), Size = UDim2.new(1, -2 * wPad, 0, 0), ZIndex = 3, Parent = welcome })
 local wInfoRow = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, -2), Size = UDim2.fromOffset(400, 20), ZIndex = 3, Parent = wInfo })
 UI.icon("info", { Size = UDim2.fromOffset(18, 18), ZIndex = 3, Parent = wInfoRow, ImageColor3 = C.dim })
-UI.label({ Text = "Später beim Trainer wiederholbar.", TextSize = 14, TextColor3 = C.dim, Position = UDim2.fromOffset(26, -1), Size = UDim2.fromOffset(360, 20), ZIndex = 3, Parent = wInfoRow })
+UI.label({ Text = "You can replay it later with the coach.", TextSize = 14, TextColor3 = C.dim, Position = UDim2.fromOffset(26, -1), Size = UDim2.fromOffset(360, 20), ZIndex = 3, Parent = wInfoRow })
 
 ---------------------------------------------------------------------------------------------------
 -- Bild 2: Aufgabenkarte waehrend der Lektion (kompakt), Fortschritt oben links, Ueberspringen oben rechts, Hilfe unten rechts
@@ -142,7 +142,7 @@ UI.label({ Text = "Später beim Trainer wiederholbar.", TextSize = 14, TextColor
 local lessonUI = group({ Name = "Lesson", Parent = canvas })
 local tab = UI.chamfer({ Position = UDim2.fromOffset(24, 78), Size = UDim2.fromOffset(250, 38), ImageColor3 = C.bg1, ImageTransparency = 0.04, ZIndex = 2, Parent = lessonUI }, "fill", 10)
 accent(tab, 12)
-local tabL = UI.label({ Text = "GRUNDLAGEN", FontFace = F.bold, TextSize = 16, Position = UDim2.fromOffset(18, 0), Size = UDim2.new(1, -30, 1, 0), ZIndex = 3, Parent = tab })
+local tabL = UI.label({ Text = "BASICS", FontFace = F.bold, TextSize = 16, Position = UDim2.fromOffset(18, 0), Size = UDim2.new(1, -30, 1, 0), ZIndex = 3, Parent = tab })
 local pips = {}
 for i = 1, 6 do
 	local p = UI.chamfer({ Position = UDim2.fromOffset(26 + (i - 1) * 30, 124), Size = UDim2.fromOffset(22, 22), ImageColor3 = C.line, ImageTransparency = 0, ZIndex = 2, Parent = lessonUI }, "outline_thick", 6)
@@ -166,10 +166,10 @@ local dotRow = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fr
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 12), SortOrder = Enum.SortOrder.LayoutOrder, Parent = dotRow })
 local stepL = UI.label({ Text = "", TextSize = 13, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Right, AnchorPoint = Vector2.new(1, 0),
 	Position = UDim2.new(1, -20, 0, 206), Size = UDim2.fromOffset(120, 40), ZIndex = 3, Parent = card })
-local bSkipAll = UI.button({ Style = "ghost", Text = "Tutorial überspringen", Icon = "skip", Size = UDim2.fromOffset(260, 46), Parent = lessonUI,
+local bSkipAll = UI.button({ Style = "ghost", Text = "Skip tutorial", Icon = "skip", Size = UDim2.fromOffset(260, 46), Parent = lessonUI,
 	OnClick = function() remote:FireServer("skipAll") end })
 bSkipAll.AnchorPoint = Vector2.new(1, 0); bSkipAll.Position = UDim2.new(1, -24, 0, 64)
-local bHelp = UI.button({ Style = "ghost", Text = "Hilfe", Size = UDim2.fromOffset(140, 50), Parent = lessonUI })
+local bHelp = UI.button({ Style = "ghost", Text = "Help", Size = UDim2.fromOffset(140, 50), Parent = lessonUI })
 bHelp.AnchorPoint = Vector2.new(1, 1); bHelp.Position = UDim2.new(1, -24, 1, -24)
 do
 	local t = bHelp:FindFirstChildWhichIsA("TextLabel")
@@ -188,7 +188,7 @@ local helpUI = group({ Name = "Help", AnchorPoint = Vector2.new(1, 1), Position 
 UI.panel({ Size = UDim2.fromScale(1, 1), Cut = 16, Parent = helpUI })
 accent(helpUI, 20)
 UI.icon("help", { Size = UDim2.fromOffset(28, 28), Position = UDim2.fromOffset(24, 20), ImageColor3 = C.red, ZIndex = 3, Parent = helpUI })
-local hTitle = UI.label({ Text = "HILFE", FontFace = F.title, TextSize = 22, Position = UDim2.fromOffset(62, 18), Size = UDim2.new(1, -80, 0, 32), ZIndex = 3, Parent = helpUI })
+local hTitle = UI.label({ Text = "HELP", FontFace = F.title, TextSize = 22, Position = UDim2.fromOffset(62, 18), Size = UDim2.new(1, -80, 0, 32), ZIndex = 3, Parent = helpUI })
 local hText = UI.label({ Text = "", TextSize = 16, TextYAlignment = Enum.TextYAlignment.Top, Position = UDim2.fromOffset(24, 62), Size = UDim2.new(1, -48, 0, 90), ZIndex = 3, Parent = helpUI })
 local hRow = UI.new("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 24, 1, -20), Size = UDim2.new(1, -48, 0, 50), ZIndex = 3, Parent = helpUI })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 10), HorizontalAlignment = Enum.HorizontalAlignment.Right, SortOrder = Enum.SortOrder.LayoutOrder, Parent = hRow })
@@ -197,9 +197,9 @@ local function showHelp(on)
 	helpOpen = on
 	fade(helpUI, on)
 end
-UI.button({ Style = "secondary", Text = "LEKTION ÜBERSPRINGEN", Size = UDim2.fromOffset(270, 50), LayoutOrder = 1, Parent = hRow,
+UI.button({ Style = "secondary", Text = "SKIP LESSON", Size = UDim2.fromOffset(270, 50), LayoutOrder = 1, Parent = hRow,
 	OnClick = function() showHelp(false); remote:FireServer("skipLesson") end })
-UI.button({ Style = "primary", Text = "WEITER ÜBEN", Size = UDim2.fromOffset(160, 50), LayoutOrder = 2, Parent = hRow, OnClick = function() showHelp(false) end })
+UI.button({ Style = "primary", Text = "KEEP PRACTICING", Size = UDim2.fromOffset(160, 50), LayoutOrder = 2, Parent = hRow, OnClick = function() showHelp(false) end })
 bHelp.Activated:Connect(function() showHelp(not helpOpen) end)
 
 ---------------------------------------------------------------------------------------------------
@@ -211,11 +211,11 @@ local dPad = 34
 local bigRing = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(dPad, 30), Size = UDim2.fromOffset(70, 70), ZIndex = 3, Parent = doneUI })
 UI.new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = bigRing }); UI.new("UIStroke", { Color = C.red, Thickness = 4, Parent = bigRing })
 UI.icon("check", { Size = UDim2.fromOffset(40, 40), Position = UDim2.fromOffset(15, 15), ZIndex = 4, Parent = bigRing })
-local dTitle = UI.label({ Text = "GRUNDLAGEN GESCHAFFT", FontFace = F.title, TextSize = 31, TextWrapped = false, Position = UDim2.fromOffset(dPad + 92, 34), Size = UDim2.new(1, -dPad * 2 - 92, 0, 36), ZIndex = 3, Parent = doneUI })
-local dSub = UI.label({ Text = "Jetzt setzt du das Gelernte im Sparring ein.", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(dPad + 92, 72), Size = UDim2.new(1, -dPad * 2 - 92, 0, 22), ZIndex = 3, Parent = doneUI })
+local dTitle = UI.label({ Text = "BASICS COMPLETE", FontFace = F.title, TextSize = 31, TextWrapped = false, Position = UDim2.fromOffset(dPad + 92, 34), Size = UDim2.new(1, -dPad * 2 - 92, 0, 36), ZIndex = 3, Parent = doneUI })
+local dSub = UI.label({ Text = "Now use what you learned in sparring.", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(dPad + 92, 72), Size = UDim2.new(1, -dPad * 2 - 92, 0, 22), ZIndex = 3, Parent = doneUI })
 local dRows = {}
-local DGROUPS = { { icon = "shield", title = "Deckung & Distanz", lessons = { 1, 3 } }, { icon = "glove", title = "Schläge & Kicks", lessons = { 2, 4 } },
-	{ icon = "wrestle", title = "Takedown & Aufstehen", lessons = { 5, 6 } } }
+local DGROUPS = { { icon = "shield", title = "Guard & Distance", lessons = { 1, 3 } }, { icon = "glove", title = "Punches & Kicks", lessons = { 2, 4 } },
+	{ icon = "wrestle", title = "Takedown & Get Up", lessons = { 5, 6 } } }
 do
 	local save = wPad; wPad = dPad
 	for i, g in ipairs(DGROUPS) do dRows[i] = groupRow(doneUI, 120 + (i - 1) * 64, g, 54) end
@@ -223,15 +223,15 @@ do
 end
 divider(doneUI, 322, dPad)
 UI.icon("octagon", { Size = UDim2.fromOffset(52, 52), Position = UDim2.fromOffset(dPad + 4, 340), ZIndex = 3, Parent = doneUI })
-UI.label({ Text = "DEIN ERSTER KAMPF", FontFace = F.title, TextSize = 27, Position = UDim2.fromOffset(dPad + 76, 338), Size = UDim2.new(1, -dPad * 2 - 76, 0, 32), ZIndex = 3, Parent = doneUI })
-UI.label({ Text = "Anfänger-Gegner  ·  1 Runde", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(dPad + 76, 370), Size = UDim2.new(1, -dPad * 2 - 76, 0, 22), ZIndex = 3, Parent = doneUI })
-local bSpar = UI.button({ Style = "primary", Text = "SPARRING STARTEN", Size = UDim2.new(1, -2 * dPad, 0, 56), Parent = doneUI, OnClick = function() remote:FireServer("choice", "sparring") end })
+UI.label({ Text = "YOUR FIRST FIGHT", FontFace = F.title, TextSize = 27, Position = UDim2.fromOffset(dPad + 76, 338), Size = UDim2.new(1, -dPad * 2 - 76, 0, 32), ZIndex = 3, Parent = doneUI })
+UI.label({ Text = "Beginner opponent  ·  1 round", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(dPad + 76, 370), Size = UDim2.new(1, -dPad * 2 - 76, 0, 22), ZIndex = 3, Parent = doneUI })
+local bSpar = UI.button({ Style = "primary", Text = "START SPARRING", Size = UDim2.new(1, -2 * dPad, 0, 56), Parent = doneUI, OnClick = function() remote:FireServer("choice", "sparring") end })
 bSpar.Position = UDim2.fromOffset(dPad, 410)
-local bGym = UI.button({ Style = "secondary", Text = "ZURÜCK INS GYM", Size = UDim2.new(1, -2 * dPad, 0, 48), Parent = doneUI, OnClick = function() remote:FireServer("choice", "gym") end })
+local bGym = UI.button({ Style = "secondary", Text = "BACK TO THE GYM", Size = UDim2.new(1, -2 * dPad, 0, 48), Parent = doneUI, OnClick = function() remote:FireServer("choice", "gym") end })
 bGym.Position = UDim2.fromOffset(dPad, 474)
 local dInfo = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(dPad, 530), Size = UDim2.fromOffset(460, 20), ZIndex = 3, Parent = doneUI })
 UI.icon("info", { Size = UDim2.fromOffset(18, 18), ImageColor3 = C.dim, ZIndex = 3, Parent = dInfo })
-UI.label({ Text = "Das Tutorial kannst du jederzeit wiederholen.", TextSize = 14, TextColor3 = C.dim, Position = UDim2.fromOffset(26, -1), Size = UDim2.fromOffset(420, 20), ZIndex = 3, Parent = dInfo })
+UI.label({ Text = "You can replay the tutorial anytime.", TextSize = 14, TextColor3 = C.dim, Position = UDim2.fromOffset(26, -1), Size = UDim2.fromOffset(420, 20), ZIndex = 3, Parent = dInfo })
 
 ---------------------------------------------------------------------------------------------------
 -- Ergebnis nach dem ersten Sparring (echte Belohnung aus CC_LastFight)
@@ -239,16 +239,16 @@ UI.label({ Text = "Das Tutorial kannst du jederzeit wiederholen.", TextSize = 14
 local afterUI = group({ Name = "After", AnchorPoint = Vector2.new(0, 0.5), Position = UDim2.new(0, 70, 0.5, 0), Size = UDim2.fromOffset(500, 300), Parent = canvas })
 UI.panel({ Size = UDim2.fromScale(1, 1), Cut = 20, Parent = afterUI })
 accent(afterUI, 24)
-local aTag = UI.label({ Text = "DEIN ERSTER KAMPF", FontFace = F.bold, TextSize = 14, TextColor3 = C.red, Position = UDim2.fromOffset(32, 24), Size = UDim2.fromOffset(300, 18), ZIndex = 3, Parent = afterUI })
+local aTag = UI.label({ Text = "YOUR FIRST FIGHT", FontFace = F.bold, TextSize = 14, TextColor3 = C.red, Position = UDim2.fromOffset(32, 24), Size = UDim2.fromOffset(300, 18), ZIndex = 3, Parent = afterUI })
 local aTitle = UI.label({ Text = "", FontFace = F.title, TextSize = 44, Position = UDim2.fromOffset(30, 46), Size = UDim2.new(1, -60, 0, 52), ZIndex = 3, Parent = afterUI })
 local aLine = UI.label({ Text = "", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(32, 100), Size = UDim2.new(1, -64, 0, 22), ZIndex = 3, Parent = afterUI })
 local aReward = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(32, 134), Size = UDim2.new(1, -64, 0, 40), ZIndex = 3, Parent = afterUI })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 10), VerticalAlignment = Enum.VerticalAlignment.Center, Parent = aReward })
 local aRow = UI.new("Frame", { BackgroundTransparency = 1, AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 32, 1, -26), Size = UDim2.new(1, -64, 0, 54), ZIndex = 3, Parent = afterUI })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 12), SortOrder = Enum.SortOrder.LayoutOrder, Parent = aRow })
-local bRetry = UI.button({ Style = "primary", Text = "NOCHMAL", Icon = "rotate", Size = UDim2.fromOffset(210, 54), LayoutOrder = 1, Parent = aRow, OnClick = function() remote:FireServer("retry") end })
-local bAfterGym = UI.button({ Style = "secondary", Text = "INS GYM", Size = UDim2.fromOffset(200, 54), LayoutOrder = 2, Parent = aRow, OnClick = function() remote:FireServer("closeAfter") end })
-local bContinue = UI.button({ Style = "primary", Text = "WEITER", Icon = "next", Size = UDim2.fromOffset(220, 54), LayoutOrder = 3, Parent = aRow, OnClick = function() remote:FireServer("closeAfter") end })
+local bRetry = UI.button({ Style = "primary", Text = "AGAIN", Icon = "rotate", Size = UDim2.fromOffset(210, 54), LayoutOrder = 1, Parent = aRow, OnClick = function() remote:FireServer("retry") end })
+local bAfterGym = UI.button({ Style = "secondary", Text = "TO THE GYM", Size = UDim2.fromOffset(200, 54), LayoutOrder = 2, Parent = aRow, OnClick = function() remote:FireServer("closeAfter") end })
+local bContinue = UI.button({ Style = "primary", Text = "CONTINUE", Icon = "next", Size = UDim2.fromOffset(220, 54), LayoutOrder = 3, Parent = aRow, OnClick = function() remote:FireServer("closeAfter") end })
 
 ---------------------------------------------------------------------------------------------------
 -- Zustand anwenden
@@ -296,7 +296,7 @@ end
 local lastPhase, lastPulse, lastTip = nil, 0, 0
 local function applyLesson(st)
 	if not st then return end
-	tabL.Text = ("GRUNDLAGEN   %d / 6"):format(st.lesson or 1)
+	tabL.Text = ("BASICS   %d / 6"):format(st.lesson or 1)
 	for i, pp in ipairs(pips) do
 		local done = st.done and st.done[i]
 		local cur = i == st.lesson
@@ -322,8 +322,8 @@ local function applyLesson(st)
 		UI.new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = d })
 		UI.new("UIStroke", { Color = i <= (st.n or 0) and C.red or C.dim, Thickness = 2, Parent = d })
 	end
-	stepL.Text = (st.steps or 1) > 1 and ("Teil %d von %d"):format(st.step or 1, st.steps) or ""
-	hTitle.Text = "HILFE: " .. (st.title or "")
+	stepL.Text = (st.steps or 1) > 1 and ("Part %d of %d"):format(st.step or 1, st.steps) or ""
+	hTitle.Text = "HELP: " .. (st.title or "")
 	local keys = {}
 	for _, k in ipairs(st.keys or {}) do table.insert(keys, (k[1] == "—" and "" or (k[1] .. " = ")) .. k[2]) end
 	hText.Text = (st.task or "") .. "\n" .. table.concat(keys, "   ·   ") .. "\n\n" .. (st.help or "")
@@ -333,7 +333,7 @@ local function applyLesson(st)
 		cardRing.Visible = true; cardRing.ImageTransparency = 0
 		TweenService:Create(cardRing, TweenInfo.new(0.45), { ImageTransparency = 1 }):Play()
 	end
-	if st.struggle then say("Probleme? Drück H – ich erkläre es dir, oder du überspringst die Lektion.", "tip") end
+	if st.struggle then say("Stuck? Press H – I'll explain it, or you can skip the lesson.", "tip") end
 end
 local function setDoneRows(rows, lessons)
 	for i, g in ipairs(GROUPS) do
@@ -353,13 +353,13 @@ local function apply()
 		local any, nextL = false, nil
 		for i = 1, 6 do if o and o.lessons and o.lessons[i] then any = true elseif not nextL then nextL = i end end
 		local repeat_ = o and o.done
-		bStartParts.title.Text = repeat_ and "GRUNDLAGEN WIEDERHOLEN" or ((any and nextL) and ("WEITER MIT LEKTION " .. nextL) or "TRAINING STARTEN")
-		bSkipW:FindFirstChildWhichIsA("TextLabel").Text = repeat_ and "SCHLIESSEN" or "ÜBERSPRINGEN"
+		bStartParts.title.Text = repeat_ and "REPLAY BASICS" or ((any and nextL) and ("CONTINUE LESSON " .. nextL) or "START TRAINING")
+		bSkipW:FindFirstChildWhichIsA("TextLabel").Text = repeat_ and "CLOSE" or "SKIP"
 		setDoneRows(wRows, o and o.lessons)
 		if lastPhase ~= "welcome" then
-			say(repeat_ and "Lust auf eine Auffrischung? Wir gehen die Grundlagen gern noch einmal durch."
-				or any and "Schön, dass du wieder da bist. Machen wir weiter, wo wir aufgehört haben."
-				or "Willkommen im Gym. Ich bin dein Trainer. Zeig mir, was du kannst.", "tip", true)
+			say(repeat_ and "Want a refresher? Happy to go over the basics again."
+				or any and "Good to have you back. Let's pick up where we left off."
+				or "Welcome to the gym. I'm your coach. Show me what you've got.", "tip", true)
 			welcomeCamera(true)
 		end
 	end
@@ -377,14 +377,14 @@ local function apply()
 	if ph == "after" then
 		local r = decode("CC_LastFight") or {}
 		local win = r.result == "win"
-		aTitle.Text = win and "SIEG" or (r.result == "draw" and "UNENTSCHIEDEN" or "NIEDERLAGE")
+		aTitle.Text = win and "WIN" or (r.result == "draw" and "DRAW" or "LOSS")
 		aTitle.TextColor3 = win and C.gold or C.text
-		aLine.Text = (r.method or "") ~= "" and (r.method .. (win and "  ·  starker Einstand" or "  ·  der nächste Versuch zählt")) or ""
+		aLine.Text = (r.method or "") ~= "" and (r.method .. (win and "  ·  strong debut" or "  ·  the next try counts")) or ""
 		for _, c in ipairs(aReward:GetChildren()) do if not c:IsA("UIListLayout") then c:Destroy() end end
 		if r.xp then UI.tag({ Text = ("+%d XP"):format(r.xp), Color = C.gold, TextColor = C.bg0, Size = UDim2.fromOffset(0, 34), Parent = aReward }) end
-		UI.tag({ Text = "+2 TP KONDITION", Color = C.blue, Size = UDim2.fromOffset(0, 34), Parent = aReward })   -- jede gekaempfte Runde (CC_Match)
+		UI.tag({ Text = "+2 TP CARDIO", Color = C.blue, Size = UDim2.fromOffset(0, 34), Parent = aReward })   -- jede gekaempfte Runde (CC_Match)
 		bRetry.Visible = not win; bAfterGym.Visible = not win; bContinue.Visible = win
-		if lastPhase ~= "after" then say(win and "Starker erster Kampf! Das Gym und Online stehen dir jetzt offen." or "Kopf hoch – jeder fängt so an. Noch ein Versuch?", win and "good" or "tip", true) end
+		if lastPhase ~= "after" then say(win and "Great first fight! The gym and online are open to you now." or "Head up – everyone starts like this. Another try?", win and "good" or "tip", true) end
 	end
 	fade(afterUI, ph == "after")
 	if ph ~= "welcome" and lastPhase == "welcome" then welcomeCamera(false) end
@@ -408,7 +408,7 @@ if dummy then
 		local ph = player:GetAttribute("CC_OnbPhase")
 		if ph ~= "lesson" then return end
 		local kind = tostring(dummy:GetAttribute("CC_Telegraph")):match("^(%a+)")
-		teleL.Text = kind == "td" and "TAKEDOWN KOMMT  –  F DRÜCKEN" or "SCHLAG KOMMT  –  F HALTEN"
+		teleL.Text = kind == "td" and "TAKEDOWN INCOMING  –  PRESS F" or "PUNCH INCOMING  –  HOLD F"
 		tele.Visible = true
 		task.delay(1.3, function() tele.Visible = false end)
 	end)

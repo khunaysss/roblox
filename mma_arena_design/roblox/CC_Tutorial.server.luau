@@ -106,48 +106,48 @@ SS.ChildAdded:Connect(function(c) if c.Name == "CC_Coach" then placeCoach() end 
 ---------------------------------------------------------------------------------------------------
 -- Tasten wie im Steuerungssystem (CC_Input / GAMEPLAY_STAND.md)
 local KEY = {
-	move = { { "W A S D", "Laufen" } }, circle = { { "A / D", "Umkreisen" } }, dist = { { "W / S", "Vor / zurück" } },
-	jab = { { "LMB", "Jab" } }, cross = { { "RMB", "Cross" } }, block = { { "F", "Block halten" } },
-	stam = { { "LMB", "Jab" }, { "RMB", "Cross" } }, rest = { { "—", "Nicht angreifen" } },
-	kick = { { "C X V Z", "Kick" }, { "F", "Deckung" } }, td = { { "E", "Takedown" } }, sprawl = { { "F", "Sprawl" } },
-	getup = { { "LEERTASTE", "Befreien / Aufstehen" } },
+	move = { { "W A S D", "Move" } }, circle = { { "A / D", "Circle" } }, dist = { { "W / S", "Forward / back" } },
+	jab = { { "LMB", "Jab" } }, cross = { { "RMB", "Cross" } }, block = { { "F", "Hold block" } },
+	stam = { { "LMB", "Jab" }, { "RMB", "Cross" } }, rest = { { "—", "Don't attack" } },
+	kick = { { "C X V Z", "Kick" }, { "F", "Guard" } }, td = { { "E", "Takedown" } }, sprawl = { { "F", "Sprawl" } },
+	getup = { { "SPACE", "Escape / stand up" } },
 }
 local LESSONS = {
-	{ title = "BEWEGEN & ABSTAND", icon = "run", group = 1, steps = {
-		{ task = "Lauf ein paar Schritte durch den Käfig.", keys = KEY.move, of = 3, kind = "walk",
-			tip = "Locker bleiben. Dein Blick bleibt automatisch beim Gegner." },
-		{ task = "Umkreise den Gegner seitlich.", keys = KEY.circle, of = 3, kind = "circle",
-			tip = "Seitlich bewegen ist sicherer als gerade zurück." },
-		{ task = "Stell dich in Jab-Reichweite und halte den Abstand.", keys = KEY.dist, of = 1, kind = "range",
-			tip = "Etwa eine Armlänge Abstand. Nicht zu nah, nicht zu weit." },
+	{ title = "MOVEMENT & RANGE", icon = "run", group = 1, steps = {
+		{ task = "Walk a few steps around the cage.", keys = KEY.move, of = 3, kind = "walk",
+			tip = "Stay loose. Your eyes stay on the opponent automatically." },
+		{ task = "Circle around your opponent.", keys = KEY.circle, of = 3, kind = "circle",
+			tip = "Moving sideways is safer than straight back." },
+		{ task = "Get into jab range and hold the distance.", keys = KEY.dist, of = 1, kind = "range",
+			tip = "About an arm's length. Not too close, not too far." },
 	} },
 	{ title = "JAB & CROSS", icon = "glove", group = 2, steps = {
-		{ task = "Lande 3 Jabs am Gegner.", keys = KEY.jab, of = 3, kind = "hit", moves = { jab = true, jabBody = true },
-			tip = "Der Jab ist schnell und hält den Gegner auf Abstand." },
-		{ task = "Lande 2 Crosses am Gegner.", keys = KEY.cross, of = 2, kind = "hit", moves = { cross = true, crossBody = true },
-			tip = "Der Cross ist stärker. Zurück in die Deckung. Dann der nächste Schlag." },
+		{ task = "Land 3 jabs on your opponent.", keys = KEY.jab, of = 3, kind = "hit", moves = { jab = true, jabBody = true },
+			tip = "The jab is fast and keeps your opponent at range." },
+		{ task = "Land 2 crosses on your opponent.", keys = KEY.cross, of = 2, kind = "hit", moves = { cross = true, crossBody = true },
+			tip = "The cross hits harder. Back to your guard. Then the next punch." },
 	} },
-	{ title = "BLOCK & AUSDAUER", icon = "shield", group = 1, steps = {
-		{ task = "Blocke 2 angekündigte Schläge.", keys = KEY.block, of = 2, kind = "block", tutor = "strike",
-			tip = "Wenn „Schlag kommt“ erscheint: F gedrückt halten." },
-		{ task = "Verbrauche Ausdauer mit Schlägen (gelber Balken).", keys = KEY.stam, of = 1, kind = "spend",
-			tip = "Jede Aktion kostet Ausdauer. Unter einem Viertel schlägst du schwächer." },
-		{ task = "Lass die Ausdauer wieder volllaufen.", keys = KEY.rest, of = 1, kind = "recover",
-			tip = "Kurz nichts tun und nicht blocken – dann füllt sich der Balken." },
+	{ title = "BLOCK & STAMINA", icon = "shield", group = 1, steps = {
+		{ task = "Block 2 incoming punches.", keys = KEY.block, of = 2, kind = "block", tutor = "strike",
+			tip = "When \"PUNCH INCOMING\" appears: hold F." },
+		{ task = "Burn stamina by throwing punches (yellow bar).", keys = KEY.stam, of = 1, kind = "spend",
+			tip = "Every action costs stamina. Below a quarter, you hit weaker." },
+		{ task = "Let your stamina refill.", keys = KEY.rest, of = 1, kind = "recover",
+			tip = "Don't attack or block for a moment – the bar refills." },
 	} },
-	{ title = "KICK & DECKUNG", icon = "kick", group = 2, steps = {
-		{ task = "Lande einen Kick und geh sofort zurück in die Deckung.", keys = KEY.kick, of = 2, kind = "kickguard",
-			tip = "Nach dem Kick sofort F – sonst stehst du offen." },
+	{ title = "KICK & GUARD", icon = "kick", group = 2, steps = {
+		{ task = "Land a kick and get right back to your guard.", keys = KEY.kick, of = 2, kind = "kickguard",
+			tip = "Press F right after the kick – or you're wide open." },
 	} },
 	{ title = "TAKEDOWN & SPRAWL", icon = "wrestle", group = 3, steps = {
-		{ task = "Bring den Gegner mit einem Takedown zu Boden.", keys = KEY.td, of = 1, kind = "takedown",
-			tip = "Nah heran, dann E. Aus der Distanz klappt kein Takedown." },
-		{ task = "Wehre einen angekündigten Takedown mit Sprawl ab.", keys = KEY.sprawl, of = 1, kind = "sprawl", tutor = "td",
-			tip = "Wenn „Takedown kommt“ erscheint: genau dann F drücken." },
+		{ task = "Take your opponent down.", keys = KEY.td, of = 1, kind = "takedown",
+			tip = "Get close, then E. Takedowns don't work from range." },
+		{ task = "Stop an incoming takedown with a sprawl.", keys = KEY.sprawl, of = 1, kind = "sprawl", tutor = "td",
+			tip = "When \"TAKEDOWN INCOMING\" appears: press F right then." },
 	} },
-	{ title = "AM BODEN AUFSTEHEN", icon = "rotate", group = 3, steps = {
-		{ task = "Der Gegner bringt dich zu Boden. Befrei dich und steh auf.", keys = KEY.getup, of = 1, kind = "getup", tutor = "ground",
-			tip = "Unten: Leertaste befreit dich. Dann noch einmal Leertaste – du stehst auf." },
+	{ title = "GET BACK UP", icon = "rotate", group = 3, steps = {
+		{ task = "Your opponent takes you down. Escape and stand up.", keys = KEY.getup, of = 1, kind = "getup", tutor = "ground",
+			tip = "On the bottom: SPACE to escape. Then SPACE again – you stand up." },
 	} },
 }
 
@@ -202,27 +202,27 @@ local function runStep(p, L, li, si)
 			local move, blocked = x, y
 			if st.kind == "hit" and a == char then
 				if st.moves[move] then progress()
-				else fail("Das war kein " .. (st.moves.jab and "Jab (linke Maustaste)" or "Cross (rechte Maustaste)") .. ".") end
+				else fail("That wasn't a " .. (st.moves.jab and "jab (left mouse)" or "cross (right mouse)") .. ".") end
 			elseif st.kind == "block" and b == char then
-				if blocked then progress() else fail("Halte F schon gedrückt, wenn „Schlag kommt“ erscheint.") end
+				if blocked then progress() else fail("Already be holding F when \"PUNCH INCOMING\" appears.") end
 			elseif st.kind == "kickguard" and a == char then
 				if move == "lowkick" or move == "bodykick" or move == "highkick" or move == "frontkick" then kickAt = os.clock()
-				else fail("Das war ein Schlag. Für Kicks: C, X, V oder Z.") end
+				else fail("That was a punch. For kicks: C, X, V or Z.") end
 			end
 		elseif kind == "td" then
 			local defended = x
 			if st.kind == "takedown" and a == char then
-				if not defended then progress() else fail("Abgewehrt – versuch es noch einmal.") end
+				if not defended then progress() else fail("Defended – try again.") end
 			elseif st.kind == "sprawl" and b == char then
-				if defended then progress() else fail("Zu spät oder zu früh. Drück F genau bei „Takedown kommt“.") end
+				if defended then progress() else fail("Too late or too early. Press F right at \"TAKEDOWN INCOMING\".") end
 			end
 		end
 	end))
 	table.insert(conns, char:GetAttributeChangedSignal("CC_OutOfRange"):Connect(function()
-		if st.kind == "hit" or st.kind == "kickguard" then fail("Zu weit weg – geh einen Schritt näher (W).") end
+		if st.kind == "hit" or st.kind == "kickguard" then fail("Too far – step closer (W).") end
 	end))
 	table.insert(conns, char:GetAttributeChangedSignal("CC_Tired"):Connect(function()
-		if st.kind ~= "spend" then fail("Keine Ausdauer – kurz durchatmen.") end
+		if st.kind ~= "spend" then fail("Out of stamina – take a breath.") end
 	end))
 	-- Ablauf je Art (Positionen, Ausdauer, Ringen) im Takt pruefen
 	local last = rootOf(char) and rootOf(char).Position
@@ -258,7 +258,7 @@ local function runStep(p, L, li, si)
 		elseif st.kind == "range" then
 			if dist >= 3.0 and dist <= 4.8 then inRange += dt else inRange = 0 end
 			if inRange >= 1.5 then progress() end
-			if os.clock() - t0 > 12 and not idleHint and n == 0 then idleHint = true; tip(p, dist > 4.8 and "Noch etwas näher heran (W)." or "Ein kleines Stück zurück (S).") end
+			if os.clock() - t0 > 12 and not idleHint and n == 0 then idleHint = true; tip(p, dist > 4.8 and "A bit closer (W)." or "A little bit back (S).") end
 		elseif st.kind == "spend" then
 			local smax = char:GetAttribute("CC_StaminaMax") or 100
 			if (char:GetAttribute("CC_Stamina") or smax) <= smax - 25 then progress() end
@@ -268,11 +268,11 @@ local function runStep(p, L, li, si)
 		elseif st.kind == "kickguard" then
 			if kickAt then
 				if char:GetAttribute("CC_Block") then kickAt = nil; progress()
-				elseif os.clock() - kickAt > 1.5 then kickAt = nil; fail("Nach dem Kick sofort F – sonst stehst du offen.") end
+				elseif os.clock() - kickAt > 1.5 then kickAt = nil; fail("Press F right after the kick – or you're wide open.") end
 			end
 		elseif st.kind == "takedown" then
 			-- nach dem gelungenen Takedown liegt der Gegner unten; Fortschritt kommt aus dem Ereignis
-			if n == 0 and os.clock() - t0 > 15 and not idleHint then idleHint = true; tip(p, "Geh ganz nah an den Gegner (W) und drück dann E.") end
+			if n == 0 and os.clock() - t0 > 15 and not idleHint then idleHint = true; tip(p, "Get right up close (W), then press E.") end
 		elseif st.kind == "getup" then
 			local w = char:GetAttribute("CC_Wrestle")
 			if w == "bottom" then wasBottom = true end
@@ -300,7 +300,7 @@ local function runLesson(p, li)
 	for si = 1, #L.steps do
 		local r = runStep(p, L, li, si)
 		if r ~= "ok" then return r end
-		tip(p, si < #L.steps and "Gut gemacht." or "Lektion geschafft!", "good")
+		tip(p, si < #L.steps and "Nice work." or "Lesson complete!", "good")
 		if L.steps[si].kind == "takedown" or L.steps[si].kind == "sprawl" or L.steps[si].kind == "getup" or L.steps[si + 1] and L.steps[si + 1].tutor then
 			resetBoth(p)
 		end
@@ -337,14 +337,14 @@ runFn.OnInvoke = function(p)
 	end
 	resetBoth(p)
 	if outcome == "skipAll" then
-		sessions[p] = nil; phase(p, ""); tip(p, "Kein Problem. Das Tutorial kannst du bei mir im Gym jederzeit wiederholen.")
+		sessions[p] = nil; phase(p, ""); tip(p, "No problem. You can replay the tutorial with me in the gym anytime.")
 		return "gym"
 	end
 	profile(p, "onb", "done", true)
 	-- Abschluss (Bild 3): Sparring starten oder zurueck ins Gym
 	stateOf(p, LESSONS[#LESSONS], #LESSONS, 1, 0)
 	phase(p, "done")
-	tip(p, "Stark. Jetzt setzt du das Gelernte im Sparring ein.", "good")
+	tip(p, "Strong. Now use what you learned in sparring.", "good")
 	local t0 = os.clock()
 	local choice
 	while p.Parent and os.clock() - t0 < 300 do
@@ -370,22 +370,22 @@ local function watchSparring(p)
 		local char = p.Character
 		if not char or REG.stateOf(p):GetAttribute("Mode") ~= "sparring" then sparWatch[p] = nil; return end
 		while p.Parent and REG.stateOf(p):GetAttribute("State") ~= "fight" and REG.stateOf(p):GetAttribute("Mode") == "sparring" do task.wait(0.1) end
-		tip(p, "Ruhig bleiben. Jab, dann Cross. Wenn er kommt: F.")
+		tip(p, "Stay calm. Jab, then cross. When he attacks: F.")
 		local takenInRow, landed, lastTip = 0, 0, os.clock()
 		local function say(text, kind) if os.clock() - lastTip > 4 then lastTip = os.clock(); tip(p, text, kind) end end
 		local c1 = fightEvent.Event:Connect(function(kind, a, b, move, blocked)
 			if kind == "hit" and b == char and not blocked then
 				takenInRow += 1
-				if takenInRow >= 3 then takenInRow = 0; say("Deckung hoch – F halten, wenn er angreift.") end
+				if takenInRow >= 3 then takenInRow = 0; say("Hands up – hold F when he attacks.") end
 			elseif kind == "hit" and a == char then
 				takenInRow = 0; landed += 1
-				if landed == 3 then say("Gut so! Treffen und wieder raus.", "good") end
+				if landed == 3 then say("That's it! Hit and get out.", "good") end
 			elseif kind == "td" and b == char and not move then   -- bei "td" ist das 4. Argument "abgewehrt"
-				say("Am Boden: Leertaste – steh wieder auf.")
+				say("On the ground: SPACE – get back up.")
 			end
 		end)
 		local c2 = char:GetAttributeChangedSignal("CC_Tired"):Connect(function() say("Ausdauer leer. Kurz Abstand nehmen und durchatmen.") end)
-		local c3 = char:GetAttributeChangedSignal("CC_OutOfRange"):Connect(function() say("Zu weit weg – erst näher heran.") end)
+		local c3 = char:GetAttributeChangedSignal("CC_OutOfRange"):Connect(function() say("Too far – get closer first.") end)
 		while p.Parent and REG.stateOf(p):GetAttribute("Mode") == "sparring" and REG.stateOf(p):GetAttribute("State") ~= "over" do task.wait(0.2) end
 		c1:Disconnect(); c2:Disconnect(); c3:Disconnect()
 		sparWatch[p] = nil
@@ -399,8 +399,8 @@ local function hookPlayer(p)
 		local ok, r = pcall(function() return HS:JSONDecode(p:GetAttribute("CC_LastFight")) end)
 		if not ok or r.mode ~= "sparring" then return end
 		profile(p, "onb", "firstFight", true)
-		tip(p, r.result == "win" and "Starker erster Kampf! Das Gym und Online stehen dir offen."
-			or "Kopf hoch – jeder fängt so an. Noch ein Versuch?", r.result == "win" and "good" or "tip")
+		tip(p, r.result == "win" and "Great first fight! The gym and online are open to you."
+			or "Head up – everyone starts like this. Another try?", r.result == "win" and "good" or "tip")
 		task.wait(7.5)                               -- Ergebnis im Kaefig (CC_Match OVER_TIME), dann im Gym
 		local o = onb(p)
 		if p.Parent and o and o.story and o.outro == false then phase(p, "outro")   -- Story-Abschluss ("War das schlecht?") einmalig
@@ -444,9 +444,9 @@ storyRemote.OnServerEvent:Connect(function(p, what, arg)
 		-- Karriere kurz erklaeren (bestehende Karriereansicht im Menue), einzeln nacheinander
 		task.spawn(function()
 			for _, t in ipairs({
-				"Karriere: Menü (M) → KARRIERE. Dort siehst du deinen nächsten Gegner.",
-				"Bei jedem Gegner stehen seine Stärken und mein Tipp. KAMPF STARTEN, wenn du bereit bist.",
-				"Du kannst auch erst im Gym weitertrainieren – jede Station macht dich stärker." }) do
+				"Career: menu (M) → CAREER. That's where you see your next opponent.",
+				"Every opponent shows his strengths and my tip. Start the fight when you're ready.",
+				"Or train in the gym first – every station makes you stronger." }) do
 				task.wait(5.5); if not p.Parent then return end
 				tip(p, t)
 			end
@@ -469,7 +469,7 @@ remote.OnServerEvent:Connect(function(p, what, arg)
 	elseif what == "closeWelcome" and ph == "welcome" then             -- Ueberspringen im Begruessungsfenster
 		profile(p, "onb", "offered", true)
 		phase(p, "")
-		tip(p, "Alles klar. Das Tutorial kannst du bei mir im Gym jederzeit wiederholen.")
+		tip(p, "All right. You can replay the tutorial with me in the gym anytime.")
 	elseif (what == "skipLesson" or what == "skipAll") and s and ph == "lesson" then
 		s.cmd = what == "skipLesson" and "skip" or "skipAll"
 	elseif what == "choice" and s and ph == "done" and (arg == "sparring" or arg == "gym") then

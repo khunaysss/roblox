@@ -81,12 +81,13 @@ local function wait_(t)                                   -- false, wenn uebersp
 	while os.clock() - t0 < t do if skipFlag or not running then return false end; RunService.Heartbeat:Wait() end
 	return not skipFlag
 end
-local function walkTo(a, target, faceAt, speed)
+local RUN = 17                                        -- Studs/s beim Rennen (Fighter_CasualRun_v3)
+local function walkTo(a, target, faceAt, speed, anim)
 	local start = a.hrp.Position
 	local d = (target - start) * Vector3.new(1, 0, 1)
 	if d.Magnitude < 0.05 then return end
 	local dur = d.Magnitude / (speed or WALK)
-	local w = a.play("Fighter_CasualWalk_v2", 0.25, true, Enum.AnimationPriority.Movement)
+	local w = a.play(anim or "Fighter_CasualWalk_v2", 0.2, true, Enum.AnimationPriority.Movement)
 	local t0 = os.clock()
 	while true do
 		local u = math.min((os.clock() - t0) / dur, 1)
@@ -108,6 +109,19 @@ local function walkTo(a, target, faceAt, speed)
 	end
 end
 local function face(a, at) a.hrp.CFrame = CFrame.lookAt(a.hrp.Position, Vector3.new(at.X, a.hrp.Position.Y, at.Z)) end
+local function runPath(a, pts, faceAt)                    -- mehrere Wegpunkte rennend (z. B. durchs Schultor)
+	for i, p in ipairs(pts) do
+		walkTo(a, p, i == #pts and faceAt or nil, RUN, "Fighter_CasualRun_v3")
+		if skipFlag or not running then return end
+	end
+end
+local function sfx(name, vol)                             -- Projekt-Sound einmal abspielen (2D)
+	local s = game:GetService("SoundService"):FindFirstChild("CC_Sounds")
+	s = s and s:FindFirstChild(name)
+	if not s then return end
+	local c = s:Clone(); c.Volume = (vol or 1) * (s.Volume > 0 and s.Volume or 0.5); c.Parent = workspace.CurrentCamera
+	c:Play(); game:GetService("Debris"):AddItem(c, 4)
+end
 
 ---------------------------------------------------------------------------------------------------- Oberflaeche: Kinobalken, Untertitel, Ueberspringen, Blende
 local gui, sub, card, black, skipBtn
@@ -128,7 +142,7 @@ local function buildGui()
 	skipBtn = Instance.new("TextButton"); skipBtn.AnchorPoint = Vector2.new(1, 0); skipBtn.Position = UDim2.new(1, -24, 0.09, 16)
 	skipBtn.Size = UDim2.fromOffset(230, 40); skipBtn.BackgroundColor3 = Color3.fromRGB(12, 21, 29); skipBtn.BackgroundTransparency = 0.25
 	skipBtn.BorderSizePixel = 0; skipBtn.Font = Enum.Font.GothamBold; skipBtn.TextSize = 15; skipBtn.TextColor3 = Color3.fromRGB(230, 232, 236)
-	skipBtn.Text = "ÜBERSPRINGEN  [LEERTASTE]"; skipBtn.ZIndex = 6; skipBtn.Parent = gui
+	skipBtn.Text = "SKIP  [SPACE]"; skipBtn.ZIndex = 6; skipBtn.Parent = gui
 	Instance.new("UICorner", skipBtn).CornerRadius = UDim.new(0, 6)
 	skipBtn.Activated:Connect(function() skipFlag = true end)
 	gui.Parent = player:WaitForChild("PlayerGui")
@@ -137,11 +151,52 @@ local function fade(to, t)
 	TweenService:Create(black, TweenInfo.new(t or 0.5), { BackgroundTransparency = to }):Play()
 	return wait_(t or 0.5)
 end
+local shake = 0                                          -- Kamerawackeln (klingt von selbst ab)
 local function say(who, text, dur)
 	sub.Text = ('<font color="#A6B3C7">%s</font>   %s'):format(who, text)
 	local ok = wait_(dur or (1.2 + #text * 0.055))
 	sub.Text = ""
 	return ok
+end
+local function shout(who, text, dur)                      -- Schrei: gross, rot, Kamera-Stoss
+	sub.Text = ('<font color="#A6B3C7">%s</font>   <font color="#FF4A3D" size="40"><b>%s</b></font>'):format(who, text)
+	shake = 1.0
+	local sc = Instance.new("UIScale"); sc.Scale = 1.35; sc.Parent = sub
+	TweenService:Create(sc, TweenInfo.new(0.25, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+	local ok = wait_(dur or 1.6)
+	sub.Text = ""; sc:Destroy()
+	return ok
+end
+-- Nahaufnahme der Visitenkarte als Bild auf dem Schirm (man soll lesen koennen, was er ihm gibt)
+local cardView
+local function showCardView(on)
+	if on and not cardView then
+		local logo = SH:FindFirstChild("CardLogo")
+		local f = Instance.new("Frame"); f.Name = "CardView"; f.AnchorPoint = Vector2.new(0.5, 0.5); f.Position = UDim2.fromScale(0.5, 0.44)
+		f.Size = UDim2.fromOffset(440, 260); f.BackgroundColor3 = Color3.fromRGB(20, 22, 26); f.BorderSizePixel = 0; f.ZIndex = 7; f.Parent = gui
+		Instance.new("UICorner", f).CornerRadius = UDim.new(0, 14)
+		local st = Instance.new("UIStroke", f); st.Color = Color3.fromRGB(200, 40, 34); st.Thickness = 3
+		local img = Instance.new("ImageLabel"); img.BackgroundTransparency = 1; img.Size = UDim2.fromOffset(130, 130); img.Position = UDim2.fromOffset(22, 22)
+		img.Image = logo and logo.Texture or ""; img.ZIndex = 8; img.Parent = f
+		local function txt(t, y, size, font, col)
+			local l = Instance.new("TextLabel"); l.BackgroundTransparency = 1; l.Position = UDim2.fromOffset(168, y); l.Size = UDim2.fromOffset(255, size + 6)
+			l.Font = font; l.TextSize = size; l.TextColor3 = col or Color3.fromRGB(236, 236, 240); l.TextXAlignment = Enum.TextXAlignment.Left
+			l.Text = t; l.ZIndex = 8; l.Parent = f
+		end
+		txt("CAGE CHAMPIONS", 34, 30, Enum.Font.GothamBlack)
+		txt("MMA GYM", 70, 24, Enum.Font.GothamBold, Color3.fromRGB(220, 52, 44))
+		txt("Beginners welcome", 110, 18, Enum.Font.GothamMedium, Color3.fromRGB(180, 186, 196))
+		local foot = Instance.new("TextLabel"); foot.BackgroundTransparency = 1; foot.Position = UDim2.fromOffset(22, 180); foot.Size = UDim2.fromOffset(396, 60)
+		foot.Font = Enum.Font.GothamMedium; foot.TextSize = 18; foot.TextColor3 = Color3.fromRGB(200, 204, 212); foot.TextWrapped = true
+		foot.Text = "Training every day · 4 PM\nAround the corner from Northpark High"; foot.ZIndex = 8; foot.Parent = f
+		local sc = Instance.new("UIScale"); sc.Scale = 0.2; sc.Parent = f
+		TweenService:Create(sc, TweenInfo.new(0.35, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+		cardView = f
+	elseif not on and cardView then
+		local f = cardView; cardView = nil
+		TweenService:Create(f.UIScale, TweenInfo.new(0.2), { Scale = 0.01 }):Play()
+		task.delay(0.22, function() f:Destroy() end)
+	end
 end
 local function titleCard(text, dur)
 	card.Text = text
@@ -189,7 +244,7 @@ local function propPart(name, size, color)
 	table.insert(props, p); return p
 end
 local function makeCard()
-	local c = propPart("Story_GymCard", Vector3.new(0.34, 0.22, 0.03), Color3.fromRGB(22, 24, 28))
+	local c = propPart("Story_GymCard", Vector3.new(1.0, 0.62, 0.04), Color3.fromRGB(22, 24, 28))
 	local logo = SH:FindFirstChild("CardLogo")
 	if logo then local d = logo:Clone(); d.Face = Enum.NormalId.Front; d.Parent = c; local d2 = logo:Clone(); d2.Face = Enum.NormalId.Back; d2.Parent = c end
 	return c
@@ -238,7 +293,7 @@ local function runFilm()
 			CFrame.lookAt(W(-12, 30), W(-40, 30))),
 	}
 	for _, a in ipairs(actors) do for _, n in ipairs({ "Fighter_CasualWalk_v2", "Story_P_Confront", "Story_S_Confront", "Story_S_Shove", "Story_P_Shoved", "Story_P_SitIdle",
-		"Story_T_Stop", "Story_T_KneelHelp", "Story_P_HelpUp", "Story_T_GiveCard", "Story_P_TakeCard" }) do if a == P or a == S or a == T then a.track(n) end end end
+		"Story_T_Stop", "Story_T_KneelHelp", "Story_P_HelpUp", "Story_T_GiveCard", "Story_P_TakeCard", "Fighter_CasualRun_v3" }) do if a == P or a == S or a == S2 or a == T then a.track(n) end end end
 	if not wait_(0.8) then return end                     -- Animationen laden (keine T-Pose)
 
 	------------------------------------------------ Szene 1: Schulschluss
@@ -261,16 +316,29 @@ local function runFilm()
 	S.hrp.CFrame = CFrame.lookAt(sPos, Vector3.new(PSTOP.X, sPos.Y, PSTOP.Z))
 	setShot(function(t) local s, p = head(S), head(P); local m = (s + p) / 2; return CFrame.lookAt(m + Vector3.new(11, -0.6, 1.5 - t * 0.2), m + Vector3.new(0, -1.0, 0)), 40 end)
 	P.play("Story_P_Confront", 0.3); S.play("Story_S_Confront", 0.3)
-	task.delay(0.5, function() if running then say("SCHÜLER", "Wohin so schnell?", 1.6) end end)
-	if not wait_(2.8) then return end
+	task.delay(0.5, function() if running then say("BULLY", "Where do you think you're going, new kid?", 2.2) end end)
+	if not wait_(2.9) then return end
 	setShot(function(t) local s, p = head(S), head(P); return CFrame.lookAt(p + Vector3.new(-3.6, 0.2, 7.5), (s + p) / 2 + Vector3.new(-0.6, -0.8, 0)), 40 end)
-	if not say("DU", "Lass mich einfach durch.", 1.6) then return end
+	if not say("YOU", "Just let me through.", 1.5) then return end
+	setShot(function(t) local s = head(S); local cf = S.hrp.CFrame; return CFrame.lookAt(s + cf.LookVector * (4.2 - t * 0.3) + cf.RightVector * 2.2 - Vector3.new(0, 0.4, 0), s + Vector3.new(0, -0.3, 0)), 34 end)
+	if not say("BULLY", "Make me.", 1.2) then return end
 	------------------------------------------------ Szene 3: Der Schubser
 	setShot(function(t) local s, p = head(S), head(P); local m = (s + p) / 2; return CFrame.lookAt(m + Vector3.new(9.5, -2.4, -2.5), m + Vector3.new(0, -1.6, 1.0)), 44 end)
 	S.stop("Story_S_Confront", 0.2); P.stop("Story_P_Confront", 0.2)
-	S.play("Story_S_Shove", 0.15); local sh = P.play("Story_P_Shoved", 0.15)
+	local sv = S.play("Story_S_Shove", 0.15); local sh = P.play("Story_P_Shoved", 0.15)
+	-- Zeitlupe im Moment des Stosses, dann Aufprall mit Wackeln und Geraeusch
+	task.delay(0.35, function()
+		if not running then return end
+		sfx("Whoosh", 0.8)
+		for _, t in ipairs({ sv, sh }) do if t then t:AdjustSpeed(0.3) end end
+		task.wait(0.55)
+		for _, t in ipairs({ sv, sh }) do if t then t:AdjustSpeed(1) end end
+		shake = 0.7; sfx("BodyHit", 0.9)
+		task.wait(0.55)
+		if running then shake = 1.1; sfx("BodyFall", 1.2) end
+	end)
 	-- Rucksack faellt: Traeger am Spieler aus, lose Tasche faellt seitlich
-	task.delay(1.15, function()
+	task.delay(1.55, function()
 		if not running then return end
 		local bp = P.model:FindFirstChild("Casual_Backpack")
 		if bp then
@@ -283,21 +351,29 @@ local function runFilm()
 			TweenService:Create(loose, TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { CFrame = to }):Play()
 		end
 	end)
-	if not wait_(1.0) then return end
-	task.delay(0.3, function() if running then say("SCHÜLER", "Pass doch auf.", 1.3) end end)
+	if not wait_(1.4) then return end
+	task.delay(0.2, function() if running then say("BULLY", "Stay down, loser!", 1.4) end end)
 	if not wait_(1.5) then return end
 	P.play("Story_P_SitIdle", 0.25, true)
-	------------------------------------------------ Szene 4: Der Trainer
+	------------------------------------------------ Szene 4: Der Trainer (kommt rennend durchs Schultor, nicht durch die Mauer)
 	local tStop = (P.hrp.CFrame * CFrame.new(-2.2, 0, -1.4)).Position
-	setShot(function(t) local p = P.hrp.Position; return CFrame.lookAt(p + Vector3.new(-6, 1.2, 9), p + Vector3.new(0, 1.0, -5)), 46 end)
-	task.spawn(walkTo, T, tStop, head(S))
-	if not wait_(2.6) then return end
-	T.play("Story_T_Stop", 0.25)
-	setShot(function(t) local m = (head(T) + head(S)) / 2; return CFrame.lookAt(m + Vector3.new(14 - t * 0.3, -0.4, 5), m + Vector3.new(0, -1.2, 0)), 40 end)
-	if not say("TRAINER", "Hey. Schluss jetzt.", 1.6) then return end
+	T.hrp.CFrame = CFrame.lookAt(W(-4, -44), W(-4, 0))
+	task.spawn(runPath, T, { W(-4, -36), W(-4, -22), tStop }, head(S))
+	-- Schrei vom Tor aus: Kamera ruckt zum Trainer
+	setShot(function(t) local h = head(T); return CFrame.lookAt(h + Vector3.new(3.5, -0.6, 9 + t * 1.5), h + Vector3.new(0, -0.4, 0)), 42 - t * 4 end)
+	if not wait_(0.45) then return end
+	if not shout("COACH", "HEY!! GET AWAY FROM HIM!", 1.5) then return end
+	-- Mobber zucken zusammen, drehen sich um und rennen
+	setShot(function(t) local m = (head(S) + head(S2)) / 2; return CFrame.lookAt(m + Vector3.new(7, -0.2, -7), m + Vector3.new(0, -0.6, 0)), 38 end)
+	S.stop("Story_S_Shove", 0.1); face(S, T.hrp.Position); face(S2, T.hrp.Position)
+	shake = 0.4
+	if not say("BULLY", "Oh no — RUN!", 0.9) then return end
+	task.spawn(runPath, S, { W(-14, -6), W(-46, -4) }); task.delay(0.15, function() if running then runPath(S2, { W(-16, -10), W(-46, -9) }) end end)
 	setShot(function(t) local p = P.hrp.Position; return CFrame.lookAt(p + Vector3.new(7, 3.6, 9), head(S) + Vector3.new(0, -1.2, 0)), 44 end)
-	task.spawn(walkTo, S, W(-38, -6)); task.delay(0.4, function() if running then walkTo(S2, W(-36, -10)) end end)
-	if not wait_(2.0) then return end
+	if not wait_(1.0) then return end
+	T.play("Story_T_Stop", 0.2)
+	setShot(function(t) local h = head(T); return CFrame.lookAt(h + T.hrp.CFrame.LookVector * 6 + T.hrp.CFrame.RightVector * 2 + Vector3.new(0, -0.5, 0), h + Vector3.new(0, -0.3, 0)), 36 end)
+	if not shout("COACH", "AND DON'T COME BACK!", 1.4) then return end
 	------------------------------------------------ Szene 5: Auf Augenhoehe
 	-- Trainer kniet vor dem sitzenden Spieler (Blender-Aufstellung: 0,30 m vor dem Spieler-Ursprung, Blick zum Spieler)
 	local helpPos = (P.hrp.CFrame * CFrame.new(0, 0, -0.30 * M2S)).Position
@@ -307,9 +383,9 @@ local function runFilm()
 	T.hrp.CFrame = CFrame.lookAt(helpPos, Vector3.new(P.hrp.Position.X, helpPos.Y, P.hrp.Position.Z))
 	setShot(function(t) local p, h = P.hrp.Position, head(T); local m = (p + h) / 2; return CFrame.lookAt(m + P.hrp.CFrame.RightVector * 14 + Vector3.new(0, 0.2, 0), m + Vector3.new(0, -1.6, 0)), 40 end)
 	T.play("Story_T_KneelHelp", 0.3); P.stop("Story_P_SitIdle", 0.3); P.play("Story_P_HelpUp", 0.3)
-	task.delay(1.0, function() if running then say("TRAINER", "Alles okay? Kannst du aufstehen?", 1.9) end end)
+	task.delay(1.0, function() if running then say("COACH", "Hey. You okay? Can you stand up?", 1.9) end end)
 	if not wait_(3.0) then return end
-	task.delay(0.0, function() if running then say("DU", "Ja … geht schon.", 1.2) end end)
+	task.delay(0.0, function() if running then say("YOU", "Yeah … I think so.", 1.2) end end)
 	if not wait_(1.0) then return end
 	-- Ende Aufhelfen: Spieler steht 0,30 m hinter seinem Ursprung -> Ursprung nachziehen (nahtlos, gleiche Pose)
 	P.hrp.CFrame = P.hrp.CFrame * CFrame.new(0, 0, 0.30 * M2S)
@@ -322,22 +398,25 @@ local function runFilm()
 	holdCard(c, T, "RightHand", CFrame.new(0, 0, -0.12) * CFrame.Angles(math.rad(90), 0, 0))
 	setShot(function(t) local p, h = head(P), head(T); local m = (p + h) / 2; return CFrame.lookAt(m + P.hrp.CFrame.RightVector * 11 + Vector3.new(0, 0.2, 0), m + Vector3.new(0, -0.9, 0)), 40 end)
 	fade(1, 0.25)
-	if not say("TRAINER", "Ich trainiere im Gym um die Ecke. Komm morgen vorbei, wenn du willst.", 3.2) then return end
+	if not say("COACH", "Guys like that only stop when you stand your ground. I coach at a gym around the corner.", 3.4) then return end
 	T.play("Story_T_GiveCard", 0.25); P.play("Story_P_TakeCard", 0.25)
 	setShot(function(t) local m = (head(P) + head(T)) / 2; return CFrame.lookAt(m + P.hrp.CFrame.RightVector * 12 + Vector3.new(0, -0.4, 0), m + Vector3.new(0, -1.4, 0)), 38 end)
 	if not wait_(1.0) then return end
 	holdCard(c, P, "LeftHand", CFrame.new(0, 0, -0.12) * CFrame.Angles(math.rad(90), 0, 0))
-	if not wait_(1.0) then return end
+	if not wait_(0.6) then return end
+	showCardView(true)
+	if not wait_(2.4) then showCardView(false); return end
+	showCardView(false)
 	setShot(function(t) local p = head(P); return CFrame.lookAt(c.Position + P.hrp.CFrame.RightVector * 3.2 + P.hrp.CFrame.LookVector * 1.2 + Vector3.new(0, 0.9, 0), c.Position), 30 end)
-	if not say("DU", "Ich kann nicht kämpfen.", 1.6) then return end
+	if not say("YOU", "I can't fight.", 1.6) then return end
 	setShot(function(t) local h = head(T); local m = (head(P) + h) / 2; return CFrame.lookAt(m + P.hrp.CFrame.RightVector * -9 + Vector3.new(0, 0.2, 0), m + Vector3.new(0, -0.6, 0)), 38 end)
-	if not say("TRAINER", "Musst du auch noch nicht können.", 2.0) then return end
+	if not say("COACH", "Not yet. Come by tomorrow — I'll teach you.", 2.4) then return end
 	if not fade(0, 0.8) then return end
 	------------------------------------------------ Szene 7: Die Entscheidung (Gym-Front in der Nachbarstrasse)
 	for _, a in ipairs({ S, S2, T, bg[1], bg[2], bg[3] }) do a.model.Parent = nil end
 	for _, p in ipairs(props) do if p ~= c then p.Parent = nil end end
 	local bpp = P.model:FindFirstChild("Casual_Backpack"); if bpp then bpp.Transparency = 0 end
-	if not titleCard("Am nächsten Nachmittag.", 2.0) then return end
+	if not titleCard("THE NEXT DAY", 2.0) then return end
 	local front = workspace.CC_StorySchool:FindFirstChild("GymFront")
 	local door = front and front:FindFirstChild("GymDoor")
 	local doorCF = door and door.CFrame
@@ -376,11 +455,11 @@ local function runFilm()
 	setShot(function(t) local p = head(P); return CFrame.lookAt(p + Vector3.new(-5.5, 0.6, 3.2 - t * 0.3), head(T) + Vector3.new(0, -0.6, 0)), 44 end)
 	if not fade(1, 0.6) then return end
 	T.play("Trainer_Pereira_Greet", 0.25)
-	if not say("TRAINER", "Du bist gekommen.", 1.6) then return end
+	if not say("COACH", "You actually came. Good.", 1.8) then return end
 	setShot(function(t) local p = head(P); return CFrame.lookAt(head(T) + Vector3.new(5.5, 0.2, -3.2), p + Vector3.new(0, -0.4, 0)), 40 end)
-	if not say("DU", "Kann ich wirklich hier anfangen?", 1.8) then return end
+	if not say("YOU", "Can I really start here?", 1.8) then return end
 	setShot(function(t) local p = head(P); return CFrame.lookAt(p + Vector3.new(-5.5, 0.4, 3.2), head(T) + Vector3.new(0, -0.6, 0)), 42 end)
-	if not say("TRAINER", "Klar. Tasche dort hin. Wir beginnen langsam.", 2.4) then return end
+	if not say("COACH", "Everyone starts somewhere. Drop your bag — let's work.", 2.6) then return end
 	if not fade(0, 0.6) then return end
 	------------------------------------------------ Szene 9: Die erste Lektion (Trainingskleidung = echter Kaempfer)
 	P.model.Parent = nil
@@ -392,15 +471,41 @@ local function runFilm()
 	T.play("Fighter_Idle_v08", 0.3, true)
 	setShot(function(t) local h = head(T); return CFrame.lookAt(h + Vector3.new(-3.0, -0.6, 8.5 - t * 0.3), h + Vector3.new(-1.5, -1.4, 0)), 42 end)
 	if not fade(1, 0.6) then return end
-	if not say("TRAINER", "Füße versetzt. Knie locker. Hände hoch. Nicht verkrampfen.", 3.4) then return end
-	-- Uebergang zur Spielkamera: hinter den eigenen Kaempfer fahren
+	if not say("COACH", "Feet apart. Knees loose. Hands up. Stay relaxed.", 3.2) then return end
+	-- Uebergang: Kamera faehrt naeher, Abblende -> Titelkarte (laeuft nach dem Film weiter, bis das Tutorial steht)
 	local fromCF = workspace.CurrentCamera.CFrame
-	setShot(function(t)
-		local u = math.min(t / 1.2, 1); u = u * u * (3 - 2 * u)
-		local goal = CFrame.lookAt(mePos + Vector3.new(-10, 4.5, 0), mePos + Vector3.new(6, 2, 0))
-		return fromCF:Lerp(goal, u), 70
+	setShot(function(t) return fromCF * CFrame.new(0, 0, -t * 1.2), 42 end)
+	fade(0, 0.7)
+end
+
+---------------------------------------------------------------------------------------------------- Zwischentitel zwischen Film, Tutorial und Sparring
+-- Eigene Oberflaeche (bleibt nach dem Film bestehen): schwarz mit Titel, haelt kurz und blendet ins Spiel auf.
+local function transition(title, subtitle, hold, fromBlack)
+	local old = player.PlayerGui:FindFirstChild("CC_StoryTransition"); if old then old:Destroy() end
+	local g = Instance.new("ScreenGui"); g.Name = "CC_StoryTransition"; g.IgnoreGuiInset = true; g.DisplayOrder = 80; g.ResetOnSpawn = false
+	local bg = Instance.new("Frame"); bg.Size = UDim2.fromScale(1, 1); bg.BackgroundColor3 = Color3.new(0, 0, 0); bg.BorderSizePixel = 0
+	bg.BackgroundTransparency = fromBlack and 0 or 1; bg.Parent = g
+	local t = Instance.new("TextLabel"); t.BackgroundTransparency = 1; t.AnchorPoint = Vector2.new(0.5, 0.5); t.Position = UDim2.fromScale(0.5, 0.46)
+	t.Size = UDim2.new(1, 0, 0, 70); t.Font = Enum.Font.GothamBlack; t.TextSize = 58; t.TextColor3 = Color3.fromRGB(240, 240, 244); t.Text = title
+	t.TextTransparency = 1; t.Parent = bg
+	local line = Instance.new("Frame"); line.AnchorPoint = Vector2.new(0.5, 0.5); line.Position = UDim2.fromScale(0.5, 0.53); line.Size = UDim2.fromOffset(0, 4)
+	line.BackgroundColor3 = Color3.fromRGB(214, 44, 36); line.BorderSizePixel = 0; line.Parent = bg
+	local s = Instance.new("TextLabel"); s.BackgroundTransparency = 1; s.AnchorPoint = Vector2.new(0.5, 0.5); s.Position = UDim2.fromScale(0.5, 0.59)
+	s.Size = UDim2.new(1, 0, 0, 34); s.Font = Enum.Font.GothamMedium; s.TextSize = 26; s.TextColor3 = Color3.fromRGB(190, 196, 206); s.Text = subtitle or ""
+	s.TextTransparency = 1; s.Parent = bg
+	g.Parent = player.PlayerGui
+	task.spawn(function()
+		if not fromBlack then TweenService:Create(bg, TweenInfo.new(0.4), { BackgroundTransparency = 0.15 }):Play() end
+		TweenService:Create(t, TweenInfo.new(0.5), { TextTransparency = 0 }):Play()
+		TweenService:Create(line, TweenInfo.new(0.6, Enum.EasingStyle.Quart), { Size = UDim2.fromOffset(320, 4) }):Play()
+		task.wait(0.25)
+		TweenService:Create(s, TweenInfo.new(0.5), { TextTransparency = 0 }):Play()
+		task.wait(hold or 2.0)
+		for _, x in ipairs({ t, s }) do TweenService:Create(x, TweenInfo.new(0.4), { TextTransparency = 1 }):Play() end
+		TweenService:Create(line, TweenInfo.new(0.4), { BackgroundTransparency = 1 }):Play()
+		TweenService:Create(bg, TweenInfo.new(0.9), { BackgroundTransparency = 1 }):Play()
+		task.wait(1.0); g:Destroy()
 	end)
-	wait_(1.3)
 end
 
 ---------------------------------------------------------------------------------------------------- Abschluss nach dem ersten Sparring (Phase "outro")
@@ -415,16 +520,16 @@ local function runOutro()
 	if not wait_(0.6) then return end
 	setShot(function(t) local m = (head(P) + head(T)) / 2; return CFrame.lookAt(m + Vector3.new(0.8, -0.2, 11 - t * 0.25), m + Vector3.new(0, -0.7, 0)), 40 end)
 	fade(1, 0.6)
-	if not say("DU", "War das schlecht?", 1.8) then return end
+	if not say("YOU", "Was that bad?", 1.6) then return end
 	setShot(function(t) return CFrame.lookAt(head(P) + Vector3.new(-3.2, 0.1, 3.6), head(T) + Vector3.new(0, -0.3, 0)), 36 end)
-	if not say("TRAINER", "Das war dein erster Tag.", 2.0) then return end
+	if not say("COACH", "That was your first day. You didn't quit.", 2.4) then return end
 	if not wait_(1.0) then return end
-	if not say("TRAINER", "Morgen wieder?", 1.4) then return end
+	if not say("COACH", "Same time tomorrow?", 1.4) then return end
 	setShot(function(t) return CFrame.lookAt(head(T) + Vector3.new(3.2, 0.1, 3.6), head(P) + Vector3.new(0, -0.3, 0)), 36 end)
 	P.play("Story_P_Nod", 0.15)
 	if not wait_(1.4) then return end
 	setShot(function(t) local m = (head(P) + head(T)) / 2; return CFrame.lookAt(m + Vector3.new(0.8, 0.4, 12), m + Vector3.new(0, -0.7, 0)), 42 end)
-	if not say("TRAINER", "Dann zeig ich dir jetzt, wie die Karriere läuft.", 2.4) then return end
+	if not say("COACH", "Then let me show you how your career works.", 2.4) then return end
 	fade(0, 0.5)
 end
 
@@ -434,13 +539,13 @@ local function flyShot(fromCF, toCF, dur)
 	setShot(function(t) local u = math.min(t / dur, 1); u = u * u * (3 - 2 * u); return fromCF:Lerp(toCF, u), 50 end)
 end
 local GYM_TOUR = {
-	{ cam = Vector3.new(103, 11, 6), at = Vector3.new(103, 5, -16), text = "Hier an den Sandsäcken trainierst du Schlagkraft. Einfach hingehen und E drücken." },
-	{ cam = Vector3.new(210, 10, 22), at = Vector3.new(225, 3, 8), text = "Hantelbank und Kurzhanteln machen deine Schläge noch härter." },
-	{ cam = Vector3.new(205, 10, 26), at = Vector3.new(210, 2, 43), text = "Laufbänder und Matten bringen Kondition – damit geht dir im Kampf nicht so schnell die Luft aus." },
-	{ cam = Vector3.new(118, 10, -48), at = Vector3.new(100, 2, -66), text = "Ringen und Bodenkampf lernst du im Kampf: Takedowns, Positionen, Submissions." },
-	{ cam = Vector3.new(112, 9, 26), at = Vector3.new(100, 5, 16), text = "Das sind die Stil-Trainer. Jeder bringt dir eine eigene Signatur bei." },
-	{ cam = Vector3.new(196, 9, -34), at = Vector3.new(208, 3, -46), text = "Am Trainer-Tisch startest du Trainingskämpfe. Die Karriere findest du im Menü (M)." },
-	{ cam = Vector3.new(160, 14, 26), at = Vector3.new(160, 4, -10), text = "Und hier im Oktagon wird gekämpft – Training, Karriere und Online." },
+	{ cam = Vector3.new(103, 11, 6), at = Vector3.new(103, 5, -16), text = "Heavy bags build punching power. Walk up and press E." },
+	{ cam = Vector3.new(210, 10, 22), at = Vector3.new(225, 3, 8), text = "The bench and dumbbells make your strikes hit even harder." },
+	{ cam = Vector3.new(205, 10, 26), at = Vector3.new(210, 2, 43), text = "Treadmills and mats build cardio — so you don't gas out in a fight." },
+	{ cam = Vector3.new(118, 10, -48), at = Vector3.new(100, 2, -66), text = "Wrestling and grappling you learn in the fight: takedowns, positions, submissions." },
+	{ cam = Vector3.new(112, 9, 26), at = Vector3.new(100, 5, 16), text = "These are the style coaches. Each one teaches you a signature move." },
+	{ cam = Vector3.new(196, 9, -34), at = Vector3.new(208, 3, -46), text = "Start training fights at the coach's desk. Your career is in the menu (M)." },
+	{ cam = Vector3.new(160, 14, 26), at = Vector3.new(160, 4, -10), text = "And this octagon is where you fight — training, career and online." },
 }
 local function runTour(stops)
 	local cam = workspace.CurrentCamera
@@ -451,7 +556,7 @@ local function runTour(stops)
 		flyShot(last, goal, 1.3)
 		if not wait_(1.3) then return end
 		setShot(function(t) return goal * CFrame.new(0, 0, -t * 0.25), 50 end)
-		if not say("TRAINER", s.text, 1.2 + #s.text * 0.05) then return end
+		if not say("COACH", s.text, 1.2 + #s.text * 0.05) then return end
 		last = goal
 	end
 end
@@ -475,11 +580,11 @@ local function runSigTour()
 	if not wait_(1.0) then return end
 	setShot(function(tt) return goal * CFrame.new(0, 0, -tt * 0.2), 46 end)
 	for _, line in ipairs({
-		"Jeder Stil-Trainer hat eine Signatur – einen besonderen Angriff.",
-		"Erst erledigst du seine Quests. Dann forderst du ihn zum Endkampf heraus.",
-		"Gewinnst du, gehört die Signatur dir. Du rüstest sie hier aus.",
-		"Im Kampf füllst du die Fokus-Leiste mit Treffern und Abwehr. Ist sie voll: G drücken." }) do
-		if not say("TRAINER", line, 1.2 + #line * 0.05) then return end
+		"Every style coach has a signature — a special attack.",
+		"First finish his quests. Then challenge him to a final fight.",
+		"Win, and the signature is yours. Equip it right here.",
+		"In a fight, landing hits and defending fills your focus bar. When it's full: press G." }) do
+		if not say("COACH", line, 1.2 + #line * 0.05) then return end
 	end
 end
 local function onbFlags() local ok, t = pcall(function() return HS:JSONDecode(player:GetAttribute("CC_Onb") or "{}") end); return ok and type(t) == "table" and t or {} end
@@ -504,6 +609,11 @@ local function begin()
 		if not running or not shot then return end
 		cam.CameraType = Enum.CameraType.Scriptable
 		local cf, fov = shot(os.clock() - shotT0)
+		if shake > 0.01 then
+			local k = shake * 0.35
+			cf = cf * CFrame.new((math.random() - 0.5) * k, (math.random() - 0.5) * k, 0) * CFrame.Angles(0, 0, (math.random() - 0.5) * k * 0.08)
+			shake = shake * 0.9
+		end
 		cam.CFrame = cf; cam.FieldOfView = fov or 50
 		for g in pairs(saved.guis) do if g.Enabled then g.Enabled = false end end
 		if cardFollow and cardFollow.card.Parent then
@@ -518,7 +628,7 @@ local function finish(skipped)
 	for _, c in ipairs(conns) do c:Disconnect() end; conns = {}
 	for _, a in ipairs(actors) do if a.model then a.model:Destroy() end end; actors = {}
 	for _, p in ipairs(props) do p:Destroy() end; props = {}
-	cardFollow = nil; shot = nil
+	cardFollow = nil; shot = nil; shake = 0; cardView = nil
 	local front = workspace:FindFirstChild("CC_StorySchool") and workspace.CC_StorySchool:FindFirstChild("GymFront")
 	schoolLight(false)
 	if gui then gui:Destroy(); gui = nil end
@@ -545,15 +655,20 @@ local function play(mode)
 	if not ok then warn("[Story] Fehler: " .. tostring(err)) end
 	local skipped = skipFlag
 	finish(skipped)
+	if mode == "onboarding" then transition("DAY 1", "FIRST LESSON", 2.2, true)
+	elseif mode == "outro" then transition("YOUR CAREER", "From nobody to champion", 1.6, true) end
 	if mode == "onboarding" then remote:FireServer("done", skipped and "skip" or "ok") end
 	if mode == "outro" then remote:FireServer("outroDone") end
 end
 
 remote.OnClientEvent:Connect(function(what) if what == "play" then task.spawn(play, "replay") end end)
+local lastPhase = player:GetAttribute("CC_OnbPhase")
 local function check()
 	local ph = player:GetAttribute("CC_OnbPhase")
 	if ph == "story" and not running then task.spawn(play, "onboarding") end
 	if ph == "outro" and not running then task.spawn(play, "outro") end
+	if ph == "spar" and lastPhase ~= "spar" then transition("FIRST SPARRING", "Show what you learned", 1.6, false) end
+	lastPhase = ph
 end
 player:GetAttributeChangedSignal("CC_OnbPhase"):Connect(check)
 task.defer(check)
@@ -607,8 +722,8 @@ task.spawn(function()
 	local area = mg and mg:WaitForChild("Canvas", 10) and mg.Canvas:WaitForChild("Menu", 10) and mg.Canvas.Menu:WaitForChild("Area", 10)
 	if not area then return end
 	local HINTS = {
-		online = { "onlineHint", "Online: SUCHE STARTEN – du kämpfst gegen den nächsten freien Spieler. Gleiche Grundwerte für alle." },
-		fighter = { "editorHint", "Mein Kämpfer: Frisur, Bart, Gesicht und Hautfarbe kannst du jederzeit ändern. Mehr wird später freigeschaltet." },
+		online = { "onlineHint", "Online: start a search and you fight the next free player. Same base stats for everyone." },
+		fighter = { "editorHint", "My Fighter: change hair, beard, face and skin anytime. More unlocks as you progress." },
 	}
 	for page, h in pairs(HINTS) do
 		local fr = area:FindFirstChild(page) or area.Parent:FindFirstChild(page) or area:WaitForChild(page, 10)
@@ -621,7 +736,7 @@ end)
 local function hookFocus(c)
 	c:GetAttributeChangedSignal("CC_Focus"):Connect(function()
 		if (c:GetAttribute("CC_Focus") or 0) >= 100 and not explained.focusTip and onbFlags().focusTip == false then
-			localTip("Fokus voll! Drück G für deine Signatur.", "good"); markExplained("focusTip")
+			localTip("Focus full! Press G for your signature.", "good"); markExplained("focusTip")
 		end
 	end)
 end

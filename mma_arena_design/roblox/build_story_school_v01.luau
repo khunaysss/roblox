@@ -114,7 +114,7 @@ function S.fence()
 	sign.CFrame = ORIGIN * CF(15.6, 7.4, -32.0) * CFrame.Angles(0, math.rad(90), 0)
 	local sg = Instance.new("SurfaceGui"); sg.Face = Enum.NormalId.Right; sg.CanvasSize = Vector2.new(600, 260); sg.LightInfluence = 1; sg.Parent = sign
 	local t = Instance.new("TextLabel"); t.Size = UDim2.fromScale(1, 1); t.BackgroundTransparency = 1; t.TextColor3 = C(232, 230, 222)
-	t.Font = Enum.Font.GothamBold; t.TextScaled = true; t.Text = "GESAMTSCHULE\nNORDPARK"; t.Parent = sg
+	t.Font = Enum.Font.GothamBold; t.TextScaled = true; t.Text = "NORTHPARK\nHIGH SCHOOL"; t.Parent = sg
 	local pad = Instance.new("UIPadding"); pad.PaddingLeft = UDim.new(0.08, 0); pad.PaddingRight = UDim.new(0.08, 0); pad.PaddingTop = UDim.new(0.14, 0); pad.PaddingBottom = UDim.new(0.14, 0); pad.Parent = t
 	return cur
 end
@@ -238,7 +238,7 @@ function S.school()
 	local plate = P("NamePlate", V(34, 3.2, 0.4), CF(0, 21.6, Z0 - 10.4), C(42, 46, 52), M.Metal)
 	local sg = Instance.new("SurfaceGui"); sg.Face = Enum.NormalId.Front; sg.CanvasSize = Vector2.new(1200, 112); sg.LightInfluence = 1; sg.Parent = plate
 	local t = Instance.new("TextLabel"); t.Size = UDim2.fromScale(1, 1); t.BackgroundTransparency = 1; t.TextColor3 = C(236, 232, 222)
-	t.Font = Enum.Font.GothamBold; t.TextScaled = true; t.Text = "GESAMTSCHULE NORDPARK"; t.Parent = sg
+	t.Font = Enum.Font.GothamBold; t.TextScaled = true; t.Text = "NORTHPARK HIGH SCHOOL"; t.Parent = sg
 	-- Seitenfassaden der Fluegel (sichtbar in Schraegansichten)
 	for _, sx in ipairs({ -1, 1 }) do
 		for f = 0, 2 do for z = Z0 + 8, Z0 + DEPTH - 8, 12 do
