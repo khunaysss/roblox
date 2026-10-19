@@ -78,7 +78,7 @@ local PREFER = {
 }
 local function arenaById(id) for _, a in ipairs(ARENAS) do if a.id == id then return a end end end
 -- Online-Arena-Wahl: "fightnight" = nur Fight Night, "cage" = Kaefige (ohne Fight Night), "any" = egal
-local PICK = { fightnight = { "fightnight" }, cage = { "pvp2", "pvp3", "pvp4", "pvp5", "pvp6", "pvp7", "pvp8", "pvp9", "arena" } }
+local PICK = { fightnight = { "fightnight" }, cage = { "pvp2", "pvp3", "pvp4", "pvp5", "pvp6", "pvp7", "pvp8", "pvp9", "arena" } }   -- 8 Kaefige (CC_PvpArena_2..9) + Fight Night + Arena = 10 Plaetze fuer gleichzeitige Kaempfe
 local function freeArena(kind, pick)
 	local force = workspace:GetAttribute("CC_TestArena")                -- Test (Studio): bestimmten Kaefig erzwingen, z. B. "pvp2"
 	if force then local a = arenaById(force); if a and not a.busy then return a end end
