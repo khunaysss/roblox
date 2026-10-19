@@ -651,6 +651,34 @@ local function schedule()
 	updateQueueAttrs()
 end
 
+-- Kaefig-Grenze: waehrend eines Kampfs bleiben beide Kaempfer im Kaefig (Wrestling-Animationen koennen den Root
+-- seitlich verschieben). Wer den Rand ueberschreitet, wird auf die Innenseite zurueckgesetzt, Blickrichtung bleibt.
+local CAGE_MARGIN = 1.5
+task.spawn(function()
+	while true do
+		task.wait(0.1)
+		for _, m in pairs(matches) do
+			if m.arena and m.state:GetAttribute("State") == "fight" then
+				local c, fy, r = cageOf(m.arena)
+				local limit = r - CAGE_MARGIN
+				for _, ch in ipairs({ chars(m) }) do
+					local root = ch and ch:FindFirstChild("HumanoidRootPart")
+					if root and root.Parent then
+						local flat = Vector3.new(root.Position.X - c.X, 0, root.Position.Z - c.Z)
+						if flat.Magnitude > limit then
+							local dir = flat.Unit
+							local np = Vector3.new(c.X, fy + 3, c.Z) + dir * limit
+							root.AssemblyLinearVelocity = Vector3.zero
+							root.CFrame = CFrame.new(np) * (root.CFrame - root.CFrame.Position)
+							warn(("[CC] Kaefig-Grenze (%s): %s zurueck in den Kaefig"):format(m.id, ch.Name))
+						end
+					end
+				end
+			end
+		end
+	end
+end)
+
 -- Fallschutz: im Kampf zurueck in die eigene Ecke, sonst ins Gym
 local FALL_Y = -25
 local lastFallCheck = 0
