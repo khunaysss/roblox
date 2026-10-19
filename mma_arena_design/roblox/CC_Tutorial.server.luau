@@ -26,7 +26,7 @@ local fightEvent = SS:WaitForChild("CC_FightEvent")
 local reset = SS:WaitForChild("CC_ResetFighter")
 local menuServer = SS:WaitForChild("CC_MenuServer")
 local dummy = workspace:WaitForChild("CC_TrainingDummy")
-local matchState = RS:WaitForChild("CC_MatchState")
+local REG = require(RS:WaitForChild("CC_MatchRegistry"))   -- Zustand je Kampf
 
 local function profile(p, kind, a, b)
 	local ev = SS:FindFirstChild("CC_ProfileEvent")
@@ -366,10 +366,10 @@ local function watchSparring(p)
 	sparWatch[p] = true
 	task.spawn(function()
 		local t0 = os.clock()
-		while p.Parent and matchState:GetAttribute("Mode") ~= "sparring" and os.clock() - t0 < 30 do task.wait(0.2) end
+		while p.Parent and REG.stateOf(p):GetAttribute("Mode") ~= "sparring" and os.clock() - t0 < 30 do task.wait(0.2) end
 		local char = p.Character
-		if not char or matchState:GetAttribute("Mode") ~= "sparring" then sparWatch[p] = nil; return end
-		while p.Parent and matchState:GetAttribute("State") ~= "fight" and matchState:GetAttribute("Mode") == "sparring" do task.wait(0.1) end
+		if not char or REG.stateOf(p):GetAttribute("Mode") ~= "sparring" then sparWatch[p] = nil; return end
+		while p.Parent and REG.stateOf(p):GetAttribute("State") ~= "fight" and REG.stateOf(p):GetAttribute("Mode") == "sparring" do task.wait(0.1) end
 		tip(p, "Ruhig bleiben. Jab, dann Cross. Wenn er kommt: F.")
 		local takenInRow, landed, lastTip = 0, 0, os.clock()
 		local function say(text, kind) if os.clock() - lastTip > 4 then lastTip = os.clock(); tip(p, text, kind) end end
@@ -386,7 +386,7 @@ local function watchSparring(p)
 		end)
 		local c2 = char:GetAttributeChangedSignal("CC_Tired"):Connect(function() say("Ausdauer leer. Kurz Abstand nehmen und durchatmen.") end)
 		local c3 = char:GetAttributeChangedSignal("CC_OutOfRange"):Connect(function() say("Zu weit weg – erst näher heran.") end)
-		while p.Parent and matchState:GetAttribute("Mode") == "sparring" and matchState:GetAttribute("State") ~= "over" do task.wait(0.2) end
+		while p.Parent and REG.stateOf(p):GetAttribute("Mode") == "sparring" and REG.stateOf(p):GetAttribute("State") ~= "over" do task.wait(0.2) end
 		c1:Disconnect(); c2:Disconnect(); c3:Disconnect()
 		sparWatch[p] = nil
 	end)

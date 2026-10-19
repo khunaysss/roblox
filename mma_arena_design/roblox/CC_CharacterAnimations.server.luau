@@ -107,10 +107,11 @@ local function staminaMax(f) return STAMINA_MAX + 2 * stat(f, "Cardio") end
 -- ---- Signaturtechniken (Konfiguration in ReplicatedStorage.CC_Signatures, alle Werte vorlaeufig) ----
 local SIG = require(RS:WaitForChild("CC_Signatures"))
 local sigFX = RS:FindFirstChild("CC_SigFX") or Instance.new("RemoteEvent"); sigFX.Name = "CC_SigFX"; sigFX.Parent = RS
+local REG = require(RS:WaitForChild("CC_MatchRegistry"))   -- Zustand je Kampf (mehrere Kaempfe gleichzeitig)
 local function focusGain(f, kind)
 	-- nur im echten Kampf mit Gegner (nicht im Tutorial); Fokus als Attribut CC_Focus am Charakter fuer das HUD
 	if not f or f.ko or not f.char:GetAttribute("CC_Opponent") then return end
-	local ms = RS:FindFirstChild("CC_MatchState")
+	local ms = REG.stateOf(f.char)
 	if not ms or ms:GetAttribute("Mode") == "tutorial" or ms:GetAttribute("State") ~= "fight" then return end
 	local n = SIG.FOCUS[kind] or 0
 	if n <= 0 then return end
@@ -325,7 +326,7 @@ local function knockout(f, kind)
 	f.char:SetAttribute("CC_KO", true)
 	task.delay(KO_TIME, function()
 		if not f.char.Parent then return end
-		local ms = RS:FindFirstChild("CC_MatchState")
+		local ms = REG.stateOf(f.char)
 		if ms and (ms:GetAttribute("State") == "over" or ms:GetAttribute("State") == "finisher") then return end -- liegen bleiben; das Runden-System setzt beim Neustart zurueck
 		ko:Stop(0.4)
 		f.hum.Health = f.hum.MaxHealth
@@ -364,7 +365,7 @@ local function knockdown(f, kind)
 	task.spawn(function()
 		for count = 1, 8 do
 			if not f.char.Parent or f.knockToken ~= token or not f.knocked then return end
-			local ms = RS:FindFirstChild("CC_MatchState")
+			local ms = REG.stateOf(f.char)
 			if ms and ms:GetAttribute("State") ~= "fight" then return end
 			f.char:SetAttribute("CC_Count", count)
 			task.wait(0.65)
@@ -459,11 +460,11 @@ local function hitFX(char, strength, kind, detail)
 	elseif kind == "legcheck" then sfx(char, "LegCheck", 0.82)
 	elseif kind == "knockdown" then
 		sfx(char, "HitHeavy", 0.84); task.delay(0.45, function() sfx(char, "CanvasImpact") end)
-		game.ReplicatedStorage.CC_MatchState:SetAttribute("CrowdBoost", os.clock())
+		REG.stateOf(char):SetAttribute("CrowdBoost", os.clock())
 	elseif kind == "ko" then
 		sfx(char, detail == "submission" and "Submission" or "HitHeavy", detail == "submission" and 0.82 or 0.85)
 		task.delay(0.7, function() sfx(char, "CanvasImpact") end)
-		game.ReplicatedStorage.CC_MatchState:SetAttribute("CrowdBoost", os.clock())
+		REG.stateOf(char):SetAttribute("CrowdBoost", os.clock())
 	end
 	local p = game.Players:GetPlayerFromCharacter(char)
 	if p then RS.CC_HitFX:FireClient(p, strength, kind) end
@@ -708,7 +709,7 @@ local function land(attacker, target, move, m, track, hitRegion)
 		-- Das Publikum reagiert auch auf klare schwere Treffer, mit Cooldown gegen Audio-Spam.
 		if m.heavy and (m.zone == "head" or dmg >= 10) and os.clock() >= (attacker.crowdAt or 0) then
 			attacker.crowdAt = os.clock() + 2.5
-			game.ReplicatedStorage.CC_MatchState:SetAttribute("CrowdBoost", os.clock())
+			REG.stateOf(attacker.char):SetAttribute("CrowdBoost", os.clock())
 		end
 	end
 	local injuryResult
@@ -2033,7 +2034,7 @@ local function equippedSig(f)
 	local trial = p:GetAttribute("CC_SigTrial")
 	local id = workspace:GetAttribute(SIG.TEST_ATTR) or trial or p:GetAttribute("CC_Signature")
 	if trial and id == trial then                                   -- Uebung beim Trainer: nur im Trainingskampf
-		local ms = RS:FindFirstChild("CC_MatchState")
+		local ms = REG.stateOf(f.char)
 		if not ms or ms:GetAttribute("Mode") ~= "training" then return nil end
 	end
 	return id and SIG.list[id] and id or nil
@@ -2062,7 +2063,7 @@ local function signature(f)
 	local def = SIG.list[id]
 	local function fail(why) f.char:SetAttribute("CC_SigDenied", why .. "|" .. workspace:GetServerTimeNow()) end
 	if f.ko or f.blocking or f.wr or f.down or frozen(f) or f.sigActive then return end
-	local ms = RS:FindFirstChild("CC_MatchState")
+	local ms = REG.stateOf(f.char)
 	if not f.char:GetAttribute("CC_Opponent") or not ms or ms:GetAttribute("Mode") == "tutorial" or ms:GetAttribute("State") ~= "fight" then return end
 	if os.clock() < f.busyUntil then return end
 	if (f.focus or 0) < SIG.FOCUS_MAX then fail("focus") return end
@@ -2261,6 +2262,7 @@ D.hum.HealthChanged:Connect(function(hp)
 	end
 end)
 RunService.Heartbeat:Connect(function(dt)
+	do local cc = REG.stateOf(dummy):GetAttribute("CageCenter"); if cc then CENTER = Vector3.new(cc.X, 0, cc.Z) end end   -- Kaefig des aktuellen Kampfs
 	local root = dummy.HumanoidRootPart
 	if root.Anchored ~= lastAnchored then        -- nach dem Ringkampf wieder vom Server steuern
 		lastAnchored = root.Anchored

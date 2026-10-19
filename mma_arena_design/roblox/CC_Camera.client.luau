@@ -20,6 +20,7 @@ local filt = {}            -- geglaettete Koerperpunkte je Modell (Ausreisser be
 local BODY_MAX_SPEED = 14  -- Studs/s: schneller bewegt sich kein Koerper sichtbar; groessere Spruenge = Wechsel-Frame
 local groundSide = nil   -- Bodenansicht: Seite (+1/-1), beim Eintritt festgelegt
 local wrW = 0             -- 0 = Stand-Ansicht, 1 = Bodenkampf-Ansicht (weich ueberblendet)
+local DEFAULT_FOV = cam.FieldOfView
 
 local function bodyPoint(model)
 	-- im Ringkampf stehen die HumanoidRootParts still; die sichtbare Position steckt im Root-Bone
@@ -43,6 +44,13 @@ local function ignoreList()
 		end
 	end
 	-- Fight-Night-Arena: Gitter, Traversen und unsichtbare Kollisionsboxen versperren die Kamera nicht
+	for _, m in ipairs(workspace:GetChildren()) do            -- weitere Online-Kaefige (CC_PvpArena_*)
+		if m.Name:sub(1, 12) == "CC_PvpArena_" then
+			for _, p in ipairs(m:GetDescendants()) do
+				if p:IsA("BasePart") and (p.Transparency > 0.2 or p.Name:find("Fence") or p.Name:find("LightRig") or p.Name:find("Truss")) then table.insert(list, p) end
+			end
+		end
+	end
 	local fn = workspace:FindFirstChild("CC_FightNight")
 	if fn then
 		for _, p in ipairs(fn:GetDescendants()) do
@@ -77,11 +85,15 @@ local FLOOR_CLEAR = 1.6    -- Kamera bleibt so weit ueber dem Kaefigboden
 
 RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, function(dt)  -- vor dem Treffer-Ruck (CC_HitFX, +1)
 	local char = player.Character
+	if char and char:GetAttribute("CC_BagPractice") then return end -- Dedicated bag camera owns this session.
 	local target = char and fightTarget(char)
 	if not (char and target and char:FindFirstChild("HumanoidRootPart") and target:FindFirstChild("HumanoidRootPart")) then
 		if cam.CameraType == Enum.CameraType.Scriptable and not player:GetAttribute("CC_Minigame") and not player:GetAttribute("CC_UIBlock") then cam.CameraType = Enum.CameraType.Custom end   -- Training-Kamera (CC_Minigame) nicht stoeren
 		camPos, aimPos = nil, nil
 		filt = {}
+		groundSide = nil
+		wrW = 0
+		cam.FieldOfView = DEFAULT_FOV
 		return
 	end
 	cam.CameraType = Enum.CameraType.Scriptable
@@ -102,8 +114,24 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	-- naechster Kaefig: Fight-Night-Arena (Online-Kaempfe), sonst die kleine Arena
 	local fnArena = workspace:FindFirstChild("CC_FightNight")
 	local fc = fnArena and fnArena:GetAttribute("CC_CageCenter")
-	if fc and (Vector3.new(me.X, 0, me.Z) - Vector3.new(fc.X, 0, fc.Z)).Magnitude < (Vector3.new(me.X, 0, me.Z) - center).Magnitude then center = Vector3.new(fc.X, 0, fc.Z) end
-	local function inside(p) return Vector3.new(p.X - center.X, 0, p.Z - center.Z).Magnitude <= CAGE_R end
+	local safeRadius = canvas and math.min(CAGE_R, math.min(canvas.Size.X, canvas.Size.Z) * 0.5 - 1.3) or CAGE_R
+	if fc and (Vector3.new(me.X, 0, me.Z) - Vector3.new(fc.X, 0, fc.Z)).Magnitude < (Vector3.new(me.X, 0, me.Z) - center).Magnitude then
+		center = Vector3.new(fc.X, 0, fc.Z)
+		safeRadius = math.max(8, (fnArena:GetAttribute("CC_CageRadius") or CAGE_R) - 1.0)
+	end
+	-- Mehrere Kaempfe: Kaefig des eigenen Kampfs (CC_MatchState = lokaler Spiegel, CageCenter/CageRadius)
+	do
+		local ms = game.ReplicatedStorage:FindFirstChild("CC_MatchState")
+		local cc = ms and ms:GetAttribute("CageCenter")
+		if cc then center = Vector3.new(cc.X, 0, cc.Z); safeRadius = math.max(8, math.min(CAGE_R, (ms:GetAttribute("CageRadius") or CAGE_R) - 1.3)) end
+	end
+	local function inside(p) return Vector3.new(p.X - center.X, 0, p.Z - center.Z).Magnitude <= safeRadius end
+	local function clampToCage(p)
+		local flat = Vector3.new(p.X - center.X, 0, p.Z - center.Z)
+		if flat.Magnitude <= safeRadius then return p end
+		local clamped = flat.Unit * safeRadius
+		return Vector3.new(center.X + clamped.X, p.Y, center.Z + clamped.Z)
+	end
 	local away = Vector3.new(me.X - foe.X, 0, me.Z - foe.Z)
 	away = away.Magnitude > 0.1 and away.Unit or -char.HumanoidRootPart.CFrame.LookVector
 	local vp = cam.ViewportSize
@@ -156,10 +184,10 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 		end
 		-- Abstand aus der Ausdehnung der Szene (Kaempfer-Abstand + Koerperlaenge am Boden), stetig
 		local span = gap + 3.5
-		local dG = math.clamp(span / (2 * th) + 3.0, 8, 13)
+		local dG = math.clamp(span / (2 * th) + 3.0, 7.5, 11.5)
 		local function g(side)
 			local dir = (perp * side * 0.92 + away * 0.38).Unit
-			return aimG + dir * dG + Vector3.new(0, 3.6 + dG * 0.12, 0)
+			return aimG + dir * dG + Vector3.new(0, 3.2 + dG * 0.10, 0)
 		end
 		wantG = g(groundSide)
 		if not inside(wantG) and inside(g(-groundSide)) then groundSide = -groundSide; wantG = g(groundSide) end
@@ -171,13 +199,22 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	if not wantS then want = wantG
 	elseif not wantG then want = wantS
 	else want = wantS:Lerp(wantG, w) end
+	-- Jede Variante (auch Notfall- und Bodenansicht) bleibt sicher innerhalb des Kaefigs.
+	want = clampToCage(want)
 	-- Wand-/Deckenschutz: vom Blickpunkt zur Wunschposition casten
 	local dir = want - aim
 	local hit = workspace:Raycast(aim, dir, params)
-	if hit then want = hit.Position - dir.Unit * 0.8 end
-	-- nie unter/durch den Boden
+	if hit and dir.Magnitude > 0.01 then want = hit.Position - dir.Unit * 0.8 end
+	want = clampToCage(want)
+	-- nie unter/durch den Boden und nie so nah, dass die Kaempfer das Bild fuellen
 	local floorY = (canvas and canvas.Position.Y or 0) + FLOOR_CLEAR
 	if want.Y < floorY then want = Vector3.new(want.X, floorY, want.Z) end
+	local view = want - aim
+	if view.Magnitude < 4.2 then
+		local fallback = view.Magnitude > 0.05 and view.Unit or away
+		want = clampToCage(aim + fallback * 4.2)
+		if want.Y < floorY then want = Vector3.new(want.X, floorY, want.Z) end
+	end
 
 	if not camPos then camPos, aimPos = want, aim end
 	local nextPos = camPos:Lerp(want, 1 - math.exp(-FOLLOW * dt))
@@ -186,6 +223,7 @@ RunService:BindToRenderStep("CC_FightCamera", Enum.RenderPriority.Camera.Value, 
 	if step.Magnitude > maxSpeed * dt then nextPos = camPos + step.Unit * maxSpeed * dt end
 	camPos = nextPos
 	aimPos = aimPos:Lerp(aim, 1 - math.exp(-AIM * dt))
+	cam.FieldOfView = cam.FieldOfView + ((67 - 7 * w) - cam.FieldOfView) * (1 - math.exp(-7 * dt))
 	cam.CFrame = CFrame.lookAt(camPos, aimPos)
 end)
 

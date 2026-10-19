@@ -1,17 +1,19 @@
 -- ServerScriptService.CC_Match
--- Kampf-Ablauf mit Menue: eine Arena, ein Kampf gleichzeitig.
+-- Kampf-Ablauf mit Menue. MEHRERE KAEMPFE GLEICHZEITIG (2026-10-19):
+--   Jeder Kampf hat einen eigenen Zustand (ReplicatedStorage.CC_Matches.<id>, siehe CC_MatchRegistry) und einen eigenen Kaefig.
+--   Kaefige: Fight Night (Walkout; Online/Karriere/Trainer bevorzugt), kleine Arena (CC_Arena; Training/Tutorial/Sparring),
+--   Online-Kaefige CC_PvpArena_2..4. KI-Kaempfe (Training, Sparring, Tutorial, Karriere, Trainer) laufen einzeln, weil es nur
+--   einen KI-Gegner gibt (CC_TrainingDummy); Online-Kaempfe laufen parallel dazu, so viele wie Kaefige frei sind.
 --   Training: Spieler (Rot) gegen den Trainingsgegner (Blau).  Gegen Spieler: die ersten zwei aus der Warteschlange (Rot/Blau).
---   Wer nicht kaempft, steht in der Lobby vor dem Kaefig (Menue sichtbar). Gegen-Spieler-Kaempfe haben Vorrang.
--- Runden: 3 x 2:00, 10 s Pause, Sieg durch K.o., Submission oder nach Punkten (verursachter Schaden); Aufgabe, wenn ein Spieler geht.
+-- Runden: 3 x 2:00, 10 s Pause, Sieg durch K.o., Submission oder nach Punkten; Aufgabe, wenn ein Spieler geht.
 -- Menue -> Server: ReplicatedStorage.CC_Menu (RemoteEvent) mit "training" | "pvp" | "career" | "cancel".
--- Zustand fuer HUD/Menue als Attribute an ReplicatedStorage.CC_MatchState:
---   State ("idle" | "intro" | "fight" | "break" | "over"), Mode ("" | "training" | "pvp"), Round, TimeLeft (s),
---   Banner, BannerSub, ScoreRed, ScoreBlue, Winner ("red" | "blue" | "draw" | ""), RedName, BlueName, WinnerName, QueuePvp (Anzahl)
--- Am Spieler: Attribut CC_Queue ("training" | "pvp" | nil). Am Charakter: CC_Opponent (Modellname des Gegners) waehrend des Kampfs.
--- Test: workspace-Attribut CC_RoundTime (Sekunden) ueberschreibt die Rundenzeit.
--- Einstieg (CC_Tutorial, nur serverseitig ueber CC_MenuServer): "tutorial" = Grundlagen im Kaefig gegen den passiven Gegner, ohne Uhr
---   (Ablauf steuert ServerStorage.CC_TutorialRun, Rueckgabe "sparring" -> direkt im Kaefig weiter); "sparring" = erster Kampf,
---   1 Runde gegen den Anfaenger-Gegner, Belohnung wie Training. Nach jedem Kampf: Attribut CC_LastFight am Spieler (JSON: mode, result, method, xp).
+-- Zustand je Kampf (Attribute am Ordner): State ("idle" | "walkout" | "intro" | "fight" | "break" | "finisher" | "over"),
+--   Mode, Round, TimeLeft, Banner, BannerSub, ScoreRed, ScoreBlue, Winner, RedName, BlueName, WinnerName, QueuePvp,
+--   CageCenter (Vector3, Boden-Oberkante in Y), CageRadius, MatchId.
+-- Am Spieler: CC_Queue ("training" | "pvp" | ... | nil), CC_MatchId (waehrend des Kampfs). Am Charakter: CC_Opponent, CC_MatchId.
+-- Test: workspace-Attribut CC_RoundTime (Sekunden) ueberschreibt die Rundenzeit; CC_TestPvpDummy = Online gegen KI (1 Spieler).
+-- Einstieg (CC_Tutorial, serverseitig ueber CC_MenuServer): "tutorial" / "sparring" wie zuvor.
+-- Nach jedem Kampf: Attribut CC_LastFight am Spieler (JSON: mode, result, method, xp).
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local RS = game.ReplicatedStorage
@@ -21,97 +23,130 @@ local reset = SS:WaitForChild("CC_ResetFighter")
 local OPP = require(RS:WaitForChild("CC_Opponents"))
 local SIGPROG = require(RS:WaitForChild("CC_SignatureProgression"))
 local Look = require(RS:WaitForChild("CC_LookShared"))
+local REG = require(RS:WaitForChild("CC_MatchRegistry"))
 local DUMMY_LOBBY_LOOK = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1 }
 
 local ROUNDS, BREAK_TIME, INTRO_TIME, OVER_TIME = 3, 10, 4, 7
-local BREAK_HEAL = 20                       -- Erholung in der Pause (max. volle Leben)
+local BREAK_HEAL = 20
 
-local state = RS:FindFirstChild("CC_MatchState") or Instance.new("Folder")
-state.Name = "CC_MatchState"; state.Parent = RS
-local function set(k, v) state:SetAttribute(k, v) end
+-- alter globaler Zustand (ein Kampf) entfaellt: Clients spiegeln ihren Kampf lokal nach CC_MatchState
+do local old = RS:FindFirstChild("CC_MatchState"); if old then old:Destroy() end end
+local matchRoot = REG.root()
+local idle = REG.idle()
 local menu = RS:FindFirstChild("CC_Menu") or Instance.new("RemoteEvent")
 menu.Name = "CC_Menu"; menu.Parent = RS
 local resultContinue = RS:FindFirstChild("CC_ResultContinue") or Instance.new("RemoteEvent")
 resultContinue.Name = "CC_ResultContinue"; resultContinue.Parent = RS
 
--- Sounds: Gong bei Rundenstart/-ende, Publikum als Dauerschleife (lauter bei K.o./Sieg)
+-- Sounds (global): Gong und Publikum
 local SFX = game:GetService("SoundService"):WaitForChild("CC_Sounds")
 local function bell(times) task.spawn(function() for i = 1, times do SFX.Bell:Play(); task.wait(0.45) end end) end
 SFX.Crowd.Looped = true; SFX.Crowd.Volume = 0.3; SFX.Crowd:Play()
 local function crowd(v) game:GetService("TweenService"):Create(SFX.Crowd, TweenInfo.new(0.6), { Volume = v }):Play() end
-state:GetAttributeChangedSignal("CrowdBoost"):Connect(function() crowd(0.8); task.delay(3, function() crowd(0.3) end) end)
 
 local dummy = workspace:WaitForChild("CC_TrainingDummy")
-local function canvasY()
-	local c = workspace.CC_Arena:FindFirstChild("Platform_Canvas_FightSurface", true)
-	return c.Position.Y + c.Size.Y / 2
+
+-- ---------------- Kaefige ----------------
+-- id, Modell, Walkout (nur Fight Night), erlaubte Arten
+local ARENAS = {}
+local function addArena(id, model, opts)
+	if not model then return end
+	local a = { id = id, model = model, fn = opts.fn or false, kinds = opts.kinds, busy = nil }
+	table.insert(ARENAS, a)
 end
--- Kampfort: Online-Kaempfe (pvp) in der Fight-Night-Arena (Workspace.CC_FightNight, setup_fight_night_v01; Entscheidung 2026-10-13),
--- Tutorial, Training und erstes Sparring in der kleinen Arena (CC_Arena, Kaefig bei 0,0).
--- workspace-Attribut CC_PvpArena = "arena" schaltet Online-Kaempfe zurueck in die kleine Arena.
-local function fightNight(m)
-	local fn = workspace:FindFirstChild("CC_FightNight")
-	return m and (m.mode == "pvp" or m.mode == "career" or m.mode == "trainer") and fn and workspace:GetAttribute("CC_PvpArena") ~= "arena" and fn:GetAttribute("CC_CageCenter") and fn or nil
-end
-local function arenaCenter(m)
-	local fn = fightNight(m)
-	if fn then
-		local c = fn:GetAttribute("CC_CageCenter")
-		if c then return Vector3.new(c.X, 0, c.Z), c.Y end
+do
+	local arena = workspace:FindFirstChild("CC_Arena")
+	if arena and not arena:GetAttribute("CC_CageCenter") then
+		local c = arena:FindFirstChild("Platform_Canvas_FightSurface", true)
+		if c then arena:SetAttribute("CC_CageCenter", Vector3.new(c.Position.X, c.Position.Y + c.Size.Y / 2, c.Position.Z)); arena:SetAttribute("CC_CageRadius", math.min(c.Size.X, c.Size.Z) * 0.5) end
 	end
-	return Vector3.zero, canvasY()
+	local fn = workspace:FindFirstChild("CC_FightNight")
+	if fn and fn:GetAttribute("CC_CageCenter") and workspace:GetAttribute("CC_PvpArena") ~= "arena" then
+		addArena("fightnight", fn, { fn = true, kinds = { pvp = true, career = true, trainer = true } })
+	end
+	addArena("arena", arena, { kinds = { training = true, tutorial = true, sparring = true, career = true, trainer = true, pvp = true } })
+	for i = 2, 9 do
+		local m = workspace:FindFirstChild("CC_PvpArena_" .. i)
+		if m and m:GetAttribute("CC_CageCenter") then addArena("pvp" .. i, m, { kinds = { pvp = true } }) end
+	end
+end
+-- Vorlieben je Art: erster freier Kaefig der Liste
+local PREFER = {
+	pvp = { "fightnight", "pvp2", "pvp3", "pvp4", "pvp5", "pvp6", "pvp7", "pvp8", "pvp9", "arena" },
+	career = { "fightnight", "arena" }, trainer = { "fightnight", "arena" },
+	training = { "arena" }, tutorial = { "arena" }, sparring = { "arena" },
+}
+local function arenaById(id) for _, a in ipairs(ARENAS) do if a.id == id then return a end end end
+local function freeArena(kind)
+	local force = workspace:GetAttribute("CC_TestArena")                -- Test (Studio): bestimmten Kaefig erzwingen, z. B. "pvp2"
+	if force then local a = arenaById(force); if a and not a.busy then return a end end
+	for _, id in ipairs(PREFER[kind] or {}) do
+		local a = arenaById(id)
+		if a and not a.busy and a.kinds[kind] then return a end
+	end
+	return nil
+end
+local function cageOf(a)
+	local c = a.model:GetAttribute("CC_CageCenter")
+	return Vector3.new(c.X, 0, c.Z), c.Y, a.model:GetAttribute("CC_CageRadius") or 16
 end
 local function corners(m)
-	local c, fy = arenaCenter(m)
-	local y = fy + 3                          -- HumanoidRootPart-Mitte 3 Studs ueber den Fuessen
+	local c, fy = cageOf(m.arena)
+	local y = fy + 3
 	return CFrame.lookAt(c + Vector3.new(0, y, 7), c + Vector3.new(0, y, -7)), CFrame.lookAt(c + Vector3.new(0, y, -7), c + Vector3.new(0, y, 7))
 end
--- Lobby: im Trainings-Gym (Workspace.CC_Gym, Boden y = 0, Mitte x = 160), sonst Hallenboden vor dem Kaefig; Spieler nebeneinander
-local LOBBY_Y = 3                              -- Hallenboden (0) + 3
+
+-- Lobby: im Trainings-Gym
+local LOBBY_Y = 3
 local function lobbyCF(i)
 	local k = ((i or 1) % 7 - 3) * 2.5
-	local gym = workspace:FindFirstChild("CC_Gym")
-	if gym then                                  -- Startort im Trainings-Gym: hinter dem Eingang, Blick in die Halle
-		local x = 160 + k                         -- Lobby V8: innen mit freiem Blick aufs Oktagon
-		return CFrame.lookAt(Vector3.new(x, LOBBY_Y, 38), Vector3.new(160, LOBBY_Y, 4))
+	if workspace:FindFirstChild("CC_Gym") then
+		return CFrame.lookAt(Vector3.new(160 + k, LOBBY_Y, 38), Vector3.new(160, LOBBY_Y, 4))
 	end
-	local x = k
-	return CFrame.lookAt(Vector3.new(x, LOBBY_Y, 25), Vector3.new(x, LOBBY_Y, 0))
+	return CFrame.lookAt(Vector3.new(k, LOBBY_Y, 25), Vector3.new(k, LOBBY_Y, 0))
 end
 
--- Shorts-Farbe nach Ecke: Rot (Standard des Charakters) / Blau (wie der Trainingsgegner)
+-- Shorts: Spieler tragen ihre freigeschalteten Shorts; KI-Gegner bekommen die Eckfarbe
 local SHORTS = { red = Color3.new(0.564706, 0.0823529, 0.117647), blue = Color3.new(0.117647, 0.235294, 0.627451) }
 local function paint(c, side)
 	local s = c and c:FindFirstChild("Fighter_Shorts", true)
 	if not (s and s:IsA("BasePart")) then return end
-	-- Spieler tragen ihre freigeschalteten Shorts (Belohnung); nur KI-Gegner bekommen die Eckfarbe
 	local plr = Players:GetPlayerFromCharacter(c)
 	if plr then
 		local ok, look = pcall(function() return HttpService:JSONDecode(plr:GetAttribute("CC_Look") or "{}") end)
-		local LookS = require(RS:WaitForChild("CC_LookShared"))
-		local it = ok and look.shorts and LookS.SHORTS[look.shorts]
+		local it = ok and look.shorts and Look.SHORTS[look.shorts]
 		if it then s.Color = it.color; return end
 	end
 	s.Color = SHORTS[side]
 end
 
--- ---------------- Warteschlange ----------------
-local queue = {}            -- { player, mode }
+-- ---------------- Kaempfe (aktiv) ----------------
+local matches = {}          -- [id] = m
+local kiBusy = false        -- der eine KI-Gegner ist belegt
+local nextId = 0
+local function activeOf(p)
+	for _, m in pairs(matches) do if m.red == p or m.blue == p then return m end end
+	return nil
+end
+local function isFighting(p) return activeOf(p) ~= nil end
+
+-- Warteschlange (global, fuer alle Menues sichtbar ueber QueuePvp)
+local queue = {}
 local function inQueue(p) for i, e in ipairs(queue) do if e[1] == p then return i end end end
 local function updateQueueAttrs()
 	local n = 0
 	for _, e in ipairs(queue) do if e[2] == "pvp" then n += 1 end end
-	set("QueuePvp", n)
+	idle:SetAttribute("QueuePvp", n)
+	for _, m in pairs(matches) do m.state:SetAttribute("QueuePvp", n) end
 end
-local current = nil         -- laufender Kampf: { red = Player, blue = Player | nil, mode = "training" | "pvp" }
-local function isFighting(p) return current ~= nil and (current.red == p or current.blue == p) end
 resultContinue.OnServerEvent:Connect(function(p)
-	if state:GetAttribute("State") == "over" and isFighting(p) then p:SetAttribute("CC_ResultReady", true) end
+	local m = activeOf(p)
+	if m and m.state:GetAttribute("State") == "over" then p:SetAttribute("CC_ResultReady", true) end
 end)
--- Menue-Wahl: vom Client (CC_Menu) oder serverseitig (ServerStorage.CC_MenuServer, z. B. Trainer im Gym)
-local menuServer = game.ServerStorage:FindFirstChild("CC_MenuServer") or Instance.new("BindableEvent")
-menuServer.Name = "CC_MenuServer"; menuServer.Parent = game.ServerStorage
-local LEVELS = { passiv = true, anfaenger = true, fortgeschritten = true }   -- Trainingsgegner-Stufen (CC_CharacterAnimations)
+
+local menuServer = SS:FindFirstChild("CC_MenuServer") or Instance.new("BindableEvent")
+menuServer.Name = "CC_MenuServer"; menuServer.Parent = SS
+local LEVELS = { passiv = true, anfaenger = true, fortgeschritten = true }
 local function careerReady(p, id)
 	return type(id) == "string" and OPP.byId[id] and OPP.isUnlocked(id, p:GetAttribute("CC_CareerBeaten"))
 end
@@ -122,7 +157,7 @@ local function trainerReady(p, id)
 end
 local function onMenu(p, what, level, fromServer)
 	if type(what) ~= "string" then return end
-	if what == "training" then                                     -- gewaehlte Stufe merken (Standard: Anfaenger); Trainer im Gym nutzt die letzte Wahl
+	if what == "training" then
 		if type(level) == "string" and LEVELS[level] then p:SetAttribute("CC_DummyLevel", level)
 		elseif not p:GetAttribute("CC_DummyLevel") then p:SetAttribute("CC_DummyLevel", "anfaenger") end
 	elseif what == "career" then
@@ -149,12 +184,14 @@ Players.PlayerRemoving:Connect(function(p)
 	local i = inQueue(p); if i then table.remove(queue, i) end
 	updateQueueAttrs()
 end)
--- Charaktere ausserhalb eines Kampfs stehen in der Lobby (der Spawn liegt im Kaefig)
+
 local lobbyCount = 0
 local function toLobby(p)
 	local c = p.Character
+	p:SetAttribute("CC_MatchId", nil)
 	if c and c:FindFirstChild("HumanoidRootPart") then
 		lobbyCount += 1
+		c:SetAttribute("CC_MatchId", nil)
 		reset:Invoke(c, lobbyCF(lobbyCount), nil)
 		c:SetAttribute("CC_Opponent", nil); c:SetAttribute("CC_Frozen", false)
 		paint(c, "red")
@@ -163,16 +200,17 @@ end
 local function hookPlayer(p)
 	p.CharacterAdded:Connect(function(c)
 		c:WaitForChild("HumanoidRootPart"); task.wait(0.5)
-		if not isFighting(p) then toLobby(p) end
+		local m = activeOf(p)
+		if m then c:SetAttribute("CC_MatchId", m.id) else toLobby(p) end
 	end)
 	if p.Character then task.spawn(function() task.wait(0.5); if not isFighting(p) then toLobby(p) end end) end
 end
 Players.PlayerAdded:Connect(hookPlayer)
 for _, p in ipairs(Players:GetPlayers()) do hookPlayer(p) end
 
-local DUMMY_PARK = CFrame.lookAt(Vector3.new(26, LOBBY_Y, -26), Vector3.new(0, LOBBY_Y, 0))   -- Hallenecke, ausserhalb des Kaefigs
-local function parkDummy()        -- Trainingsgegner wartet ausserhalb des Kaefigs und greift nicht an
-	dummy:SetAttribute("CC_InMatch", false); dummy:SetAttribute("CC_Opponent", nil)
+local DUMMY_PARK = CFrame.lookAt(Vector3.new(26, LOBBY_Y, -26), Vector3.new(0, LOBBY_Y, 0))
+local function parkDummy()
+	dummy:SetAttribute("CC_InMatch", false); dummy:SetAttribute("CC_Opponent", nil); dummy:SetAttribute("CC_MatchId", nil)
 	dummy:SetAttribute("CC_CareerId", nil); dummy:SetAttribute("CC_CareerName", nil); dummy:SetAttribute("CC_TrainerBoss", nil)
 	for _, s in ipairs({ "Power", "Cardio", "Wrestling", "Grappling" }) do dummy:SetAttribute("CC_" .. s, nil) end
 	Look.apply(dummy, DUMMY_LOBBY_LOOK, SS:FindFirstChild("CC_Custom"))
@@ -185,24 +223,24 @@ local function chars(m)
 	local b = m.blue and m.blue.Character or (not m.blue and dummy) or nil
 	return r, b
 end
-local frozen = false
 local function freeze(m, on)
-	frozen = on
+	m.frozen = on
 	for _, c in ipairs({ chars(m) }) do if c then c:SetAttribute("CC_Frozen", on) end end
 end
 RunService.Heartbeat:Connect(function()
-	if not current then return end
-	for _, c in ipairs({ chars(current) }) do
-		local h = c and c:FindFirstChildOfClass("Humanoid")
-		if h then
-			if frozen then h.WalkSpeed = 0 elseif h.WalkSpeed == 0 and not c:GetAttribute("CC_KO") and not c:GetAttribute("CC_Wrestle") then h.WalkSpeed = c:GetAttribute("CC_MobilitySpeed") or 8 end
+	for _, m in pairs(matches) do
+		for _, c in ipairs({ chars(m) }) do
+			local h = c and c:FindFirstChildOfClass("Humanoid")
+			if h then
+				if m.frozen then h.WalkSpeed = 0 elseif h.WalkSpeed == 0 and not c:GetAttribute("CC_KO") and not c:GetAttribute("CC_Wrestle") then h.WalkSpeed = c:GetAttribute("CC_MobilitySpeed") or 8 end
+			end
 		end
 	end
 end)
 local function damage(c) return c and (c:GetAttribute("CC_DamageDealt") or 0) or 0 end
 local function clearDamage(m) for _, c in ipairs({ chars(m) }) do if c then c:SetAttribute("CC_DamageDealt", 0) end end end
 local JUDGE_BIAS = { -1.35, 0, 1.35 }
-local function scoreRound(cards, totalsRed, totalsBlue, round, r, b, kdRedStart, kdBlueStart)
+local function scoreRound(m, cards, totalsRed, totalsBlue, round, r, b, kdRedStart, kdBlueStart)
 	local rd, bd = damage(r), damage(b)
 	local rkd = math.max(0, (r:GetAttribute("CC_Knockdowns") or 0) - kdRedStart)
 	local bkd = math.max(0, (b:GetAttribute("CC_Knockdowns") or 0) - kdBlueStart)
@@ -219,9 +257,9 @@ local function scoreRound(cards, totalsRed, totalsBlue, round, r, b, kdRedStart,
 		totalsRed[j] += sr; totalsBlue[j] += sb
 	end
 	table.insert(cards, card)
-	set("JudgeCards", HttpService:JSONEncode(cards))
-	set("JudgeRed", totalsRed[1] + totalsRed[2] + totalsRed[3])
-	set("JudgeBlue", totalsBlue[1] + totalsBlue[2] + totalsBlue[3])
+	m.set("JudgeCards", HttpService:JSONEncode(cards))
+	m.set("JudgeRed", totalsRed[1] + totalsRed[2] + totalsRed[3])
+	m.set("JudgeBlue", totalsBlue[1] + totalsBlue[2] + totalsBlue[3])
 end
 local function decisionWinner(totalsRed, totalsBlue)
 	local redVotes, blueVotes = 0, 0
@@ -246,6 +284,10 @@ local function doctorWinner(m)
 	if ru == bu then return nil end
 	return ru and "blue" or "red"
 end
+local function tagMatch(m)                              -- Zuordnung Spieler/Charaktere -> Kampf (Anzeige, Fokus, Signaturen)
+	for _, p in ipairs({ m.red, m.blue }) do if p and p.Parent then p:SetAttribute("CC_MatchId", m.id) end end
+	for _, c in ipairs({ chars(m) }) do if c then c:SetAttribute("CC_MatchId", m.id) end end
+end
 local function placeBoth(m, heal)
 	local r, b = chars(m)
 	local cr, cb = corners(m)
@@ -253,14 +295,14 @@ local function placeBoth(m, heal)
 	if b then reset:Invoke(b, cb, heal and math.min(100, b.Humanoid.Health + heal) or nil) end
 	if r and b then r:SetAttribute("CC_Opponent", b.Name); b:SetAttribute("CC_Opponent", r.Name) end
 	paint(r, "red"); paint(b, "blue")
+	tagMatch(m)
 end
-local function present(m)                    -- beide Kaempfer noch da?
+local function present(m)
 	local r, b = chars(m)
 	return r ~= nil and r.Parent ~= nil and m.red.Parent ~= nil, b ~= nil and b.Parent ~= nil and (not m.blue or m.blue.Parent ~= nil)
 end
--- Fortschritt (CC_Profile): Spieler gegen Spieler zaehlt in die Bilanz, Training gibt nur XP; jede Runde trainiert Kondition
 local function profile(p, kind, a, b, c)
-	local ev = game.ServerStorage:FindFirstChild("CC_ProfileEvent")
+	local ev = SS:FindFirstChild("CC_ProfileEvent")
 	if ev and p and p.Parent then ev:Fire(p, kind, a, b, c) end
 end
 local function koWinner(m)
@@ -269,80 +311,104 @@ local function koWinner(m)
 	if b and b:GetAttribute("CC_KO") then return "red" end
 	return nil
 end
+local function streamTo(m, pos)
+	for _, pl in ipairs({ m.red, m.blue }) do
+		if pl and pl.Parent then pcall(function() pl:RequestStreamAroundAsync(pos, 10) end) end
+	end
+end
+
+-- neuen Kampf anlegen (Zustands-Ordner, Kaefig belegen)
+local function newMatch(e, arena)
+	nextId += 1
+	local m = e
+	m.id = "M" .. nextId
+	m.arena = arena
+	arena.busy = m.id
+	local st = Instance.new("Folder"); st.Name = m.id; st.Parent = matchRoot
+	m.state = st
+	function m.set(k, v) st:SetAttribute(k, v) end
+	local c, fy, r = cageOf(arena)
+	m.set("MatchId", m.id); m.set("Arena", arena.id); m.set("CageCenter", Vector3.new(c.X, fy, c.Z)); m.set("CageRadius", r)
+	m.set("State", "idle"); m.set("Mode", m.mode); m.set("QueuePvp", idle:GetAttribute("QueuePvp") or 0)
+	st:GetAttributeChangedSignal("CrowdBoost"):Connect(function() crowd(0.8); task.delay(3, function() crowd(0.3) end) end)
+	if not m.blue then kiBusy = true end
+	matches[m.id] = m
+	tagMatch(m)
+	return m
+end
+local function endMatch(m)
+	matches[m.id] = nil
+	if m.arena and m.arena.busy == m.id then m.arena.busy = nil end
+	if not m.blue then kiBusy = false end
+	for _, p in ipairs({ m.red, m.blue }) do if p and p.Parent then toLobby(p) end end
+	if not m.blue then parkDummy() end
+	task.delay(2, function() if m.state then m.state:Destroy() end end)   -- Clients haben dann auf "idle" umgeschaltet
+end
 
 local runMatch
--- Tutorial: Spieler und passiver Gegner im Kaefig, keine Uhr und kein Ergebnis; CC_Tutorial fuehrt durch die Lektionen
 local function runTutorial(m)
-	current = m
-	set("Mode", "tutorial"); set("RedName", m.red.Name); set("BlueName", "Trainingsgegner"); set("Winner", ""); set("WinnerName", "")
+	m.set("Mode", "tutorial"); m.set("RedName", m.red.Name); m.set("BlueName", "Trainingsgegner"); m.set("Winner", ""); m.set("WinnerName", "")
 	dummy:SetAttribute("CC_Difficulty", "passiv"); dummy:SetAttribute("CC_Passive", true); dummy:SetAttribute("CC_InMatch", true)
 	freeze(m, false)
 	placeBoth(m)
 	clearDamage(m)
-	set("State", "tutorial"); set("Banner", ""); set("BannerSub", "")
-	print("[CC] Tutorial startet: " .. m.red.Name)
-	local run = game.ServerStorage:FindFirstChild("CC_TutorialRun")
+	m.set("State", "tutorial"); m.set("Banner", ""); m.set("BannerSub", "")
+	print("[CC] Tutorial startet: " .. m.red.Name .. " (" .. m.id .. ")")
+	local run = SS:FindFirstChild("CC_TutorialRun")
 	local ok, nextStep = pcall(function() return run and run:Invoke(m.red) end)
 	if not ok then warn("[CC] Tutorial-Fehler: " .. tostring(nextStep)) end
 	dummy:SetAttribute("CC_Tutor", nil); dummy:SetAttribute("CC_Passive", nil)
 	if ok and nextStep == "sparring" and m.red.Parent and m.red.Character then
-		return runMatch({ red = m.red, mode = "sparring" })   -- direkt im Kaefig weiter
+		m.mode = "sparring"; m.set("Mode", "sparring")
+		return runMatch(m)                                          -- gleicher Kaefig, gleicher Zustand
 	end
-	current = nil
-	if m.red.Parent then toLobby(m.red) end
-	parkDummy()
-	set("State", "idle"); set("Mode", ""); set("RedName", ""); set("BlueName", "")
 end
 
 function runMatch(m)
 	if m.mode == "tutorial" then return runTutorial(m) end
-	current = m
-
-	-- Der Client muss die Kampfclips bereits besitzen, bevor Walkout/Takedown beginnt.
-	-- Ohne diese Schranke kann Roblox beim ersten Abspielen kurz die Bind-/T-Pose zeigen.
+	-- Kampfclips vorladen (keine T-Pose beim ersten Abspielen)
 	local preloadDeadline = os.clock() + 8
 	while os.clock() < preloadDeadline do
 		local pending = false
 		for _, p in ipairs({ m.red, m.blue }) do
-			if p and p.Parent and p:GetAttribute("CC_AnimationsReady") ~= true then
-				pending = true
-				break
-			end
+			if p and p.Parent and p:GetAttribute("CC_AnimationsReady") ~= true then pending = true; break end
 		end
 		if not pending then break end
 		task.wait(0.1)
 	end
-
 	for _, p in ipairs({ m.red, m.blue }) do if p then p:SetAttribute("CC_ResultReady", nil); p:SetAttribute("CC_LastFight", nil) end end
 	local career = m.mode == "career" and OPP.byId[m.opponentId] or nil
 	local trainerDef = m.mode == "trainer" and SIGPROG.list[m.opponentId] or nil
 	local trainer = trainerDef and trainerDef.boss or nil
 	local blueLabel = career and career.name or trainer and trainer.name or (m.blue and m.blue.Name or "Trainingsgegner")
 	local rounds = career and career.rounds or trainer and trainer.rounds or (m.mode == "sparring" and 1 or ROUNDS)
+	local set = m.set
 	set("Rounds", rounds)
 	set("Mode", m.mode); set("OpponentId", career and career.id or trainerDef and m.opponentId or ""); set("RedName", m.red.Name); set("BlueName", blueLabel); set("WinnerName", "")
 	set("Winner", ""); set("ScoreRed", 0); set("ScoreBlue", 0); set("JudgeCards", "[]"); set("JudgeRed", 0); set("JudgeBlue", 0)
-	if m.mode == "training" or m.mode == "sparring" then
-		local lv = m.mode == "sparring" and "anfaenger" or (m.red:GetAttribute("CC_DummyLevel") or "anfaenger")
-		dummy:SetAttribute("CC_Difficulty", lv); dummy:SetAttribute("CC_Passive", lv == "passiv" or nil)
-		local styleByLevel = { passiv = "Boxer", anfaenger = "Boxer", fortgeschritten = "Kickboxer" }
-		dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or styleByLevel[lv] or "Boxer")
-		dummy:SetAttribute("CC_InMatch", true)
-	elseif career then
-		dummy:SetAttribute("CC_Difficulty", career.difficulty); dummy:SetAttribute("CC_Passive", nil); dummy:SetAttribute("CC_InMatch", true)
-		dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or career.aiStyle or "Boxer")
-		dummy:SetAttribute("CC_CareerId", career.id); dummy:SetAttribute("CC_CareerName", career.name)
-		for s, v in pairs(career.stats) do dummy:SetAttribute("CC_" .. s, v) end
-		Look.apply(dummy, career.look, SS:FindFirstChild("CC_Custom"))
-	elseif trainer then
-		dummy:SetAttribute("CC_Difficulty", trainer.difficulty); dummy:SetAttribute("CC_Passive", nil); dummy:SetAttribute("CC_InMatch", true)
-		dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or trainer.aiStyle or "Boxer")
-		dummy:SetAttribute("CC_TrainerBoss", m.opponentId); dummy:SetAttribute("CC_CareerName", trainer.name)
-		for s, v in pairs(trainer.stats) do dummy:SetAttribute("CC_" .. s, v) end
-		Look.apply(dummy, trainer.look, SS:FindFirstChild("CC_Custom"))
-	elseif not m.blue then
-		dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or "Grappler")
-		dummy:SetAttribute("CC_InMatch", true)
+	if not m.blue then
+		if m.mode == "training" or m.mode == "sparring" then
+			local lv = m.mode == "sparring" and "anfaenger" or (m.red:GetAttribute("CC_DummyLevel") or "anfaenger")
+			dummy:SetAttribute("CC_Difficulty", lv); dummy:SetAttribute("CC_Passive", lv == "passiv" or nil)
+			local styleByLevel = { passiv = "Boxer", anfaenger = "Boxer", fortgeschritten = "Kickboxer" }
+			dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or styleByLevel[lv] or "Boxer")
+			dummy:SetAttribute("CC_InMatch", true)
+		elseif career then
+			dummy:SetAttribute("CC_Difficulty", career.difficulty); dummy:SetAttribute("CC_Passive", nil); dummy:SetAttribute("CC_InMatch", true)
+			dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or career.aiStyle or "Boxer")
+			dummy:SetAttribute("CC_CareerId", career.id); dummy:SetAttribute("CC_CareerName", career.name)
+			for s, v in pairs(career.stats) do dummy:SetAttribute("CC_" .. s, v) end
+			Look.apply(dummy, career.look, SS:FindFirstChild("CC_Custom"))
+		elseif trainer then
+			dummy:SetAttribute("CC_Difficulty", trainer.difficulty); dummy:SetAttribute("CC_Passive", nil); dummy:SetAttribute("CC_InMatch", true)
+			dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or trainer.aiStyle or "Boxer")
+			dummy:SetAttribute("CC_TrainerBoss", m.opponentId); dummy:SetAttribute("CC_CareerName", trainer.name)
+			for s, v in pairs(trainer.stats) do dummy:SetAttribute("CC_" .. s, v) end
+			Look.apply(dummy, trainer.look, SS:FindFirstChild("CC_Custom"))
+		else
+			dummy:SetAttribute("CC_AIStyle", workspace:GetAttribute("CC_TestAIStyle") or "Grappler")
+			dummy:SetAttribute("CC_InMatch", true)
+		end
 	end
 	do
 		local r0, b0 = chars(m)
@@ -354,35 +420,30 @@ function runMatch(m)
 			end
 		end
 	end
-	print(("[CC] Kampf startet (%s): %s gegen %s"):format(m.mode, m.red.Name, blueLabel))
+	print(("[CC] Kampf %s startet (%s, Kaefig %s): %s gegen %s"):format(m.id, m.mode, m.arena.id, m.red.Name, blueLabel))
 	set("Finisher", nil)
-	do local r0, b0 = chars(m); for _, c in ipairs({ r0, b0 }) do if c then c:SetAttribute("CC_FocusReset", os.clock()) end end end   -- Signatur-Fokus: neues Match = 0
-	-- Fight Night: Walkout ueber den vorhandenen Einlaufweg bis zur Kaefigtuer, danach wie gewohnt in die Ecken
-	local fn = fightNight(m)
-	if fn then
+	do local r0, b0 = chars(m); for _, c in ipairs({ r0, b0 }) do if c then c:SetAttribute("CC_FocusReset", os.clock()) end end end
+	-- Kaefig vorladen (weit entfernte Kaefige: sonst faellt der Spieler beim Teleport durch)
+	do local c, fy = cageOf(m.arena); streamTo(m, Vector3.new(c.X, fy, c.Z)) end
+	-- Fight Night: Walkout
+	if m.arena.fn then
+		local fn = m.arena.model
 		local spots = fn:FindFirstChild("FN_Spots")
 		local startP, door = spots and spots:FindFirstChild("Fighter_Walkout_Main"), spots and spots:FindFirstChild("Cage_Door")
 		if startP and door then
-			set("Mode", m.mode); set("State", "walkout")
+			set("State", "walkout")
 			if trainer then set("Banner", "TRAINER-ENDKAMPF"); set("BannerSub", m.red.Name .. "  vs.  " .. blueLabel)
 			elseif career then set("Banner", "KARRIERE"); set("BannerSub", m.red.Name .. "  vs.  " .. blueLabel)
 			else set("Banner", "FIGHT NIGHT"); set("BannerSub", "Walkout") end
 			local r, b = chars(m)
-			-- Streaming: Boden am Ziel vorher laden lassen, sonst faellt der Spieler beim Teleport durch (Map liegt weit entfernt)
-			for _, pl in ipairs({ m.red, m.blue }) do
-				if pl and pl.Parent then
-					pcall(function() pl:RequestStreamAroundAsync(startP.Position, 10) end)
-					pcall(function() pl:RequestStreamAroundAsync(door.Position, 10) end)
-				end
-			end
+			streamTo(m, startP.Position); streamTo(m, door.Position)
 			local list = {}
 			for i, c in ipairs({ r, b }) do
 				local h, root = c and c:FindFirstChildOfClass("Humanoid"), c and c:FindFirstChild("HumanoidRootPart")
 				if h and root then
 					local side = (i == 1) and -2.5 or 2.5
-					local mid = door.Position + (startP.Position - door.Position) * 0.55   -- ab der Mitte des Einlaufwegs (Gehtempo: gut 6 s bis zur Tuer)
-					local from = Vector3.new(mid.X, startP.Position.Y, mid.Z) + Vector3.new(side, 0, (i - 1) * 4)        -- Rot vorn, Blau dahinter
-					-- auf die Oberkante der Bodenkollision stellen (duenne Laufsteg-Platte: sonst starten die Fuesse darin und fallen durch)
+					local mid = door.Position + (startP.Position - door.Position) * 0.55
+					local from = Vector3.new(mid.X, startP.Position.Y, mid.Z) + Vector3.new(side, 0, (i - 1) * 4)
 					local rpar = RaycastParams.new(); rpar.FilterType = Enum.RaycastFilterType.Include; rpar.FilterDescendantsInstances = { fn:FindFirstChild("FN_Collision") }
 					local hit = workspace:Raycast(from + Vector3.new(0, 10, 0), Vector3.new(0, -30, 0), rpar)
 					from = Vector3.new(from.X, (hit and hit.Position.Y or from.Y) + 3.1, from.Z)
@@ -394,7 +455,6 @@ function runMatch(m)
 			end
 			paint(r, "red"); paint(b, "blue")
 			for _, e in ipairs(list) do
-				-- Trainer-Endkampf und Karriere: der KI-Gegner laeuft mit ein (hinter dem Spieler); sonst (nur Test) steht er schon an der Tuer
 				if e.c == dummy and not (trainer or career) then e.root.CFrame = CFrame.lookAt(e.goal, e.goal - Vector3.new(0, 0, 1)) else e.h:MoveTo(e.goal) end
 			end
 			local t0 = os.clock()
@@ -406,7 +466,6 @@ function runMatch(m)
 				if done then break end
 				task.wait(0.25)
 			end
-			print(("[CC] Walkout fertig nach %.1f s"):format(os.clock() - t0))
 		end
 	end
 	local totalRed, totalBlue, winner, method = 0, 0, nil, nil
@@ -431,7 +490,7 @@ function runMatch(m)
 		set("State", "fight"); set("TimeLeft", roundTime)
 		bell(1)
 		freeze(m, false)
-		task.delay(1, function() if state:GetAttribute("Banner") == "FIGHT!" then set("Banner", ""); set("BannerSub", "") end end)
+		task.delay(1, function() if m.state.Parent and m.state:GetAttribute("Banner") == "FIGHT!" then set("Banner", ""); set("BannerSub", "") end end)
 		local t0 = os.clock()
 		while os.clock() - t0 < roundTime do
 			task.wait(0.1)
@@ -456,7 +515,7 @@ function runMatch(m)
 		local r, b = chars(m)
 		totalRed += damage(r); totalBlue += damage(b)
 		set("ScoreRed", totalRed); set("ScoreBlue", totalBlue)
-		if r and b then scoreRound(scorecards, judgeRed, judgeBlue, round, r, b, kdRedStart, kdBlueStart) end
+		if r and b then scoreRound(m, scorecards, judgeRed, judgeBlue, round, r, b, kdRedStart, kdBlueStart) end
 		for _, p in ipairs({ m.red, m.blue }) do profile(p, "train", "Cardio", 2) end
 		if not winner then
 			local dw = doctorWinner(m)
@@ -473,9 +532,7 @@ function runMatch(m)
 		winner = decisionWinner(judgeRed, judgeBlue)
 	end
 	if method == "K.O." or method == "Submission" then task.wait(1.5) end
-	-- Finisher-Wiederholung: nur wenn der Server den K.o. durch eine Signatur bestaetigt hat. Ergebnis steht bereits fest
-	-- (Winner wird vorher gesetzt); die Clients zeigen die letzte Aktion als lokale Kopie und koennen sie ueberspringen.
-	local fin = state:GetAttribute("Finisher")
+	local fin = m.state:GetAttribute("Finisher")
 	if fin and method == "K.O." then
 		local wn = winner == "red" and m.red.Name or winner == "blue" and blueLabel or ""
 		set("Winner", winner); set("WinnerName", wn)
@@ -486,17 +543,16 @@ function runMatch(m)
 	local wname = winner == "red" and m.red.Name or winner == "blue" and blueLabel or ""
 	set("State", "over"); set("Winner", winner); set("WinnerName", wname)
 	bell(3); crowd(0.8); task.delay(4, function() crowd(0.3) end)
-	-- Text fuer Zuschauer; die Kaempfer sehen im HUD SIEG / NIEDERLAGE
 	set("Banner", winner == "draw" and "UNENTSCHIEDEN" or (wname .. " GEWINNT"))
 	set("BannerSub", method .. string.format("   ·   %d : %d", totalRed, totalBlue))
-	print(("[CC] Kampf vorbei: %s (%s) %d:%d"):format(winner, method, totalRed, totalBlue))
+	print(("[CC] Kampf %s vorbei: %s (%s) %d:%d"):format(m.id, winner, method, totalRed, totalBlue))
 	for side, p in pairs({ red = m.red, blue = m.blue or false }) do
 		if p then
 			local res = winner == "draw" and "draw" or (winner == side and "win" or "loss")
-			local xp = nil                                 -- Online/Karriere: XP vergibt CC_Profile selbst
+			local xp = nil
 			profile(p, "goal", "fights", 1)
-			if side == "red" then
-				local ch = p.Character
+			local ch = p.Character
+			if side == "red" or m.mode == "pvp" then
 				profile(p, "sig_fight_result", { body = ch and ch:GetAttribute("CC_BodyHits") or 0, counters = ch and ch:GetAttribute("CC_CounterHits") or 0, jabs = ch and ch:GetAttribute("CC_JabHits") or 0, blocks = ch and ch:GetAttribute("CC_Blocks") or 0, kicks = ch and ch:GetAttribute("CC_KickHits") or 0, takedowns = ch and ch:GetAttribute("CC_Takedowns") or 0, groundHits = ch and ch:GetAttribute("CC_GroundHits") or 0, subs = (res == "win" and method == "Submission") and 1 or 0, career = m.mode == "career", result = res })
 			end
 			if m.mode == "career" and side == "red" and career then
@@ -513,7 +569,7 @@ function runMatch(m)
 			else
 				xp = res == "win" and 30 or 15; profile(p, "xp", xp)
 			end
-			p:SetAttribute("CC_LastFight", HttpService:JSONEncode({ mode = m.mode, opponentId = career and career.id or trainerDef and m.opponentId or nil, opponentName = career and career.name or trainer and trainer.name or nil, result = res, method = method, xp = xp, scorecards = scorecards, judgeRed = judgeRed, judgeBlue = judgeBlue }))
+			p:SetAttribute("CC_LastFight", HttpService:JSONEncode({ mode = m.mode, opponentId = career and career.id or trainerDef and m.opponentId or nil, opponentName = career and career.name or trainer and trainer.name or (m.mode == "pvp" and (side == "red" and (m.blue and m.blue.Name) or m.red.Name)) or nil, result = res, method = method, xp = xp, scorecards = scorecards, judgeRed = judgeRed, judgeBlue = judgeBlue }))
 		end
 	end
 	for t = OVER_TIME, 1, -1 do
@@ -523,43 +579,59 @@ function runMatch(m)
 		task.wait(1)
 	end
 	for _, p in ipairs({ m.red, m.blue }) do if p then p:SetAttribute("CC_ResultReady", nil) end end
-	-- zurueck in die Lobby
 	freeze(m, false)
-	current = nil
-	for _, p in ipairs({ m.red, m.blue }) do if p and p.Parent then toLobby(p) end end
-	if not m.blue then parkDummy() end                -- Trainingsgegner war beteiligt (Training, Sparring, Test)
-	set("State", "idle"); set("Mode", ""); set("OpponentId", ""); set("Banner", ""); set("BannerSub", ""); set("RedName", ""); set("BlueName", "")
 end
 
--- naechsten Kampf aus der Warteschlange bilden (Gegen-Spieler hat Vorrang)
-local function nextMatch()
-	while true do
-		for i = #queue, 1, -1 do if not queue[i][1].Parent or not queue[i][1].Character then table.remove(queue, i) end end
-		local pvp = {}
-		for i, e in ipairs(queue) do if e[2] == "pvp" then table.insert(pvp, i) end end
-		if #pvp == 1 and workspace:GetAttribute("CC_TestPvpDummy") then          -- Test (Studio, 1 Spieler): Online-Ablauf gegen den Trainingsgegner
+-- Kampf starten (eigener Thread), danach Kaefig/KI-Gegner wieder freigeben
+local function launch(m)
+	task.spawn(function()
+		local ok, err = pcall(runMatch, m)
+		if not ok then warn("[CC] Kampf-Fehler (" .. tostring(m.id) .. "): " .. tostring(err)) end
+		endMatch(m)
+	end)
+end
+
+-- Warteschlange abarbeiten: Online-Paare und KI-Kaempfe, solange Kaefige frei sind
+local function schedule()
+	for i = #queue, 1, -1 do if not queue[i][1].Parent or not queue[i][1].Character then table.remove(queue, i) end end
+	-- Online: Paare bilden
+	local pvp = {}
+	for i, e in ipairs(queue) do if e[2] == "pvp" then table.insert(pvp, i) end end
+	while #pvp >= 2 do
+		local arena = freeArena("pvp"); if not arena then break end
+		local ia, ib = pvp[1], pvp[2]
+		local a, b = queue[ia][1], queue[ib][1]
+		table.remove(queue, ib); table.remove(queue, ia)
+		a:SetAttribute("CC_Queue", nil); b:SetAttribute("CC_Queue", nil)
+		launch(newMatch({ red = a, blue = b, mode = "pvp" }, arena))
+		pvp = {}; for i, e in ipairs(queue) do if e[2] == "pvp" then table.insert(pvp, i) end end
+	end
+	if #pvp == 1 and workspace:GetAttribute("CC_TestPvpDummy") and not kiBusy then          -- Test (Studio, 1 Spieler)
+		local arena = freeArena("pvp")
+		if arena then
 			local a = queue[pvp[1]][1]
-			table.remove(queue, pvp[1]); a:SetAttribute("CC_Queue", nil); updateQueueAttrs()
-			return { red = a, mode = "pvp" }
+			table.remove(queue, pvp[1]); a:SetAttribute("CC_Queue", nil)
+			launch(newMatch({ red = a, mode = "pvp" }, arena))
 		end
-		if #pvp >= 2 then
-			local a, b = queue[pvp[1]][1], queue[pvp[2]][1]
-			table.remove(queue, pvp[2]); table.remove(queue, pvp[1])
-			a:SetAttribute("CC_Queue", nil); b:SetAttribute("CC_Queue", nil); updateQueueAttrs()
-			return { red = a, blue = b, mode = "pvp" }
-		end
+	end
+	-- KI-Kaempfe: einer gleichzeitig (ein KI-Gegner)
+	if not kiBusy then
 		for i, e in ipairs(queue) do
-			if e[2] == "training" or e[2] == "tutorial" or e[2] == "sparring" or e[2] == "career" or e[2] == "trainer" then
-				table.remove(queue, i); e[1]:SetAttribute("CC_Queue", nil); updateQueueAttrs()
-				return { red = e[1], mode = e[2], opponentId = e[3] }
+			local kind = e[2]
+			if kind == "training" or kind == "tutorial" or kind == "sparring" or kind == "career" or kind == "trainer" then
+				local arena = freeArena(kind)
+				if arena then
+					table.remove(queue, i); e[1]:SetAttribute("CC_Queue", nil)
+					launch(newMatch({ red = e[1], mode = kind, opponentId = e[3] }, arena))
+					break
+				end
 			end
 		end
-		task.wait(0.5)
 	end
+	updateQueueAttrs()
 end
 
--- Fallschutz: wer unter die Welt faellt (z. B. Boden noch nicht geladen), kommt sicher zurueck.
---   Ausserhalb eines Kampfs: in die Lobby (Gym). Im Kampf: zurueck in die eigene Ecke, Leben unveraendert (keine Flucht aus dem Kampf).
+-- Fallschutz: im Kampf zurueck in die eigene Ecke, sonst ins Gym
 local FALL_Y = -25
 local lastFallCheck = 0
 RunService.Heartbeat:Connect(function()
@@ -571,10 +643,10 @@ RunService.Heartbeat:Connect(function()
 		local h = c and c:FindFirstChildOfClass("Humanoid")
 		if r and h and r.Position.Y < FALL_Y then
 			r.AssemblyLinearVelocity = Vector3.zero
-			if isFighting(p) then
-				local cr, cb = corners(current)
-				local cf = (current.red == p) and cr or cb
-				reset:Invoke(c, cf, h.Health)
+			local m = activeOf(p)
+			if m then
+				local cr, cb = corners(m)
+				reset:Invoke(c, (m.red == p) and cr or cb, h.Health)
 				warn(("[CC] Fallschutz: %s im Kampf zurueck in die Ecke"):format(p.Name))
 			else
 				toLobby(p)
@@ -585,19 +657,18 @@ RunService.Heartbeat:Connect(function()
 	local dr = dummy:FindFirstChild("HumanoidRootPart")
 	if dr and dr.Position.Y < FALL_Y then
 		dr.AssemblyLinearVelocity = Vector3.zero
-		if current and not current.blue then local _, cb = corners(current); reset:Invoke(dummy, cb, dummy.Humanoid.Health) else parkDummy() end
+		local km
+		for _, m in pairs(matches) do if not m.blue then km = m end end
+		if km then local _, cb = corners(km); reset:Invoke(dummy, cb, dummy.Humanoid.Health) else parkDummy() end
 	end
 end)
 
-set("State", "idle"); set("Mode", ""); set("OpponentId", ""); set("Banner", ""); set("BannerSub", ""); set("QueuePvp", 0); set("RedName", ""); set("BlueName", "")
+idle:SetAttribute("State", "idle"); idle:SetAttribute("Mode", ""); idle:SetAttribute("QueuePvp", 0)
 parkDummy()
+local ids = {}; for _, a in ipairs(ARENAS) do table.insert(ids, a.id) end
+print("[CC] Kampf-Verwaltung: Kaefige " .. table.concat(ids, ", "))
 while true do
-	local m = nextMatch()
-	local ok, err = pcall(runMatch, m)
-	if not ok then
-		warn("[CC] Kampf-Fehler: " .. tostring(err))
-		current = nil; frozen = false
-		for _, p in ipairs({ m.red, m.blue }) do if p and p.Parent then toLobby(p) end end
-		parkDummy(); set("State", "idle"); set("Mode", ""); set("OpponentId", ""); set("Banner", ""); set("BannerSub", ""); set("RedName", ""); set("BlueName", "")
-	end
+	local ok, err = pcall(schedule)
+	if not ok then warn("[CC] Warteschlange: " .. tostring(err)) end
+	task.wait(0.5)
 end

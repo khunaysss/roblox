@@ -173,3 +173,10 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Alte Halle ausgeblendet (ServerStorage.CC_GymOld_HiddenByV03), Sicherung des ganzen alten Gyms: ServerStorage.CC_GymBackup_v03_20261018. Alte Lampen-Lichter bleiben (Geometrie unsichtbar).
 - Getestet (Testprofil): Laufen zu allen Zonen, Treppe hoch, Galerie entlang, Sack-Training Z2 (startet, schwingt). Oktagon-Podest blockiert den direkten Weg quer durch (gewollt).
 - Offen: Licht auf die neue Halle abstimmen (aktuell alte Lichter), Plakate/Vitrine der alten Details evtl. nicht an Wänden; Galerie oben ist leer begehbar (nur Deko-Geräte).
+
+### Mehrere Online-Kämpfe gleichzeitig (2026-10-19, allein getestet – Zwei-Spieler-Test offen)
+- CC_Match umgebaut: jeder Kampf hat einen eigenen Zustand (ReplicatedStorage.CC_Matches.<id>, Modul CC_MatchRegistry) und einen eigenen Käfig. Käfige: Fight Night (Walkout), kleine Arena (Training/Tutorial/Sparring), neu CC_PvpArena_2/3/4 (Kopien der Arena bei x −400, z −160/0/160) → bis zu 4 Online-Kämpfe gleichzeitig + 1 KI-Kampf (nur ein KI-Gegner).
+- Clients: CC_MatchStateMirror spiegelt den eigenen Kampf lokal nach CC_MatchState → HUD, Menü, Finisher, Tutorial unverändert. Server-Prüfungen (Fokus, Signatur, K.o., Zählen, Publikum) lesen den Zustand des eigenen Kampfs. Kamera und KI nutzen den Käfig des eigenen Kampfs.
+- Getestet (1 Spieler): Training in der Arena; Online-Ablauf gegen KI (Testschalter CC_TestPvpDummy) in Fight Night mit Walkout und in Käfig 3 (CC_TestArena = "pvp3"); Ergebnis, XP, Rückkehr ins Gym, Zustand wird aufgeräumt.
+- Sicherung: ServerStorage.CC_MultiMatchBackup_20261019.
+- OFFEN: echter Test mit 2–4 Spielern (Studio → Test → Clients 2/4), gleichzeitige Kämpfe prüfen; Publikumsgeräusch ist noch global (alle hören jeden Kampf).
