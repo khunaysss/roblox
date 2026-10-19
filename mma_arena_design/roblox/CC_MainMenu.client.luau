@@ -337,6 +337,7 @@ UI.label({ Text = "SCHNELLER KAMPF", FontFace = F.head, TextSize = 19, Size = UD
 UI.label({ Text = "Gegen den nächsten Spieler in der Warteschlange. 3 Runden, je 2 Minuten.",
 	TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 30), Size = UDim2.new(1, 0, 0, 40), Parent = oCard })
 -- Arena-Wahl (Server paart nur Spieler mit passender Wahl; "egal" passt zu allen)
+do
 local pvpArena = player:GetAttribute("CC_PvpArenaPick") or "any"
 local arRow = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), LayoutOrder = 1, Parent = online })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = arRow })
@@ -348,8 +349,9 @@ for i, e in ipairs({ { "fightnight", "FIGHT NIGHT" }, { "cage", "KÄFIG" }, { "a
 	b:SetAttribute("Selected", e[1] == pvpArena)
 end
 arRow.LayoutOrder = 2
+end
 local oState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 28), Parent = online })
-local bSearch = UI.button({ Style = "primary", Text = "SUCHE STARTEN", Icon = "search", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("pvp", pvpArena) end, Parent = online })
+local bSearch = UI.button({ Style = "primary", Text = "SUCHE STARTEN", Icon = "search", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("pvp", player:GetAttribute("CC_PvpArenaPick") or "any") end, Parent = online })
 local bCancel = UI.button({ Style = "danger", Text = "SUCHE ABBRECHEN", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = online })
 UI.button({ Style = "secondary", Text = "GEWERTET", Sub = "Rangliste gibt es noch nicht", Icon = "star", LayoutOrder = 6, Disabled = true, Badge = "NICHT VERFÜGBAR",
 	Size = UDim2.new(1, 0, 0, 66), Parent = online })
@@ -469,6 +471,7 @@ slider(settingsCard, 108, "Musik", "music")
 slider(settingsCard, 174, "Effekte", "effects")
 local settingsNote = card(settings, 2, 146)
 UI.label({ Text = "ANZEIGE", FontFace = F.head, TextSize = 21, TextColor3 = C.text, Size = UDim2.new(1, 0, 0, 28), Parent = settingsNote })
+do
 local toggleSet = {}
 local function toggle(y, title, key, invert)   -- invert: Schalter zeigt "AN", wenn der gespeicherte Wert false ist (Kamera-Wackeln an = noShake false)
 	local row = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, y), Size = UDim2.new(1, 0, 0, 40), Parent = settingsNote })
@@ -496,6 +499,7 @@ local function loadSettings()
 end
 player:GetAttributeChangedSignal("CC_SettingsLoaded"):Connect(loadSettings)
 task.defer(loadSettings)
+end
 local settingsActions = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 56), LayoutOrder = 3, Parent = settings })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Right,
 	Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = settingsActions })
@@ -701,8 +705,8 @@ local CATS = {
 	{ id = "face", name = "GESICHT", icon = "face", key = "face", list = Look.FACE },
 	{ id = "skin", name = "HAUTFARBE", icon = "skin", key = "skin", skin = true },
 	{ id = "tattoo", name = "TATTOOS", icon = "star", locked = "Tattoos gibt es noch nicht." },
-	{ id = "shorts", name = "SHORTS", icon = "shorts", locked = "Die Shorts-Farbe richtet sich nach der Ecke: rote Ecke rot, blaue Ecke blau. Eigene Shorts gibt es noch nicht." },
-	{ id = "gloves", name = "HANDSCHUHE", icon = "glove", locked = "Andere Handschuhe gibt es noch nicht." },
+	{ id = "shorts", name = "SHORTS", icon = "shorts", key = "shorts", reward = Look.SHORTS },      -- Belohnungen (CC_LookShared): Level, Titel, Signaturen
+	{ id = "gloves", name = "HANDSCHUHE", icon = "glove", key = "gloves", reward = Look.GLOVES },
 }
 local catButtons = {}
 local currentCat
@@ -750,6 +754,33 @@ local function showCat(cat)
 	grid.Visible = cat.locked == nil
 	colorTitle.Text = cat.colors and cat.colorTitle or ""
 	if cat.locked then midSub.Text = "Nicht verfügbar"; return end
+	if cat.reward then                                   -- Farben: freigeschaltete waehlbar, gesperrte zeigen ihre Bedingung
+		grid.Visible = false
+		local prog = Look.progressOf(player)
+		local n = 0
+		for i, it in ipairs(cat.reward) do
+			local ok = Look.unlocked(it, prog); if ok then n += 1 end
+			local b = UI.swatch({ Color = it.color, LayoutOrder = i, Name = it.name, Size = UDim2.fromOffset(46, 46), Parent = swRow,
+				OnClick = function()
+					if ok then draft[cat.key] = i; previewDraft(); showCat(currentCat)
+					else colorTitle.Text = it.name:upper() .. "  ·  GESPERRT  ·  " .. Look.reqText(it) end
+				end })
+			if not ok then
+				UI.icon("lock", { Size = UDim2.fromOffset(18, 18), AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), ZIndex = 5, ImageColor3 = UI.C.text, Parent = b })
+				local dim = Instance.new("Frame"); dim.BackgroundColor3 = UI.C.bg0; dim.BackgroundTransparency = 0.45; dim.BorderSizePixel = 0
+				dim.Size = UDim2.new(1, -10, 1, -10); dim.Position = UDim2.fromOffset(5, 5); dim.ZIndex = 3; dim.Parent = b
+			end
+			table.insert(swatches, { btn = b, key = cat.key, value = i })
+		end
+		midSub.Text = ("%d von %d freigeschaltet"):format(n, #cat.reward)
+		lockedNote.Visible = true
+		lockedNote.Text = "Neue Farben bekommst du durch Level, Karriere-Titel und Signaturen. Gesperrte Farbe anklicken zeigt die Bedingung."
+		local cur = cat.reward[draft[cat.key] or 1]
+		colorTitle.Text = "AUSGEWÄHLT:  " .. (cur and cur.name:upper() or "")
+		edMid.Size = UDim2.fromOffset(560, 340)
+		refreshSelection()
+		return
+	end
 	if cat.skin then
 		midSub.Text = #Look.SKIN .. " Hauttöne"
 		for i = 1, #Look.SKIN do
