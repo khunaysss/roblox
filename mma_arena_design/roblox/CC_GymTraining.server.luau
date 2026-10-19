@@ -50,11 +50,11 @@ local function notice(p, text) p:SetAttribute("CC_Notice", text .. "|" .. tostri
 
 -- ---------- Uebungen ----------
 local KINDS = {
-	bag = { label = "Sandsack", stat = "Power", game = "seq", n = 10, time = 7.0, cam = "side" },
-	bench = { label = "Bankdrücken", stat = "Power", game = "rhythm", n = 8, interval = 1.2, keys = { "Space" }, anim = "bench", prop = "barbell", cam = "bench" },
-	curl = { label = "Kurzhantel-Curls", stat = "Power", game = "rhythm", n = 10, interval = 0.95, keys = { "Q", "E" }, anim = "curl", prop = "dumbbells", cam = "front" },
-	tread = { label = "Laufband", stat = "Cardio", game = "tread", n = 30, time = 30, keys = { "Q", "E" }, cam = "side" },   -- Laufband: 30 s Tempo halten
-	jack = { label = "Hampelmann", stat = "Cardio", game = "rhythm", n = 14, interval = 0.62, keys = { "Space" }, anim = "jack", cam = "front" },
+	bag = { label = "Heavy bag", stat = "Power", game = "seq", n = 10, time = 7.0, cam = "side" },
+	bench = { label = "Bench press", stat = "Power", game = "rhythm", n = 8, interval = 1.2, keys = { "Space" }, anim = "bench", prop = "barbell", cam = "bench" },
+	curl = { label = "Dumbbell curls", stat = "Power", game = "rhythm", n = 10, interval = 0.95, keys = { "Q", "E" }, anim = "curl", prop = "dumbbells", cam = "front" },
+	tread = { label = "Treadmill", stat = "Cardio", game = "tread", n = 30, time = 30, keys = { "Q", "E" }, cam = "side" },   -- Laufband: 30 s Tempo halten
+	jack = { label = "Jumping jacks", stat = "Cardio", game = "rhythm", n = 14, interval = 0.62, keys = { "Space" }, anim = "jack", cam = "front" },
 }
 local SEQ_KEYS = { "Q", "E", "R", "F" }
 local LEAD = 1.6                 -- Sekunden Vorlauf (Countdown) bis zur ersten Aufgabe
@@ -433,26 +433,26 @@ game:GetService("RunService").Heartbeat:Connect(function()
 end)
 
 local function statText(p)
-	return ("Level %d · Schlagkraft %d · Kondition %d · Ringen %d · Bodenkampf %d · Bilanz %d-%d"):format(
+	return ("Level %d · Power %d · Cardio %d · Wrestling %d · Grappling %d · Record %d-%d"):format(
 		p:GetAttribute("CC_Level") or 1, p:GetAttribute("CC_Power") or 0, p:GetAttribute("CC_Cardio") or 0,
 		p:GetAttribute("CC_Wrestling") or 0, p:GetAttribute("CC_Grappling") or 0, p:GetAttribute("CC_Wins") or 0, p:GetAttribute("CC_Losses") or 0)
 end
 
 local STATIONS = {
-	punch_bag = { "Sandsack", "Training starten", function(p, m) start(p, m, "bag") end },
-	punch_bag_standing = { "Standsack", "Training starten", function(p, m) start(p, m, "bag") end },
-	bench_dumbbell = { "Kurzhanteln", "Curls trainieren", function(p, m) start(p, m, "curl") end },
-	bench_press = { "Hantelbank", "Bankdrücken", function(p, m) start(p, m, "bench") end },
-	stretch_spot = { "Trainingsmatte", "Hampelmann", function(p, m) start(p, m, "jack") end },
-	coach_talk = { "Trainer", "Trainingskampf starten", function(p)
-		notice(p, "Trainer: Zeig mir, was du kannst! Trainingskampf startet …")
+	punch_bag = { "Heavy bag", "Start training", function(p, m) start(p, m, "bag") end },
+	punch_bag_standing = { "Standing bag", "Start training", function(p, m) start(p, m, "bag") end },
+	bench_dumbbell = { "Dumbbells", "Train curls", function(p, m) start(p, m, "curl") end },
+	bench_press = { "Bench", "Bench press", function(p, m) start(p, m, "bench") end },
+	stretch_spot = { "Training mat", "Jumping jacks", function(p, m) start(p, m, "jack") end },
+	coach_talk = { "Coach", "Start training fight", function(p)
+		notice(p, "Coach: Show me what you got! Training fight starting …")
 		local be = SS:FindFirstChild("CC_MenuServer")      -- gleiche Warteschlange wie das Menue (CC_Match)
 		if be then be:Fire(p, "training") end
 	end },
-	character_customization = { "Spiegel", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
-	locker = { "Spind", "Kämpfer anpassen", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
-	treadmill = { "Laufband", "Laufen", function(p, m) start(p, m, "tread") end },
-	read_plan = { "Trainingsplan", "Ansehen", function(p) p:SetAttribute("CC_OpenPlan", os.clock()) end },
+	character_customization = { "Mirror", "Customize fighter", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
+	locker = { "Locker", "Customize fighter", function(p) p:SetAttribute("CC_OpenCustomize", os.clock()) end },
+	treadmill = { "Treadmill", "Run", function(p, m) start(p, m, "tread") end },
+	read_plan = { "Training plan", "View", function(p) p:SetAttribute("CC_OpenPlan", os.clock()) end },
 }
 
 local n = 0

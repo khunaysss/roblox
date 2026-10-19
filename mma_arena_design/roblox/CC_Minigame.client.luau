@@ -27,7 +27,7 @@ local GOOD, PERFECT, LATE = 0.18, 0.08, 0.25
 local PAD = { [Enum.KeyCode.ButtonX] = "Q", [Enum.KeyCode.ButtonY] = "E", [Enum.KeyCode.ButtonB] = "R", [Enum.KeyCode.ButtonA] = "F" }
 local KEYMAP = { [Enum.KeyCode.Q] = "Q", [Enum.KeyCode.E] = "E", [Enum.KeyCode.R] = "R", [Enum.KeyCode.F] = "F", [Enum.KeyCode.Space] = "Space" }
 local PAD_LABEL = { Q = "X", E = "Y", R = "B", F = "A", Space = "A" }
-local STAT_DE = { Power = "SCHLAGKRAFT", Cardio = "KONDITION" }
+local STAT_DE = { Power = "POWER", Cardio = "CARDIO" }
 
 -- ---------- Oberflaeche ----------
 local gui = Instance.new("ScreenGui"); gui.Name = "CC_MinigameGui"; gui.ResetOnSpawn = false; gui.Enabled = false; gui.IgnoreGuiInset = true
@@ -44,7 +44,7 @@ local howRow = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fr
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, VerticalAlignment = Enum.VerticalAlignment.Center, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = howRow })
 local progL = UI.label({ Text = "", FontFace = F.bold, TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 80), Size = UDim2.new(1, 0, 0, 20), Parent = card })
 local _, progFill = UI.bar({ Position = UDim2.fromOffset(0, 104), Size = UDim2.new(1, 0, 0, 6), Parent = card }, C.green)
-UI.hints({ AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -40, 1, -32), Entries = { { pc = "RÜCKTASTE", pad = "SELECT", text = "Abbrechen" } }, Parent = canvas })
+UI.hints({ AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -40, 1, -32), Entries = { { pc = "BACKSPACE", pad = "SELECT", text = "Cancel" } }, Parent = canvas })
 
 local game_ = nil          -- aktuelle Aufgabe (wird unten belegt)
 -- Countdown und Rueckmeldung
@@ -80,7 +80,7 @@ for k = T_MIN, T_MAX, 2 do
 end
 local targetL = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextColor3 = C.green, Position = UDim2.fromOffset(110, 8), Size = UDim2.fromOffset(260, 26), Parent = tread })
 local speedL = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextXAlignment = Enum.TextXAlignment.Right, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -110, 0, 8), Size = UDim2.fromOffset(260, 26), Parent = tread })
-UI.label({ Text = "AUSDAUER", FontFace = F.bold, TextSize = 14, TextColor3 = C.dim, Position = UDim2.fromOffset(110, 118), Size = UDim2.fromOffset(120, 18), Parent = tread })
+UI.label({ Text = "STAMINA", FontFace = F.bold, TextSize = 14, TextColor3 = C.dim, Position = UDim2.fromOffset(110, 118), Size = UDim2.fromOffset(120, 18), Parent = tread })
 local _, stamFill = UI.bar({ Position = UDim2.fromOffset(230, 123), Size = UDim2.new(1, -340, 0, 8), Parent = tread }, C.warn)
 local function treadBtn(text, icon, x, dir, key)
 	local b = UI.button({ Style = "secondary", Text = text, Icon = icon, Size = UDim2.fromOffset(96, 120), Parent = tread })
@@ -92,8 +92,8 @@ local bSlow = treadBtn("", "back", 0, -1)
 local bFast = treadBtn("", "next", 664, 1)
 local kSlow = UI.key("Q", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 1, 6), Parent = bSlow })
 local kFast = UI.key("E", { AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 1, 6), Parent = bFast })
-UI.label({ Text = "LANGSAMER", FontFace = F.bold, TextSize = 13, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Center, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -20), Size = UDim2.fromOffset(110, 18), Parent = bSlow })
-UI.label({ Text = "SCHNELLER", FontFace = F.bold, TextSize = 13, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Center, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -20), Size = UDim2.fromOffset(110, 18), Parent = bFast })
+UI.label({ Text = "SLOWER", FontFace = F.bold, TextSize = 13, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Center, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -20), Size = UDim2.fromOffset(110, 18), Parent = bSlow })
+UI.label({ Text = "FASTER", FontFace = F.bold, TextSize = 13, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Center, AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, -20), Size = UDim2.fromOffset(110, 18), Parent = bFast })
 local treadDir = 0
 local function sendTempo(d)
 	if treadDir == d then return end
@@ -113,7 +113,7 @@ local resCanvas = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fro
 UI.autoscale(resCanvas, 720)
 local res = UI.panel({ AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.52), Size = UDim2.fromOffset(580, 330), Parent = resCanvas })
 UI.new("UIPadding", { PaddingLeft = UDim.new(0, 28), PaddingRight = UDim.new(0, 28), PaddingTop = UDim.new(0, 20), Parent = res })
-UI.label({ Text = "TRAINING BEENDET", FontFace = F.bold, TextSize = 15, TextColor3 = C.red, Size = UDim2.new(1, 0, 0, 20), Parent = res })
+UI.label({ Text = "TRAINING OVER", FontFace = F.bold, TextSize = 15, TextColor3 = C.red, Size = UDim2.new(1, 0, 0, 20), Parent = res })
 local resTitle = UI.label({ Text = "", FontFace = F.title, TextSize = 40, Position = UDim2.fromOffset(0, 22), Size = UDim2.new(1, 0, 0, 48), TextWrapped = false, Parent = res })
 local resLine = UI.label({ Text = "", TextSize = 17, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 72), Size = UDim2.new(1, 0, 0, 24), Parent = res })
 local rewardRow = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 108), Size = UDim2.new(1, 0, 0, 44), Parent = res })
@@ -129,9 +129,9 @@ local function closeResult()
 	player:SetAttribute("CC_TrainResultOpen", nil)
 	game:GetService("GuiService").SelectedObject = nil
 end
-UI.button({ Style = "secondary", Text = "NOCHMAL", Icon = "rotate", Size = UDim2.fromOffset(220, 56), LayoutOrder = 1, Parent = btnRow,
+UI.button({ Style = "secondary", Text = "AGAIN", Icon = "rotate", Size = UDim2.fromOffset(220, 56), LayoutOrder = 1, Parent = btnRow,
 	OnClick = function() closeResult(); trainEv:FireServer("again") end })
-local bNext = UI.button({ Style = "primary", Text = "WEITER", Icon = "next", Size = UDim2.fromOffset(220, 56), LayoutOrder = 2, Parent = btnRow, OnClick = closeResult })
+local bNext = UI.button({ Style = "primary", Text = "CONTINUE", Icon = "next", Size = UDim2.fromOffset(220, 56), LayoutOrder = 2, Parent = btnRow, OnClick = closeResult })
 
 -- ---------- Zustand ----------
 local boxes = {}
@@ -139,7 +139,7 @@ local feedbackUntil = 0
 local function isPad() return UIS:GetLastInputType().Name:find("Gamepad") ~= nil end
 local function label(key)
 	if isPad() then return PAD_LABEL[key] or key end
-	return key == "Space" and "LEER" or key
+	return key == "Space" and "SPACE" or key
 end
 local function showFeedback(text, color)
 	feedback.Text = text; feedback.TextColor3 = color; feedbackUntil = os.clock() + 0.55
@@ -160,9 +160,9 @@ local function press(key)
 	if g.game == "seq" then
 		local i = g.cur; if i > g.n then return end
 		if key == g.keys[i] then
-			report("hit", i); showFeedback("TREFFER", C.green)
+			report("hit", i); showFeedback("HIT", C.green)
 		else
-			report("miss", i); showFeedback("FALSCHE TASTE", C.red)
+			report("miss", i); showFeedback("WRONG KEY", C.red)
 		end
 		g.cur = i + 1
 	else
@@ -175,10 +175,10 @@ local function press(key)
 			end
 		end
 		if not best then return end
-		if key ~= g.keys[best] then report("miss", best); showFeedback("FALSCHE TASTE", C.red); return end
-		if bestD <= PERFECT then report("hit", best); g.perfect += 1; showFeedback("PERFEKT!", C.gold)
+		if key ~= g.keys[best] then report("miss", best); showFeedback("WRONG KEY", C.red); return end
+		if bestD <= PERFECT then report("hit", best); g.perfect += 1; showFeedback("PERFECT!", C.gold)
 		elseif bestD <= GOOD then report("hit", best); showFeedback("GUT", C.green)
-		else report("miss", best); showFeedback(now < g.start + (best - 1) * g.interval and "ZU FRÜH" or "ZU SPÄT", C.red) end
+		else report("miss", best); showFeedback(now < g.start + (best - 1) * g.interval and "TOO EARLY" or "TOO LATE", C.red) end
 	end
 end
 
@@ -233,16 +233,16 @@ local function buildHow(g)
 	local function txt(t, o) UI.label({ Text = t, TextSize = 17, TextColor3 = C.text, AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, 30), TextWrapped = false, LayoutOrder = o, Parent = howRow }) end
 	local function key(k, o) UI.key(label(k), { LayoutOrder = o, Parent = howRow }) end
 	if g.game == "tread" then
-		if touch then txt("Tippe die Knöpfe – halte dein Tempo im grünen Zielbereich", 1)
-		else txt("Halten:", 1); key(isPad() and "LB" or "Q", 2); txt("langsamer", 3); key(isPad() and "RB" or "E", 4); txt("schneller – bleib im grünen Bereich", 5) end
+		if touch then txt("Tap the buttons – keep your pace in the green zone", 1)
+		else txt("Hold:", 1); key(isPad() and "LB" or "Q", 2); txt("langsamer", 3); key(isPad() and "RB" or "E", 4); txt("faster – stay in the green zone", 5) end
 	elseif g.game == "seq" then
-		txt((touch and "Tippe die Tasten der Reihe nach an" or "Drücke die Tasten der Reihe nach") .. (" – %d Schläge in %d Sekunden"):format(g.n, g.time), 1)
+		txt((touch and "Tap the keys in order" or "Press the keys in order") .. (" – %d strikes in %d seconds"):format(g.n, g.time), 1)
 	elseif g.keys[2] and g.keys[1] ~= g.keys[2] then
-		txt(touch and "Tippe" or "Drücke", 1); key(g.keys[1], 2); txt("und", 3); key(g.keys[2], 4); txt("abwechselnd, wenn der Ring den Kreis berührt", 5)
+		txt(touch and "Tap" or "Press", 1); key(g.keys[1], 2); txt("and", 3); key(g.keys[2], 4); txt("alternating, when the ring touches the circle", 5)
 	elseif touch then
-		txt("Tippe den Kreis an, wenn der Ring ihn berührt", 1)
+		txt("Tap the circle when the ring touches it", 1)
 	else
-		txt("Drücke", 1); key(g.keys[1], 2); txt("wenn der Ring den Kreis berührt", 3)
+		txt("Press", 1); key(g.keys[1], 2); txt("when the ring touches the circle", 3)
 	end
 end
 
@@ -305,19 +305,19 @@ player:GetAttributeChangedSignal("CC_TrainResult"):Connect(function()
 	if not ok or type(r) ~= "table" then return end
 	local rate = r.n > 0 and r.hits / r.n or 0
 	if r.reason == "Abbruch" then rate = -1 end
-	resTitle.Text = rate < 0 and "ABGEBROCHEN" or rate >= 0.9 and "SEHR STARK" or rate >= 0.6 and "STARK" or rate >= 0.3 and "GESCHAFFT" or "NOCHMAL VERSUCHEN"
+	resTitle.Text = rate < 0 and "CANCELED" or rate >= 0.9 and "VERY STRONG" or rate >= 0.6 and "STRONG" or rate >= 0.3 and "COMPLETE" or "TRY AGAIN"
 	resTitle.TextColor3 = rate >= 0.6 and C.gold or (rate >= 0.3 and C.text or C.warn)
 	task.wait()                                      -- lastPerfect wird beim Ende des Minispiels gesetzt
-	resLine.Text = ("%s  ·  %d von %d getroffen%s"):format(r.label or "", r.hits, r.n, lastPerfect > 0 and ("  ·  %d perfekt"):format(lastPerfect) or "")
+	resLine.Text = ("%s  ·  %d of %d hit%s"):format(r.label or "", r.hits, r.n, lastPerfect > 0 and ("  ·  %d perfekt"):format(lastPerfect) or "")
 	for _, c in ipairs(rewardRow:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end end
 	local statDe = STAT_DE[r.stat] or r.stat
 	UI.tag({ Text = ("+%d TP  %s"):format(r.tp, statDe), Color = r.tp > 0 and C.blue or C.bg3, Size = UDim2.fromOffset(0, 36), Parent = rewardRow })
 	UI.tag({ Text = ("+%d XP"):format(r.xp), Color = r.xp > 0 and C.gold or C.bg3, TextColor = C.bg0, Size = UDim2.fromOffset(0, 36), Parent = rewardRow })
-	if r.tp == 0 then UI.label({ Text = "Ab 30 % Treffern gibt es Trainingspunkte.", TextSize = 15, TextColor3 = C.dim, AutomaticSize = Enum.AutomaticSize.X, TextWrapped = false, Size = UDim2.fromOffset(0, 36), Parent = rewardRow }) end
+	if r.tp == 0 then UI.label({ Text = "You earn training points from 30 % hits.", TextSize = 15, TextColor3 = C.dim, AutomaticSize = Enum.AutomaticSize.X, TextWrapped = false, Size = UDim2.fromOffset(0, 36), Parent = rewardRow }) end
 	-- Fortschritt des Werts (Attribute kommen vom Profil-Server, kurz warten)
 	task.delay(0.3, function()
 		local v, tp = player:GetAttribute("CC_" .. r.stat) or 0, player:GetAttribute("CC_" .. r.stat .. "TP") or 0
-		statL.Text = ("%s %d / 20   ·   %d/10 TP bis zum nächsten Punkt"):format(statDe, v, tp)
+		statL.Text = ("%s %d / 20   ·   %d/10 TP until the next point"):format(statDe, v, tp)
 		for k, pip in ipairs(resPips) do pip.BackgroundColor3 = k <= tp and C.blue or C.bg3 end
 	end)
 	resGui.Enabled = true
@@ -390,11 +390,11 @@ RunService:BindToRenderStep("CC_Minigame", Enum.RenderPriority.Camera.Value + 5,
 	progFill.Size = UDim2.fromScale(done / g.n, 1)
 	if now < g.start then
 		countL.Text = tostring(math.ceil(g.start - now))
-		progL.Text = "Gleich geht's los …"
+		progL.Text = "Get ready …"
 		if g.game == "rhythm" then target.Text = label(g.keys[1]); ring.Size = UDim2.fromOffset(92, 92) end
 		return
 	end
-	countL.Text = (now - g.start < 0.5) and "LOS!" or ""
+	countL.Text = (now - g.start < 0.5) and "GO!" or ""
 	if g.game == "tread" then
 		local raw = player:GetAttribute("CC_Tread")
 		if raw then
@@ -404,22 +404,22 @@ RunService:BindToRenderStep("CC_Minigame", Enum.RenderPriority.Camera.Value + 5,
 				local function x(v) return math.clamp((v - T_MIN) / (T_MAX - T_MIN), 0, 1) end
 				band.Position = UDim2.fromScale(x(tg - 0.8), 0); band.Size = UDim2.fromScale(x(tg + 0.8) - x(tg - 0.8), 1)
 				mark.Position = UDim2.fromScale(x(sp), 0.5)
-				targetL.Text = ("ZIEL  %.1f km/h"):format(tg)
-				speedL.Text = ("DU  %.1f km/h"):format(sp)
+				targetL.Text = ("TARGET  %.1f km/h"):format(tg)
+				speedL.Text = ("YOU  %.1f km/h"):format(sp)
 				stamFill.Size = UDim2.fromScale(st / 100, 1)
 				local inBand = math.abs(sp - tg) <= 0.8
 				local col = tired == "1" and C.red or (inBand and C.green or (sp > tg and C.red or C.warn))
 				mark.BackgroundColor3 = col; speedL.TextColor3 = col
-				feedback.Text = tired == "1" and "ERSCHÖPFT" or (inBand and "IM ZIEL" or (sp > tg and "ZU SCHNELL" or "ZU LANGSAM"))
+				feedback.Text = tired == "1" and "EXHAUSTED" or (inBand and "ON TARGET" or (sp > tg and "TOO FAST" or "TOO SLOW"))
 				feedback.TextColor3 = col; feedbackUntil = os.clock() + 0.2
 				progFill.Size = UDim2.fromScale(math.clamp(inb / g.n, 0, 1), 1)
-				progL.Text = ("Restzeit %d s   ·   im Zielbereich %d von %d s"):format(math.ceil(left), math.floor(inb), g.n)
+				progL.Text = ("Time left %d s   ·   in zone %d of %d s"):format(math.ceil(left), math.floor(inb), g.n)
 			end
 		end
 	elseif g.game == "seq" then
 		local left = math.max(0, g.start + g.time - now)
 		timeFill.Size = UDim2.fromScale(left / g.time, 1)
-		progL.Text = ("Schlag %d / %d   ·   Treffer %d   ·   Fehler %d   ·   noch %.1f s"):format(math.min(g.cur, g.n), g.n, g.hits, g.misses, left)
+		progL.Text = ("Strike %d / %d   ·   Hits %d   ·   Misses %d   ·   %.1f s left"):format(math.min(g.cur, g.n), g.n, g.hits, g.misses, left)
 		for i, b in ipairs(boxes) do
 			local d = g.done[i]
 			b.Bg.ImageColor3 = d == "hit" and C.green or d == "miss" and C.redDark or C.bg1
@@ -429,7 +429,7 @@ RunService:BindToRenderStep("CC_Minigame", Enum.RenderPriority.Camera.Value + 5,
 		if left <= 0 then for i = g.cur, g.n do report("miss", i) end; g.cur = g.n + 1 end
 	else
 		for i = 1, g.n do
-			if not g.done[i] and now > g.start + (i - 1) * g.interval + LATE then report("miss", i); showFeedback("VERPASST", C.red) end
+			if not g.done[i] and now > g.start + (i - 1) * g.interval + LATE then report("miss", i); showFeedback("MISSED", C.red) end
 		end
 		local nxt
 		for i = 1, g.n do if not g.done[i] then nxt = i; break end end
@@ -443,6 +443,6 @@ RunService:BindToRenderStep("CC_Minigame", Enum.RenderPriority.Camera.Value + 5,
 			tStroke.Color = inWin and C.green or C.red
 			target.Text = label(g.keys[nxt])
 		end
-		progL.Text = ("Wiederholung %d / %d   ·   Treffer %d   ·   perfekt %d"):format(math.min(done + 1, g.n), g.n, g.hits, g.perfect)
+		progL.Text = ("Rep %d / %d   ·   Hits %d   ·   Perfect %d"):format(math.min(done + 1, g.n), g.n, g.hits, g.perfect)
 	end
 end)

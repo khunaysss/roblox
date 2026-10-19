@@ -1,5 +1,5 @@
 -- StarterGui.CC_MenuGui.Menu (LocalScript in einer ScreenGui)
--- Lobby-Menue: TRAINING (gegen den Trainingsgegner) oder GEGEN SPIELER (Warteschlange, die ersten zwei kaempfen).
+-- Lobby-Menue: TRAINING (gegen den Trainingsgegner) oder VS PLAYERS (Warteschlange, die ersten zwei kaempfen).
 -- Sichtbar, solange der eigene Charakter in keinem Kampf ist (kein Attribut CC_Opponent).
 -- Server: ReplicatedStorage.CC_Menu ("training" | "pvp" | "cancel"); Stand aus ReplicatedStorage.CC_MatchState und Player.CC_Queue.
 local player = game.Players.LocalPlayer
@@ -32,9 +32,9 @@ local function button(text, color, order)
 end
 label("CAGE CHAMPIONS", 30, Enum.Font.GothamBlack, Color3.fromRGB(255, 220, 60), 1, 36)
 local trainingB = button("TRAINING", Color3.fromRGB(40, 90, 200), 2)
-local pvpB = button("GEGEN SPIELER", Color3.fromRGB(200, 40, 50), 3)
-local cancelB = button("ABBRECHEN", Color3.fromRGB(70, 70, 78), 4)
-local fighterB = button("KÄMPFER", Color3.fromRGB(60, 140, 90), 4)
+local pvpB = button("VS PLAYERS", Color3.fromRGB(200, 40, 50), 3)
+local cancelB = button("CANCEL", Color3.fromRGB(70, 70, 78), 4)
+local fighterB = button("FIGHTER", Color3.fromRGB(60, 140, 90), 4)
 local status = label("", 16, Enum.Font.GothamBold, Color3.fromRGB(220, 220, 225), 5, 44)
 -- Profil (CC_Profile): Level, XP-Balken, Werte mit Trainingspunkten, Bilanz
 local levelL = label("", 18, Enum.Font.GothamBlack, Color3.fromRGB(255, 220, 60), 6, 22)
@@ -44,7 +44,7 @@ local function bar(order, color)
 	return fill
 end
 local xpFill = bar(7, Color3.fromRGB(255, 200, 40))
-local STAT_NAMES = { { "Power", "Schlagkraft" }, { "Cardio", "Kondition" }, { "Wrestling", "Ringen" }, { "Grappling", "Bodenkampf" } }
+local STAT_NAMES = { { "Power", "Power" }, { "Cardio", "Cardio" }, { "Wrestling", "Wrestling" }, { "Grappling", "Grappling" } }
 local statRows = {}
 for i, s_ in ipairs(STAT_NAMES) do
 	local l = label("", 14, Enum.Font.GothamBold, Color3.fromRGB(220, 220, 225), 7 + i * 2, 16)
@@ -57,8 +57,8 @@ local HS = game:GetService("HttpService")
 local lookEvent = RS:WaitForChild("CC_Look", 10)
 local lookOpts = RS:WaitForChild("CC_LookOptions", 10)
 local NAMES = { Hair_QuiffV03 = "Tolle", Hair_Buzzcut = "Buzzcut", Hair_SidePart = "Seitenscheitel", Hair_ShortCurls = "Locken",
-	none = "kein Bart", Beard_Short = "kurz", Beard_Full = "Vollbart", Face_Focused = "fokussiert", Face_Neutral = "neutral", Face_Friendly = "freundlich" }
-local SKIN_N = { "hell", "mittel", "gebräunt", "dunkel" }
+	none = "no beard", Beard_Short = "kurz", Beard_Full = "Vollbart", Face_Focused = "fokussiert", Face_Neutral = "neutral", Face_Friendly = "freundlich" }
+local SKIN_N = { "light", "medium", "tan", "dark" }
 local HAIRC_N = { "schwarz", "dunkelbraun", "braun", "blond", "rot", "grau" }
 local custom = Instance.new("Frame")
 custom.AnchorPoint = Vector2.new(0, 0.5); custom.Position = UDim2.new(0, 360, 0.5, 0); custom.Size = UDim2.fromOffset(330, 330)
@@ -67,7 +67,7 @@ Instance.new("UICorner", custom).CornerRadius = UDim.new(0, 10)
 local cpad = Instance.new("UIPadding", custom); cpad.PaddingLeft = UDim.new(0, 16); cpad.PaddingRight = UDim.new(0, 16); cpad.PaddingTop = UDim.new(0, 14)
 local clist = Instance.new("UIListLayout", custom); clist.Padding = UDim.new(0, 8); clist.SortOrder = Enum.SortOrder.LayoutOrder
 local ct = Instance.new("TextLabel"); ct.BackgroundTransparency = 1; ct.Size = UDim2.new(1, 0, 0, 30); ct.Font = Enum.Font.GothamBlack; ct.TextSize = 22
-ct.TextColor3 = Color3.fromRGB(255, 220, 60); ct.Text = "DEIN KÄMPFER"; ct.TextXAlignment = Enum.TextXAlignment.Left; ct.LayoutOrder = 0; ct.Parent = custom
+ct.TextColor3 = Color3.fromRGB(255, 220, 60); ct.Text = "YOUR FIGHTER"; ct.TextXAlignment = Enum.TextXAlignment.Left; ct.LayoutOrder = 0; ct.Parent = custom
 local function list_(attr) local t = {}; for x in string.gmatch(lookOpts and lookOpts:GetAttribute(attr) or "", "[^,]+") do table.insert(t, x) end; return t end
 local function currentLook()
 	local ok, t = pcall(function() return HS:JSONDecode(player:GetAttribute("CC_Look") or "") end)
@@ -107,7 +107,7 @@ for i, r in ipairs(ROWS) do
 	left.Activated:Connect(function() step(-1) end); right.Activated:Connect(function() step(1) end)
 end
 local done = Instance.new("TextButton"); done.Size = UDim2.new(1, 0, 0, 40); done.BackgroundColor3 = Color3.fromRGB(60, 140, 90); done.Font = Enum.Font.GothamBlack
-done.TextSize = 18; done.TextColor3 = Color3.new(1, 1, 1); done.Text = "FERTIG"; done.LayoutOrder = 10; done.Parent = custom
+done.TextSize = 18; done.TextColor3 = Color3.new(1, 1, 1); done.Text = "DONE"; done.LayoutOrder = 10; done.Parent = custom
 Instance.new("UICorner", done).CornerRadius = UDim.new(0, 8)
 done.Activated:Connect(function() custom.Visible = false end)
 fighterB.Activated:Connect(function() custom.Visible = not custom.Visible end)
@@ -136,15 +136,15 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	trainingB.Visible = q == nil; pvpB.Visible = q == nil; cancelB.Visible = q ~= nil; fighterB.Visible = q == nil
 	local lines = {}
 	if busy then
-		table.insert(lines, ("Kampf läuft: %s gegen %s"):format(state:GetAttribute("RedName") or "?", state:GetAttribute("BlueName") or "?"))
+		table.insert(lines, ("Fight in progress: %s vs %s"):format(state:GetAttribute("RedName") or "?", state:GetAttribute("BlueName") or "?"))
 	end
 	if q == "pvp" then
 		local n = state:GetAttribute("QueuePvp") or 0
-		table.insert(lines, n >= 2 and "Gegner gefunden – du bist als Nächstes dran." or "Warte auf einen Gegner … (" .. n .. "/2)")
+		table.insert(lines, n >= 2 and "Opponent found – you are up next." or "Waiting for an opponent … (" .. n .. "/2)")
 	elseif q == "training" then
-		table.insert(lines, busy and "Training startet nach diesem Kampf." or "Training startet …")
+		table.insert(lines, busy and "Training starts after this fight." or "Training starting …")
 	elseif not busy then
-		table.insert(lines, "Wähle einen Modus.")
+		table.insert(lines, "Choose a mode.")
 	end
 	status.Text = table.concat(lines, "\n")
 	local lv, xp, nx = player:GetAttribute("CC_Level") or 1, player:GetAttribute("CC_XP") or 0, player:GetAttribute("CC_XPNext") or 100
@@ -155,6 +155,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		row[1].Text = ("%s  %d / 20"):format(row[3], v)
 		row[2].Size = UDim2.fromScale(math.clamp((v + tp / 10) / 20, 0, 1), 1)
 	end
-	recordL.Text = ("Bilanz %d-%d   ·   K.o. %d   ·   Sub %d%s"):format(player:GetAttribute("CC_Wins") or 0, player:GetAttribute("CC_Losses") or 0,
+	recordL.Text = ("Record %d-%d   ·   KO %d   ·   Sub %d%s"):format(player:GetAttribute("CC_Wins") or 0, player:GetAttribute("CC_Losses") or 0,
 		player:GetAttribute("CC_KOs") or 0, player:GetAttribute("CC_Subs") or 0, player:GetAttribute("CC_ProfileSaved") and "" or "  (nicht gespeichert)")
 end)

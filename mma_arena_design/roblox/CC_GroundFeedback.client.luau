@@ -86,7 +86,7 @@ local names = {
 	side = "SIDE CONTROL",
 	mount = "MOUNT",
 	back = "BACK CONTROL",
-	stand = "STAND",
+	stand = "STANDING",
 }
 local function positionName(value)
 	return names[value] or string.upper(tostring(value or ""))
@@ -103,8 +103,8 @@ RunService.RenderStepped:Connect(function()
 	local counterUntil = char:GetAttribute("CC_CounterUntil")
 	if counterUntil and counterUntil > now then
 		local remaining = math.clamp((counterUntil - now) / 0.4, 0, 1)
-		title.Text = "F  ·  JETZT KONTERN"
-		detail.Text = char:GetAttribute("CC_CounterLabel") or "ANGRIFF ABWEHREN"
+		title.Text = "F  ·  COUNTER NOW"
+		detail.Text = char:GetAttribute("CC_CounterLabel") or "DEFEND THE ATTACK"
 		fill.Size = UDim2.fromScale(remaining, 1)
 		fill.BackgroundColor3 = Color3.fromRGB(255, 196, 46)
 		accent.BackgroundColor3 = Color3.fromRGB(255, 196, 46)
@@ -124,11 +124,11 @@ RunService.RenderStepped:Connect(function()
 	else
 		local pos = positionName(char:GetAttribute("CC_GroundPos"))
 		if role == "bottom" then
-			title.Text = "SPACE  ·  BEFREIEN & AUFSTEHEN"
-			detail.Text = pos .. "  ·  F kontert einen Positionswechsel"
+			title.Text = "SPACE  ·  ESCAPE & GET UP"
+			detail.Text = pos .. "  ·  F counters a position change"
 		else
-			title.Text = "E  ·  POSITION  /  SPACE  ·  AUFSTEHEN"
-			detail.Text = pos .. "  ·  F kontert eine Befreiung"
+			title.Text = "E  ·  POSITION  /  SPACE  ·  GET UP"
+			detail.Text = pos .. "  ·  F counters an escape"
 		end
 		fill.Size = UDim2.fromScale(0, 1)
 	end

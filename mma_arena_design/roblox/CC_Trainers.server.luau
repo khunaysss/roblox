@@ -9,12 +9,12 @@ local SIG = require(RS:WaitForChild("CC_Signatures"))
 local SIGPROG = require(RS:WaitForChild("CC_SignatureProgression"))
 
 local INFO = {   -- Reihenfolge = feste Zonen im Gym; sig = Schluessel in CC_Signatures.list
-	{ id = "Mike_Tyson", name = "Mike Tyson", style = "Peek-a-boo Boxen", sig = "tyson", move = "Linker Koerperhaken + rechter Uppercut" },
-	{ id = "Muhammad_Ali", name = "Muhammad Ali", style = "Tänzelndes Boxen", sig = "ali", move = "Instinkt-Modus: automatisch ausweichen, Calf Kick" },
-	{ id = "Alex_Pereira", name = "Alex Pereira", style = "Kickboxen", sig = "pereira", move = "Linker Konterhaken" },
-	{ id = "Khabib_Nurmagomedov", name = "Khabib Nurmagomedov", style = "Ringen", sig = "khabib", move = "Eagle Slam: hochheben, tragen, slammen" },
-	{ id = "Saenchai", name = "Saenchai", style = "Muay Thai", sig = "saenchai", move = "Rad-Kick: Cartwheel Kick zum Kopf" },
-	{ id = "Charles_Oliveira", name = "Charles Oliveira", style = "Muay Thai / BJJ", sig = "oliveira", move = "Bronx Choke: auf den Ruecken springen und wuergen" },
+	{ id = "Mike_Tyson", name = "Mike Tyson", style = "Peek-a-boo Boxing", sig = "tyson", move = "Left body hook + right uppercut" },
+	{ id = "Muhammad_Ali", name = "Muhammad Ali", style = "Dancing Boxing", sig = "ali", move = "Instinct mode: dodge automatically, calf kick" },
+	{ id = "Alex_Pereira", name = "Alex Pereira", style = "Kickboxing", sig = "pereira", move = "Left counter hook" },
+	{ id = "Khabib_Nurmagomedov", name = "Khabib Nurmagomedov", style = "Wrestling", sig = "khabib", move = "Eagle Slam: lift, carry, slam" },
+	{ id = "Saenchai", name = "Saenchai", style = "Muay Thai", sig = "saenchai", move = "Wheel Kick: cartwheel kick to the head" },
+	{ id = "Charles_Oliveira", name = "Charles Oliveira", style = "Muay Thai / BJJ", sig = "oliveira", move = "Bronx Choke: jump on the back and choke" },
 }
 local POSITIONS = { -- Lobby V10: Trainer bleiben an freien Wegen und nahe ihren Trainingsbereichen
 	{ pos = Vector3.new(100, 0, 16), look = Vector3.new(91, 0, 12) },   -- Tyson: Boxsäcke
@@ -82,7 +82,7 @@ panel.OnServerEvent:Connect(function(p, action, sig)
 			if scene then local ok, len = pcall(function() return scene:Invoke(p, SIGPROG.list[sig].trainerId, "challenge") end); wait = ok and tonumber(len) or 0 end
 			if be then task.delay(wait, function() if p.Parent then be:Fire(p, "trainer", sig) end end) end
 		else
-			p:SetAttribute("CC_Notice", "Erledige zuerst alle Trainer-Quests.|" .. tostring(workspace:GetServerTimeNow()))
+			p:SetAttribute("CC_Notice", "Finish all coach quests first.|" .. tostring(workspace:GetServerTimeNow()))
 		end
 	end
 end)

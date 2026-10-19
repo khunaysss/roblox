@@ -1086,7 +1086,7 @@ local function openCounterWindow(f, duration, label)
 	if not f or not f.char then return end
 	local untilTime = workspace:GetServerTimeNow() + duration
 	f.char:SetAttribute("CC_CounterUntil", untilTime)
-	f.char:SetAttribute("CC_CounterLabel", label or "KONTER")
+	f.char:SetAttribute("CC_CounterLabel", label or "COUNTER")
 	task.delay(duration + 0.05, function()
 		if f.char and f.char.Parent and f.char:GetAttribute("CC_CounterUntil") == untilTime then
 			f.char:SetAttribute("CC_CounterUntil", nil)
@@ -1106,7 +1106,7 @@ function groundAdvance(top)
 	local t0 = os.clock()
 	local ta = playPair(top, bottom, step[1], false)
 	startGroundAction(top, "POSITION", pairLen(step[1]), w.pos, step[2])
-	openCounterWindow(bottom, COUNTER_WINDOW, "POSITIONSWECHSEL KONTERN")
+	openCounterWindow(bottom, COUNTER_WINDOW, "COUNTER POSITION CHANGE")
 	task.wait(COUNTER_WINDOW)
 	if not (top.wr and bottom.wr) then return end
 	if countered(bottom, t0, 0.3) then
@@ -1268,8 +1268,8 @@ function groundEscape(f, chaining)
 		local L = pairLen(back[1]) - 0.02
 		ta.TimePosition, tb.TimePosition = L, L
 		ta:AdjustSpeed(-1); tb:AdjustSpeed(-1)
-		startGroundAction(f, bottomEscape and "BEFREIUNG" or "AUFSTEHEN", L, pos, back[2])
-		if bottomEscape then openCounterWindow(top, COUNTER_WINDOW, "BEFREIUNG KONTERN") end
+		startGroundAction(f, bottomEscape and "ESCAPE" or "GET UP", L, pos, back[2])
+		if bottomEscape then openCounterWindow(top, COUNTER_WINDOW, "COUNTER ESCAPE") end
 
 		if bottomEscape then
 			task.wait(COUNTER_WINDOW)
@@ -1306,12 +1306,12 @@ function groundEscape(f, chaining)
 	end
 
 	if f == top and DOWN_OK then
-		startGroundAction(f, "AUFSTEHEN", 1.2, "guard", "stand")
+		startGroundAction(f, "GET UP", 1.2, "guard", "stand")
 		topDisengage(top)
 		return
 	end
 	top.wr.state = "escape"
-	startGroundAction(f, "AUFSTEHEN", pairLen("Ground_Guard_Escape") + 1.5, "guard", "stand")
+	startGroundAction(f, "GET UP", pairLen("Ground_Guard_Escape") + 1.5, "guard", "stand")
 	local ta = playPair(top, bottom, "Ground_Guard_Escape", false)
 	if not holdTrackEnd(ta, pairLen("Ground_Guard_Escape"), nil, function() return pairCancelled(top, bottom) end) then return end
 	if pairCancelled(top, bottom) then return end

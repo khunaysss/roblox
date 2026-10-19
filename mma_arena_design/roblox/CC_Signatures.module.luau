@@ -24,7 +24,7 @@ S.FOCUS = {                    -- Gewinn je Ereignis (vorlaeufig)
 -- aus der Schaden/Reaktion kommen. trails: Zeitfenster (s) und Bones fuer die Bewegungsspur (nur schnelle Phasen).
 S.list = {
 	tyson = {
-		name = "PEEK-A-BOO KOMBINATION", short = "Linker Koerperhaken + rechter Uppercut", trainer = "Mike_Tyson",
+		name = "PEEK-A-BOO COMBO", short = "Left body hook + right uppercut", trainer = "Mike_Tyson",
 		anim = "Fighter_Sig_Tyson", length = 30 / 24, lock = 1.18,
 		stamina = 20, range = 4.1,                      -- Studs zwischen den Kaempfern: Start nur, wenn die Kombination real treffen kann (gemessen: trifft bis ~4,0)
 		color = Color3.fromRGB(150, 20, 28),           -- dunkelrot
@@ -38,7 +38,7 @@ S.list = {
 		-- Instinkt-Modus (Ultra-Instinkt-Idee): kein fester Schlag, sondern 5 s Zustand. Ali weicht bis zu 3 Treffern automatisch aus
 		-- (Faust oder Tritt), sein Low Kick wird zum Calf Kick mit 2,5-fachem Schaden und schwerer Bein-Verletzung (beendet den Modus).
 		-- Takedown-Versuch gegen ihn im Modus: Knie zum Kopf, Angreifer faellt kurz um (kein Knockdown), verbraucht ein Ausweichen.
-		name = "INSTINKT-MODUS", short = "Weicht automatisch aus · Calf Kick mit voller Wucht", trainer = "Muhammad_Ali",
+		name = "INSTINCT MODE", short = "Dodges automatically · full-force calf kick", trainer = "Muhammad_Ali",
 		special = "instinct", duration = 5.0, dodges = 3, calfMult = 2.5, calfInjury = 35,
 		kneeDamage = 18, kneeInjury = 15, kneeDownTime = 1.6,   -- Takedown gegen Ali im Modus: Knie-Konter, Angreifer faellt und steht wieder auf
 		anim = "Fighter_Sig_Ali", length = 26 / 24, lock = 0.2,
@@ -48,7 +48,7 @@ S.list = {
 		trails = {},
 	},
 	pereira = {
-		name = "STEINHAND-KONTER", short = "Explosiver linker Konterhaken", trainer = "Alex_Pereira",
+		name = "STONE HAND COUNTER", short = "Explosive left counter hook", trainer = "Alex_Pereira",
 		anim = "Fighter_Sig_Pereira", length = 0.98, lock = 0.98, stamina = 22, range = 4.5,
 		color = Color3.fromRGB(190, 44, 34),
 		hits = { { win = { 0.33, 0.49 }, limb = "LeftHand", zone = "head", move = "hook", scale = 1.35, react = "hitHook", ko = "koFwd", impact = 1.4 } },
@@ -56,14 +56,14 @@ S.list = {
 	},
 	khabib = {
 		-- Hochheben, Tragen, Slam (Paar TD_LiftSlam, Wrestling_Prototype_v04): Aufprall Frame 45 -> Zusatzschaden, roter Bildschirm beim Opfer.
-		name = "EAGLE SLAM", short = "Hochheben, tragen und auf die Matte slammen", trainer = "Khabib_Nurmagomedov",
+		name = "EAGLE SLAM", short = "Lift, carry and slam onto the mat", trainer = "Khabib_Nurmagomedov",
 		special = "takedown", slam = true, impactFrame = 45, slamDamage = 14, slamInjury = 10, stamina = 24, range = 5.0, length = 56 / 24, lock = 56 / 24,
 		color = Color3.fromRGB(120, 95, 55), hits = {}, trails = {},
 	},
 	saenchai = {
 		-- Rad-Kick (Cartwheel Kick): Saenchai dreht sich auf der linken Hand ins Rad, der rechte Fuss trifft von oben den Kopf.
 		-- Animation Fighter_Sig_Saenchai_Wheel (Fighter_Rigged_v23): Treffer bei Frame 13-16 (0,50-0,66 s), Fuss erreicht das Kopfziel genau.
-		name = "RAD-KICK", short = "Cartwheel Kick zum Kopf", trainer = "Saenchai",
+		name = "WHEEL KICK", short = "Cartwheel kick to the head", trainer = "Saenchai",
 		anim = "Fighter_Sig_Saenchai_Wheel", length = 30 / 24, lock = 1.25, stamina = 22, range = 4.4,
 		color = Color3.fromRGB(240, 235, 215),
 		hits = { { win = { 0.48, 0.68 }, limb = "RightFoot", zone = "head", move = "highkick", scale = 1.35, react = "hitHook", ko = "ko", impact = 1.5 } },
@@ -72,7 +72,7 @@ S.list = {
 	oliveira = {
 		-- Ruecken nehmen + Rear Naked Choke (Paar Sig_BackTake, Ground_Positions_v02): unblockbar (Block/Sprawl helfen nicht),
 		-- danach sofort das Wuerge-Duell mit Vorsprung (subStart) und staerkerem Zug (subPower). Befreien bleibt moeglich.
-		name = "BRONX CHOKE", short = "Auf den Ruecken springen und wuergen (unblockbar)", trainer = "Charles_Oliveira",
+		name = "BRONX CHOKE", short = "Jump on the back and choke (unblockable)", trainer = "Charles_Oliveira",
 		special = "backtake", stamina = 24, range = 4.8, length = 48 / 24, lock = 48 / 24,
 		subStart = 0.50, subPower = 1.25, subTime = 4.5,
 		color = Color3.fromRGB(220, 190, 85), hits = {}, trails = {},

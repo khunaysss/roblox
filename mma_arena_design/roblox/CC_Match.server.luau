@@ -163,10 +163,10 @@ local function onMenu(p, what, level, fromServer)
 		if type(level) == "string" and LEVELS[level] then p:SetAttribute("CC_DummyLevel", level)
 		elseif not p:GetAttribute("CC_DummyLevel") then p:SetAttribute("CC_DummyLevel", "anfaenger") end
 	elseif what == "career" then
-		if not careerReady(p, level) then p:SetAttribute("CC_Notice", "Dieser Karriere-Gegner ist noch gesperrt.|" .. tostring(workspace:GetServerTimeNow())); return end
+		if not careerReady(p, level) then p:SetAttribute("CC_Notice", "This career opponent is still locked.|" .. tostring(workspace:GetServerTimeNow())); return end
 		p:SetAttribute("CC_CareerSelected", level)
 	elseif what == "trainer" then
-		if not fromServer or not trainerReady(p, level) then p:SetAttribute("CC_Notice", "Erledige zuerst alle Trainer-Quests.|" .. tostring(workspace:GetServerTimeNow())); return end
+		if not fromServer or not trainerReady(p, level) then p:SetAttribute("CC_Notice", "Finish all coach quests first.|" .. tostring(workspace:GetServerTimeNow())); return end
 		p:SetAttribute("CC_TrainerSelected", level)
 	end
 	local i = inQueue(p)
@@ -436,8 +436,8 @@ function runMatch(m)
 		local startP, door = spots and spots:FindFirstChild("Fighter_Walkout_Main"), spots and spots:FindFirstChild("Cage_Door")
 		if startP and door then
 			set("State", "walkout")
-			if trainer then set("Banner", "TRAINER-ENDKAMPF"); set("BannerSub", m.red.Name .. "  vs.  " .. blueLabel)
-			elseif career then set("Banner", "KARRIERE"); set("BannerSub", m.red.Name .. "  vs.  " .. blueLabel)
+			if trainer then set("Banner", "COACH FINAL FIGHT"); set("BannerSub", m.red.Name .. "  vs.  " .. blueLabel)
+			elseif career then set("Banner", "CAREER"); set("BannerSub", m.red.Name .. "  vs.  " .. blueLabel)
 			else set("Banner", "FIGHT NIGHT"); set("BannerSub", "Walkout") end
 			local r, b = chars(m)
 			streamTo(m, startP.Position); streamTo(m, door.Position)
@@ -486,7 +486,7 @@ function runMatch(m)
 		local wait = round == 1 and (workspace:GetAttribute("CC_IntroTime") or INTRO_TIME) or (workspace:GetAttribute("CC_BreakTime") or BREAK_TIME)
 		for t = wait, 1, -1 do
 			set("TimeLeft", t)
-			set("Banner", "RUNDE " .. round); set("BannerSub", t <= 3 and tostring(t) or (round == 1 and "Kampf beginnt" or "Pause"))
+			set("Banner", "ROUND " .. round); set("BannerSub", t <= 3 and tostring(t) or (round == 1 and "Fight begins" or "Break"))
 			task.wait(1)
 		end
 		set("Banner", "FIGHT!"); set("BannerSub", "")
@@ -500,7 +500,7 @@ function runMatch(m)
 			task.wait(0.1)
 			set("TimeLeft", math.max(0, math.ceil(roundTime - (os.clock() - t0))))
 			local rOk, bOk = present(m)
-			if not (rOk and bOk) then winner = rOk and "red" or "blue"; method = "Aufgabe"; break end
+			if not (rOk and bOk) then winner = rOk and "red" or "blue"; method = "Forfeit"; break end
 			local r, b = chars(m)
 			set("ScoreRed", totalRed + damage(r)); set("ScoreBlue", totalBlue + damage(b))
 			winner = koWinner(m)
@@ -523,16 +523,16 @@ function runMatch(m)
 		for _, p in ipairs({ m.red, m.blue }) do profile(p, "train", "Cardio", 2) end
 		if not winner then
 			local dw = doctorWinner(m)
-			if dw then winner, method = dw, "Arztabbruch"; set("Banner", "ARZTABBRUCH"); set("BannerSub", "Kampf wird beendet") end
+			if dw then winner, method = dw, "Arztabbruch"; set("Banner", "DOCTOR STOPPAGE"); set("BannerSub", "Fight is being stopped") end
 		end
 		if winner then break end
 		freeze(m, true)
 		bell(3)
-		set("Banner", "ENDE RUNDE " .. round); set("BannerSub", string.format("Punkte  %d : %d", totalRed, totalBlue))
+		set("Banner", "END OF ROUND " .. round); set("BannerSub", string.format("Points  %d : %d", totalRed, totalBlue))
 		task.wait(2)
 	end
 	if not winner then
-		method = "Punktentscheidung"
+		method = "Decision"
 		winner = decisionWinner(judgeRed, judgeBlue)
 	end
 	if method == "K.O." or method == "Submission" then task.wait(1.5) end
@@ -547,7 +547,7 @@ function runMatch(m)
 	local wname = winner == "red" and m.red.Name or winner == "blue" and blueLabel or ""
 	set("State", "over"); set("Winner", winner); set("WinnerName", wname)
 	bell(3); crowd(0.8); task.delay(4, function() crowd(0.3) end)
-	set("Banner", winner == "draw" and "UNENTSCHIEDEN" or (wname .. " GEWINNT"))
+	set("Banner", winner == "draw" and "DRAW" or (wname .. " WINS"))
 	set("BannerSub", method .. string.format("   ·   %d : %d", totalRed, totalBlue))
 	print(("[CC] Kampf %s vorbei: %s (%s) %d:%d"):format(m.id, winner, method, totalRed, totalBlue))
 	for side, p in pairs({ red = m.red, blue = m.blue or false }) do

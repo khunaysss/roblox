@@ -1,7 +1,7 @@
 -- StarterGui.CC_GymHUD.GymHUD (LocalScript in einer ScreenGui)
 -- Gym-Oberflaeche (UI-Ueberarbeitung Schritt 2, Designsystem ReplicatedStorage.CC_UI):
 --   * Profil-Karte oben links: Level, XP, 4 Werte mit Trainingspunkten (10 TP = +1 Wert)
---   * "NAECHSTE AUFGABE" oben rechts: aus den echten Werten abgeleitet (schwaecherer Gym-Wert -> passende Station)
+--   * "NEXT TASK" oben rechts: aus den echten Werten abgeleitet (schwaecherer Gym-Wert -> passende Station)
 --   * eigene Interaktions-Hinweise fuer die Gym-Stationen (ProximityPrompt Style Custom, nur lokal umgestellt):
 --     Taste je Geraet (PC-Taste / Controller-Taste / Antippen auf Touch), Station, Aktion, was trainiert wird
 --   * Trainingsplan (Station "Trainingsplan", Attribut CC_OpenPlan vom Server)
@@ -26,13 +26,13 @@ gui.DisplayOrder = 10
 local canvas = UI.new("Frame", { Name = "Canvas", BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = gui })
 UI.autoscale(canvas, 720)
 
-local STATS = { { "Power", "Schlagkraft" }, { "Cardio", "Kondition" }, { "Wrestling", "Ringen" }, { "Grappling", "Bodenkampf" } }
-local STAT_DE = { Power = "Schlagkraft", Cardio = "Kondition", Wrestling = "Ringen", Grappling = "Bodenkampf" }
+local STATS = { { "Power", "Power" }, { "Cardio", "Cardio" }, { "Wrestling", "Wrestling" }, { "Grappling", "Grappling" } }
+local STAT_DE = { Power = "Power", Cardio = "Cardio", Wrestling = "Wrestling", Grappling = "Grappling" }
 local WHERE = {
-	Power = "Sandsack, Hantelbank oder Kurzhanteln",
-	Cardio = "Laufband, Hampelmann auf der Trainingsmatte · jede Kampfrunde",
-	Wrestling = "Takedowns und Sprawls im Kampf",
-	Grappling = "Positionen, Befreien und Submissions im Kampf",
+	Power = "Heavy bag, bench or dumbbells",
+	Cardio = "Treadmill, jumping jacks on the mat · every fight round",
+	Wrestling = "Takedowns and sprawls in fights",
+	Grappling = "Positions, escapes and submissions in fights",
 }
 
 ---------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ end
 local task_ = UI.panel({ Name = "NextTask", AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -20, 0, 70), Size = UDim2.fromOffset(380, 112), Parent = canvas })
 UI.new("UIPadding", { PaddingLeft = UDim.new(0, 18), PaddingRight = UDim.new(0, 18), PaddingTop = UDim.new(0, 12), Parent = task_ })
 UI.new("Frame", { BackgroundColor3 = C.red, BorderSizePixel = 0, Position = UDim2.new(0, -18, 0, 4), Size = UDim2.new(0, 5, 1, -28), Parent = task_ })
-UI.label({ Text = "NÄCHSTE AUFGABE", FontFace = F.bold, TextSize = 14, TextColor3 = C.red, Size = UDim2.new(1, 0, 0, 18), Parent = task_ })
+UI.label({ Text = "NEXT TASK", FontFace = F.bold, TextSize = 14, TextColor3 = C.red, Size = UDim2.new(1, 0, 0, 18), Parent = task_ })
 local taskTitle = UI.label({ Text = "", FontFace = F.head, TextSize = 21, Position = UDim2.fromOffset(0, 20), Size = UDim2.new(1, 0, 0, 28), Parent = task_ })
 local taskSub = UI.label({ Text = "", TextSize = 16, TextColor3 = C.dim, TextYAlignment = Enum.TextYAlignment.Top, Position = UDim2.fromOffset(0, 50), Size = UDim2.new(1, 0, 0, 44), Parent = task_ })
 
@@ -75,13 +75,13 @@ local function updateTask()
 		if attr("CC_" .. s, 0) < 20 and (not bestV or v < bestV) then best, bestV = s, v end
 	end
 	if not best then
-		taskTitle.Text = "Kämpfen"
-		taskSub.Text = "Schlagkraft und Kondition sind voll. Ringen und Bodenkampf steigen im Kampf (Trainer: Trainingskampf)."
+		taskTitle.Text = "Fight"
+		taskSub.Text = "Power and cardio are maxed. Wrestling and grappling improve in fights (coach: training fight)."
 		return
 	end
 	local v, tp = attr("CC_" .. best, 0), attr("CC_" .. best .. "TP", 0)
-	taskTitle.Text = STAT_DE[best] .. " trainieren"
-	taskSub.Text = ("%s · noch %d TP bis %s %d"):format(best == "Power" and "Sandsack, Hantelbank, Kurzhanteln" or "Laufband oder Hampelmann",
+	taskTitle.Text = "Train " .. STAT_DE[best]
+	taskSub.Text = ("%s · %d TP until %s %d"):format(best == "Power" and "Heavy bag, bench, dumbbells" or "Treadmill or jumping jacks",
 		10 - tp, STAT_DE[best], v + 1)
 end
 
@@ -111,7 +111,7 @@ player:GetAttributeChangedSignal("CC_Notice"):Connect(function()
 end)
 -- Bodenlage: Aufstehen nicht moeglich, weil der Gegner direkt am Koerper steht
 local function hookChar(c)
-	c:GetAttributeChangedSignal("CC_DownBlocked"):Connect(function() toast("Gegner zu nah – erst Abstand schaffen (Stoßtritt)", C.warn, "warn") end)
+	c:GetAttributeChangedSignal("CC_DownBlocked"):Connect(function() toast("Opponent too close – create distance first (push kick)", C.warn, "warn") end)
 end
 player.CharacterAdded:Connect(hookChar)
 if player.Character then hookChar(player.Character) end
@@ -120,7 +120,7 @@ player:GetAttributeChangedSignal("CC_LevelUp"):Connect(function()
 end)
 player:GetAttributeChangedSignal("CC_StatUp"):Connect(function()
 	local s_, v = tostring(player:GetAttribute("CC_StatUp")):match("^(%w+):(%d+)")
-	if s_ then toast((STAT_DE[s_] or s_) .. " steigt auf " .. v .. " / 20", C.blue, "trophy") end
+	if s_ then toast((STAT_DE[s_] or s_) .. " levels up " .. v .. " / 20", C.blue, "trophy") end
 end)
 
 ---------------------------------------------------------------------------------------------------
@@ -128,10 +128,10 @@ end)
 ---------------------------------------------------------------------------------------------------
 local gymFolder = workspace:WaitForChild("CC_GymInteractions", 20)
 local TRAINS = {
-	punch_bag = "Schlagkraft · Tastenfolge", punch_bag_standing = "Schlagkraft · Tastenfolge",
-	bench_press = "Schlagkraft · Rhythmus", bench_dumbbell = "Schlagkraft · Rhythmus",
-	stretch_spot = "Kondition · Rhythmus", treadmill = "Kondition · Tempo halten", coach_talk = "Trainingskampf (ohne Bilanz)",
-	character_customization = "Aussehen ändern", locker = "Aussehen ändern", read_plan = "Werte und Trainingsorte",
+	punch_bag = "Power · Key sequence", punch_bag_standing = "Power · Key sequence",
+	bench_press = "Power · Rhythm", bench_dumbbell = "Power · Rhythm",
+	stretch_spot = "Cardio · Rhythm", treadmill = "Cardio · Hold the pace", coach_talk = "Training fight (no record)",
+	character_customization = "Change look", locker = "Change look", read_plan = "Stats and training spots",
 }
 local function isGymPrompt(p) return gymFolder and p:IsA("ProximityPrompt") and p:IsDescendantOf(gymFolder) end
 local function styleCustom(p) if isGymPrompt(p) then p.Style = Enum.ProximityPromptStyle.Custom end end
@@ -187,8 +187,8 @@ local function openPlan()
 	closePlan()
 	plan = UI.panel({ Name = "Plan", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(620, 420), Parent = canvas })
 	UI.new("UIPadding", { PaddingLeft = UDim.new(0, 26), PaddingRight = UDim.new(0, 26), PaddingTop = UDim.new(0, 20), Parent = plan })
-	UI.label({ Text = "TRAININGSPLAN", FontFace = F.title, TextSize = 30, Size = UDim2.new(1, 0, 0, 36), Parent = plan })
-	UI.label({ Text = ("Level %d  ·  10 Trainingspunkte ergeben +1 Wert (max. 20)"):format(attr("CC_Level", 1)), TextSize = 16, TextColor3 = C.dim,
+	UI.label({ Text = "TRAINING PLAN", FontFace = F.title, TextSize = 30, Size = UDim2.new(1, 0, 0, 36), Parent = plan })
+	UI.label({ Text = ("Level %d  ·  10 training points give +1 stat (max. 20)"):format(attr("CC_Level", 1)), TextSize = 16, TextColor3 = C.dim,
 		Position = UDim2.fromOffset(0, 38), Size = UDim2.new(1, 0, 0, 22), Parent = plan })
 	for i, s in ipairs(STATS) do
 		local y = 76 + (i - 1) * 64
@@ -200,7 +200,7 @@ local function openPlan()
 		fill.Size = UDim2.fromScale(math.clamp((v + tp / 10) / 20, 0, 1), 1)
 		UI.label({ Text = WHERE[s[1]], TextSize = 15, TextColor3 = C.dim, Position = UDim2.fromOffset(0, y + 35), Size = UDim2.new(1, 0, 0, 20), Parent = plan })
 	end
-	local b = UI.button({ Style = "secondary", Text = "SCHLIESSEN", Icon = "close", Size = UDim2.fromOffset(220, 52), OnClick = closePlan, Parent = plan })
+	local b = UI.button({ Style = "secondary", Text = "CLOSE", Icon = "close", Size = UDim2.fromOffset(220, 52), OnClick = closePlan, Parent = plan })
 	b.AnchorPoint = Vector2.new(1, 1); b.Position = UDim2.new(1, 0, 1, -18)
 	UI.focus(b)
 end

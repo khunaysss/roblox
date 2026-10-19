@@ -414,7 +414,7 @@ function UI.button(opts)
 	return b, { title = title, sub = sub, icon = icon, badge = badge, bg = bg }
 end
 
--- kleines Schild (z. B. "BALD", "GESPERRT")
+-- kleines Schild (z. B. "SOON", "LOCKED")
 function UI.tag(props)
 	local t = UI.chamfer({ AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(0, 22), ImageColor3 = props.Color or UI.C.bg3, ImageTransparency = 0 }, "fill", 6)
 	UI.new("UIPadding", { PaddingLeft = UDim.new(0, 8), PaddingRight = UDim.new(0, 8), Parent = t })
@@ -425,7 +425,7 @@ function UI.tag(props)
 	return t
 end
 
--- Tastensymbol fuer Hinweise (Text in einem Kaestchen, z. B. "E", "LEER", "A")
+-- Tastensymbol fuer Hinweise (Text in einem Kaestchen, z. B. "E", "SPACE", "A")
 function UI.key(text, props)
 	local k = UI.chamfer({ AutomaticSize = Enum.AutomaticSize.X, Size = UDim2.fromOffset(30, 30), ImageColor3 = UI.C.text, ImageTransparency = 0 }, "fill", 6)
 	UI.new("UIPadding", { PaddingLeft = UDim.new(0, 7), PaddingRight = UDim.new(0, 7), Parent = k })

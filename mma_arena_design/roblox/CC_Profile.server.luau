@@ -85,7 +85,7 @@ local function rewardCheck(plr)
 	end
 	lastUnlocked[plr] = now
 	if #names > 0 then
-		plr:SetAttribute("CC_Notice", "Neu freigeschaltet: " .. table.concat(names, ", ") .. " (Mein Kämpfer)|" .. tostring(workspace:GetServerTimeNow()))
+		plr:SetAttribute("CC_Notice", "Newly unlocked: " .. table.concat(names, ", ") .. " (My Fighter)|" .. tostring(workspace:GetServerTimeNow()))
 	end
 end
 Players.PlayerRemoving:Connect(function(plr) lastUnlocked[plr] = nil end)
@@ -281,7 +281,7 @@ event.Event:Connect(function(plr, kind, a, b, c)
 		p.sigProgress[a] = p.sigProgress[a] or SIGPROG.newProgress()[a]
 		p.sigProgress[a].started = true
 		p.dirty = true; publish(plr); saveSoon(plr)
-		plr:SetAttribute("CC_Notice", "Trainer-Quest gestartet.|" .. tostring(workspace:GetServerTimeNow()))
+		plr:SetAttribute("CC_Notice", "Coach quest started.|" .. tostring(workspace:GetServerTimeNow()))
 	elseif kind == "sig_fight_result" and type(a) == "table" then
 		local p = profiles[plr]
 		for id, def in pairs(SIGPROG.list) do
@@ -305,7 +305,7 @@ event.Event:Connect(function(plr, kind, a, b, c)
 			q.bossWins = (q.bossWins or 0) + 1
 			if not table.find(p.sigs, a) then table.insert(p.sigs, a) end
 			p.sig = a
-			plr:SetAttribute("CC_Notice", SIGPROG.list[a].signatureName .. " freigeschaltet!|" .. tostring(workspace:GetServerTimeNow()))
+			plr:SetAttribute("CC_Notice", SIGPROG.list[a].signatureName .. " unlocked!|" .. tostring(workspace:GetServerTimeNow()))
 		end
 		p.dirty = true; publish(plr); saveSoon(plr)
 	elseif kind == "sig_unlock" and SIG.list[a] then
@@ -335,7 +335,7 @@ event.Event:Connect(function(plr, kind, a, b, c)
 				local after = OPP.titleFor(#p.career.beaten)
 				if after ~= before then                                  -- neuer Karriere-Titel: einmalige Belohnung
 					addXP(plr, after.bonusXP or 0)
-					plr:SetAttribute("CC_Notice", ("Neuer Titel: %s  (+%d XP)|%s"):format(after.name, after.bonusXP or 0, tostring(workspace:GetServerTimeNow())))
+					plr:SetAttribute("CC_Notice", ("New title: %s  (+%d XP)|%s"):format(after.name, after.bonusXP or 0, tostring(workspace:GetServerTimeNow())))
 				end
 			end
 		elseif b == "loss" then p.losses += 1; p.career.losses += 1 end
@@ -345,8 +345,8 @@ event.Event:Connect(function(plr, kind, a, b, c)
 		plr:SetAttribute("CC_CareerAdvance", a .. "|" .. b .. "|" .. tostring(workspace:GetServerTimeNow()))
 		if not p.onb.careerTip then                                   -- erster offizieller Kampf: Belohnungen kurz erklaeren (auch nach Niederlage)
 			p.onb.careerTip = true
-			local text = b == "win" and ("Erster Karrieresieg! +%d XP. Mehr XP = höheres Level, neue Gegner werden frei."):format(xp)
-				or ("+%d XP auch ohne Sieg. Trainier im Gym und versuch es nochmal – die Karriere läuft weiter."):format(xp)
+			local text = b == "win" and ("First career win! +%d XP. More XP = higher level, new opponents unlock."):format(xp)
+				or ("+%d XP even without a win. Train in the gym and try again – your career goes on."):format(xp)
 			plr:SetAttribute("CC_CoachTip", game:GetService("HttpService"):JSONEncode({ text = text, kind = b == "win" and "good" or "tip", t = workspace:GetServerTimeNow() }))
 		end
 	elseif kind == "result" then

@@ -228,7 +228,7 @@ local function playFinisher()
 	end
 	local tag = Instance.new("TextLabel"); tag.BackgroundTransparency = 1; tag.AnchorPoint = Vector2.new(1, 1); tag.Position = UDim2.new(1, -28, 1, -14)
 	tag.Size = UDim2.fromOffset(360, 30); tag.Font = Enum.Font.GothamBold; tag.TextSize = 16; tag.TextColor3 = Color3.fromRGB(200, 200, 205)
-	tag.TextXAlignment = Enum.TextXAlignment.Right; tag.Text = "LEERTASTE  Überspringen"; tag.Parent = gui
+	tag.TextXAlignment = Enum.TextXAlignment.Right; tag.Text = "SPACE  Skip"; tag.Parent = gui
 	local title = Instance.new("TextLabel"); title.BackgroundTransparency = 1; title.AnchorPoint = Vector2.new(0, 1); title.Position = UDim2.new(0, 28, 1, -12)
 	title.Size = UDim2.fromOffset(500, 36); title.Font = Enum.Font.GothamBlack; title.TextSize = 26; title.TextColor3 = Color3.fromRGB(214, 36, 46)
 	title.TextXAlignment = Enum.TextXAlignment.Left; title.Text = (SIG.list[info.sig] and SIG.list[info.sig].name or "FINISHER"); title.Parent = gui

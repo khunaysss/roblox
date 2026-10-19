@@ -49,7 +49,7 @@ remote.OnServerEvent:Connect(function(plr, t)
 	if type(t) ~= "table" then return end
 	local c = plr.Character
 	if c and (c:GetAttribute("CC_Opponent") or c:GetAttribute("CC_Wrestle")) then
-		remote:FireClient(plr, "rejected", "Nicht während eines Kampfs.")
+		remote:FireClient(plr, "rejected", "Not during a fight.")
 		return
 	end
 	local look = Look.sanitize(t)

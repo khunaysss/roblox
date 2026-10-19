@@ -44,7 +44,7 @@ local function makeGui(def, info)
 	local skip = Instance.new("TextLabel"); skip.BackgroundTransparency = 1; skip.AnchorPoint = Vector2.new(1, 0.5)
 	skip.Position = UDim2.new(0.97, 0, 0.5, 0); skip.Size = UDim2.new(0.3, 0, 0.32, 0); skip.Font = Enum.Font.GothamMedium
 	skip.TextScaled = true; skip.TextXAlignment = Enum.TextXAlignment.Right; skip.TextColor3 = Color3.fromRGB(150, 152, 158)
-	skip.Text = "LEERTASTE  Überspringen"; skip.Parent = bottom
+	skip.Text = "SPACE  Skip"; skip.Parent = bottom
 	gui.Parent = player:WaitForChild("PlayerGui")
 	return gui, title, sub
 end

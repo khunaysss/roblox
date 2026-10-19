@@ -79,11 +79,11 @@ UI.label({ Text = player.DisplayName, FontFace = F.head, TextSize = 22, Position
 local pLevel = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextColor3 = C.gold, TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.fromOffset(20, 12), Size = UDim2.new(1, -40, 0, 24), Parent = profile })
 local _, pXP = UI.bar({ Position = UDim2.fromOffset(20, 44), Size = UDim2.new(1, -40, 0, 6), Parent = profile }, C.gold)
 local pInfo = UI.label({ Text = "", TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(20, 58), Size = UDim2.new(1, -190, 0, 26), Parent = profile })
-local profileMore = UI.label({ Text = "FORTSCHRITT  ›", FontFace = F.bold, TextSize = 14, TextColor3 = C.dim,
+local profileMore = UI.label({ Text = "PROGRESS  ›", FontFace = F.bold, TextSize = 14, TextColor3 = C.dim,
 	TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.new(1, -174, 0, 58), Size = UDim2.fromOffset(145, 26), ZIndex = 8, Parent = profile })
 
 local menuHints = UI.hints({ AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -40, 1, -32), Entries = {
-	{ pc = "KLICK", pad = "A", text = "Auswählen" }, { pc = "RÜCKTASTE", pad = "B", text = "Zurück" } }, Parent = menu })
+	{ pc = "CLICK", pad = "A", text = "Select" }, { pc = "BACKSPACE", pad = "B", text = "Back" } }, Parent = menu })
 
 local status = UI.panel({ Name = "Status", AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0, 34), Size = UDim2.fromOffset(500, 54), Visible = false, Parent = menu })
 local statusL = UI.label({ Text = "", FontFace = F.bold, TextSize = 18, TextXAlignment = Enum.TextXAlignment.Center, Size = UDim2.fromScale(1, 1), Parent = status })
@@ -138,11 +138,11 @@ local function nav(order, text, sub, icon, fn, disabled, badge)
 	table.insert(navButtons, b)
 	return b
 end
-nav(1, "KARRIERE", "Fortschritt · Werte · Bilanz", "trophy", function() go("career") end)
-nav(2, "ONLINE", "Gegen echte Spieler kämpfen", "globe", function() go("online") end)
-nav(3, "TRAINING", "Trainingskampf oder Gym", "dumbbell", function() go("training") end)
-nav(4, "MEIN KÄMPFER", "Aussehen anpassen", "fighter", function() go("fighter") end)
-nav(5, "EINSTELLUNGEN", "Ton · Anzeige · Tutorial", "gear", function() go("settings") end)
+nav(1, "CAREER", "Progress · Stats · Record", "trophy", function() go("career") end)
+nav(2, "ONLINE", "Fight real players", "globe", function() go("online") end)
+nav(3, "TRAINING", "Training fight or gym", "dumbbell", function() go("training") end)
+nav(4, "MY FIGHTER", "Customize your look", "fighter", function() go("fighter") end)
+nav(5, "SETTINGS", "Sound · Display · Tutorial", "gear", function() go("settings") end)
 navButtons[1]:SetAttribute("Selected", true)
 for _, button in ipairs(navButtons) do
 	button.MouseEnter:Connect(function()
@@ -155,7 +155,7 @@ end
 
 -- Karriere: Ranglistenweg mit zehn Gegnern (Liste scrollbar), Rivalen- und Titelkampf, Karriere-Titel (CC_CareerTitle)
 local career = page("career")
-header(career, "KARRIERE")
+header(career, "CAREER")
 local cSummary = card(career, 1, 62)
 local cLevel = UI.label({ Text = "", FontFace = F.head, TextSize = 19, TextColor3 = C.gold, Size = UDim2.new(1, 0, 0, 24), Parent = cSummary })
 local cRecord = UI.label({ Text = "", TextSize = 15, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 26), Size = UDim2.new(1, 0, 0, 20), Parent = cSummary })
@@ -172,7 +172,7 @@ local careerDetail=UI.panel({Name="OpponentDetails",AnchorPoint=Vector2.new(1,1)
 local careerOpponentName=UI.label({Text="",FontFace=F.title,TextSize=27,Position=UDim2.fromOffset(30,15),Size=UDim2.new(1,-60,0,40),TextWrapped=false,Parent=careerDetail})
 local careerStyle=UI.label({Text="",TextSize=16,TextColor3=C.dim,Position=UDim2.fromOffset(30,53),Size=UDim2.new(1,-60,0,25),Parent=careerDetail})
 local careerStats={}
-for i,entry in ipairs({{"Power","Schlagkraft"},{"Cardio","Kondition"},{"Wrestling","Ringen"},{"Grappling","Bodenkampf"}}) do
+for i,entry in ipairs({{"Power","Power"},{"Cardio","Cardio"},{"Wrestling","Wrestling"},{"Grappling","Grappling"}}) do
  local y=85+(i-1)*31
  UI.label({Text=entry[2],TextSize=15,Position=UDim2.fromOffset(30,y),Size=UDim2.fromOffset(150,24),Parent=careerDetail})
  local _,fill=UI.bar({Position=UDim2.fromOffset(190,y+7),Size=UDim2.fromOffset(220,10),Parent=careerDetail},i<=2 and C.red or C.gold)
@@ -193,8 +193,8 @@ local function selectCareer(id)
   row.fill.Size=UDim2.fromScale(math.clamp((v or 0)/20,0,1),1)
  end
  for rid, row in pairs(cRows) do row.button:SetAttribute("Selected", rid == id) end
-	cTip.Text = "TRAINER-TIPP  ·  " .. def.tip
-	if cFightParts then cFightParts.title.Text = "KAMPF GEGEN " .. def.name:upper() end
+	cTip.Text = "COACH TIP  ·  " .. def.tip
+	if cFightParts then cFightParts.title.Text = "FIGHT VS " .. def.name:upper() end
 	if stage then
 		Look.apply(stage, def.look, RS:FindFirstChild("CC_CustomShared"))
 		local shorts = stage:FindFirstChild("Fighter_Shorts", true); if shorts and shorts:IsA("BasePart") then shorts.Color = C.blue end
@@ -202,7 +202,7 @@ local function selectCareer(id)
 end
 for i, def in ipairs(Opponents.list) do
 	local d = def
-	local b, parts = UI.button({ Style = "ghost", Text = ("#%d  %s"):format(d.rank or i,d.name):upper(), Sub = ("RANG #%d  ·  %s  ·  %s"):format(d.rank or i, d.stage, d.style),
+	local b, parts = UI.button({ Style = "ghost", Text = ("#%d  %s"):format(d.rank or i,d.name):upper(), Sub = ("RANK #%d  ·  %s  ·  %s"):format(d.rank or i, d.stage, d.style),
 		Size = UDim2.new(1, 0, 0, 34), LayoutOrder = 11-i, Name = d.id, OnClick = function() selectCareer(d.id) end, Parent = cRoster })
 	parts.title.TextSize=15
  parts.title.Position=UDim2.fromOffset(28,0);parts.title.Size=UDim2.new(0.64,-28,1,0);parts.title.TextYAlignment=Enum.TextYAlignment.Center
@@ -212,8 +212,8 @@ end
 local cActions = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 54), LayoutOrder = 4, Parent = career })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Right,
 	Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = cActions })
-UI.button({ Style = "secondary", Text = "INS GYM", Icon = "dumbbell", Size = UDim2.new(0.34, -5, 1, 0), LayoutOrder = 1, OnClick = function() close() end, Parent = cActions })
-cFight, cFightParts = UI.button({ Style = "primary", Text = "KAMPF STARTEN", Icon = "glove", Size = UDim2.new(0.66, -5, 1, 0), LayoutOrder = 2,
+UI.button({ Style = "secondary", Text = "TO THE GYM", Icon = "dumbbell", Size = UDim2.new(0.34, -5, 1, 0), LayoutOrder = 1, OnClick = function() close() end, Parent = cActions })
+cFight, cFightParts = UI.button({ Style = "primary", Text = "START FIGHT", Icon = "glove", Size = UDim2.new(0.66, -5, 1, 0), LayoutOrder = 2,
 	OnClick = function()
 		if player:GetAttribute("CC_Queue") == "career" then menuEvent:FireServer("cancel")
 		elseif player:GetAttribute("CC_Queue") == nil then menuEvent:FireServer("career", selectedCareerId) end
@@ -225,12 +225,12 @@ local function refreshCareer()
 	cLevel.Text = ("LEVEL %d   ·   %d / %d XP"):format(lv, xp, nx)
 	cXP.Size = UDim2.fromScale(math.clamp(xp / nx, 0, 1), 1)
 	local title = player:GetAttribute("CC_CareerTitle") or (Opponents.titleFor and Opponents.titleFor(cw).name) or "AMATEUR"
-	cRecord.Text = ("%s   ·   %s   ·   Karriere %d/%d   ·   Bilanz %d-%d"):format(title, Opponents.division or "DIVISION", cw, #Opponents.list, cw, cl)
+	cRecord.Text = ("%s   ·   %s   ·   Career %d/%d   ·   Record %d-%d"):format(title, Opponents.division or "DIVISION", cw, #Opponents.list, cw, cl)
 	for id, row in pairs(cRows) do
 		local unlocked = Opponents.isUnlocked(id, beaten)
 		row.button:SetAttribute("Disabled", not unlocked)
-		local stateText = beaten[id] and "SIEG" or (unlocked and "BEREIT" or "GESPERRT")
-		row.parts.sub.Text = (beaten[id] and "SIEG" or (unlocked and "BEREIT" or "GESPERRT"))
+		local stateText = beaten[id] and "WIN" or (unlocked and "READY" or "LOCKED")
+		row.parts.sub.Text = (beaten[id] and "WIN" or (unlocked and "READY" or "LOCKED"))
  row.parts.sub.TextColor3=beaten[id] and C.green or (unlocked and C.gold or C.dim)
 	end
 	local unlocked = Opponents.isUnlocked(selectedCareerId, beaten)
@@ -243,13 +243,13 @@ local function refreshCareer()
 	end
 	local q = player:GetAttribute("CC_Queue")
 	cFight:SetAttribute("Disabled", not unlocked or (q ~= nil and q ~= "career"))
-	cFightParts.title.Text = q == "career" and "WARTEN ABBRECHEN" or ("KAMPF GEGEN " .. Opponents.byId[selectedCareerId].name:upper())
+	cFightParts.title.Text = q == "career" and "CANCEL WAIT" or ("FIGHT VS " .. Opponents.byId[selectedCareerId].name:upper())
 end
 selectCareer(selectedCareerId)
 
 -- Fortschritt: echte Tages-/Wochenziele und abgeleitete Level-Titel.
 local progress = page("progress")
-header(progress, "FORTSCHRITT")
+header(progress, "PROGRESS")
 local pgSummary = card(progress, 1, 62)
 local pgRank = UI.label({ Text = "", FontFace = F.head, TextSize = 20, TextColor3 = C.gold, Size = UDim2.new(1, 0, 0, 24), Parent = pgSummary })
 local pgXPText = UI.label({ Text = "", TextSize = 15, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Right, Size = UDim2.new(1, 0, 0, 24), Parent = pgSummary })
@@ -257,8 +257,8 @@ local _, pgXP = UI.bar({ Position = UDim2.fromOffset(0, 42), Size = UDim2.new(1,
 
 local pgTabs = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), LayoutOrder = 2, Parent = progress })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = pgTabs })
-local pgGoalsTab = UI.button({ Style = "ghost", Text = "ZIELE & BELOHNUNGEN", Icon = "trophy", Size = UDim2.new(0.5, -4, 1, 0), LayoutOrder = 1, Parent = pgTabs })
-local pgLevelsTab = UI.button({ Style = "ghost", Text = "LEVEL & TITEL", Icon = "star", Size = UDim2.new(0.5, -4, 1, 0), LayoutOrder = 2, Parent = pgTabs })
+local pgGoalsTab = UI.button({ Style = "ghost", Text = "GOALS & REWARDS", Icon = "trophy", Size = UDim2.new(0.5, -4, 1, 0), LayoutOrder = 1, Parent = pgTabs })
+local pgLevelsTab = UI.button({ Style = "ghost", Text = "LEVEL & TITLE", Icon = "star", Size = UDim2.new(0.5, -4, 1, 0), LayoutOrder = 2, Parent = pgTabs })
 
 local pgBody = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 276), LayoutOrder = 3, Parent = progress })
 local pgGoals = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Parent = pgBody })
@@ -311,16 +311,16 @@ local function refreshProgress()
 	for id, row in pairs(goalRows) do
 		local count = math.min(tonumber(data.counts[id]) or 0, row.def.target)
 		local claimed = data.claimed[id] == true
-		row.status.Text = ("%s  ·  %d / %d"):format(row.def.period == "day" and "TÄGLICH" or "WÖCHENTLICH", count, row.def.target)
+		row.status.Text = ("%s  ·  %d / %d"):format(row.def.period == "day" and "DAILY" or "WEEKLY", count, row.def.target)
 		row.fill.Size = UDim2.fromScale(count / row.def.target, 1)
 		row.button:SetAttribute("Disabled", claimed or count < row.def.target)
-		row.parts.title.Text = claimed and "GEHOLT" or (count >= row.def.target and "ABHOLEN" or ("+" .. row.def.xp .. " XP"))
+		row.parts.title.Text = claimed and "CLAIMED" or (count >= row.def.target and "CLAIM" or ("+" .. row.def.xp .. " XP"))
 	end
 	local currentTitle = player:GetAttribute("CC_RankTitle")
 	for _, row in ipairs(levelRows) do
 		local unlocked = lv >= row.def.level
 		row.title.TextColor3 = unlocked and (currentTitle == row.def.title and C.gold or C.text) or C.mute
-		row.state.Text = unlocked and (currentTitle == row.def.title and "AKTIV" or "ERREICHT") or "GESPERRT"
+		row.state.Text = unlocked and (currentTitle == row.def.title and "ACTIVE" or "REACHED") or "LOCKED"
 		row.state.TextColor3 = unlocked and (currentTitle == row.def.title and C.gold or C.green) or C.mute
 	end
 end
@@ -333,8 +333,8 @@ refreshProgress()
 local online = page("online")
 header(online, "ONLINE")
 local oCard = card(online, 1, 100)
-UI.label({ Text = "SCHNELLER KAMPF", FontFace = F.head, TextSize = 19, Size = UDim2.new(1, 0, 0, 26), Parent = oCard })
-UI.label({ Text = "Gegen den nächsten Spieler in der Warteschlange. 3 Runden, je 2 Minuten.",
+UI.label({ Text = "QUICK FIGHT", FontFace = F.head, TextSize = 19, Size = UDim2.new(1, 0, 0, 26), Parent = oCard })
+UI.label({ Text = "Fight the next player in the queue. 3 rounds, 2 minutes each.",
 	TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 30), Size = UDim2.new(1, 0, 0, 40), Parent = oCard })
 -- Arena-Wahl (Server paart nur Spieler mit passender Wahl; "egal" passt zu allen)
 do
@@ -342,7 +342,7 @@ local pvpArena = player:GetAttribute("CC_PvpArenaPick") or "any"
 local arRow = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), LayoutOrder = 1, Parent = online })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = arRow })
 local arButtons = {}
-for i, e in ipairs({ { "fightnight", "FIGHT NIGHT" }, { "cage", "KÄFIG" }, { "any", "EGAL" } }) do
+for i, e in ipairs({ { "fightnight", "FIGHT NIGHT" }, { "cage", "CAGE" }, { "any", "ANY" } }) do
 	local b = UI.button({ Style = "ghost", Text = e[2], Size = UDim2.new(1 / 3, -6, 1, 0), LayoutOrder = i, Name = "Ar_" .. e[1], Parent = arRow,
 		OnClick = function() pvpArena = e[1]; player:SetAttribute("CC_PvpArenaPick", e[1]); for k, x in pairs(arButtons) do x:SetAttribute("Selected", k == pvpArena) end end })
 	arButtons[e[1]] = b
@@ -351,9 +351,9 @@ end
 arRow.LayoutOrder = 2
 end
 local oState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 28), Parent = online })
-local bSearch = UI.button({ Style = "primary", Text = "SUCHE STARTEN", Icon = "search", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("pvp", player:GetAttribute("CC_PvpArenaPick") or "any") end, Parent = online })
-local bCancel = UI.button({ Style = "danger", Text = "SUCHE ABBRECHEN", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = online })
-UI.button({ Style = "secondary", Text = "GEWERTET", Sub = "Rangliste gibt es noch nicht", Icon = "star", LayoutOrder = 6, Disabled = true, Badge = "NICHT VERFÜGBAR",
+local bSearch = UI.button({ Style = "primary", Text = "START SEARCH", Icon = "search", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("pvp", player:GetAttribute("CC_PvpArenaPick") or "any") end, Parent = online })
+local bCancel = UI.button({ Style = "danger", Text = "CANCEL SEARCH", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = online })
+UI.button({ Style = "secondary", Text = "RANKED", Sub = "Rankings are not available yet", Icon = "star", LayoutOrder = 6, Disabled = true, Badge = "NOT AVAILABLE",
 	Size = UDim2.new(1, 0, 0, 66), Parent = online })
 
 -- Training
@@ -364,27 +364,27 @@ local dummyLevel = player:GetAttribute("CC_DummyLevel") or "anfaenger"
 local lvRow = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 44), LayoutOrder = 1, Parent = training })
 UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = lvRow })
 local lvButtons = {}
-for i, e in ipairs({ { "passiv", "PASSIV" }, { "anfaenger", "ANFÄNGER" }, { "fortgeschritten", "PROFI" } }) do
+for i, e in ipairs({ { "passiv", "PASSIVE" }, { "anfaenger", "BEGINNER" }, { "fortgeschritten", "PRO" } }) do
 	local b = UI.button({ Style = "ghost", Text = e[2], Size = UDim2.new(1 / 3, -6, 1, 0), LayoutOrder = i, Name = "Lv_" .. e[1], Parent = lvRow,
 		OnClick = function() dummyLevel = e[1]; for k, x in pairs(lvButtons) do x:SetAttribute("Selected", k == dummyLevel) end end })
 	lvButtons[e[1]] = b
 	b:SetAttribute("Selected", e[1] == dummyLevel)
 end
-local bFight = UI.button({ Style = "nav", Text = "TRAININGSKAMPF", Sub = "Gegen den Trainingsgegner · ohne Bilanz", Icon = "glove", LayoutOrder = 2,
+local bFight = UI.button({ Style = "nav", Text = "TRAINING FIGHT", Sub = "Against the training opponent · no record", Icon = "glove", LayoutOrder = 2,
 	OnClick = function() menuEvent:FireServer("training", dummyLevel) end, Parent = training })
-UI.button({ Style = "nav", Text = "GYM-TRAINING", Sub = "Minispiele an den Stationen", Icon = "dumbbell", LayoutOrder = 3,
+UI.button({ Style = "nav", Text = "GYM TRAINING", Sub = "Minigames at the stations", Icon = "dumbbell", LayoutOrder = 3,
 	OnClick = function() close() end, Parent = training })
-UI.button({ Style = "ghost", Text = "GRUNDLAGEN WIEDERHOLEN (TUTORIAL)", Icon = "help", LayoutOrder = 6, Name = "Tutorial",
+UI.button({ Style = "ghost", Text = "REPLAY BASICS (TUTORIAL)", Icon = "help", LayoutOrder = 6, Name = "Tutorial",
 	OnClick = function() close(); RS:WaitForChild("CC_Tutorial"):FireServer("openWelcome") end, Parent = training })
 local tState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 4, Size = UDim2.new(1, 0, 0, 28), Parent = training })
-local bTCancel = UI.button({ Style = "danger", Text = "ABBRECHEN", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = training })
+local bTCancel = UI.button({ Style = "danger", Text = "CANCEL", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = training })
 
 -- Einstellungen: lokal und sofort wirksam. Musik wird anhand des Sound-Namens erkannt;
 -- nicht erkannte Sounds gelten als Effekte. Gespeichert im Profil (CC_Progress "settings"; CC_Profile setzt die Attribute beim Laden).
 local settings = page("settings")
-header(settings, "EINSTELLUNGEN")
+header(settings, "SETTINGS")
 local settingsCard = card(settings, 1, 272)
-UI.label({ Text = "TON", FontFace = F.head, TextSize = 21, TextColor3 = C.text, Size = UDim2.new(1, 0, 0, 28), Parent = settingsCard })
+UI.label({ Text = "SOUND", FontFace = F.head, TextSize = 21, TextColor3 = C.text, Size = UDim2.new(1, 0, 0, 28), Parent = settingsCard })
 
 local volume = {
 	master = player:GetAttribute("CC_MasterVolume") or 0.8,
@@ -466,26 +466,26 @@ local function slider(parent, y, title, key)
 	end)
 	return track
 end
-slider(settingsCard, 42, "Gesamt", "master")
-slider(settingsCard, 108, "Musik", "music")
-slider(settingsCard, 174, "Effekte", "effects")
+slider(settingsCard, 42, "Master", "master")
+slider(settingsCard, 108, "Music", "music")
+slider(settingsCard, 174, "Effects", "effects")
 local settingsNote = card(settings, 2, 146)
-UI.label({ Text = "ANZEIGE", FontFace = F.head, TextSize = 21, TextColor3 = C.text, Size = UDim2.new(1, 0, 0, 28), Parent = settingsNote })
+UI.label({ Text = "DISPLAY", FontFace = F.head, TextSize = 21, TextColor3 = C.text, Size = UDim2.new(1, 0, 0, 28), Parent = settingsNote })
 do
 local toggleSet = {}
 local function toggle(y, title, key, invert)   -- invert: Schalter zeigt "AN", wenn der gespeicherte Wert false ist (Kamera-Wackeln an = noShake false)
 	local row = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, y), Size = UDim2.new(1, 0, 0, 40), Parent = settingsNote })
 	UI.label({ Text = title, FontFace = F.bold, TextSize = 17, Size = UDim2.new(0.62, 0, 1, 0), Parent = row })
 	local b, parts
-	local function show() local on = display[key] ~= (invert == true); b:SetAttribute("KitSprite",on and "toggle_on" or "toggle_off"); b:SetAttribute("Selected", on); parts.title.Text = on and "AN" or "AUS" end
+	local function show() local on = display[key] ~= (invert == true); b:SetAttribute("KitSprite",on and "toggle_on" or "toggle_off"); b:SetAttribute("Selected", on); parts.title.Text = on and "ON" or "OFF" end
 	b, parts = UI.button({ Style = "secondary", Text = "", Size = UDim2.new(0.3, 0, 1, 0), Name = key, OnClick = function()
 		display[key] = not display[key]; player:SetAttribute(key == "reduceFx" and "CC_ReduceFX" or "CC_NoShake", display[key]); show(); sendSettings()
 	end, Parent = row })
 	b.AnchorPoint = Vector2.new(1, 0); b.Position = UDim2.new(1, 0, 0, 0)
 	toggleSet[key] = show; show()
 end
-toggle(34, "Starke Effekte (Blitze, Tönung)", "reduceFx", true)
-toggle(80, "Kamera-Wackeln", "noShake", true)
+toggle(34, "Strong effects (flashes, tint)", "reduceFx", true)
+toggle(80, "Camera shake", "noShake", true)
 -- Gespeicherte Werte uebernehmen, sobald das Profil geladen ist (und bei spaeteren Server-Aenderungen)
 local function loadSettings()
 	if not player:GetAttribute("CC_SettingsLoaded") then return end
@@ -505,9 +505,9 @@ UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Horizont
 	Padding = UDim.new(0, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = settingsActions })
 UI.button({ Style = "secondary", Text = "TUTORIAL", Icon = "help", Size = UDim2.new(0.34, -7, 1, 0), LayoutOrder = 1,
 	OnClick = function() close(); RS:WaitForChild("CC_Tutorial"):FireServer("openWelcome") end, Parent = settingsActions })
-UI.button({ Style = "secondary", Text = "INTRO ANSEHEN", Size = UDim2.new(0.36, -7, 1, 0), LayoutOrder = 2,       -- Story-Film erneut (ohne Fortschritt)
+UI.button({ Style = "secondary", Text = "WATCH INTRO", Size = UDim2.new(0.36, -7, 1, 0), LayoutOrder = 2,       -- Story-Film erneut (ohne Fortschritt)
 	OnClick = function() close(); local r = RS:FindFirstChild("CC_Story"); if r then r:FireServer("replay") end end, Parent = settingsActions })
-UI.button({ Style = "primary", Text = "FERTIG", Icon = "check", Size = UDim2.new(0.30, -6, 1, 0), LayoutOrder = 3,
+UI.button({ Style = "primary", Text = "DONE", Icon = "check", Size = UDim2.new(0.30, -6, 1, 0), LayoutOrder = 3,
 	OnClick = function() back() end, Parent = settingsActions })
 applyVolumes()
 
@@ -654,7 +654,7 @@ end
 ---------------------------------------------------------------------------------------------------
 local editor = page("fighter", menu)
 local edLeft = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(56, 34), Size = UDim2.fromOffset(250, 600), Parent = editor })
-header(edLeft, "MEIN KÄMPFER").Size = UDim2.fromOffset(420, 48)
+header(edLeft, "MY FIGHTER").Size = UDim2.fromOffset(420, 48)
 local catList = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 72), Size = UDim2.new(1, 0, 0, 520), Parent = edLeft })
 UI.new("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = catList })
 local edMid = UI.panel({ Position = UDim2.fromOffset(326, 106), Size = UDim2.fromOffset(560, 380), Parent = editor })
@@ -685,7 +685,7 @@ end
 rotButton("back", -1, 1)
 local rotLabel = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(150, 40), LayoutOrder = 2, Parent = rotRow })
 UI.icon("rotate", { Size = UDim2.fromOffset(26, 26), Position = UDim2.fromOffset(4, 7), ImageColor3 = C.dim, Parent = rotLabel })
-local rotText = UI.label({ Text = "DREHEN", FontFace = F.bold, TextSize = 17, TextColor3 = C.dim, Position = UDim2.fromOffset(38, 0), Size = UDim2.new(1, -38, 1, 0), Parent = rotLabel })
+local rotText = UI.label({ Text = "ROTATE", FontFace = F.bold, TextSize = 17, TextColor3 = C.dim, Position = UDim2.fromOffset(38, 0), Size = UDim2.new(1, -38, 1, 0), Parent = rotLabel })
 rotButton("next", 1, 3)
 local saveState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.fromOffset(0, 62), Size = UDim2.new(1, 0, 0, 26), Parent = edRight })
 local btnRow = UI.new("Frame", { BackgroundTransparency = 1, Position = UDim2.fromOffset(0, 96), Size = UDim2.new(1, 0, 0, 58), Parent = edRight })
@@ -693,20 +693,20 @@ UI.new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Horizont
 local saving = false
 local pending                      -- gesendetes Aussehen (wird nach Bestaetigung zu saved)
 local saveMsg, saveMsgColor
-local bReset = UI.button({ Style = "secondary", Text = "ZURÜCKSETZEN", Size = UDim2.fromOffset(210, 58), LayoutOrder = 1, Parent = btnRow })
-local bSave = UI.button({ Style = "primary", Text = "SPEICHERN", Icon = "check", Size = UDim2.fromOffset(210, 58), LayoutOrder = 2, Parent = btnRow })
+local bReset = UI.button({ Style = "secondary", Text = "RESET", Size = UDim2.fromOffset(210, 58), LayoutOrder = 1, Parent = btnRow })
+local bSave = UI.button({ Style = "primary", Text = "SAVE", Icon = "check", Size = UDim2.fromOffset(210, 58), LayoutOrder = 2, Parent = btnRow })
 local edHints = UI.hints({ AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 162), Size = UDim2.new(1, 0, 0, 28), Entries = {
-	{ pc = "Q / E", pad = "LB / RB", text = "Drehen" }, { pc = "RÜCKTASTE", pad = "B", text = "Zurück" } }, Parent = edRight })
+	{ pc = "Q / E", pad = "LB / RB", text = "Rotate" }, { pc = "BACKSPACE", pad = "B", text = "Back" } }, Parent = edRight })
 
 -- Kategorien (nur vorhandene Anpassungen waehlbar)
 local CATS = {
-	{ id = "hair", name = "HAARE", icon = "hair", key = "hair", list = Look.HAIR, colors = "hairColor", colorTitle = "HAARFARBE" },
-	{ id = "beard", name = "BART", icon = "beard", key = "beard", list = Look.BEARD, colors = "hairColor", colorTitle = "BARTFARBE (= HAARFARBE)" },
-	{ id = "face", name = "GESICHT", icon = "face", key = "face", list = Look.FACE },
-	{ id = "skin", name = "HAUTFARBE", icon = "skin", key = "skin", skin = true },
-	{ id = "tattoo", name = "TATTOOS", icon = "star", locked = "Tattoos gibt es noch nicht." },
+	{ id = "hair", name = "HAIR", icon = "hair", key = "hair", list = Look.HAIR, colors = "hairColor", colorTitle = "HAIR COLOR" },
+	{ id = "beard", name = "BEARD", icon = "beard", key = "beard", list = Look.BEARD, colors = "hairColor", colorTitle = "BEARD COLOR (= HAIR COLOR)" },
+	{ id = "face", name = "FACE", icon = "face", key = "face", list = Look.FACE },
+	{ id = "skin", name = "SKIN", icon = "skin", key = "skin", skin = true },
+	{ id = "tattoo", name = "TATTOOS", icon = "star", locked = "Tattoos are not available yet." },
 	{ id = "shorts", name = "SHORTS", icon = "shorts", key = "shorts", reward = Look.SHORTS },      -- Belohnungen (CC_LookShared): Level, Titel, Signaturen
-	{ id = "gloves", name = "HANDSCHUHE", icon = "glove", key = "gloves", reward = Look.GLOVES },
+	{ id = "gloves", name = "GLOVES", icon = "glove", key = "gloves", reward = Look.GLOVES },
 }
 local catButtons = {}
 local currentCat
@@ -753,7 +753,7 @@ local function showCat(cat)
 	lockedNote.Text = cat.locked or ""
 	grid.Visible = cat.locked == nil
 	colorTitle.Text = cat.colors and cat.colorTitle or ""
-	if cat.locked then midSub.Text = "Nicht verfügbar"; return end
+	if cat.locked then midSub.Text = "Not available"; return end
 	if cat.reward then                                   -- Farben: freigeschaltete waehlbar, gesperrte zeigen ihre Bedingung
 		grid.Visible = false
 		local prog = Look.progressOf(player)
@@ -763,7 +763,7 @@ local function showCat(cat)
 			local b = UI.swatch({ Color = it.color, LayoutOrder = i, Name = it.name, Size = UDim2.fromOffset(46, 46), Parent = swRow,
 				OnClick = function()
 					if ok then draft[cat.key] = i; previewDraft(); showCat(currentCat)
-					else colorTitle.Text = it.name:upper() .. "  ·  GESPERRT  ·  " .. Look.reqText(it) end
+					else colorTitle.Text = it.name:upper() .. "  ·  LOCKED  ·  " .. Look.reqText(it) end
 				end })
 			if not ok then
 				UI.icon("lock", { Size = UDim2.fromOffset(18, 18), AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), ZIndex = 5, ImageColor3 = UI.C.text, Parent = b })
@@ -772,17 +772,17 @@ local function showCat(cat)
 			end
 			table.insert(swatches, { btn = b, key = cat.key, value = i })
 		end
-		midSub.Text = ("%d von %d freigeschaltet"):format(n, #cat.reward)
+		midSub.Text = ("%d of %d unlocked"):format(n, #cat.reward)
 		lockedNote.Visible = true
-		lockedNote.Text = "Neue Farben bekommst du durch Level, Karriere-Titel und Signaturen. Gesperrte Farbe anklicken zeigt die Bedingung."
+		lockedNote.Text = "You unlock new colors through levels, career titles and signatures. Click a locked color to see its requirement."
 		local cur = cat.reward[draft[cat.key] or 1]
-		colorTitle.Text = "AUSGEWÄHLT:  " .. (cur and cur.name:upper() or "")
+		colorTitle.Text = "SELECTED:  " .. (cur and cur.name:upper() or "")
 		edMid.Size = UDim2.fromOffset(560, 340)
 		refreshSelection()
 		return
 	end
 	if cat.skin then
-		midSub.Text = #Look.SKIN .. " Hauttöne"
+		midSub.Text = #Look.SKIN .. " Skin tones"
 		for i = 1, #Look.SKIN do
 			local l = Look.copy(draft); l.skin = i
 			local b, vp = UI.optionCard({ Text = Look.SKIN_N[i], LayoutOrder = i, Parent = grid,
@@ -791,7 +791,7 @@ local function showCat(cat)
 			table.insert(cards, { btn = b, key = "skin", value = i })
 		end
 	else
-		midSub.Text = #cat.list .. " Varianten"
+		midSub.Text = #cat.list .. " Variants"
 		for i, v in ipairs(cat.list) do
 			local l = Look.copy(draft); l[cat.key] = v
 			if cat.key == "beard" or cat.key == "face" then l.hair = draft.hair end
@@ -821,10 +821,10 @@ local function dirty() return not Look.same(draft, saved) end
 local function doSave()
 	if saving or not dirty() then return end
 	saving = true
-	saveMsg, saveMsgColor = "Speichert …", C.dim
+	saveMsg, saveMsgColor = "Saving …", C.dim
 	pending = Look.copy(draft)
 	lookEvent:FireServer(pending)
-	task.delay(10, function() if saving then saving = false; saveMsg, saveMsgColor = "Keine Antwort vom Server – bitte erneut speichern.", C.warn end end)
+	task.delay(10, function() if saving then saving = false; saveMsg, saveMsgColor = "No response from server – please save again.", C.warn end end)
 end
 bSave:SetAttribute("Disabled", true)
 -- Einstieg (CC_Tutorial, Phase "editor"): Knopf heisst FERTIG, ist immer aktiv, speichert bei Aenderungen und schliesst das Menue
@@ -834,7 +834,7 @@ local function finishOnboarding()
 	onboarding = false
 	doSave()
 	RS:WaitForChild("CC_Tutorial"):FireServer("editorDone")
-	bSave:FindFirstChildWhichIsA("TextLabel").Text = "SPEICHERN"
+	bSave:FindFirstChildWhichIsA("TextLabel").Text = "SAVE"
 	close()
 end
 bSave.Activated:Connect(function() if onboarding then finishOnboarding() else doSave() end end)
@@ -848,17 +848,17 @@ lookEvent.OnClientEvent:Connect(function(res, text)
 	if res == "ok" then
 		saved = Look.copy(pending or draft)
 		if not editor.Visible then draft = Look.copy(saved); previewDraft() end   -- z. B. nach SPEICHERN im Abfrage-Fenster
-		saveMsg, saveMsgColor = "Übernommen – wird gespeichert …", C.dim
+		saveMsg, saveMsgColor = "Applied – saving …", C.dim
 	else
-		saveMsg, saveMsgColor = text or "Speichern nicht möglich.", C.warn
+		saveMsg, saveMsgColor = text or "Cannot save.", C.warn
 	end
 end)
 player:GetAttributeChangedSignal("CC_SaveStatus"):Connect(function()
 	local s = tostring(player:GetAttribute("CC_SaveStatus")):match("^(%a+)")
 	if not saveMsg or saving then return end
 	if s == "ok" then saveMsg, saveMsgColor = "Gespeichert", C.green
-	elseif s == "offline" then saveMsg, saveMsgColor = "Nur für diese Sitzung (Profil nicht geladen)", C.warn
-	elseif s == "error" then saveMsg, saveMsgColor = "Speichern fehlgeschlagen – bitte später erneut versuchen.", C.warn end
+	elseif s == "offline" then saveMsg, saveMsgColor = "This session only (profile not loaded)", C.warn
+	elseif s == "error" then saveMsg, saveMsgColor = "Saving failed – please try again later.", C.warn end
 end)
 
 -- Editor oeffnen/schliessen (beim Verlassen mit ungespeicherten Aenderungen nachfragen)
@@ -879,9 +879,9 @@ local function editorClosed()
 end
 local function confirmLeave(onLeave)
 	if not dirty() then onLeave(); return end
-	UI.dialog(canvas, "ÄNDERUNGEN SPEICHERN?", "Du hast dein Aussehen geändert, aber noch nicht gespeichert.", {
-		{ Text = "VERWERFEN", Style = "secondary", OnClick = function() onLeave() end },
-			{ Text = "SPEICHERN", Style = "primary", OnClick = function() doSave(); onLeave() end },
+	UI.dialog(canvas, "SAVE CHANGES?", "You changed your look but have not saved yet.", {
+		{ Text = "DISCARD", Style = "secondary", OnClick = function() onLeave() end },
+			{ Text = "SAVE", Style = "primary", OnClick = function() doSave(); onLeave() end },
 	})
 end
 
@@ -1024,7 +1024,7 @@ end, false, 3000, Enum.KeyCode.Backspace, Enum.KeyCode.ButtonB)
 ---------------------------------------------------------------------------------------------------
 -- Menue-Knopf im Gym (wenn das Menue zu ist): Klick, M oder Controller-Select
 ---------------------------------------------------------------------------------------------------
-local menuBtn = UI.button({ Style = "secondary", Text = "MENÜ", Icon = "menu", Size = UDim2.fromOffset(150, 48), Name = "MenuButton",
+local menuBtn = UI.button({ Style = "secondary", Text = "MENU", Icon = "menu", Size = UDim2.fromOffset(150, 48), Name = "MenuButton",
 	OnClick = function() open() end })
 menuBtn.Position = UDim2.fromOffset(20, 12)
 menuBtn.Parent = canvas
@@ -1049,12 +1049,12 @@ local function queueText()
 	local busy = (state:GetAttribute("Mode") or "") ~= ""
 	if q == "pvp" then
 		local n = state:GetAttribute("QueuePvp") or 0
-		if n >= 2 then return "Gegner gefunden – " .. (busy and "ihr seid nach dem laufenden Kampf dran." or "Kampf startet …") end
-		return "Suche läuft … (" .. n .. " von 2 Spielern)"
+		if n >= 2 then return "Opponent found – " .. (busy and "you are up after the current fight." or "Fight starting …") end
+		return "Searching … (" .. n .. " of 2 players)"
 	elseif q == "training" then
-		return busy and "Arena belegt – Training startet nach dem laufenden Kampf." or "Training startet …"
+		return busy and "Arena busy – training starts after the current fight." or "Training starting …"
 	elseif q == "career" then
-		return busy and "Fight Night belegt – dein Karriere-Kampf wartet." or "Karriere-Kampf startet …"
+		return busy and "Fight Night busy – your career fight is waiting." or "Career fight starting …"
 	end
 	return nil
 end
@@ -1080,8 +1080,8 @@ RunService.Heartbeat:Connect(function(dt)
 		local d = dirty()
 		bSave:SetAttribute("Disabled", not d or saving)
 		bReset:SetAttribute("Disabled", not d)
-		if onboarding then bSave:SetAttribute("Disabled", saving); saveState.Text, saveState.TextColor3 = "Wähle dein Aussehen – später jederzeit änderbar.", C.dim
-		elseif d and not saving then saveState.Text, saveState.TextColor3 = "Nicht gespeicherte Änderungen", C.warn
+		if onboarding then bSave:SetAttribute("Disabled", saving); saveState.Text, saveState.TextColor3 = "Choose your look – you can change it anytime.", C.dim
+		elseif d and not saving then saveState.Text, saveState.TextColor3 = "Unsaved changes", C.warn
 		elseif saveMsg then saveState.Text, saveState.TextColor3 = saveMsg, saveMsgColor
 		else saveState.Text = "" end
 		return
@@ -1092,7 +1092,7 @@ RunService.Heartbeat:Connect(function(dt)
 	pLevel.Text = ("LEVEL %d"):format(lv)
 	pXP.Size = UDim2.fromScale(math.clamp(xp / nx, 0, 1), 1)
 	local loaded = player:GetAttribute("CC_ProfileSaved")
-	pInfo.Text = ("%d / %d XP   ·   Bilanz %d-%d%s"):format(xp, nx, w, l, not loaded and "   ·   Profil nicht geladen" or "")
+	pInfo.Text = ("%d / %d XP   ·   Record %d-%d%s"):format(xp, nx, w, l, not loaded and "   ·   Profile not loaded" or "")
 	pInfo.TextColor3 = not loaded and C.warn or C.dim
 	if pages.career.Visible then refreshCareer() end
 	-- Warteschlange
@@ -1102,7 +1102,7 @@ RunService.Heartbeat:Connect(function(dt)
 	statusL.Text = txt or ""
 	bSearch.Visible = q == nil; bCancel.Visible = q == "pvp"
 	bSearch:SetAttribute("Disabled", q ~= nil)
-	oState.Text = q == "pvp" and txt or (q == "training" and "Du bist für einen Trainingskampf angemeldet." or "Bereit.")
+	oState.Text = q == "pvp" and txt or (q == "training" and "You are signed up for a training fight." or "Ready.")
 	oState.TextColor3 = q == "pvp" and C.gold or C.dim
 	bFight:SetAttribute("Disabled", q ~= nil)
 	tState.Text = q == "training" and txt or ""
@@ -1125,21 +1125,21 @@ local lLogo = logo(loading, UDim2.fromScale(0.5, 0.4), 120, Vector2.new(0.5, 0.5
 for _, d in ipairs(lLogo:GetDescendants()) do if d:IsA("GuiObject") then d.ZIndex = 51 end end
 local _, lFill = UI.bar({ AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.61, 0), Size = UDim2.fromOffset(520, 7), ZIndex = 51, Parent = loading }, C.red)
 lFill.ZIndex = 52
-local lText = UI.label({ Text = "LÄDT …", FontFace = F.bold, TextSize = 16, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Center,
+local lText = UI.label({ Text = "LOADING …", FontFace = F.bold, TextSize = 16, TextColor3 = C.dim, TextXAlignment = Enum.TextXAlignment.Center,
 	AnchorPoint = Vector2.new(0.5, 0), Position = UDim2.new(0.5, 0, 0.61, 25), Size = UDim2.fromOffset(520, 30), ZIndex = 51, Parent = loading })
 
 task.spawn(function()
 	local steps = {
-        { "Oberfläche", function() local t0=os.clock(); while not UI.Ready and os.clock()-t0<6 do task.wait(0.1) end end },
+        { "Interface", function() local t0=os.clock(); while not UI.Ready and os.clock()-t0<6 do task.wait(0.1) end end },
 		{ "Spielwelt", function() if not game:IsLoaded() then game.Loaded:Wait() end end },
-		{ "Kämpfer", function() local c = player.Character or player.CharacterAdded:Wait(); c:WaitForChild("HumanoidRootPart", 15) end },
+		{ "Fighter", function() local c = player.Character or player.CharacterAdded:Wait(); c:WaitForChild("HumanoidRootPart", 15) end },
 		{ "Profil", function() local t0 = os.clock(); while player:GetAttribute("CC_Level") == nil and os.clock() - t0 < 8 do task.wait(0.1) end end },
 		{ "Aussehen", function() RS:WaitForChild("CC_CustomShared", 5) end },
 		{ "Arena", function() workspace:WaitForChild("CC_Arena", 15) end },
 		{ "Einstieg", function() local t0 = os.clock(); while player:GetAttribute("CC_OnbPhase") == nil and os.clock() - t0 < 10 do task.wait(0.1) end end },
 	}
 	for i, s in ipairs(steps) do
-		lText.Text = "LÄDT … " .. s[1]
+		lText.Text = "LOADING … " .. s[1]
 		pcall(s[2])
 		TweenService:Create(lFill, TweenInfo.new(0.25), { Size = UDim2.fromScale(i / #steps, 1) }):Play()
 		task.wait(0.12)
@@ -1150,7 +1150,7 @@ task.spawn(function()
 	if ph == "editor" then                            -- erster Start: direkt in den Editor (Standardaussehen vorausgewaehlt)
 		onboarding = true
 		open("fighter")
-		bSave:FindFirstChildWhichIsA("TextLabel").Text = "FERTIG"
+		bSave:FindFirstChildWhichIsA("TextLabel").Text = "DONE"
 	elseif ph == "" and char and not char:GetAttribute("CC_Opponent") then open() end   -- Begruessung zeigt CC_Tutorial selbst
 	TweenService:Create(loading, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
 	for _, d in ipairs(loading:GetDescendants()) do

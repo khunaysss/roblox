@@ -1,8 +1,8 @@
 -- StarterPlayer.StarterPlayerScripts.CC_SigUltimateFX
 -- Zusaetzliche Effekte der Signaturen (nur Optik, alles lokal; Regeln und Schaden bleiben auf dem Server):
---   Tyson  "PEEK-A-BOO KOMBINATION": dunkelrote Aura waehrend der Kombination; Uppercut-Treffer im Anime-Stil:
+--   Tyson  "PEEK-A-BOO COMBO": dunkelrote Aura waehrend der Kombination; Uppercut-Treffer im Anime-Stil:
 --          Schweiss-Spritzer, Luft-Schockwelle, Impact-Frame (kurz schwarz-weiss), Speedlines, Kamera-Stoss.
---   Ali    "INSTINKT-MODUS": silbrig-blaue Aura fuer die Dauer des Modus, Anzeige mit Restzeit und Ausweich-Punkten,
+--   Ali    "INSTINCT MODE": silbrig-blaue Aura fuer die Dauer des Modus, Anzeige mit Restzeit und Ausweich-Punkten,
 --          Nachbild beim automatischen Ausweichen, Calf-Kick-Einschlag am Bein (Druckwelle, roter Rand beim Getroffenen).
 -- Ereignisse kommen ueber ReplicatedStorage.CC_SigFX (start, hit, dodge, calf, instinct_end, cancel).
 -- Bildschirm-Effekte nur fuer Angreifer/Getroffenen; Attribut CC_ReduceFX am Spieler schaltet sie ab.

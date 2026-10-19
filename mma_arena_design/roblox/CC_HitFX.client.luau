@@ -39,25 +39,25 @@ fx.OnClientEvent:Connect(function(strength, kind)
 		if kind == "knockdown" then show("KNOCKDOWN!", Color3.fromRGB(255, 196, 46), 5, 1.1) end
 	elseif kind == "land" then
 		local heavy = strength >= 0.3
-		show(heavy and "SCHWERER TREFFER" or "TREFFER", heavy and Color3.fromRGB(255, 170, 60) or Color3.new(1, 1, 1), heavy and 2 or 1)
+		show(heavy and "HEAVY HIT" or "HIT", heavy and Color3.fromRGB(255, 170, 60) or Color3.new(1, 1, 1), heavy and 2 or 1)
 		if heavy then holdUntil = os.clock() + 0.06; holdCF = nil end
 	elseif kind == "block" and not grounded() then
-		show("GEBLOCKT", Color3.fromRGB(120, 190, 255), 2)
+		show("BLOCKED", Color3.fromRGB(120, 190, 255), 2)
 	end
 end)
 
 -- Hinweise vom Server am Charakter
 local function watch(char)
-	char:GetAttributeChangedSignal("CC_Tired"):Connect(function() show("ZU WENIG AUSDAUER", Color3.fromRGB(255, 90, 70), 3, 0.9) end)
-	char:GetAttributeChangedSignal("CC_OutOfRange"):Connect(function() show("ZU WEIT WEG", Color3.fromRGB(220, 220, 225), 0, 0.7) end)
+	char:GetAttributeChangedSignal("CC_Tired"):Connect(function() show("NOT ENOUGH STAMINA", Color3.fromRGB(255, 90, 70), 3, 0.9) end)
+	char:GetAttributeChangedSignal("CC_OutOfRange"):Connect(function() show("TOO FAR", Color3.fromRGB(220, 220, 225), 0, 0.7) end)
 	char:GetAttributeChangedSignal("CC_SigDenied"):Connect(function()   -- Signatur abgelehnt (Server)
 		local why = tostring(char:GetAttribute("CC_SigDenied")):match("^(%a+)")
-		local txt = ({ focus = "FOKUS NOCH NICHT VOLL", position = "NICHT IN POSITION", anim = "SIGNATUR NICHT VERFÜGBAR" })[why]
+		local txt = ({ focus = "FOCUS NOT FULL YET", position = "NOT IN POSITION", anim = "SIGNATURE NOT AVAILABLE" })[why]
 		if txt then show(txt, Color3.fromRGB(220, 220, 225), 1, 0.8) end
 	end)
 end
 player:GetAttributeChangedSignal("CC_SigLearned"):Connect(function()   -- Uebung beim Trainer bestanden
-	show("SIGNATUR FREIGESCHALTET!", Color3.fromRGB(255, 200, 80), 4, 2.0)
+	show("SIGNATURE UNLOCKED!", Color3.fromRGB(255, 200, 80), 4, 2.0)
 end)
 if player.Character then watch(player.Character) end
 player.CharacterAdded:Connect(watch)

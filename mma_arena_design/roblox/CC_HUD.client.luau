@@ -32,8 +32,8 @@ local function bar(name, anchorX, color, label)
 	return fill
 end
 
-local myFill = bar("Player", 0, Color3.fromRGB(200, 40, 50), "DU")
-local foeFill = bar("Opponent", 1, Color3.fromRGB(40, 90, 200), "GEGNER")
+local myFill = bar("Player", 0, Color3.fromRGB(200, 40, 50), "YOU")
+local foeFill = bar("Opponent", 1, Color3.fromRGB(40, 90, 200), "OPPONENT")
 -- Ausdauer: gelber Balken unter den Lebensbalken, mit Beschriftung; wird bei wenig Ausdauer rot und blinkt
 local function sbar(anchorX)
 	local frame = Instance.new("Frame")
@@ -43,12 +43,12 @@ local function sbar(anchorX)
 	local fill = Instance.new("Frame"); fill.AnchorPoint = Vector2.new(anchorX, 0); fill.Position = UDim2.fromScale(anchorX, 0)
 	fill.Size = UDim2.fromScale(1, 1); fill.BackgroundColor3 = Color3.fromRGB(240, 200, 40); fill.BorderSizePixel = 0; fill.Parent = frame
 	local t = Instance.new("TextLabel"); t.Name = "Label"; t.BackgroundTransparency = 1; t.Size = UDim2.fromScale(1, 1); t.ZIndex = 2
-	t.Font = Enum.Font.GothamBold; t.TextSize = 11; t.TextColor3 = Color3.new(1, 1, 1); t.TextStrokeTransparency = 0.4; t.Text = "AUSDAUER"; t.Parent = frame
+	t.Font = Enum.Font.GothamBold; t.TextSize = 11; t.TextColor3 = Color3.new(1, 1, 1); t.TextStrokeTransparency = 0.4; t.Text = "STAMINA"; t.Parent = frame
 	return fill, t
 end
 local myStam, myStamL = sbar(0)
 local foeStam = sbar(1)
--- Zustand unter der eigenen Ausdauer: BLOCK / WENIG AUSDAUER
+-- Zustand unter der eigenen Ausdauer: BLOCK / LOW STAMINA
 local stateL = Instance.new("TextLabel")
 stateL.Position = UDim2.fromOffset(20, 84); stateL.Size = UDim2.fromOffset(320, 22); stateL.BackgroundTransparency = 1
 stateL.Font = Enum.Font.GothamBlack; stateL.TextSize = 18; stateL.TextXAlignment = Enum.TextXAlignment.Left
@@ -60,7 +60,7 @@ local focusF = Instance.new("Frame"); focusF.Position = UDim2.fromOffset(20, 68)
 focusF.BackgroundColor3 = Color3.fromRGB(25, 25, 28); focusF.BorderSizePixel = 0; focusF.Visible = false; focusF.Parent = gui
 local focusFill = Instance.new("Frame"); focusFill.Size = UDim2.fromScale(0, 1); focusFill.BorderSizePixel = 0; focusFill.BackgroundColor3 = Color3.fromRGB(150, 20, 28); focusFill.Parent = focusF
 local focusL = Instance.new("TextLabel"); focusL.BackgroundTransparency = 1; focusL.Size = UDim2.fromScale(1, 1); focusL.ZIndex = 2; focusL.Font = Enum.Font.GothamBold
-focusL.TextSize = 10; focusL.TextColor3 = Color3.new(1, 1, 1); focusL.TextStrokeTransparency = 0.4; focusL.Text = "FOKUS"; focusL.Parent = focusF
+focusL.TextSize = 10; focusL.TextColor3 = Color3.new(1, 1, 1); focusL.TextStrokeTransparency = 0.4; focusL.Text = "FOCUS"; focusL.Parent = focusF
 local function sigEquipped() local id = workspace:GetAttribute(SIGCFG.TEST_ATTR) or player:GetAttribute("CC_SigTrial") or player:GetAttribute("CC_Signature"); return id and SIGCFG.list[id] end
 
 local ko = Instance.new("TextLabel")
@@ -85,11 +85,11 @@ hint.Font = Enum.Font.Gotham
 hint.TextSize = 16
 hint.TextColor3 = Color3.new(1, 1, 1)
 hint.TextStrokeTransparency = 0.5
-hint.Text = "WASD laufen · LMB Jab · RMB Cross (+Umschalt: Koerper) · Q Haken · R Uppercut · C/X/V/Z Kicks · F Block/Sprawl · E Takedown · T Ziel · Leertaste Aufstehen"
+hint.Text = "WASD move · LMB Jab · RMB Cross (+Shift: body) · Q Hook · R Uppercut · C/X/V/Z Kicks · F Block/Sprawl · E Takedown · T Target · Space Get up"
 hint.Parent = gui
 local HINT_STAND = hint.Text
 -- Bodenkampf: Hinweise je Position und Rolle; Submission-Duell als Balken in der Mitte
-local POS_NAME = { guard = "GUARD", half = "HALF GUARD", side = "SIDE CONTROL", mount = "MOUNT", back = "RUECKEN" }
+local POS_NAME = { guard = "GUARD", half = "HALF GUARD", side = "SIDE CONTROL", mount = "MOUNT", back = "BACK" }
 local posL = Instance.new("TextLabel")
 posL.AnchorPoint = Vector2.new(0.5, 1); posL.Position = UDim2.new(0.5, 0, 1, -48); posL.Size = UDim2.fromOffset(400, 30)
 posL.BackgroundTransparency = 1; posL.Font = Enum.Font.GothamBlack; posL.TextSize = 24; posL.TextColor3 = Color3.fromRGB(255, 220, 60)
@@ -102,32 +102,32 @@ duelFill.BorderSizePixel = 0; duelFill.Parent = duel
 local duelL = Instance.new("TextLabel"); duelL.AnchorPoint = Vector2.new(0.5, 1); duelL.Position = UDim2.new(0.5, 0, 0, -4); duelL.Size = UDim2.fromOffset(600, 30)
 duelL.BackgroundTransparency = 1; duelL.Font = Enum.Font.GothamBlack; duelL.TextSize = 24; duelL.TextColor3 = Color3.new(1, 1, 1)
 duelL.TextStrokeTransparency = 0.2; duelL.Parent = duel
-local DOWN_NAME = { back = "RÜCKENLAGE", side = "SEITENLAGE", seated = "SITZEND", kneel = "KNIEND" }
+local DOWN_NAME = { back = "BACK CONTROL", side = "SIDE CONTROL", seated = "SEATED", kneel = "KNEELING" }
 local function groundHint(char)
 	local down = char:GetAttribute("CC_Down")
 	if down then
-		local t = { "Leertaste Aufstehen" }
-		if down ~= "kneel" then table.insert(t, "E höher (Seite/Sitzen/Knien)") end
-		if down == "back" then table.insert(t, "LMB Stoßtritt"); table.insert(t, "C Beintritt") end
+		local t = { "Space Get up" }
+		if down ~= "kneel" then table.insert(t, "E Move up (side/seated/kneeling)") end
+		if down == "back" then table.insert(t, "LMB Push kick"); table.insert(t, "C Leg kick") end
 		table.insert(t, "F Block")
 		return table.concat(t, " · ")
 	end
 	local oppName = char:GetAttribute("CC_Opponent")
 	local opp = oppName and workspace:FindFirstChild(oppName)
 	if opp and opp:GetAttribute("CC_Down") and not char:GetAttribute("CC_Wrestle") then
-		return "Gegner am Boden: C Low Kick auf die Beine" .. (opp:GetAttribute("CC_Down") == "back" and " · E in die Guard" or "")
+		return "Opponent down: C Low kick to the legs" .. (opp:GetAttribute("CC_Down") == "back" and " · E into guard" or "")
 	end
 	local role, pos = char:GetAttribute("CC_Wrestle"), char:GetAttribute("CC_GroundPos")
 	if not role or not pos then return nil end
 	if role == "top" then
 		local t = {}
-		if pos ~= "back" then table.insert(t, "E Position verbessern") end
-		if pos == "guard" or pos == "mount" then table.insert(t, "LMB Schlag") end
+		if pos ~= "back" then table.insert(t, "E Improve position") end
+		if pos == "guard" or pos == "mount" then table.insert(t, "LMB Strike") end
 		if pos == "mount" or pos == "back" then table.insert(t, "Q Submission") end
-		table.insert(t, "F Konter"); if pos == "guard" then table.insert(t, "Leertaste Aufstehen (Gegner bleibt liegen)") end
+		table.insert(t, "F Counter"); if pos == "guard" then table.insert(t, "Space Get up (opponent stays down)") end
 		return table.concat(t, " · ")
 	end
-	return (pos == "guard" and "Leertaste Aufstehen" or "Leertaste Befreien") .. " · F Konter (wenn der Gegner die Position wechselt)"
+	return (pos == "guard" and "Space Get up" or "Space Escape") .. " · F Counter (when the opponent changes position)"
 end
 
 -- Rundenanzeige oben mittig: Runde, Zeit, Punkte; grosses Banner in der Mitte
@@ -162,7 +162,7 @@ local function showToast(text, color)
 	if true then return end   -- Meldungen zeigt jetzt CC_GymHUD (UI-Ueberarbeitung Schritt 2)
 	toast.Text = text; toast.TextColor3 = color or Color3.new(1, 1, 1); toast.Visible = true; toastUntil = os.clock() + 3
 end
-local STAT_DE = { Power = "Schlagkraft", Cardio = "Kondition", Wrestling = "Ringen", Grappling = "Bodenkampf" }
+local STAT_DE = { Power = "Power", Cardio = "Cardio", Wrestling = "Wrestling", Grappling = "Grappling" }
 player:GetAttributeChangedSignal("CC_Notice"):Connect(function()
 	local t = player:GetAttribute("CC_Notice"); if t then showToast(t:match("^(.*)|") or t) end
 end)
@@ -171,7 +171,7 @@ player:GetAttributeChangedSignal("CC_LevelUp"):Connect(function()
 end)
 player:GetAttributeChangedSignal("CC_StatUp"):Connect(function()
 	local s_, v = tostring(player:GetAttribute("CC_StatUp")):match("^(%w+):(%d+)")
-	if s_ then showToast((STAT_DE[s_] or s_) .. " steigt auf " .. v .. "!", Color3.fromRGB(120, 190, 255)) end
+	if s_ then showToast((STAT_DE[s_] or s_) .. " levels up " .. v .. "!", Color3.fromRGB(120, 190, 255)) end
 end)
 local exBar = Instance.new("Frame")
 exBar.AnchorPoint = Vector2.new(0.5, 0.5); exBar.Position = UDim2.fromScale(0.5, 0.7); exBar.Size = UDim2.fromOffset(360, 16)
@@ -186,7 +186,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	if ex then
 		local name, t0, dur = ex:match("^(.-)|([%d%.]+)|([%d%.]+)$")
 		local k = (t0 and dur) and math.clamp((workspace:GetServerTimeNow() - tonumber(t0)) / tonumber(dur), 0, 1) or 0
-		exFill.Size = UDim2.fromScale(k, 1); exL.Text = (name or "Training") .. " … (nicht bewegen)"
+		exFill.Size = UDim2.fromScale(k, 1); exL.Text = (name or "Training") .. " … (do not move)"
 	end
 end)
 game:GetService("RunService").RenderStepped:Connect(function()
@@ -200,7 +200,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 	local tut = match and match:GetAttribute("Mode") == "tutorial"         -- Tutorial: nur die eigene Ausdauer (kein Sieg/Niederlage), Platz fuer die Aufgabenkarte
 	for _, b in ipairs({ myFill.Parent, foeFill.Parent, foeStam.Parent }) do b.Visible = inMatch and not tut end
 	myStam.Parent.Visible = inMatch
-	foeFill.Parent:FindFirstChildOfClass("TextLabel").Text = dummy and (dummy == workspace:FindFirstChild("CC_TrainingDummy") and "GEGNER" or string.upper(dummy.Name)) or "GEGNER"
+	foeFill.Parent:FindFirstChildOfClass("TextLabel").Text = dummy and (dummy == workspace:FindFirstChild("CC_TrainingDummy") and "OPPONENT" or string.upper(dummy.Name)) or "OPPONENT"
 	local dh = dummy and dummy:FindFirstChildOfClass("Humanoid")
 	if dh then foeFill.Size = UDim2.fromScale(math.clamp(dh.Health / dh.MaxHealth, 0, 1), 1) end
 	ko.Visible = (char and char:GetAttribute("CC_KO")) or (dummy and dummy:GetAttribute("CC_KO")) or false
@@ -213,50 +213,50 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		local low = stam < LOW_STAMINA
 		local blink = low and (os.clock() * 3) % 1 < 0.5
 		myStam.BackgroundColor3 = ((tired and workspace:GetServerTimeNow() - tired < 0.4) or blink) and Color3.fromRGB(255, 80, 60) or Color3.fromRGB(240, 200, 40)
-		myStamL.Text = "AUSDAUER " .. math.floor(stam + 0.5)
+		myStamL.Text = "STAMINA " .. math.floor(stam + 0.5)
 		local sdef = sigEquipped()
 		local fo = char:GetAttribute("CC_Focus") or 0
 		focusF.Visible = inMatch and not tut and sdef ~= nil
 		focusFill.Size = UDim2.fromScale(math.clamp(fo / SIGCFG.FOCUS_MAX, 0, 1), 1)
 		local full = fo >= SIGCFG.FOCUS_MAX
 		focusFill.BackgroundColor3 = full and Color3.fromRGB(236, 190, 76) or Color3.fromRGB(150, 20, 28)
-		focusL.Text = full and ("G  " .. (sdef and sdef.name or "SIGNATUR")) or "FOKUS"
+		focusL.Text = full and ("G  " .. (sdef and sdef.name or "SIGNATURE")) or "FOCUS"
 		local blocking = char:GetAttribute("CC_Block")
 		stateL.Visible = inMatch and not tut
-		stateL.Text = blocking and "BLOCK" or (low and "WENIG AUSDAUER" or "")
+		stateL.Text = blocking and "BLOCK" or (low and "LOW STAMINA" or "")
 		stateL.TextColor3 = blocking and Color3.fromRGB(120, 190, 255) or Color3.fromRGB(255, 90, 70)
 	end
 	if char then
 		local gh = groundHint(char)
 		local guided = match and (match:GetAttribute("Mode") == "tutorial" or match:GetAttribute("Mode") == "sparring")   -- Einstieg: keine volle Tastenleiste (CC_Tutorial)
-		hint.Text = gh or ((inMatch and not guided) and (HINT_STAND .. (sigEquipped() and " · G Signatur" or "")) or "")
+		hint.Text = gh or ((inMatch and not guided) and (HINT_STAND .. (sigEquipped() and " · G Signature" or "")) or "")
 		posL.Text = gh and (POS_NAME[char:GetAttribute("CC_GroundPos")] or DOWN_NAME[char:GetAttribute("CC_Down")] or "") or ""
 		local p = char:GetAttribute("CC_SubProgress")
 		duel.Visible = p ~= nil
 		if p then
 			duelFill.Size = UDim2.fromScale(p, 1)
 			local mine = char:GetAttribute("CC_SubRole") == "attack"
-			duelL.Text = (char:GetAttribute("CC_SubName") or "SUBMISSION") .. (mine and "  –  Q haemmern!" or "  –  Leertaste haemmern!")
+			duelL.Text = (char:GetAttribute("CC_SubName") or "SUBMISSION") .. (mine and "  –  mash Q!" or "  –  mash SPACE!")
 		end
 	end
 	if dummy then foeStam.Size = UDim2.fromScale(math.clamp((dummy:GetAttribute("CC_Stamina") or 100) / (dummy:GetAttribute("CC_StaminaMax") or 100), 0, 1), 1) end
 	if match then
 		local st, t = match:GetAttribute("State"), match:GetAttribute("TimeLeft") or 0
-		roundL.Text = st == "over" and "ENDE" or ("RUNDE " .. tostring(match:GetAttribute("Round") or 1) .. " / " .. tostring(match:GetAttribute("Rounds") or 3))
-		timeL.Text = st == "fight" and string.format("%d:%02d", t // 60, t % 60) or (st == "break" and "PAUSE" or "--:--")
-		scoreL.Text = string.format("Punkte  %d : %d", match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0)
+		roundL.Text = st == "over" and "END" or ("ROUND " .. tostring(match:GetAttribute("Round") or 1) .. " / " .. tostring(match:GetAttribute("Rounds") or 3))
+		timeL.Text = st == "fight" and string.format("%d:%02d", t // 60, t % 60) or (st == "break" and "BREAK" or "--:--")
+		scoreL.Text = string.format("Points  %d : %d", match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0)
 		banner.Text = match:GetAttribute("Banner") or ""
-		-- Kaempfer sehen ihr eigenes Ergebnis; Zuschauer den Servertext ("<Name> GEWINNT")
+		-- Kaempfer sehen ihr eigenes Ergebnis; Zuschauer den Servertext ("<Name> WINS")
 		local me = player.Name
 		local fighter = me == match:GetAttribute("RedName") or me == match:GetAttribute("BlueName")
-		if st == "over" and fighter and match:GetAttribute("Winner") ~= "draw" then banner.Text = match:GetAttribute("WinnerName") == me and "SIEG" or "NIEDERLAGE" end
+		if st == "over" and fighter and match:GetAttribute("Winner") ~= "draw" then banner.Text = match:GetAttribute("WinnerName") == me and "WIN" or "LOSS" end
 		local w = match:GetAttribute("Winner")
 		banner.TextColor3 = (st == "over" and w == "red") and Color3.fromRGB(255, 215, 70) or (st == "over" and w == "blue") and Color3.fromRGB(120, 160, 255) or Color3.new(1, 1, 1)
 		clock.Visible = st ~= "idle" and st ~= "tutorial"
 		if fighter then
 			local mine, theirs = match:GetAttribute("ScoreRed") or 0, match:GetAttribute("ScoreBlue") or 0
 			if me == match:GetAttribute("BlueName") then mine, theirs = theirs, mine end
-			scoreL.Text = string.format("Punkte  %d : %d", mine, theirs)
+			scoreL.Text = string.format("Points  %d : %d", mine, theirs)
 		end
 		bannerSub.Text = match:GetAttribute("BannerSub") or ""
 		if banner.Text ~= "" then ko.Visible = false end

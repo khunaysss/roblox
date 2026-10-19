@@ -26,7 +26,7 @@ local function button(x, text, color)
 	return b
 end
 local act = button(20, "", Color3.fromRGB(170, 30, 40))
-local close = button(220, "Schliessen", Color3.fromRGB(60, 64, 76))
+local close = button(220, "Close", Color3.fromRGB(60, 64, 76))
 
 local cur
 local function refresh()
@@ -37,17 +37,17 @@ local function refresh()
 	if cur.sig then
 		act.Visible = true
 		if unlocked then
-			act.Text = eq == cur.sig and "Ablegen" or "Ausrüsten (G)"
+			act.Text = eq == cur.sig and "Ablegen" or "Equip (G)"
 			move.Text = cur.move
 		else
-			act.Text = trial and "Übung abbrechen" or "Lernen"
-			move.Text = cur.move .. (trial and "\nÜBUNG: Trainingskampf starten und die Kombination einmal landen (G bei vollem Fokus)."
-				or "\nNoch nicht freigeschaltet.")
+			act.Text = trial and "Cancel practice" or "Lernen"
+			move.Text = cur.move .. (trial and "\nPRACTICE: start a training fight and land the combo once (G with full focus)."
+				or "\nNot unlocked yet.")
 		end
-		sigL.Text = "Signatur: " .. cur.sigName .. (eq == cur.sig and "  ✓" or "")
+		sigL.Text = "Signature: " .. cur.sigName .. (eq == cur.sig and "  ✓" or "")
 	else
 		act.Visible = false
-		sigL.Text = "Signatur: kommt bald"
+		sigL.Text = "Signature: coming soon"
 	end
 end
 ev.OnClientEvent:Connect(function(kind, data)
