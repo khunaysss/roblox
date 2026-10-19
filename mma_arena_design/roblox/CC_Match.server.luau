@@ -351,7 +351,7 @@ end
 
 local runMatch
 local function runTutorial(m)
-	m.set("Mode", "tutorial"); m.set("RedName", m.red.Name); m.set("BlueName", "Trainingsgegner"); m.set("Winner", ""); m.set("WinnerName", "")
+	m.set("Mode", "tutorial"); m.set("RedName", m.red.Name); m.set("BlueName", "Training Partner"); m.set("Winner", ""); m.set("WinnerName", "")
 	dummy:SetAttribute("CC_Difficulty", "passiv"); dummy:SetAttribute("CC_Passive", true); dummy:SetAttribute("CC_InMatch", true)
 	freeze(m, false)
 	placeBoth(m)
@@ -384,12 +384,12 @@ function runMatch(m)
 	local career = m.mode == "career" and OPP.byId[m.opponentId] or nil
 	local trainerDef = m.mode == "trainer" and SIGPROG.list[m.opponentId] or nil
 	local trainer = trainerDef and trainerDef.boss or nil
-	local blueLabel = career and career.name or trainer and trainer.name or (m.blue and m.blue.Name or "Trainingsgegner")
+	local blueLabel = career and career.name or trainer and trainer.name or (m.blue and m.blue.Name or "Training Partner")
 	local rounds = career and career.rounds or trainer and trainer.rounds or (m.mode == "sparring" and 1 or ROUNDS)
 	local set = m.set
 	set("Rounds", rounds)
 	set("Mode", m.mode); set("OpponentId", career and career.id or trainerDef and m.opponentId or ""); set("RedName", m.red.Name); set("BlueName", blueLabel); set("WinnerName", "")
-	set("Winner", ""); set("ScoreRed", 0); set("ScoreBlue", 0); set("JudgeCards", "[]"); set("JudgeRed", 0); set("JudgeBlue", 0)
+	set("Winner", ""); set("Stoppage", ""); set("ScoreRed", 0); set("ScoreBlue", 0); set("JudgeCards", "[]"); set("JudgeRed", 0); set("JudgeBlue", 0)
 	if not m.blue then
 		if m.mode == "training" or m.mode == "sparring" then
 			local lv = m.mode == "sparring" and "anfaenger" or (m.red:GetAttribute("CC_DummyLevel") or "anfaenger")
@@ -508,11 +508,12 @@ function runMatch(m)
 				local loser = winner == "red" and b or r
 				local stop = loser and loser:GetAttribute("CC_Stoppage")
 				method = (loser and loser:GetAttribute("CC_LastReact") == "submission") and "Submission"
-					or stop == "LEG_TKO" and "T.K.O. · Beinverletzung"
-					or stop == "ARM_TKO" and "T.K.O. · Armverletzung"
-					or stop == "BODY_TKO" and "T.K.O. · Rippenverletzung"
+					or stop == "LEG_TKO" and "T.K.O. · Leg injury"
+					or stop == "ARM_TKO" and "T.K.O. · Arm injury"
+					or stop == "BODY_TKO" and "T.K.O. · Rib injury"
 					or stop == "GROUND_TKO" and "T.K.O. · Ground-and-Pound"
 					or stop == "TKO" and "T.K.O." or "K.O."
+				set("Stoppage", method)               -- Ringrichter (CC_Referee) greift sofort ein
 				break
 			end
 		end
@@ -523,7 +524,7 @@ function runMatch(m)
 		for _, p in ipairs({ m.red, m.blue }) do profile(p, "train", "Cardio", 2) end
 		if not winner then
 			local dw = doctorWinner(m)
-			if dw then winner, method = dw, "Arztabbruch"; set("Banner", "DOCTOR STOPPAGE"); set("BannerSub", "Fight is being stopped") end
+			if dw then winner, method = dw, "Doctor stoppage"; set("Stoppage", method); set("Banner", "DOCTOR STOPPAGE"); set("BannerSub", "Fight is being stopped") end
 		end
 		if winner then break end
 		freeze(m, true)

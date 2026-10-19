@@ -1,0 +1,10 @@
+{
+ "raise_contact_max_cm": 7.6,
+ "foot_slide_cm": {
+  "Ref_Idle": 0.0,
+  "Ref_Fight": 0.0,
+  "Ref_Stop": 0.0,
+  "Ref_RaiseHand": 0.0,
+  "Fighter_WinRaise": 0.0
+ }
+}

@@ -1,0 +1,46 @@
+{
+ "rest_angle_before_deg_max": 10.01,
+ "rest_angle_after_deg_max": 0.0,
+ "parts": 18,
+ "bones": 16,
+ "height_m": 1.774,
+ "frames": {
+  "1": {
+   "hand_L_to_head_m": 0.781,
+   "hand_R_to_head_m": 0.781
+  },
+  "10": {
+   "hand_L_to_head_m": 0.781,
+   "hand_R_to_head_m": 0.781
+  },
+  "17": {
+   "hand_L_to_head_m": 0.781,
+   "hand_R_to_head_m": 0.781
+  },
+  "30": {
+   "hand_L_to_head_m": 0.781,
+   "hand_R_to_head_m": 0.781
+  }
+ },
+ "fbx_bytes": 474668,
+ "part_names": [
+  "Referee__Brows",
+  "Referee__Brows.001",
+  "Referee__Eye_Dark",
+  "Referee__Eye_White",
+  "Referee__Gloves_Black",
+  "Referee__Gloves_Seam",
+  "Referee__Hair",
+  "Referee__Mouth",
+  "Referee__Pants_Black",
+  "Referee__Polo_Black",
+  "Referee__Polo_Buttons",
+  "Referee__Polo_Rib_Charcoal",
+  "Referee__Shoe_Accent_Grey",
+  "Referee__Shoe_Soles",
+  "Referee__Shoes",
+  "Referee__Skin",
+  "Referee__Skin_Shade",
+  "Referee__Stubble"
+ ]
+}

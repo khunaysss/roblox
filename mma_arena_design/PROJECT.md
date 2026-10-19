@@ -113,6 +113,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - UI-Schritte 1 und 2 (Designsystem `CC_UI`, Hauptmenü, Editor, Gym-Anzeigen, Ergebnisanzeige) – PC getestet.
 - Story-Film überarbeitet (2026-10-19, in Studio getestet): englische Texte (Film, Rundflug, Hinweise, Tutorial), Schule „NORTHPARK HIGH SCHOOL“; Schubser mit Zeitlupe, Wackeln und Sound; Trainer rennt durchs Schultor und schreit (rot, Kamera-Stoß); Mobber rennen weg; größere Karte + lesbare Karten-Nahaufnahme; Zwischentitel „DAY 1 – FIRST LESSON“ (Film → Tutorial), „FIRST SPARRING“, „YOUR CAREER“ (nach dem Abschluss). Hände waren im Film sichtbar (geprüft).
 - Spiel komplett auf Englisch (2026-10-19, in Studio getestet): Menü, Kampf-HUD, Gym-HUD, Minispiele, Trainer-Panel, Trainer-/Signaturtexte, Gegner und Tipps, Ziele/Titel (neu im Repo: roblox/CC_Progression.module.luau), Meldungen. Roblox kann von Englisch aus automatisch in andere Sprachen übersetzen (Creator Hub → Localization). Signaturen umbenannt: STONE HAND COUNTER (Pereira), WHEEL KICK (Saenchai).
+- Ringrichter (2026-10-19, in Studio getestet mit Trainingskampf): ServerScriptService.CC_Referee (roblox/CC_Referee.server.luau), ein Ringrichter pro laufendem Kampf (alle Käfige). Geht seitlich der Kämpfer mit, „Fight!“-Zeichen, rennt bei K.o./Submission/T.K.O./Arzt dazwischen (neues Match-Attribut `Stoppage`), hält am Ende den Arm des Siegers hoch. Animationen Ref_Idle, Ref_Fight, Ref_Stop, Ref_RaiseHand, Fighter_WinRaise (build_referee_anims_v01.py → Fighter_Casual_v05.blend, Export v28, in CC_Animations geladen). Modell-Export export/Referee_Rigged_v01.fbx + setup_referee_v01.luau; bis zum Import steht ein Platzhalter (Story-Figur in Schwarz).
 - Blender-Modelle: Arena, Event-Map mit Backstage, Trainings-Gym v02, Haupttrainer v03, Ringrichter v02, Trainer v02, Fighter Design v03/Customization v05, Fighter Rigged bis v20.
 
 ## Offene Punkte
@@ -135,6 +136,7 @@ Neu zusammengestellt am 2026-10-17 aus `CURRENT.md`, `TASKS.md`, `GAME_DESIGN.md
 - Upload nötig: Fighter_Sig_Saenchai_Wheel, WR_TD_LiftSlam_A, WR_TD_LiftSlam_B, WR_Sig_BackTake_A, WR_Sig_BackTake_B.
 - Bronx-Choke-Balance (Vorsprung 0,50, Zug ×1,25) vorläufig; mit echtem Gegner-Spieler prüfen.
 - Sprache: Spiel ist englisch; Code-Kommentare, Logs und Backups in ServerStorage bleiben deutsch. `CC_BagPracticeUI` (Sandsack-Übung) liegt nur in Studio, nicht im Repo (englisch angepasst). Tutorial-Kasten überdeckt oben links teilweise Name/Ausdauerleiste.
+- Ringrichter: Modell noch importieren (Referee_Rigged_v01.fbx, dann `_G.CC_SetupReferee()`); Animationen Ref_* und Fighter_WinRaise hochladen. Nicht geprüft: PvP mit zwei Spielern, Submission-Ende, Arzt-Abbruch, Bodenkampf (Ringrichter-Position), Regelverstöße (gibt es im Spiel noch nicht).
 - Beim Laden von Skripten nach Studio: LocalScript und Script heißen gleich (CC_Tutorial, CC_TrainerScenes) – immer nach ClassName unterscheiden.
 - „FIRST SPARRING“-Titel und „YOUR CAREER“-Titel noch nicht im echten Ablauf gesehen (nur „DAY 1“ geprüft).
 
