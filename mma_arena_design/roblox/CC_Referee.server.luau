@@ -209,9 +209,12 @@ local function raiseHand(ref)
 		if wa and an then
 			local wt = wa:LoadAnimation(an); wt.Priority = Enum.AnimationPriority.Action4; wt:Play(0.2)
 			ref.winTrack = wt
-			-- Sicherheit: Pose endet spaetestens, wenn der Sieger den Kampf verlaesst
-			local c; c = winner:GetAttributeChangedSignal("CC_MatchId"):Connect(function() c:Disconnect(); pcall(function() wt:Stop(0.3) end) end)
-			task.delay(12, function() if c.Connected then c:Disconnect() end; pcall(function() wt:Stop(0.3) end) end)
+			-- Sicherheit: Pose endet, sobald der Sieger den Kampf verlaesst (CC_MatchId weg), spaetestens nach 15 s
+			task.spawn(function()
+				local t1 = os.clock()
+				while os.clock() - t1 < 15 and wt.IsPlaying and winner.Parent and winner:GetAttribute("CC_MatchId") do task.wait(0.2) end
+				pcall(function() wt:Stop(0.3) end)
+			end)
 		end
 		if rt then rt.Stopped:Wait() end
 		if not alive() then if ref.winTrack then pcall(function() ref.winTrack:Stop(0.3) end) end return end
