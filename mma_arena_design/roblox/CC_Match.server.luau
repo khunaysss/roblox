@@ -292,6 +292,18 @@ local function tagMatch(m)                              -- Zuordnung Spieler/Cha
 	for _, p in ipairs({ m.red, m.blue }) do if p and p.Parent then p:SetAttribute("CC_MatchId", m.id) end end
 	for _, c in ipairs({ chars(m) }) do if c then c:SetAttribute("CC_MatchId", m.id) end end
 end
+-- Rundenpause: beide in ihre Ecke (Hocker + Eck-Trainer: CC_Corner.server), Blick zur Kaefigmitte
+local function placeCorners(m, heal)
+	local r, b = chars(m)
+	local c, fy, rad = cageOf(m.arena)
+	local y, d = fy + 3, math.max(8, rad - 4.5)
+	local cr = CFrame.lookAt(c + Vector3.new(0, y, d), c + Vector3.new(0, y, 0))
+	local cb = CFrame.lookAt(c + Vector3.new(0, y, -d), c + Vector3.new(0, y, 0))
+	if r then reset:Invoke(r, cr, heal and math.min(100, r.Humanoid.Health + heal) or nil) end
+	if b then reset:Invoke(b, cb, heal and math.min(100, b.Humanoid.Health + heal) or nil) end
+	paint(r, "red"); paint(b, "blue")
+	tagMatch(m)
+end
 local function placeBoth(m, heal)
 	local r, b = chars(m)
 	local cr, cb = corners(m)
@@ -476,7 +488,8 @@ function runMatch(m)
 	local scorecards, judgeRed, judgeBlue = {}, { 0, 0, 0 }, { 0, 0, 0 }
 	for round = 1, rounds do
 		freeze(m, true)
-		placeBoth(m, round > 1 and BREAK_HEAL or nil)
+		local corner = round > 1 and (workspace:GetAttribute("CC_BreakTime") or BREAK_TIME) >= 6
+		if corner then placeCorners(m, BREAK_HEAL); set("Corner", true) else placeBoth(m, round > 1 and BREAK_HEAL or nil) end
 		clearDamage(m)
 		local roundRed, roundBlue = chars(m)
 		local kdRedStart = roundRed and (roundRed:GetAttribute("CC_Knockdowns") or 0) or 0
@@ -486,6 +499,7 @@ function runMatch(m)
 		local wait = round == 1 and (workspace:GetAttribute("CC_IntroTime") or INTRO_TIME) or (workspace:GetAttribute("CC_BreakTime") or BREAK_TIME)
 		for t = wait, 1, -1 do
 			set("TimeLeft", t)
+			if corner and t == 3 then set("Corner", false); placeBoth(m, nil) end   -- aufstehen, zurueck in die Startpositionen
 			set("Banner", "ROUND " .. round); set("BannerSub", t <= 3 and tostring(t) or (round == 1 and "Fight begins" or "Break"))
 			task.wait(1)
 		end

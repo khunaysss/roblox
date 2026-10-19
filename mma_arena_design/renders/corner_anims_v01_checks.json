@@ -1,0 +1,14 @@
+{
+ "bottle_hand_error_cm": 0.1,
+ "foot_slide_cm": {
+  "Fighter_CornerRest": {
+   "Left": 0.0,
+   "Right": 0.0
+  },
+  "Coach_CornerTalk": {
+   "Left": 0.0,
+   "Right": 0.0
+  }
+ },
+ "fighter_seat_hip_m": 0.472
+}
