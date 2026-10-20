@@ -1,0 +1,38 @@
+{
+ "Belt_Title_Band": {
+  "verts_inside_shorts": 12,
+  "worst_cm": -0.3
+ },
+ "Belt_Title_Plate": {
+  "verts_inside_shorts": 6,
+  "worst_cm": -0.3
+ },
+ "Belt_Title_Trim": {
+  "verts_inside_shorts": 0,
+  "worst_cm": 0.0
+ },
+ "Belt_Title_Gem": {
+  "verts_inside_shorts": 0,
+  "worst_cm": 0.0
+ },
+ "Belt_Cloth_Band": {
+  "verts_inside_shorts": 8,
+  "worst_cm": -0.2
+ },
+ "Belt_Cloth_Tip": {
+  "verts_inside_shorts": 0,
+  "worst_cm": 0.0
+ },
+ "parts": {
+  "title": [
+   "Belt_Title_Band",
+   "Belt_Title_Plate",
+   "Belt_Title_Trim",
+   "Belt_Title_Gem"
+  ],
+  "cloth": [
+   "Belt_Cloth_Band",
+   "Belt_Cloth_Tip"
+  ]
+ }
+}

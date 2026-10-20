@@ -1,0 +1,9 @@
+{
+ "walk_source": "Fighter_CasualWalk",
+ "doc_hand_to_face_target_cm": 0.0,
+ "foot_slide_cm": {
+  "Fighter_Dejected": 0.0,
+  "Doc_Check": 0.0,
+  "Fighter_Celebrate_landing_40_72": 0.0
+ }
+}
