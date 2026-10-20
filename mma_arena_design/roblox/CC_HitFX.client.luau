@@ -36,33 +36,41 @@ local function opponentRoot()
 	local foe = name and (workspace:FindFirstChild(name) or (Players:FindFirstChild(name) and Players[name].Character))
 	return foe and foe:FindFirstChild("HumanoidRootPart")
 end
-local function sparks(strength)
-	local root = opponentRoot()
+-- Schweiss vom Kopf des Gegners bei harten Treffern: kleine helle Tropfen, weg vom Angreifer, fallen nach unten (nur lokal)
+local function opponentChar()
+	local c = player.Character
+	local name = c and c:GetAttribute("CC_Opponent")
+	return name and (workspace:FindFirstChild(name) or (Players:FindFirstChild(name) and Players[name].Character)) or nil
+end
+local function sweat(strength)
+	local foe = opponentChar()
+	local root = foe and foe:FindFirstChild("HumanoidRootPart")
 	if not root or player:GetAttribute("CC_ReduceFX") then return end
+	local head = foe:FindFirstChild("Head", true)
+	local pos = head and (head:IsA("Bone") and head.TransformedWorldCFrame.Position or head:IsA("BasePart") and head.Position) or root.Position + Vector3.new(0, 1.6, 0)
+	local me = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	local away = me and (root.Position - me.Position) * Vector3.new(1, 0, 1)
+	away = (away and away.Magnitude > 0.1) and away.Unit or root.CFrame.LookVector * -1
 	local anchor = Instance.new("Part")
 	anchor.Anchored = true; anchor.CanCollide = false; anchor.CanQuery = false; anchor.CanTouch = false
 	anchor.Transparency = 1; anchor.Size = Vector3.new(0.2, 0.2, 0.2)
-	local me = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-	local toMe = me and (me.Position - root.Position) * Vector3.new(1, 0, 1)
-	anchor.CFrame = CFrame.new(root.Position + Vector3.new(0, 1.2, 0) + ((toMe and toMe.Magnitude > 0.1) and toMe.Unit * 0.9 or Vector3.zero))
+	anchor.CFrame = CFrame.lookAt(pos, pos + away + Vector3.new(0, 0.35, 0))
 	anchor.Parent = workspace
-	local spark = Instance.new("ParticleEmitter")
-	spark.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-	spark.Color = ColorSequence.new(Color3.fromRGB(255, 230, 150), Color3.fromRGB(255, 120, 40))
-	spark.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(1, 0) })
-	spark.Lifetime = NumberRange.new(0.25, 0.45)
-	spark.Speed = NumberRange.new(8 + 8 * strength, 14 + 10 * strength)
-	spark.SpreadAngle = Vector2.new(180, 180)
-	spark.LightEmission = 1
-	spark.Parent = anchor
-	spark:Emit(math.floor(24 + 26 * strength))
-	local dust = spark:Clone()
-	dust.Color = ColorSequence.new(Color3.fromRGB(200, 196, 190))
-	dust.Speed = NumberRange.new(2, 4); dust.Lifetime = NumberRange.new(0.6, 0.9)
-	dust.Size = NumberSequence.new(1.2, 3.0); dust.LightEmission = 0; dust.Transparency = NumberSequence.new(0.4, 1)
-	dust.Parent = anchor
-	dust:Emit(6)
-	Debris:AddItem(anchor, 1.2)
+	local drops = Instance.new("ParticleEmitter")
+	drops.Texture = "rbxasset://textures/particles/smoke_main.dds"          -- runde, weiche Tropfen (Standard waere ein Stern)
+	drops.EmissionDirection = Enum.NormalId.Front
+	drops.Color = ColorSequence.new(Color3.fromRGB(235, 240, 245))
+	drops.Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.25), NumberSequenceKeypoint.new(1, 1) })
+	drops.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.24), NumberSequenceKeypoint.new(1, 0.1) })
+	drops.Lifetime = NumberRange.new(0.35, 0.6)
+	drops.Speed = NumberRange.new(6 + 6 * strength, 10 + 8 * strength)
+	drops.SpreadAngle = Vector2.new(28, 28)
+	drops.Acceleration = Vector3.new(0, -40, 0)
+	drops.Drag = 2
+	drops.LightEmission = 0
+	drops.Parent = anchor
+	drops:Emit(math.floor(14 + 18 * strength))
+	Debris:AddItem(anchor, 1)
 end
 local function grounded()
 	local c = player.Character
@@ -79,32 +87,61 @@ fx.OnClientEvent:Connect(function(strength, kind)
 		show(heavy and "HEAVY HIT" or "HIT", heavy and Color3.fromRGB(255, 170, 60) or Color3.new(1, 1, 1), heavy and 2 or 1)
 		if heavy then
 			holdUntil = os.clock() + 0.04 + 0.06 * math.min(1, strength); holdCF = nil   -- staerkerer Treffer = laenger Halt
-			sparks(math.min(1, strength))
+			sweat(math.min(1, strength))
 		end
 	elseif kind == "block" and not grounded() then
 		show("BLOCKED", Color3.fromRGB(120, 190, 255), 2)
 	end
 end)
 
--- K.o. / Submission / T.K.O. im eigenen Kampf (ReplicatedStorage.CC_MatchState.Stoppage): kurzer Blitz, Farbe raus, Unschaerfe, dann zurueck
+-- K.o. / Submission / T.K.O. im eigenen Kampf (ReplicatedStorage.CC_MatchState.Stoppage): TV-Schnitt in Zeitlupe.
+-- Kamera springt in einen tiefen Seitenwinkel auf den Verlierer, beide Kaempfer laufen ~1,5 s mit 30 % Tempo (nur lokal), dann zurueck.
 do
-	local Lighting, TweenService = game:GetService("Lighting"), game:GetService("TweenService")
 	local mirror = game.ReplicatedStorage:WaitForChild("CC_MatchState")
-	local white = Instance.new("Frame"); white.Size = UDim2.fromScale(1, 1); white.BackgroundColor3 = Color3.new(1, 1, 1)
-	white.BackgroundTransparency = 1; white.BorderSizePixel = 0; white.ZIndex = 3; white.Parent = gui
+	local function fighters()
+		local list = {}
+		for _, p in ipairs(Players:GetPlayers()) do
+			local c = p.Character
+			if c and c:GetAttribute("CC_MatchId") and c:GetAttribute("CC_MatchId") == (player.Character and player.Character:GetAttribute("CC_MatchId")) then table.insert(list, c) end
+		end
+		local d = workspace:FindFirstChild("CC_TrainingDummy")
+		if d and player.Character and d:GetAttribute("CC_MatchId") == player.Character:GetAttribute("CC_MatchId") then table.insert(list, d) end
+		return list
+	end
 	mirror:GetAttributeChangedSignal("Stoppage"):Connect(function()
 		local st = tostring(mirror:GetAttribute("Stoppage") or "")
 		if st == "" or st == "Forfeit" then return end
-		white.BackgroundTransparency = 0.25
-		TweenService:Create(white, TweenInfo.new(0.35), { BackgroundTransparency = 1 }):Play()
-		if player:GetAttribute("CC_ReduceFX") then return end
-		local cc = Instance.new("ColorCorrectionEffect"); cc.Name = "CC_KOGrade"; cc.Saturation = -0.75; cc.Contrast = 0.25; cc.Parent = Lighting
-		local blur = Instance.new("BlurEffect"); blur.Name = "CC_KOBlur"; blur.Size = 10; blur.Parent = Lighting
-		shake = math.max(shake, 1)
-		task.delay(0.9, function()
-			TweenService:Create(cc, TweenInfo.new(1.4), { Saturation = 0, Contrast = 0 }):Play()
-			TweenService:Create(blur, TweenInfo.new(1.0), { Size = 0 }):Play()
-			task.delay(1.5, function() cc:Destroy(); blur:Destroy() end)
+		local list = fighters()
+		local loser
+		for _, c in ipairs(list) do if c:GetAttribute("CC_KO") or c:GetAttribute("CC_Down") then loser = c end end
+		loser = loser or opponentChar() or list[1]
+		local lr = loser and loser:FindFirstChild("HumanoidRootPart")
+		if not lr then return end
+		local tracks = {}
+		for _, c in ipairs(list) do
+			local an = c:FindFirstChildWhichIsA("Animator", true)
+			if an then for _, t in ipairs(an:GetPlayingAnimationTracks()) do table.insert(tracks, { t, t.Speed }); t:AdjustSpeed(t.Speed * 0.3) end end
+		end
+		local cam = workspace.CurrentCamera
+		local side = lr.CFrame.RightVector
+		-- Seite ohne Ringrichter waehlen (er soll nicht vor der Kamera stehen)
+		local refs = workspace:FindFirstChild("CC_Referees")
+		for _, r in ipairs(refs and refs:GetChildren() or {}) do
+			local rp = r:IsA("Model") and r.PrimaryPart
+			if rp and (rp.Position - (lr.Position + side * 8)).Magnitude < (rp.Position - (lr.Position - side * 8)).Magnitude then side = -side end
+		end
+		local t0 = os.clock()
+		RunService:BindToRenderStep("CC_KOReplay", Enum.RenderPriority.Last.Value + 40, function()
+			local u = os.clock() - t0
+			local focus = lr.Position + Vector3.new(0, 0.4, 0)
+			cam.CameraType = Enum.CameraType.Scriptable
+			cam.CFrame = CFrame.lookAt(focus + side * (14 - u * 1.2) + Vector3.new(0, 1.2, 0) + lr.CFrame.LookVector * 3, focus)   -- ganzer Kaempfer im Bild, langsame Fahrt
+			cam.FieldOfView = 38
+		end)
+		task.delay(1.5, function()
+			pcall(function() RunService:UnbindFromRenderStep("CC_KOReplay") end)
+			for _, e in ipairs(tracks) do pcall(function() e[1]:AdjustSpeed(e[2]) end) end
+			cam.CameraType = Enum.CameraType.Custom; cam.FieldOfView = 70
 		end)
 	end)
 end
