@@ -35,6 +35,7 @@ local RS = game:GetService("ReplicatedStorage")
 local SIG = require(RS:WaitForChild("CC_Signatures"))
 local OPP = require(RS:WaitForChild("CC_Opponents"))
 local PROG = require(RS:WaitForChild("CC_Progression"))
+local RANK = require(RS:WaitForChild("CC_Rank"))
 local SIGPROG = require(RS:WaitForChild("CC_SignatureProgression"))
 local event = SS:FindFirstChild("CC_ProfileEvent") or Instance.new("BindableEvent")
 event.Name = "CC_ProfileEvent"; event.Parent = SS
@@ -44,11 +45,12 @@ progressRemote.Name = "CC_Progress"; progressRemote.Parent = RS
 local profiles = {}            -- [player] = Tabelle
 local function default()
 	local p = { v = 4, level = 1, xp = 0, wins = 0, losses = 0, kos = 0, subs = 0, stats = {}, tp = {},
-		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1, shorts = 1, gloves = 1 },
+		look = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1, shorts = 1, gloves = 1, belt = 1 },
 		onb = { editor = false, offered = false, lessons = { false, false, false, false, false, false }, done = false, firstFight = false, story = false, outro = false, careerTip = false,
 			gymTour = false, sigTour = false, onlineHint = false, editorHint = false, focusTip = false },  -- Erklaerungen beim ersten Mal (alle Spieler einmal)
 		sig = "", sigs = {}, sigProgress = SIGPROG.newProgress(), career = { beaten = {}, losses = 0 },
 		goals = { day = PROG.dayKey(), week = PROG.weekKey(), counts = {}, claimed = {} }, -- Signaturen, Karriere und servergepruefte Ziele
+		rank = { points = 0 },  -- Online-Ranking (nur Kaempfe gegen echte Spieler), Stufen in CC_Rank
 		settings = { master = 0.8, music = 0.4, effects = 0.7, reduceFx = false, noShake = false } } -- Einstellungen (Menue), Client sendet CC_Progress "settings"
 	for _, s in ipairs(STATS) do p.stats[s] = 0; p.tp[s] = 0 end
 	return p
@@ -107,6 +109,11 @@ local function publish(plr)
 	plr:SetAttribute("CC_CareerNext", OPP.nextId(p.career.beaten))
 	plr:SetAttribute("CC_CareerTitle", OPP.titleFor and OPP.titleFor(#p.career.beaten).name or nil)
 	plr:SetAttribute("CC_RankTitle", PROG.titleForLevel(p.level))
+	do
+		local tier, nextTier = RANK.tierOf(p.rank.points)
+		plr:SetAttribute("CC_RankPoints", p.rank.points); plr:SetAttribute("CC_RankTier", tier.name)
+		plr:SetAttribute("CC_RankNext", nextTier and nextTier.name or nil); plr:SetAttribute("CC_RankNextAt", nextTier and nextTier.min or nil)
+	end
 	plr:SetAttribute("CC_MasterVolume", p.settings.master); plr:SetAttribute("CC_MusicVolume", p.settings.music); plr:SetAttribute("CC_EffectsVolume", p.settings.effects)
 	plr:SetAttribute("CC_ReduceFX", p.settings.reduceFx); plr:SetAttribute("CC_NoShake", p.settings.noShake); plr:SetAttribute("CC_SettingsLoaded", true)
 	plr:SetAttribute("CC_Goals", game:GetService("HttpService"):JSONEncode({
@@ -190,6 +197,7 @@ local function load(plr)
 				for id, value in pairs(data.goals.claimed) do if PROG.goalById[id] and value == true then p.goals.claimed[id] = true end end
 			end
 		end
+		if type(data.rank) == "table" and tonumber(data.rank.points) then p.rank.points = math.clamp(math.floor(data.rank.points), 0, RANK.MAX_POINTS) end
 		if type(data.look) == "table" then for k, v in pairs(data.look) do if p.look[k] ~= nil and type(v) == type(p.look[k]) then p.look[k] = v end end end
 		for _, s in ipairs(STATS) do
 			if type(data.stats) == "table" and tonumber(data.stats[s]) then p.stats[s] = math.clamp(math.floor(data.stats[s]), 0, STAT_MAX) end
@@ -214,6 +222,7 @@ local function save(plr)
 			gymTour = p.onb.gymTour, sigTour = p.onb.sigTour, onlineHint = p.onb.onlineHint, editorHint = p.onb.editorHint, focusTip = p.onb.focusTip },
 		sig = p.sig, sigs = table.clone(p.sigs), sigProgress = SIGPROG.normalize(p.sigProgress), career = { beaten = table.clone(p.career.beaten), losses = p.career.losses },
 		goals = { day = p.goals.day, week = p.goals.week, counts = table.clone(p.goals.counts), claimed = table.clone(p.goals.claimed) },
+		rank = { points = p.rank.points },
 		settings = table.clone(p.settings) }
 	local ok, err
 	for i = 1, 3 do
@@ -357,6 +366,7 @@ event.Event:Connect(function(plr, kind, a, b, c)
 			addXP(plr, XP_WIN + ((b == "K.O." or b == "Submission") and XP_FINISH or 0))
 		elseif a == "loss" then p.losses += 1; addXP(plr, XP_LOSS)
 		else addXP(plr, XP_DRAW) end
+		p.rank.points = RANK.apply(p.rank.points, a)          -- Online-Ranking: Sieg +25, Niederlage -15, nie unter 0
 		p.dirty = true; publish(plr)
 	end
 end)
@@ -372,7 +382,15 @@ local function finalSave(plr)
 	pending -= 1
 	if profiles[plr] == p then profiles[plr] = nil end
 end
-Players.PlayerRemoving:Connect(finalSave)
+-- Verlassen mitten im Online-Kampf (CC_RankLive von CC_Match): zaehlt als Niederlage, sonst koennte man Punktverlust durch Weggehen umgehen
+-- (Server-Shutdown in BindToClose zaehlt nicht als Aufgeben)
+Players.PlayerRemoving:Connect(function(plr)
+	local p = profiles[plr]
+	if p and plr:GetAttribute("CC_RankLive") then
+		p.rank.points = RANK.apply(p.rank.points, "loss"); p.losses += 1; p.dirty = true
+	end
+	finalSave(plr)
+end)
 game:BindToClose(function()
 	for plr in pairs(profiles) do task.spawn(finalSave, plr) end
 	local t0 = os.clock()

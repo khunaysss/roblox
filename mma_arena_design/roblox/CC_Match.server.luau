@@ -393,6 +393,8 @@ function runMatch(m)
 		task.wait(0.1)
 	end
 	for _, p in ipairs({ m.red, m.blue }) do if p then p:SetAttribute("CC_ResultReady", nil); p:SetAttribute("CC_LastFight", nil) end end
+	-- Online-Ranking: bis zum Ergebnis gilt der Kampf als "live"; wer vorher das Spiel verlaesst, verliert Punkte (CC_Profile)
+	if m.mode == "pvp" and m.blue then for _, p in ipairs({ m.red, m.blue }) do p:SetAttribute("CC_RankLive", true) end end
 	local career = m.mode == "career" and OPP.byId[m.opponentId] or nil
 	local trainerDef = m.mode == "trainer" and SIGPROG.list[m.opponentId] or nil
 	local trainer = trainerDef and trainerDef.boss or nil
@@ -576,6 +578,7 @@ function runMatch(m)
 		if p then
 			local res = winner == "draw" and "draw" or (winner == side and "win" or "loss")
 			local xp = nil
+			p:SetAttribute("CC_RankLive", nil)
 			profile(p, "goal", "fights", 1)
 			local ch = p.Character
 			if side == "red" or m.mode == "pvp" then

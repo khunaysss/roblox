@@ -334,7 +334,7 @@ local online = page("online")
 header(online, "ONLINE")
 local oCard = card(online, 1, 100)
 UI.label({ Text = "QUICK FIGHT", FontFace = F.head, TextSize = 19, Size = UDim2.new(1, 0, 0, 26), Parent = oCard })
-UI.label({ Text = "Fight the next player in the queue. 3 rounds, 2 minutes each.",
+UI.label({ Text = "Fight the next player in the queue. 3 rounds, 2 minutes each. Every online fight is ranked.",
 	TextSize = 16, TextColor3 = C.dim, Position = UDim2.fromOffset(0, 30), Size = UDim2.new(1, 0, 0, 40), Parent = oCard })
 -- Arena-Wahl (Server paart nur Spieler mit passender Wahl; "egal" passt zu allen)
 do
@@ -353,8 +353,21 @@ end
 local oState = UI.label({ Text = "", FontFace = F.bold, TextSize = 17, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, 28), Parent = online })
 local bSearch = UI.button({ Style = "primary", Text = "START SEARCH", Icon = "search", LayoutOrder = 4, OnClick = function() menuEvent:FireServer("pvp", player:GetAttribute("CC_PvpArenaPick") or "any") end, Parent = online })
 local bCancel = UI.button({ Style = "danger", Text = "CANCEL SEARCH", Icon = "close", LayoutOrder = 5, OnClick = function() menuEvent:FireServer("cancel") end, Parent = online })
-UI.button({ Style = "secondary", Text = "RANKED", Sub = "Rankings are not available yet", Icon = "star", LayoutOrder = 6, Disabled = true, Badge = "NOT AVAILABLE",
+-- Online-Rang (CC_Rank): Stufe und Punkte vom Server, jeder Online-Kampf zaehlt (Sieg +25, Niederlage -15)
+local RANK = require(RS:WaitForChild("CC_Rank"))
+local rankBtn, rankParts = UI.button({ Style = "secondary", Text = "RANK: BRONZE", Sub = "0 points", Icon = "star", LayoutOrder = 6, Disabled = true,
 	Size = UDim2.new(1, 0, 0, 66), Parent = online })
+local function refreshRank()
+	local pts = player:GetAttribute("CC_RankPoints") or 0
+	local tier = player:GetAttribute("CC_RankTier") or "Bronze"
+	local nxt, at = player:GetAttribute("CC_RankNext"), player:GetAttribute("CC_RankNextAt")
+	if rankParts and rankParts.title then rankParts.title.Text = "RANK: " .. string.upper(tier); rankParts.title.TextColor3 = RANK.colorOf(tier) end
+	if rankParts and rankParts.sub then
+		rankParts.sub.Text = nxt and ("%d points  ·  %d more for %s"):format(pts, math.max(0, (at or pts) - pts), nxt) or ("%d points  ·  highest rank reached"):format(pts)
+	end
+end
+for _, attr in ipairs({ "CC_RankPoints", "CC_RankTier", "CC_RankNext", "CC_RankNextAt" }) do player:GetAttributeChangedSignal(attr):Connect(refreshRank) end
+refreshRank()
 
 -- Training
 local training = page("training")
