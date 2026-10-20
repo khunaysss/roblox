@@ -510,6 +510,8 @@ function runMatch(m)
 		freeze(m, false)
 		task.delay(1, function() if m.state.Parent and m.state:GetAttribute("Banner") == "FIGHT!" then set("Banner", ""); set("BannerSub", "") end end)
 		local t0 = os.clock()
+		-- Testschalter: nur Studio, fuenf Sekunden nach Beginn der ersten Runde.
+		local testDoctorAt = RunService:IsStudio() and round == 1 and workspace:GetAttribute("CC_TestDoctor") == true and (t0 + 5) or nil
 		while os.clock() - t0 < roundTime do
 			task.wait(0.1)
 			set("TimeLeft", math.max(0, math.ceil(roundTime - (os.clock() - t0))))
@@ -517,6 +519,11 @@ function runMatch(m)
 			if not (rOk and bOk) then winner = rOk and "red" or "blue"; method = "Forfeit"; break end
 			local r, b = chars(m)
 			set("ScoreRed", totalRed + damage(r)); set("ScoreBlue", totalBlue + damage(b))
+			if testDoctorAt and workspace:GetAttribute("CC_TestDoctor") == true and os.clock() >= testDoctorAt then
+				winner, method = "red", "Doctor stoppage"
+				set("Stoppage", method); set("Banner", "DOCTOR STOPPAGE"); set("BannerSub", "Fight is being stopped")
+				break
+			end
 			winner = koWinner(m)
 			if winner then
 				local loser = winner == "red" and b or r

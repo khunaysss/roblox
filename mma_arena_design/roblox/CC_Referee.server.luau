@@ -189,10 +189,14 @@ local function raiseHand(ref)
 		local winner = (w == "red" and a) or (w == "blue" and b) or nil
 		local wr = rootOf(winner)
 		if not wr then ref.mode = "watch"; return end
-		local alive = function() return refs[state.Name] == ref and ref.model.Parent ~= nil end
+		local function alive()
+			return refs[state.Name] == ref and ref.model.Parent ~= nil and state.Parent ~= nil
+				and state:GetAttribute("State") == "over" and winner.Parent ~= nil
+				and winner:GetAttribute("CC_MatchId") == state.Name
+		end
+		winner:SetAttribute("CC_WinRaiseDone", nil)
 		task.wait(0.5)
 		if not alive() then return end
-		-- links neben dem Sieger (aus dessen Sicht), gleiche Blickrichtung; Abstand 0,55 m wie in Blender
 		local cf = wr.CFrame
 		local goal = (cf * CFrame.new(-0.55 / 0.28, 0, 0)).Position
 		local t0 = os.clock()
@@ -202,32 +206,43 @@ local function raiseHand(ref)
 		end
 		if not alive() then return end
 		ref.root.CFrame = CFrame.lookAt(Vector3.new(goal.X, ref.root.Position.Y, goal.Z), Vector3.new(goal.X, ref.root.Position.Y, goal.Z) + cf.LookVector)
-		for _, n in ipairs({ "Ref_Stop", "Ref_Fight" }) do local t = ref.tracks[n]; if t then t:Stop(0.2) end end
-		local rt = play(ref, "Ref_RaiseHand", 0.2)
+		for _, n in ipairs({ "Ref_Stop", "Ref_Fight", "Fighter_CasualWalk_v2" }) do
+			local track = ref.tracks[n]
+			if track then track:Stop(0.15) end
+		end
+		local rt = play(ref, "Ref_RaiseHand", 0.15)
+		if rt then rt.Looped = false; rt.Priority = Enum.AnimationPriority.Action4 end
 		local wa = winner:FindFirstChildWhichIsA("Animator", true)
 		local an = animFor("Fighter_WinRaise")
-		if wa and an then
-			local wt = wa:LoadAnimation(an); wt.Priority = Enum.AnimationPriority.Action4; wt:Play(0.2)
-			ref.winTrack = wt
-			-- Sicherheit: Pose endet, sobald der Sieger den Kampf verlaesst (CC_MatchId weg), spaetestens nach 15 s
-			task.spawn(function()
-				local t1 = os.clock()
-				while os.clock() - t1 < 15 and wt.IsPlaying and winner.Parent and winner:GetAttribute("CC_MatchId") do task.wait(0.2) end
-				pcall(function() wt:Stop(0.3) end)
-			end)
-		end
-		if rt then rt.Stopped:Wait() end
-		if not alive() then if ref.winTrack then pcall(function() ref.winTrack:Stop(0.3) end) end return end
-		local t = ref.tracks["Ref_RaiseHand"]
-		if t then t:Play(0); t.TimePosition = t.Length * 0.85; t:AdjustSpeed(0) end      -- Arm oben halten bis zum Ende
-		if ref.winTrack then ref.winTrack.TimePosition = ref.winTrack.Length * 0.85; ref.winTrack:AdjustSpeed(0) end
+		if not (wa and an) then return end
+		local wt = wa:LoadAnimation(an)
+		wt.Name = "CC_Referee_WinRaise"
+		wt.Priority = Enum.AnimationPriority.Action4; wt.Looped = false
+		ref.winTrack = wt
+		ref.winConnection = winner:GetAttributeChangedSignal("CC_MatchId"):Connect(function()
+			if winner:GetAttribute("CC_MatchId") ~= state.Name then
+				wt:Stop(0.15)
+				winner:SetAttribute("CC_WinRaiseDone", nil)
+			end
+		end)
+		wt:Play(0.15)
+		local began = os.clock()
+		repeat task.wait(0.05) until not alive() or not wt.IsPlaying or os.clock() - began > 6
+		local completed = alive() and not wt.IsPlaying and wt.Length > 0
+		if wt.IsPlaying then wt:Stop(0.15) end
+		if rt and rt.IsPlaying then rt:Stop(0.15) end
+		if ref.winConnection then ref.winConnection:Disconnect(); ref.winConnection = nil end
+		ref.winTrack = nil
+		wt:Destroy()
+		if completed then winner:SetAttribute("CC_WinRaiseDone", state.Name) end
 	end)
 end
 
 local function removeRef(id)
 	local ref = refs[id]; refs[id] = nil
 	if not ref then return end
-	if ref.winTrack then pcall(function() ref.winTrack:Stop(0.3) end) end
+	if ref.winConnection then ref.winConnection:Disconnect() end
+	if ref.winTrack then pcall(function() ref.winTrack:Stop(0.15) end) end
 	ref.model:Destroy()
 end
 
