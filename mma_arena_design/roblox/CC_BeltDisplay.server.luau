@@ -43,6 +43,8 @@ local function update(entry)
 	local st = state and state:GetAttribute("State")
 	local belt = beltOf(player)
 	local visible = belt ~= nil and (not state or SHOW[st] == true)
+	local shorts = char:FindFirstChild("Fighter_Shorts", true)
+	local shortsColor = shorts and shorts:IsA("BasePart") and shorts.Color or nil
 	for name, part in pairs(entry.parts) do
 		local isTitle = name:find("Belt_Title_") ~= nil
 		local on = visible and ((isTitle and belt.kind == "title") or (not isTitle and belt.kind == "style"))
@@ -52,8 +54,8 @@ local function update(entry)
 			if name == "Belt_Title_Band" then part.Color = LEATHER
 			elseif name == "Belt_Title_Plate" then part.Color = belt.plate
 			elseif name == "Belt_Title_Trim" then part.Color = belt.trim or TRIM
-			elseif name == "Belt_Cloth_Band" then part.Color = belt.color
-			elseif name == "Belt_Cloth_Tip" then part.Color = belt.accent end
+			elseif name == "Belt_Cloth_Band" then part.Color = (Look.styleColors(belt, shortsColor))
+			elseif name == "Belt_Cloth_Tip" then local _, tip = Look.styleColors(belt, shortsColor); part.Color = tip end
 		end
 		local gui = part:FindFirstChild("CC_BeltTitle")
 		if gui then
@@ -103,6 +105,10 @@ local function attach(player, char)
 		table.insert(entry.connections, player:GetAttributeChangedSignal(attr):Connect(function() update(entry) end))
 	end
 	table.insert(entry.connections, char:GetAttributeChangedSignal("CC_MatchId"):Connect(function() update(entry) end))
+	local shorts = char:FindFirstChild("Fighter_Shorts", true)
+	if shorts and shorts:IsA("BasePart") then
+		table.insert(entry.connections, shorts:GetPropertyChangedSignal("Color"):Connect(function() update(entry) end))   -- Stilguertel hebt sich von neuen Shorts ab
+	end
 	table.insert(entry.connections, char.Destroying:Connect(function() clear(entry) end))
 	update(entry)
 end

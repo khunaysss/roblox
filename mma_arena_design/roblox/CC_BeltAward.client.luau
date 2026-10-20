@@ -20,7 +20,9 @@ end
 
 local function busy()
 	local st = mirror:GetAttribute("State")
+	local onb = player:GetAttribute("CC_OnbPhase")
 	return st == "fight" or st == "break" or st == "intro" or st == "finisher" or player:GetAttribute("CC_UIBlock") == true
+		or (onb ~= nil and onb ~= "")                    -- Einstieg (Editor, Story, Tutorial) erst abschliessen
 end
 
 local function banner(belt)

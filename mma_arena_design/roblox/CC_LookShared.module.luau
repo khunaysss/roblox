@@ -151,4 +151,56 @@ function M.apply(char, look, tpl)
 	end
 end
 
+-- Guertel-Darstellung (Server: CC_BeltDisplay, Client: Editor-Vorschau). tpl = Ordner mit Belt_Title_* / Belt_Cloth_* (Attribut CC_C0).
+-- Gibt den tatsaechlich gezeigten Guertel zurueck (nil = keiner). Gesperrte Auswahl -> Auto.
+function M.resolveBelt(look, prog)
+	local item = M.BELTS[tonumber(look and look.belt) or 1] or M.BELTS[1]
+	if not M.unlocked(item, prog) then item = M.BELTS[1] end
+	if item.kind == "auto" then return M.bestTitleBelt(prog) end
+	if item.kind == "none" then return nil end
+	return item
+end
+-- Stilguertel: Bandfarbe zu nah an der Shorts-Farbe -> Band und Enden tauschen, damit er sich abhebt
+function M.styleColors(belt, shortsColor)
+	local band, tip = belt.color, belt.accent
+	if shortsColor then
+		local d = math.abs(band.R - shortsColor.R) + math.abs(band.G - shortsColor.G) + math.abs(band.B - shortsColor.B)
+		if d < 0.45 then band, tip = tip, band end
+	end
+	return band, tip
+end
+local BELT_PARTS = { "Belt_Title_Band", "Belt_Title_Plate", "Belt_Title_Trim", "Belt_Title_Gem", "Belt_Cloth_Band", "Belt_Cloth_Tip" }
+function M.applyBelt(char, belt, tpl, visible)
+	local hrp = char and char:FindFirstChild("HumanoidRootPart")
+	if not (hrp and tpl) then return end
+	local shorts = char:FindFirstChild("Fighter_Shorts", true)
+	local band, tip
+	if belt and belt.kind == "style" then band, tip = M.styleColors(belt, shorts and shorts:IsA("BasePart") and shorts.Color or nil) end
+	for _, name in ipairs(BELT_PARTS) do
+		local p = char:FindFirstChild(name)
+		if not p then
+			local t = tpl:FindFirstChild(name)
+			if t and t:IsA("BasePart") and typeof(t:GetAttribute("CC_C0")) == "CFrame" then
+				p = t:Clone(); p.Anchored = false; p.Massless = true; p.CanCollide = false; p.CanTouch = false; p.CanQuery = false
+				p:SetAttribute("CC_CosmeticBelt", true)
+				local m = Instance.new("Motor6D"); m.Name = name .. "Motor6D"; m.Part0 = hrp; m.Part1 = p; m.C0 = t:GetAttribute("CC_C0"); m.Parent = p
+				p.CFrame = hrp.CFrame * m.C0; p.Parent = char
+			end
+		end
+		if p then
+			local isTitle = name:find("Belt_Title_") ~= nil
+			local on = visible ~= false and belt ~= nil and ((isTitle and belt.kind == "title") or (not isTitle and belt.kind == "style"))
+			if on and name == "Belt_Title_Gem" then on = belt.gems == true end
+			p.Transparency = on and 0 or 1
+			if on then
+				if name == "Belt_Title_Band" then p.Color = Color3.fromRGB(16, 16, 18)
+				elseif name == "Belt_Title_Plate" then p.Color = belt.plate
+				elseif name == "Belt_Title_Trim" then p.Color = belt.trim or Color3.fromRGB(242, 204, 96)
+				elseif name == "Belt_Cloth_Band" then p.Color = band
+				elseif name == "Belt_Cloth_Tip" then p.Color = tip end
+			end
+		end
+	end
+end
+
 return M

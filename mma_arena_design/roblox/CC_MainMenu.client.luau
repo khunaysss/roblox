@@ -580,7 +580,12 @@ local function setStageYaw(y)
 	if stage then stage:PivotTo(stageCF(stage:GetPivot().Position)) end
 end
 -- Vorschau aktualisieren (nur Kopf-Teile und Farben, ohne neue Kopie)
-local function previewDraft() if stage then Look.apply(stage, draft, templates()) end end
+local function previewDraft()
+	if stage then
+		Look.apply(stage, draft, templates())
+		Look.applyBelt(stage, Look.resolveBelt(draft, Look.progressOf(player)), RS:FindFirstChild("CC_BeltParts"), true)   -- Guertel auch in der Vorschau
+	end
+end
 
 -- Kamera: Hauptmenue = weite Einstellung; Editor = naeher, Kaempfer rechts gross
 local cam = workspace.CurrentCamera

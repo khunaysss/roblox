@@ -30,4 +30,8 @@ for name, color in pairs(BASE) do
 		table.insert(missing, name)
 	end
 end
+-- Kopie fuer den Client (Editor-Vorschau): ReplicatedStorage.CC_BeltParts
+local rs = game:GetService("ReplicatedStorage")
+local old = rs:FindFirstChild("CC_BeltParts"); if old then old:Destroy() end
+local copy = out:Clone(); copy.Name = "CC_BeltParts"; copy.Parent = rs
 return ("Guertel: %d Teile eingerichtet%s"):format(n, #missing > 0 and (", fehlen: " .. table.concat(missing, ", ")) or "")
