@@ -14,46 +14,80 @@ M.NAMES = { Hair_QuiffV03 = "Quiff", Hair_Buzzcut = "Buzzcut", Hair_SidePart = "
 	none = "No Beard", Beard_Short = "Short", Beard_Full = "Full Beard", Face_Focused = "Focused", Face_Neutral = "Neutral", Face_Friendly = "Friendly" }
 M.SKIN_N = { "Light", "Medium", "Tan", "Dark" }
 M.HAIRCOL_N = { "Black", "Dark Brown", "Brown", "Blonde", "Red", "Grey" }
-M.DEFAULT = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1, shorts = 1, gloves = 1 }
+M.DEFAULT = { hair = "Hair_QuiffV03", beard = "none", face = "Face_Focused", skin = 2, hairColor = 1, shorts = 1, gloves = 1, belt = 1 }
 -- Belohnungen: Shorts- und Handschuhfarben. req: lvl = Level, wins = Karriere-Siege (Titel), sigs = freigeschaltete Signaturen.
 -- Nur Aussehen, keine Staerke. Freigeschaltet ist, was die Bedingung erfuellt (wird nicht gespeichert, sondern aus dem Profil berechnet).
 M.SHORTS = {
-	{ name = "Rot", color = Color3.fromRGB(196, 32, 40) },
-	{ name = "Schwarz", color = Color3.fromRGB(28, 29, 33), req = { lvl = 2 } },
-	{ name = "Blau", color = Color3.fromRGB(38, 82, 170), req = { lvl = 4 } },
+	{ name = "Red", color = Color3.fromRGB(196, 32, 40) },
+	{ name = "Black", color = Color3.fromRGB(28, 29, 33), req = { lvl = 2 } },
+	{ name = "Blue", color = Color3.fromRGB(38, 82, 170), req = { lvl = 4 } },
 	{ name = "White", color = Color3.fromRGB(232, 232, 228), req = { wins = 2 }, title = "AMATEUR CHAMPION" },
 	{ name = "Green", color = Color3.fromRGB(34, 120, 64), req = { lvl = 7 } },
 	{ name = "Purple", color = Color3.fromRGB(104, 52, 160), req = { wins = 4 }, title = "PRO" },
 	{ name = "Orange", color = Color3.fromRGB(220, 110, 30), req = { sigs = 1 } },
-	{ name = "Tarn-Oliv", color = Color3.fromRGB(86, 92, 58), req = { lvl = 12 } },
-	{ name = "Silber", color = Color3.fromRGB(170, 174, 182), req = { wins = 7 }, title = "TOP-HERAUSFORDERER" },
+	{ name = "Olive", color = Color3.fromRGB(86, 92, 58), req = { lvl = 12 } },
+	{ name = "Silver", color = Color3.fromRGB(170, 174, 182), req = { wins = 7 }, title = "TOP CONTENDER" },
 	{ name = "Gold", color = Color3.fromRGB(214, 168, 48), req = { wins = 10 }, title = "LIGHTWEIGHT CHAMPION" },
 }
 M.GLOVES = {
-	{ name = "Schwarz", color = Color3.fromRGB(26, 26, 30) },
-	{ name = "Rot", color = Color3.fromRGB(180, 28, 36), req = { lvl = 3 } },
+	{ name = "Black", color = Color3.fromRGB(26, 26, 30) },
+	{ name = "Red", color = Color3.fromRGB(180, 28, 36), req = { lvl = 3 } },
 	{ name = "White", color = Color3.fromRGB(230, 230, 226), req = { wins = 2 }, title = "AMATEUR CHAMPION" },
-	{ name = "Blau", color = Color3.fromRGB(36, 76, 160), req = { lvl = 5 } },
+	{ name = "Blue", color = Color3.fromRGB(36, 76, 160), req = { lvl = 5 } },
 	{ name = "Pink", color = Color3.fromRGB(214, 70, 140), req = { sigs = 1 } },
 	{ name = "Green", color = Color3.fromRGB(40, 130, 70), req = { lvl = 9 } },
 	{ name = "Purple", color = Color3.fromRGB(110, 56, 170), req = { sigs = 3 } },
-	{ name = "Silber", color = Color3.fromRGB(176, 180, 188), req = { wins = 7 }, title = "TOP-HERAUSFORDERER" },
+	{ name = "Silver", color = Color3.fromRGB(176, 180, 188), req = { wins = 7 }, title = "TOP CONTENDER" },
 	{ name = "Gold", color = Color3.fromRGB(218, 172, 52), req = { wins = 10 }, title = "LIGHTWEIGHT CHAMPION" },
 }
+-- Guertel: jeder steht fuer einen Erfolg. Getragen wird einer (Auswahl in "My Fighter"), sichtbar im Gym und beim Walkout.
+--   kind "auto"  = automatisch der hoechste erreichte Titelguertel (oder keiner)
+--   kind "title" = Titelguertel (Ledergurt mit Platte, Teile Belt_Title_*): plate = Plattenfarbe, gems = Steine sichtbar
+--   kind "style" = Stilguertel (Stoffguertel, Teile Belt_Cloth_*): color = Band, accent = Enden; erspielt mit der Signatur des Trainers
+--   kind "none"  = ohne Guertel
+-- req.sig = Schluessel einer bestimmten Signatur (CC_SigUnlocked), req.sigs = Anzahl, req.wins = Karriere-Siege.
+M.BELTS = {
+	{ name = "Best Title (Auto)", kind = "auto", color = Color3.fromRGB(212, 168, 56) },
+	{ name = "No Belt", kind = "none", color = Color3.fromRGB(60, 62, 70) },
+	{ name = "Amateur Champion", kind = "title", color = Color3.fromRGB(170, 174, 182), plate = Color3.fromRGB(170, 174, 182), req = { wins = 2 }, title = "AMATEUR CHAMPION" },
+	{ name = "Pro", kind = "title", color = Color3.fromRGB(212, 168, 56), plate = Color3.fromRGB(212, 168, 56), req = { wins = 4 }, title = "PRO" },
+	{ name = "Top Contender", kind = "title", color = Color3.fromRGB(212, 168, 56), plate = Color3.fromRGB(212, 168, 56), gems = true, req = { wins = 7 }, title = "TOP CONTENDER" },
+	{ name = "Lightweight Champion", kind = "title", color = Color3.fromRGB(232, 190, 70), plate = Color3.fromRGB(232, 190, 70), gems = true, req = { wins = 10 }, title = "LIGHTWEIGHT CHAMPION" },
+	{ name = "Peek-a-Boo Belt", kind = "style", color = Color3.fromRGB(180, 28, 36), accent = Color3.fromRGB(20, 20, 22), req = { sig = "tyson" }, sigName = "PEEK-A-BOO COMBO" },
+	{ name = "Dancing Boxing Belt", kind = "style", color = Color3.fromRGB(235, 235, 230), accent = Color3.fromRGB(214, 168, 56), req = { sig = "ali" }, sigName = "INSTINCT MODE" },
+	{ name = "Kickboxing Belt", kind = "style", color = Color3.fromRGB(26, 26, 30), accent = Color3.fromRGB(196, 32, 40), req = { sig = "pereira" }, sigName = "STONE HAND COUNTER" },
+	{ name = "Muay Thai Belt", kind = "style", color = Color3.fromRGB(214, 168, 56), accent = Color3.fromRGB(150, 22, 30), req = { sig = "saenchai" }, sigName = "WHEEL KICK" },
+	{ name = "Wrestling Belt", kind = "style", color = Color3.fromRGB(36, 76, 160), accent = Color3.fromRGB(20, 20, 22), req = { sig = "khabib" }, sigName = "EAGLE SLAM" },
+	{ name = "BJJ Belt", kind = "style", color = Color3.fromRGB(104, 52, 160), accent = Color3.fromRGB(20, 20, 22), req = { sig = "oliveira" }, sigName = "BRONX CHOKE" },
+	{ name = "Cage Legend", kind = "title", color = Color3.fromRGB(24, 24, 28), plate = Color3.fromRGB(28, 28, 32), trim = Color3.fromRGB(232, 190, 70), gems = true, req = { wins = 10, sigs = 6 }, title = "CAGE LEGEND" },
+}
+-- hoechster erreichter Titelguertel (fuer "auto"); nil = noch keiner
+function M.bestTitleBelt(prog)
+	local best
+	for _, b in ipairs(M.BELTS) do
+		if b.kind == "title" and M.unlocked(b, prog) then best = b end
+	end
+	return best
+end
+
 -- Fortschritt eines Spielers (Attribute vom Profil); funktioniert auf Server und Client
 function M.progressOf(plr)
 	local sigs = plr:GetAttribute("CC_SigUnlocked") or ""
-	local n = 0; for s in sigs:gmatch("[^,]+") do n += 1 end
-	return { lvl = plr:GetAttribute("CC_Level") or 1, wins = plr:GetAttribute("CC_CareerWins") or 0, sigs = n }
+	local n, set = 0, {}
+	for s in sigs:gmatch("[^,]+") do n += 1; set[s] = true end
+	return { lvl = plr:GetAttribute("CC_Level") or 1, wins = plr:GetAttribute("CC_CareerWins") or 0, sigs = n, sigSet = set }
 end
 function M.unlocked(item, prog)
 	local r = item and item.req
 	if not r then return item ~= nil end
+	if r.sig and not (prog.sigSet and prog.sigSet[r.sig]) then return false end
 	return (prog.lvl or 0) >= (r.lvl or 0) and (prog.wins or 0) >= (r.wins or 0) and (prog.sigs or 0) >= (r.sigs or 0)
 end
 function M.reqText(item)
 	local r = item.req
 	if not r then return "Default" end
+	if r.sig then return ("Unlock the signature %s"):format(item.sigName or r.sig) end
+	if r.wins and r.sigs then return ("%d career wins and all %d signatures"):format(r.wins, r.sigs) end
 	if r.wins then return ("Title: %s (%d career wins)"):format(item.title or "", r.wins) end
 	if r.sigs then return r.sigs == 1 and "Unlock your first signature" or ("Unlock %d signatures"):format(r.sigs) end
 	return ("Reach level %d"):format(r.lvl)
@@ -71,6 +105,7 @@ function M.sanitize(t)
 	if type(t.hairColor) == "number" and M.HAIRCOL[t.hairColor] then look.hairColor = t.hairColor end
 	if type(t.shorts) == "number" and M.SHORTS[t.shorts] then look.shorts = t.shorts end
 	if type(t.gloves) == "number" and M.GLOVES[t.gloves] then look.gloves = t.gloves end
+	if type(t.belt) == "number" and M.BELTS[t.belt] then look.belt = t.belt end
 	return look
 end
 function M.copy(t) local c = {}; for k, v in pairs(t) do c[k] = v end; return c end

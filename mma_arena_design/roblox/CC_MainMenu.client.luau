@@ -707,6 +707,7 @@ local CATS = {
 	{ id = "tattoo", name = "TATTOOS", icon = "star", locked = "Tattoos are not available yet." },
 	{ id = "shorts", name = "SHORTS", icon = "shorts", key = "shorts", reward = Look.SHORTS },      -- Belohnungen (CC_LookShared): Level, Titel, Signaturen
 	{ id = "gloves", name = "GLOVES", icon = "glove", key = "gloves", reward = Look.GLOVES },
+	{ id = "belt", name = "BELT", icon = "trophy", key = "belt", reward = Look.BELTS },          -- Guertel: Titel (Karriere) und Stil (Signaturen)
 }
 local catButtons = {}
 local currentCat
@@ -774,7 +775,7 @@ local function showCat(cat)
 		end
 		midSub.Text = ("%d of %d unlocked"):format(n, #cat.reward)
 		lockedNote.Visible = true
-		lockedNote.Text = "You unlock new colors through levels, career titles and signatures. Click a locked color to see its requirement."
+		lockedNote.Text = (cat.key == "belt" and "Each belt proves an achievement: title belts come from career wins, style belts from a coach's signature. Click a locked belt to see how to earn it." or "You unlock new colors through levels, career titles and signatures. Click a locked color to see its requirement.")
 		local cur = cat.reward[draft[cat.key] or 1]
 		colorTitle.Text = "SELECTED:  " .. (cur and cur.name:upper() or "")
 		edMid.Size = UDim2.fromOffset(560, 340)
