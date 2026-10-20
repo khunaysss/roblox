@@ -76,7 +76,9 @@ end
 local function bone(a, name) return a.model:FindFirstChild(name, true) end
 
 ---------------------------------------------------------------------------------------------------- Steuerung des Ablaufs
+local PACE = 0.8                                        -- Tempo des Films: Pausen auf 80 % (Szenen bleiben)
 local function wait_(t)                                   -- false, wenn uebersprungen
+	t = t * PACE
 	local t0 = os.clock()
 	while os.clock() - t0 < t do if skipFlag or not running then return false end; RunService.Heartbeat:Wait() end
 	return not skipFlag
@@ -154,7 +156,7 @@ end
 local shake = 0                                          -- Kamerawackeln (klingt von selbst ab)
 local function say(who, text, dur)
 	sub.Text = ('<font color="#A6B3C7">%s</font>   %s'):format(who, text)
-	local ok = wait_(dur or (1.2 + #text * 0.055))
+	local ok = wait_(dur or (1.2 + #text * 0.055))            -- wait_ rechnet das Tempo selbst ein
 	sub.Text = ""
 	return ok
 end

@@ -27,6 +27,43 @@ local function show(text, color, prio, dur)
 	if now < msgUntil and prio < msgPrio then return end   -- wichtigere Meldung nicht sofort ueberschreiben
 	msg.Text = text; msg.TextColor3 = color; msgUntil = now + (dur or 0.6); msgPrio = prio
 end
+-- Funken und Staub am Gegner bei schweren Treffern (rein lokal, verschwinden nach einer Sekunde)
+local Players = game:GetService("Players")
+local Debris = game:GetService("Debris")
+local function opponentRoot()
+	local c = player.Character
+	local name = c and c:GetAttribute("CC_Opponent")
+	local foe = name and (workspace:FindFirstChild(name) or (Players:FindFirstChild(name) and Players[name].Character))
+	return foe and foe:FindFirstChild("HumanoidRootPart")
+end
+local function sparks(strength)
+	local root = opponentRoot()
+	if not root or player:GetAttribute("CC_ReduceFX") then return end
+	local anchor = Instance.new("Part")
+	anchor.Anchored = true; anchor.CanCollide = false; anchor.CanQuery = false; anchor.CanTouch = false
+	anchor.Transparency = 1; anchor.Size = Vector3.new(0.2, 0.2, 0.2)
+	local me = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	local toMe = me and (me.Position - root.Position) * Vector3.new(1, 0, 1)
+	anchor.CFrame = CFrame.new(root.Position + Vector3.new(0, 1.2, 0) + ((toMe and toMe.Magnitude > 0.1) and toMe.Unit * 0.9 or Vector3.zero))
+	anchor.Parent = workspace
+	local spark = Instance.new("ParticleEmitter")
+	spark.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+	spark.Color = ColorSequence.new(Color3.fromRGB(255, 230, 150), Color3.fromRGB(255, 120, 40))
+	spark.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.7), NumberSequenceKeypoint.new(1, 0) })
+	spark.Lifetime = NumberRange.new(0.25, 0.45)
+	spark.Speed = NumberRange.new(8 + 8 * strength, 14 + 10 * strength)
+	spark.SpreadAngle = Vector2.new(180, 180)
+	spark.LightEmission = 1
+	spark.Parent = anchor
+	spark:Emit(math.floor(24 + 26 * strength))
+	local dust = spark:Clone()
+	dust.Color = ColorSequence.new(Color3.fromRGB(200, 196, 190))
+	dust.Speed = NumberRange.new(2, 4); dust.Lifetime = NumberRange.new(0.6, 0.9)
+	dust.Size = NumberSequence.new(1.2, 3.0); dust.LightEmission = 0; dust.Transparency = NumberSequence.new(0.4, 1)
+	dust.Parent = anchor
+	dust:Emit(6)
+	Debris:AddItem(anchor, 1.2)
+end
 local function grounded()
 	local c = player.Character
 	return c and (c:GetAttribute("CC_Wrestle") or c:GetAttribute("CC_Down"))
@@ -40,11 +77,37 @@ fx.OnClientEvent:Connect(function(strength, kind)
 	elseif kind == "land" then
 		local heavy = strength >= 0.3
 		show(heavy and "HEAVY HIT" or "HIT", heavy and Color3.fromRGB(255, 170, 60) or Color3.new(1, 1, 1), heavy and 2 or 1)
-		if heavy then holdUntil = os.clock() + 0.06; holdCF = nil end
+		if heavy then
+			holdUntil = os.clock() + 0.04 + 0.06 * math.min(1, strength); holdCF = nil   -- staerkerer Treffer = laenger Halt
+			sparks(math.min(1, strength))
+		end
 	elseif kind == "block" and not grounded() then
 		show("BLOCKED", Color3.fromRGB(120, 190, 255), 2)
 	end
 end)
+
+-- K.o. / Submission / T.K.O. im eigenen Kampf (ReplicatedStorage.CC_MatchState.Stoppage): kurzer Blitz, Farbe raus, Unschaerfe, dann zurueck
+do
+	local Lighting, TweenService = game:GetService("Lighting"), game:GetService("TweenService")
+	local mirror = game.ReplicatedStorage:WaitForChild("CC_MatchState")
+	local white = Instance.new("Frame"); white.Size = UDim2.fromScale(1, 1); white.BackgroundColor3 = Color3.new(1, 1, 1)
+	white.BackgroundTransparency = 1; white.BorderSizePixel = 0; white.ZIndex = 3; white.Parent = gui
+	mirror:GetAttributeChangedSignal("Stoppage"):Connect(function()
+		local st = tostring(mirror:GetAttribute("Stoppage") or "")
+		if st == "" or st == "Forfeit" then return end
+		white.BackgroundTransparency = 0.25
+		TweenService:Create(white, TweenInfo.new(0.35), { BackgroundTransparency = 1 }):Play()
+		if player:GetAttribute("CC_ReduceFX") then return end
+		local cc = Instance.new("ColorCorrectionEffect"); cc.Name = "CC_KOGrade"; cc.Saturation = -0.75; cc.Contrast = 0.25; cc.Parent = Lighting
+		local blur = Instance.new("BlurEffect"); blur.Name = "CC_KOBlur"; blur.Size = 10; blur.Parent = Lighting
+		shake = math.max(shake, 1)
+		task.delay(0.9, function()
+			TweenService:Create(cc, TweenInfo.new(1.4), { Saturation = 0, Contrast = 0 }):Play()
+			TweenService:Create(blur, TweenInfo.new(1.0), { Size = 0 }):Play()
+			task.delay(1.5, function() cc:Destroy(); blur:Destroy() end)
+		end)
+	end)
+end
 
 -- Hinweise vom Server am Charakter
 local function watch(char)
