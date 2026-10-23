@@ -1,0 +1,18 @@
+{
+ "shoulder_joint": [
+  0.3,
+  -0.044,
+  1.405
+ ],
+ "back_contact": [
+  0.18,
+  0.102,
+  1.345
+ ],
+ "wrist_target_error_cm": 1.1,
+ "foot_slide_cm": {
+  "Right_stand": 0.0,
+  "Left_planted_17_50": 0.0
+ },
+ "start_end_hand_cm": 0.5
+}
