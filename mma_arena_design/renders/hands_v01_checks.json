@@ -1,0 +1,74 @@
+{
+ "hand_faces": {
+  "Hand_Open_L": 162,
+  "Hand_Open_R": 162,
+  "Hand_Relaxed_L": 162,
+  "Hand_Relaxed_R": 162,
+  "Hand_Point_L": 162,
+  "Hand_Point_R": 162,
+  "Hand_Fist_L": 162,
+  "Hand_Fist_R": 162,
+  "Hand_Thumb_L": 162,
+  "Hand_Thumb_R": 162
+ },
+ "body_verts_before": 1204,
+ "body_hand_verts_removed": 228,
+ "body_verts_after": 976,
+ "hand_dims_rest": {
+  "Open": {
+   "length_u_m": 0.276,
+   "width_v_m": [
+    -0.07,
+    0.169
+   ],
+   "thick_n_m": [
+    -0.033,
+    0.052
+   ]
+  },
+  "Relaxed": {
+   "length_u_m": 0.233,
+   "width_v_m": [
+    -0.064,
+    0.144
+   ],
+   "thick_n_m": [
+    -0.033,
+    0.094
+   ]
+  },
+  "Point": {
+   "length_u_m": 0.262,
+   "width_v_m": [
+    -0.064,
+    0.091
+   ],
+   "thick_n_m": [
+    -0.033,
+    0.13
+   ]
+  },
+  "Fist": {
+   "length_u_m": 0.172,
+   "width_v_m": [
+    -0.064,
+    0.081
+   ],
+   "thick_n_m": [
+    -0.033,
+    0.141
+   ]
+  },
+  "Thumb": {
+   "length_u_m": 0.172,
+   "width_v_m": [
+    -0.064,
+    0.191
+   ],
+   "thick_n_m": [
+    -0.048,
+    0.071
+   ]
+  }
+ }
+}
