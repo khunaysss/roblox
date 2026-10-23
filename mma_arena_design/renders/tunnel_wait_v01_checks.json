@@ -1,0 +1,10 @@
+{
+ "foot_slide_cm": {
+  "Left": 0.0,
+  "Right": 0.0
+ },
+ "loop_seam_cm": {
+  "hand": 0.41,
+  "head": 0.46
+ }
+}
