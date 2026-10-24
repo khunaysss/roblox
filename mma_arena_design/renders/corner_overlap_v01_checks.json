@@ -1,0 +1,128 @@
+{
+ "mouth_axis_m": [
+  0.018,
+  0.026
+ ],
+ "meshes": [
+  "Beard_Full_Moustache",
+  "Beard_Full_Volume",
+  "Beard_Short_Shell",
+  "Casual_Backpack",
+  "Casual_Hands",
+  "Casual_Hoodie",
+  "Casual_Pants",
+  "Casual_Shoes",
+  "Coach_Jacket",
+  "Coach_Pants",
+  "Face_Focused_Brow_L",
+  "Face_Focused_Brow_R",
+  "Face_Focused_Eye_Glint_L",
+  "Face_Focused_Eye_Glint_R",
+  "Face_Focused_Eye_L",
+  "Face_Focused_Eye_R",
+  "Face_Focused_Mouth",
+  "Face_Friendly_Brow_L",
+  "Face_Friendly_Brow_R",
+  "Face_Friendly_Eye_Glint_L",
+  "Face_Friendly_Eye_Glint_R",
+  "Face_Friendly_Eye_L",
+  "Face_Friendly_Eye_R",
+  "Face_Friendly_Mouth",
+  "Face_Neutral_Brow_L",
+  "Face_Neutral_Brow_R",
+  "Face_Neutral_Eye_Glint_L",
+  "Face_Neutral_Eye_Glint_R",
+  "Face_Neutral_Eye_L",
+  "Face_Neutral_Eye_R",
+  "Face_Neutral_Mouth",
+  "Fighter_Body",
+  "Fighter_BodyNoHands",
+  "Fighter_Gloves",
+  "Fighter_Shorts",
+  "Hair_Buzzcut",
+  "Hair_Cap",
+  "Hair_ShortCurls_Base",
+  "Hair_ShortCurls_Tufts",
+  "Hair_SidePart_Short",
+  "Hair_SidePart_Sideburn_L",
+  "Hair_SidePart_Sideburn_R",
+  "Hair_SidePart_Swept",
+  "Hair_Sideburn_L",
+  "Hair_Sideburn_R",
+  "Hand_Fist_L",
+  "Hand_Fist_R",
+  "Hand_Open_L",
+  "Hand_Open_R",
+  "Hand_Point_L",
+  "Hand_Point_R",
+  "Hand_Relaxed_L",
+  "Hand_Relaxed_R",
+  "Hand_Thumb_L",
+  "Hand_Thumb_R"
+ ],
+ "theta": {
+  "0": {
+   "overlap_pairs_sum": 95476,
+   "worst_frame": 88,
+   "worst_pairs": 10493,
+   "hand_mouth_m_drink": [
+    0.206,
+    0.207
+   ]
+  },
+  "20": {
+   "overlap_pairs_sum": 47641,
+   "worst_frame": 37,
+   "worst_pairs": 9605,
+   "hand_mouth_m_drink": [
+    0.206,
+    0.218
+   ]
+  },
+  "-20": {
+   "overlap_pairs_sum": 144949,
+   "worst_frame": 88,
+   "worst_pairs": 14036,
+   "hand_mouth_m_drink": [
+    0.198,
+    0.208
+   ]
+  },
+  "30": {
+   "overlap_pairs_sum": 41622,
+   "worst_frame": 37,
+   "worst_pairs": 7428,
+   "hand_mouth_m_drink": [
+    0.206,
+    0.225
+   ]
+  },
+  "-30": {
+   "overlap_pairs_sum": 141878,
+   "worst_frame": 88,
+   "worst_pairs": 10295,
+   "hand_mouth_m_drink": [
+    0.196,
+    0.21
+   ]
+  },
+  "40": {
+   "overlap_pairs_sum": 40343,
+   "worst_frame": 43,
+   "worst_pairs": 3139,
+   "hand_mouth_m_drink": [
+    0.206,
+    0.233
+   ]
+  },
+  "-40": {
+   "overlap_pairs_sum": 115165,
+   "worst_frame": 82,
+   "worst_pairs": 8444,
+   "hand_mouth_m_drink": [
+    0.195,
+    0.212
+   ]
+  }
+ }
+}
