@@ -1,0 +1,67 @@
+{
+ "canvas_z_m": 0.6,
+ "cage_apothem_m": 4.5,
+ "side_m": 3.728,
+ "platform_apothem_m": 5.4,
+ "door_clear_w_m": 1.05,
+ "stud_m": 0.28,
+ "platform_height_m": 0.6,
+ "door": {
+  "clear_width_m": 1.05,
+  "clear_height_m": 1.91,
+  "hinge_xy": [
+   3.557,
+   -2.807
+  ]
+ },
+ "stairs": {
+  "risers": 3,
+  "rise_m": 0.2,
+  "run_m": 0.3,
+  "width_m": 1.7,
+  "landing_depth_m": 0.9
+ },
+ "counts": {
+  "ARENA_CAGE": {
+   "objects": 108,
+   "tris": 12710
+  },
+  "ARENA_DOOR": {
+   "objects": 19,
+   "tris": 1626
+  },
+  "ARENA_PLATFORM": {
+   "objects": 36,
+   "tris": 5212
+  },
+  "ARENA_STAIRS": {
+   "objects": 16,
+   "tris": 704
+  },
+  "ARENA_CANVAS": {
+   "objects": 5,
+   "tris": 743
+  }
+ },
+ "objects_total": 184,
+ "tris_total": 20995,
+ "fence_tris": 20,
+ "door_swing": {
+  "open_deg": 102.0,
+  "opens_outward": true,
+  "min_clearance_to_handrail_m": 0.078,
+  "clear_passage_open_m": 1.025,
+  "door_bottom_above_apron_m": 0.035
+ },
+ "preview_fighter_action": "Trainer_Tyson_Idle",
+ "renders": [
+  "arena_v02_01_front.png",
+  "arena_v02_02_overview_high.png",
+  "arena_v02_03_reverse.png",
+  "arena_v02_04_door_stairs.png",
+  "arena_v02_05_inside.png",
+  "arena_v02_06_door_open.png",
+  "arena_v02_06b_door_open_wide.png",
+  "arena_v02_07_door_closed.png"
+ ]
+}
