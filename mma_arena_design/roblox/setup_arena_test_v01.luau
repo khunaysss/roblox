@@ -31,7 +31,8 @@ local canvasData = Vector3.new(0, 0.58 * S, 0)
 local rel = doorRef.Position - canvas.Position
 local rotated = rel.X + rel.Z < 0                                -- Import 180 Grad gedreht?
 local Rinv = rotated and CFrame.Angles(0, math.pi, 0) or CFrame.new()
-local function toWorld(cf) return CFrame.new(TEST_C) * CFrame.new(canvasData) * Rinv * CFrame.new(-canvas.Position) * cf end
+local canvasImp = canvas.Position                                -- vor dem Verschieben festhalten (die Matte wird selbst mit verschoben)
+local function toWorld(cf) return CFrame.new(TEST_C) * CFrame.new(canvasData) * Rinv * CFrame.new(-canvasImp) * cf end
 local function dataToWorld(p) return TEST_C + p end             -- Datenraum: Blender-Ursprung = Hallenmitte am Boden
 
 local model = Instance.new("Model"); model.Name = "CC_ArenaTest_v04"
