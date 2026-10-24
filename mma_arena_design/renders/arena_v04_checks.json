@@ -1,0 +1,66 @@
+{
+ "doors": {
+  "exits_concourse": 4,
+  "gallery_service": 2
+ },
+ "gallery_stairs": {
+  "count": 2,
+  "steps": 24,
+  "rise_m": 0.183,
+  "run_m": 0.28
+ },
+ "ringside": {
+  "items_checked": 13,
+  "blocking_walkway_or_entry": [],
+  "min_apothem_m": 7.02
+ },
+ "crowd": {
+  "seats": 900,
+  "spectators": 637,
+  "variants_front": 24,
+  "variants_back": 8,
+  "empty_groups_seats": 91
+ },
+ "hall_counts": {
+  "HALL_SHELL": {
+   "objects": 14,
+   "tris": 3684
+  },
+  "HALL_SEATING": {
+   "objects": 11,
+   "tris": 7112
+  },
+  "HALL_GALLERY": {
+   "objects": 7,
+   "tris": 5016
+  },
+  "HALL_ROOF": {
+   "objects": 3,
+   "tris": 3356
+  },
+  "HALL_TRUSS": {
+   "objects": 4,
+   "tris": 6624
+  },
+  "HALL_SIGN": {
+   "objects": 3,
+   "tris": 2594
+  },
+  "HALL_RINGSIDE": {
+   "objects": 12,
+   "tris": 1004
+  }
+ },
+ "spectator_variant_tris": [
+  168,
+  168,
+  120,
+  168
+ ],
+ "renders": [
+  "arena_v04_01_front.png",
+  "arena_v04_03_reverse.png",
+  "arena_v04_02_overview_high.png",
+  "arena_v04_05_inside.png"
+ ]
+}
