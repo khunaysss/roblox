@@ -29,7 +29,8 @@ for (const b of bundles) {
           if (name) {
             const file = path.join(OUT, name + '.rbxmx');
             // Schon hochgeladene (ID vorhanden) nie anfassen; noch nicht hochgeladene durch den aktuellen Studio-Stand ersetzen
-            if (uploaded.has(name)) kept++;
+            // Bereits geschriebene Dateien (auch bereinigte) nie ueberschreiben
+            if (uploaded.has(name) || fs.existsSync(file)) kept++;
             else { fs.writeFileSync(file, HEAD + chunk + '</roblox>'); made++; }
           }
           start = -1;
