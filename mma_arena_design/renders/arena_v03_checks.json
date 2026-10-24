@@ -1,0 +1,45 @@
+{
+ "seats": 900,
+ "spectators": 734,
+ "spectator_variants": 6,
+ "hall_counts": {
+  "HALL_SHELL": {
+   "objects": 10,
+   "tris": 2448
+  },
+  "HALL_SEATING": {
+   "objects": 7,
+   "tris": 6784
+  },
+  "HALL_GALLERY": {
+   "objects": 5,
+   "tris": 3888
+  },
+  "HALL_ROOF": {
+   "objects": 3,
+   "tris": 3356
+  },
+  "HALL_TRUSS": {
+   "objects": 4,
+   "tris": 6624
+  },
+  "HALL_SIGN": {
+   "objects": 3,
+   "tris": 2594
+  }
+ },
+ "instance_sources_tris": {
+  "seat": 72,
+  "spectator_each": 144
+ },
+ "crowd_instances": {
+  "seats": 900,
+  "spectators": 734
+ },
+ "renders": [
+  "arena_v03_01_front.png",
+  "arena_v03_03_reverse.png",
+  "arena_v03_02_overview_high.png",
+  "arena_v03_05_inside.png"
+ ]
+}
