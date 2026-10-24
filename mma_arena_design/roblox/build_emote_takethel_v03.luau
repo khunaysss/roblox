@@ -26,7 +26,7 @@ B.build("Emote_TakeTheL_v3", 4.0, false, function(t)
 	P.lt = V(6 * lift, s * 18 * lift, -s * 10 * lift)
 	P.ut = V(9 + 4 * lift, -s * 10 * lift, s * 4 * lift)
 	P.hd = V(5, -s * 8 * lift, 6)
-	P.R = V(0.4, 3.12, -0.58); P.Rp = V(1.3, -0.1, 0.3); P.Rh = V(0, 25, -80)
-	P.L = V(-0.2, 1.5, -0.78); P.Lp = V(-1, -0.4, 0.3); P.Lh = V(0, 0, 10)
+	P.R = V(0.12, 2.55, -0.82); P.Rp = V(1.2, -0.8, 0.1); P.Rh = V(-25, 0, 0)   -- Handgelenk vor der Stirn, Zeigefinger (Finger-Hand) an der Stirn = L
+	P.L = V(-0.05, 0.3 + hop * 0.05, -0.72); P.Lp = V(-1, -0.2, -0.2); P.Lh = V(0, 0, 0)   -- linke Hand mittig vor der Hose
 	return P
 end)
