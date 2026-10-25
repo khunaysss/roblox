@@ -1,0 +1,30 @@
+{
+ "body_verts_before": 6231,
+ "body_verts_after": 6999,
+ "muscle_plates": 32,
+ "mouth_min_z": 1.579,
+ "head_bottom_z": 1.554,
+ "heads": {
+  "Head_SquareJaw": 72,
+  "Head_StrongChin": 48,
+  "Head_Brawler": 120
+ },
+ "body_groups": [
+  "Head",
+  "LeftFoot",
+  "LeftHand",
+  "LeftLowerArm",
+  "LeftLowerLeg",
+  "LeftUpperArm",
+  "LeftUpperLeg",
+  "LowerTorso",
+  "RightFoot",
+  "RightHand",
+  "RightLowerArm",
+  "RightLowerLeg",
+  "RightUpperArm",
+  "RightUpperLeg",
+  "UpperTorso"
+ ],
+ "fbx_bytes": 715916
+}
