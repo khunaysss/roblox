@@ -1,0 +1,46 @@
+{
+ "uv_nan_fixed": 0,
+ "Fighter_Body": {
+  "before": {
+   "verts": 1204,
+   "faces": 1360,
+   "groups": 15
+  },
+  "after": {
+   "verts": 6231,
+   "faces": 6411,
+   "groups": 15
+  },
+  "uv_area": 0.488,
+  "armature_mod": true
+ },
+ "Fighter_Gloves": {
+  "before": {
+   "verts": 684,
+   "faces": 722,
+   "groups": 2
+  },
+  "after": {
+   "verts": 2648,
+   "faces": 2690,
+   "groups": 2
+  },
+  "uv_area": null,
+  "armature_mod": true
+ },
+ "Fighter_Shorts": {
+  "before": {
+   "verts": 972,
+   "faces": 1056,
+   "groups": 3
+  },
+  "after": {
+   "verts": 883,
+   "faces": 956,
+   "groups": 3
+  },
+  "uv_area": null,
+  "armature_mod": true
+ },
+ "fbx_bytes": 604748
+}
